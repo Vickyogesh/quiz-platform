@@ -17,6 +17,11 @@ fi
 --- .openshift/action_hooks/pre_build ---
 #!/bin/bash
 if [ ! -d $OPENSHIFT_DATA_DIR/bin ]; then
+mkdir $OPENSHIFT_DATA_DIR/quiz
+cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/bin ]; then
 
 # install python 2.7.3 on builder gear
 cd $OPENSHIFT_TMP_DIR

@@ -20,9 +20,9 @@ from quiz.settings import Settings
 ###########################################################
 
 # Input files
-CHAPTERS_FILE   = "chapters.csv"
-TOPICS_FILE     = "topics.csv"
-QUESTIONS_FILE  = "questions.csv"
+CHAPTERS_FILE   = "dbdata/chapters.csv"
+TOPICS_FILE     = "dbdata/topics.csv"
+QUESTIONS_FILE  = "dbdata/questions.csv"
 
 # Default users
 REAL_USERS = [
