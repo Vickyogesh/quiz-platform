@@ -11,7 +11,7 @@ rhc cartridge add mysql-5.1
 --- .openshift/action_hooks/stop ---
 #!/bin/bash
 if [  -f $OPENSHIFT_TMP_DIR/uswgi.pid ]; then
-kill `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
+kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
 fi
 
 --- .openshift/action_hooks/pre_build ---
@@ -67,3 +67,7 @@ $OPENSHIFT_DATA_DIR/bin/pip install --use-mirrors -r $OPENSHIFT_REPO_DIR/require
 $OPENSHIFT_DATA_DIR/bin/uwsgi -s $OPENSHIFT_INTERNAL_IP:$OPENSHIFT_INTERNAL_PORT --socket-protocol http --pp $OPENSHIFT_REPO_DIR/diy --module application -d $OPENSHIFT_DIY_LOG_DIR/app.log --pidfile $OPENSHIFT_TMP_DIR/uwsgi.pid
 or
 $OPENSHIFT_DATA_DIR/bin/uwsgi -L --master --process 2 -s $OPENSHIFT_INTERNAL_IP:$OPENSHIFT_INTERNAL_PORT --socket-protocol http --pp $OPENSHIFT_REPO_DIR/wsgi -w service:app -d $OPENSHIFT_DIY_LOG_DIR/app.log --pidfile $OPENSHIFT_TMP_DIR/uwsgi.pid
+
+5)
+cd $OPENSHIFT_REPO_DIR
+$OPENSHIFT_DATA_DIR/bin/python misc/dbsetup.py
