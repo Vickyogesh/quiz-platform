@@ -1,0 +1,113 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Quiz tests</title>
+ 
+  <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+  <script type="text/javascript">
+    function getXmlHttp(){
+      var xmlhttp;
+      try {
+        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+      } catch (e) {
+        try {
+          xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        } catch (E) {
+          xmlhttp = false;
+        }
+      }
+      if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+        xmlhttp = new XMLHttpRequest();
+      }
+      return xmlhttp;
+    }
+
+    function url(val) { return document.getElementById('host').value + val }
+
+    function auth()
+    {
+        xmlhttp = getXmlHttp();
+        xmlhttp.open('GET', url('/authorize'), false);
+        xmlhttp.send(null);
+        info = xmlhttp.getResponseHeader('WWW-Authenticate')
+        nonce = info.substring(info.indexOf('"')+1, info.length-1)
+
+        login = document.getElementById('login').value
+        pass = document.getElementById('passwd').value
+        dig = CryptoJS.MD5(login + ':' + pass)
+        dig = CryptoJS.MD5(nonce + ':' + dig)
+
+        xmlhttp = getXmlHttp();
+        xmlhttp.open('GET', url('/authorize'), false);
+        xmlhttp.setRequestHeader('Authorization',
+          'QuizAuth nonce="' + nonce +
+          '", appid="32bfe1c505d4a2a042bafd53993f10ece3ccddca", ' +
+          ' username="' + login + '", digest="' + dig + '"')
+        xmlhttp.send(null);
+
+        if(xmlhttp.status != 200)
+        {
+          alert('Something wrong: ' + xmlhttp.statusText + '\n' + xmlhttp.responseText)
+          document.cookie = 'QUIZSID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          document.getElementById('quiz').style.display = 'none';
+        }
+        else
+          document.getElementById('quiz').style.display = 'block';
+    }
+
+    function get_quiz()
+    {
+        var topic = document.getElementById('topic').value
+        var lang = document.getElementById('lang').value
+        var xmlhttp = getXmlHttp();
+        xmlhttp.open('GET', url('/quiz?topic='+topic +'&lang='+lang), false);
+        xmlhttp.send(null);
+
+        if(xmlhttp.status != 200)
+        {
+          alert('Something wrong: ' + xmlhttp.statusText)
+          return;
+        }
+
+        var txt = eval('(' + xmlhttp.responseText + ')');
+        var topic_id = txt.topic
+        var questions = txt.questions
+
+        var quiz_list = document.getElementById('quiz_list')
+        var html = '<table>'
+        for (var i = 0; i < questions.length; i++)
+        {
+          html += "<tr>";
+          html += "<td align='right'>" + (i + 1) + ".</td>";
+          html += "<td>" + questions[i].text + "</td>";
+          html += "<td>" + (questions[i].answer ? "true":"false") + "</td>";
+          html += "</tr>"
+        }
+        quiz_list.innerHTML = html + "</table>";
+    }
+   </script>
+</head>
+
+ <body>
+    <p>Host: <input type="text" id="host" value="http://quiz-skozlovf.rhcloud.com/"></p>
+    <form>
+      <p><b>Authorization</b></p>
+      Login: <input type="text" id="login" value="testuser"><p/>
+      Pasword:<input type="password" id="passwd" value="testpasswd"><p/>
+      <p><input type="button" onclick="auth()" value="Send">
+     </form>
+     <hr/>
+     <div id='quiz' style="display:none">
+     <p><b>Quiz</b></p>
+     Topic: <input type="text" id="topic" value="1">
+     Lang: <select id='lang'>
+            <option>it</option>
+            <option>de</option>
+            <option>fr</option>
+          </select>
+     <input type="button" onclick="get_quiz()" value="Get quiz">
+     <p/>
+     <p id='quiz_list'></p>
+     </div>
+ </body>
+</html>

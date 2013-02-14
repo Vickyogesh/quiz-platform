@@ -1,0 +1,2 @@
+class QuizCoreError(Exception):
+    pass
