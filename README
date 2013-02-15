@@ -43,7 +43,7 @@ This section provides steps to setup such DIY cartridge.
 
 --- .openshift/action_hooks/stop ---
 #!/bin/bash
-if [  -f $OPENSHIFT_TMP_DIR/uswgi.pid ]; then
+if [  -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
 kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
 fi
 
