@@ -1,6 +1,6 @@
 #!/bin/bash
 # The logic to stop your application should be put in this script.
 
-if [  -f $OPENSHIFT_TMP_DIR/uswgi.pid ]; then
+if [  -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
 kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
 fi

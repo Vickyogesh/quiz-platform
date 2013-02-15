@@ -43,7 +43,7 @@ This section provides steps to setup such DIY cartridge.
 
 --- .openshift/action_hooks/stop ---
 #!/bin/bash
-if [  -f $OPENSHIFT_TMP_DIR/uswgi.pid ]; then
+if [  -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
 kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
 fi
 
@@ -107,3 +107,20 @@ $OPENSHIFT_DATA_DIR/bin/uwsgi -L --master --process 2 -s $OPENSHIFT_INTERNAL_IP:
 4) Setup quiz database with dbsetup tool
 cd $OPENSHIFT_REPO_DIR
 $OPENSHIFT_DATA_DIR/bin/python misc/dbsetup.py -nif -u real -c misc/config.ini
+
+
+Develop flow
+============
+
+How to use git flow to work with production and testing repos
+
+1) clone release openshift repo
+2) git flow init
+3) git remote add test [testing openshift repo]
+4) git fetch test
+5) (you have to be inside develop branch) git branch -u test/master
+6) git pull
+
+now you have two tracked branches:
+    master - production repo
+    develop - testing repo
