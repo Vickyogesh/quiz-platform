@@ -5,11 +5,14 @@ from __future__ import print_function
 import os
 import os.path
 import sys
-sys.path.append(os.path.join(sys.path[0], '..', 'wsgi'))  # to use settings
+
+# to use settings
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'wsgi'))
 
 import argparse
 import csv
-from sqlalchemy import *
+from sqlalchemy import create_engine, MetaData, Table, Column
+from sqlalchemy import String, Enum, ForeignKey, Boolean
 from sqlalchemy.dialects.mysql import SMALLINT as SmallInteger
 from sqlalchemy.dialects.mysql import TINYINT as TinylInteger
 from quiz.settings import Settings
@@ -20,9 +23,24 @@ from quiz.settings import Settings
 ###########################################################
 
 # Input files
-CHAPTERS_FILE   = "dbdata/chapters.csv"
-TOPICS_FILE     = "dbdata/topics.csv"
-QUESTIONS_FILE  = "dbdata/questions.csv"
+CHAPTERS_FILE = "dbdata/chapters.csv"
+TOPICS_FILE = "dbdata/topics.csv"
+QUESTIONS_FILE = "dbdata/questions.csv"
+
+# application keys
+APPLICATIONS = [
+    {
+        'appkey': 'd1053fc29b0e07c7173890db4be19515bc04ae48',
+        'description': 'mobileapp'
+    },
+    {
+        'appkey': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
+        'description': 'webapp'
+    },
+    {
+        'appkey': 'b929d0c46cf5609e0104e50d301b0b8b482e9bfc',
+        'description': 'desktopapp'
+    }]
 
 # Default users
 REAL_USERS = [
@@ -31,8 +49,7 @@ REAL_USERS = [
         'login': 'root',
         'passwd': 'ari09Xsw_',
         'type':'admin'
-    },
-]
+    }]
 
 # Test users
 TEST_USERS = [
@@ -53,8 +70,7 @@ TEST_USERS = [
         'login': 'chuck@norris.com',
         'passwd': 'boo',
         'type':'school'
-    }
-]
+    }]
 
 
 ###########################################################
@@ -92,7 +108,7 @@ args = parser.parse_args()
 if len(args.config) == 0:
     path = os.path.join(os.path.dirname(__file__),
                         '..',
-                        'data',
+                        'test-data',
                         'config.ini')
     paths = os.path.split(os.path.abspath(path))
 else:
@@ -172,21 +188,7 @@ def prepare_db():
 
 def fill_apps():
     print('Populating applications...')
-    lines = [
-        {
-            'appkey': 'd1053fc29b0e07c7173890db4be19515bc04ae48',
-            'description': 'mobileapp'
-        },
-        {
-            'appkey': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
-            'description': 'webapp'
-        },
-        {
-            'appkey': 'b929d0c46cf5609e0104e50d301b0b8b482e9bfc',
-            'description': 'desktopapp'
-        }
-    ]
-    ctx.conn.execute(ctx.tbl_apps.insert(), lines)
+    ctx.conn.execute(ctx.tbl_apps.insert(), APPLICATIONS)
 
 
 def initdb():

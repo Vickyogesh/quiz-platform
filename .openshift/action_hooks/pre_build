@@ -36,8 +36,9 @@ cd pip-1.1
 python setup.py install
 
 # install uWSGI
-cd $OPENSHIFT_TMP_DIR
-pip install uwsgi
+# Commented because we have uwsgi entry in the requirements.txt
+# cd $OPENSHIFT_TMP_DIR
+# pip install uwsgi
 
 # cleanup
 cd $OPENSHIFT_TMP_DIR
