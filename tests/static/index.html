@@ -22,12 +22,11 @@
       return xmlhttp;
     }
 
-    function url(val) { return document.getElementById('host').value + val }
 
     function auth()
     {
         xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', url('/authorize'), false);
+        xmlhttp.open('GET', '/authorize', false);
         xmlhttp.send(null);
         info = xmlhttp.getResponseHeader('WWW-Authenticate')
         nonce = info.substring(info.indexOf('"')+1, info.length-1)
@@ -38,7 +37,7 @@
         dig = CryptoJS.MD5(nonce + ':' + dig)
 
         xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', url('/authorize'), false);
+        xmlhttp.open('GET', '/authorize', false);
         xmlhttp.setRequestHeader('Authorization',
           'QuizAuth nonce="' + nonce +
           '", appid="32bfe1c505d4a2a042bafd53993f10ece3ccddca", ' +
@@ -60,7 +59,7 @@
         var topic = document.getElementById('topic').value
         var lang = document.getElementById('lang').value
         var xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', url('/quiz?topic='+topic +'&lang='+lang), false);
+        xmlhttp.open('GET', '/quiz?topic='+topic +'&lang='+lang, false);
         xmlhttp.send(null);
 
         if(xmlhttp.status != 200)
@@ -89,7 +88,6 @@
 </head>
 
  <body>
-    <p>Host: <input type="text" id="host" value="http://quiz-skozlovf.rhcloud.com/"></p>
     <form>
       <p><b>Authorization</b></p>
       Login: <input type="text" id="login" value="testuser"><p/>

@@ -36,7 +36,7 @@ class ServiceBase(AuthMixin):
 
         try:
             endpoint, values = adapter.match()
-            if endpoint != 'on_authorize' and endpoint != 'on_index':
+            if endpoint != 'on_authorize':
                 self._assert_session()
             return getattr(self, endpoint)(request, **values)
         except HTTPException, e:

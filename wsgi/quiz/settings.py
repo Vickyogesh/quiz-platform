@@ -24,6 +24,7 @@ class Settings(object):
         cfg.read(cfg_file)
         self._parse_session_and_cache(cfg)
         self._parse_db(cfg)
+        self._parse_testing(cfg)
 
     # Return root directory and file path of the configuration
     def _get_config_file_info(self, paths):
@@ -61,4 +62,12 @@ class Settings(object):
             params = self.dbinfo['params']
             self.dbinfo['database'] += '?' + params
         except KeyError:
+            pass
+
+    # Parse testing section
+    def _parse_testing(self, cfg):
+        self.testing = {}
+        try:
+            self._fill_params(cfg, self.testing, 'testing')
+        except Exception:
             pass

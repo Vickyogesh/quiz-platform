@@ -14,7 +14,7 @@ def get_config_paths():
     oshift_path = os.path.normpath(oshift_path)
 
     path = os.path.dirname(__file__)
-    path = os.path.join(path, '../test-data')
+    path = os.path.join(path, '..', 'test-data')
     path = os.path.normpath(path)
 
     return [oshift_path, path]
