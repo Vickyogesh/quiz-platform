@@ -1,29 +1,11 @@
+# to use tests_common
 import os.path
 import sys
-sys.path.append(os.path.join(sys.path[0], '..'))        # to use test_settings
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import requests
 import unittest
-import hashlib
-from test_settings import *
-
-
-def get_nonce(header):
-    return header[16:-1]
-
-
-def create_auth_header(nonce, app_id, username, digest):
-    fmt = 'QuizAuth nonce="{0}", appid="{1}", username="{2}", digest="{3}"'
-    return fmt.format(nonce, app_id, username, digest)
-
-
-def create_digest(nonce, username, passwd):
-    m = hashlib.md5()
-    m.update('%s:%s' % (username, passwd))
-    ha1 = m.hexdigest()
-    m = hashlib.md5()
-    m.update('%s:%s' % (nonce, ha1))
-    return m.hexdigest()
+from tests_common import url, createAuthHeader
 
 
 class AuthTest(unittest.TestCase):
@@ -52,7 +34,7 @@ class AuthTest(unittest.TestCase):
                          r.text.splitlines()[-1])
 
     def test_authWrongAppId(self):
-        auth_txt = create_auth_header('nonce', "12", "testuser", "dd")
+        auth_txt = createAuthHeader('nonce', appkey='12')
         headers = {'Authorization': auth_txt}
 
         r = self.req.get(url('/authorize'), headers=headers)
@@ -62,9 +44,9 @@ class AuthTest(unittest.TestCase):
 
     def test_authWrongDigest(self):
         r = self.req.get(url('/authorize'))
-        nonce = get_nonce(r.headers['WWW-Authenticate'])
 
-        auth_txt = create_auth_header(nonce, app_id, "testuser", "dd")
+        hdr = r.headers['WWW-Authenticate']
+        auth_txt = createAuthHeader(hdr, passwd="dd")
         headers = {'Authorization': auth_txt}
 
         r = self.req.get(url('/authorize'), headers=headers)
@@ -74,11 +56,11 @@ class AuthTest(unittest.TestCase):
 
     def test_authOk(self):
         r = self.req.get(url('/authorize'))
-        nonce = get_nonce(r.headers['WWW-Authenticate'])
 
-        digest = create_digest(nonce, 'testuser', 'testpasswd')
-        auth_txt = create_auth_header(nonce, app_id, "testuser", digest)
+        hdr = r.headers['WWW-Authenticate']
+        auth_txt = createAuthHeader(hdr)
         headers = {'Authorization': auth_txt}
+
         r = self.req.get(url('/authorize'), headers=headers)
         self.assertEqual(200, r.status_code)
         self.assertTrue('QUIZSID' in r.cookies)

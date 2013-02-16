@@ -1,21 +1,18 @@
+# to use tests_common and quiz module
 import os.path
 import sys
-
-# to use test_settings
-sys.path.append(os.path.join(sys.path[0], '..'))
-
- # to use quiz.db
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
-from test_settings import db_uri
+import tests_common as cfg
 from quiz.db import QuizDb
 
 
 class CoreTest(unittest.TestCase):
     def setUp(self):
-        self.dbinfo = {'database': db_uri, 'verbose': 'False'}
+        self.dbinfo = {'database': cfg.db_uri, 'verbose': 'False'}
         self.db = QuizDb(self)
 
     def test_getInfo(self):

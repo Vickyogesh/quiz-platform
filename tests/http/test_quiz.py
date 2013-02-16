@@ -1,12 +1,12 @@
+# to use tests_common
 import os.path
 import sys
-sys.path.append(os.path.join(sys.path[0], '..'))        # to use test_settings
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import requests
 import unittest
 import json
-from test_settings import *
-from test_auth import get_nonce, create_auth_header, create_digest
+from tests_common import url, createAuthHeader
 
 
 # Quiz requests (/quiz)
@@ -15,10 +15,9 @@ class QuizTest(unittest.TestCase):
         self.req = requests.Session()
 
         r = self.req.get(url('/authorize'))
-        nonce = get_nonce(r.headers['WWW-Authenticate'])
 
-        digest = create_digest(nonce, 'testuser', 'testpasswd')
-        auth_txt = create_auth_header(nonce, app_id, "testuser", digest)
+        hdr = r.headers['WWW-Authenticate']
+        auth_txt = createAuthHeader(hdr)
         headers = {'Authorization': auth_txt}
 
         r = self.req.get(url('/authorize'), headers=headers)
