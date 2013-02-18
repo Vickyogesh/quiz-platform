@@ -126,3 +126,5 @@ How to use git flow to work with production and testing repos
 now you have two tracked branches:
     master - production repo
     develop - testing repo
+
+NOTE: set push.default=upstream to push from develop branch
