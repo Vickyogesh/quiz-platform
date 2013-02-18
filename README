@@ -4,6 +4,8 @@ Quiz Web Service repo layout
 misc/ - Contains tools, initial db data and documentation
 tests/ - Web service tests
 wsg/ - Quiz web service itself
+test-data/ - Local configurations and other files. Used only for local testing.
+             This folder is not included to the repo.
 
 
 OpenShift hooks (scripts)

@@ -1,12 +1,9 @@
-import os
+# to use tests_common and quiz module
 import os.path
 import sys
-
-# to use test_settings
-sys.path.append(os.path.join(sys.path[0], '..'))
-
- # to use quiz.settings
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
+
 
 import unittest
 from quiz.settings import Settings
