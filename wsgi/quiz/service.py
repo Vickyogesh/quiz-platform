@@ -35,7 +35,8 @@ class QuizService(ServiceBase):
         except BadRequest:
             raise BadRequest('Missing parameter.')
 
-        quiz = self.core.getQuestionList(topic_id, lang)
+        user_id = self.session['user_id']
+        quiz = self.core.getQuestionList(topic_id, user_id, lang)
         result = json.dumps(quiz, separators=(',', ':'))
         return Response(result, content_type='application/json')
 

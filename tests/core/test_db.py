@@ -12,7 +12,7 @@ from quiz.db import QuizDb
 
 class CoreTest(unittest.TestCase):
     def setUp(self):
-        self.dbinfo = {'database': cfg.db_uri, 'verbose': 'False'}
+        self.dbinfo = {'database': cfg.db_uri, 'verbose': 'false'}
         self.db = QuizDb(self)
 
     def test_getInfo(self):
@@ -24,10 +24,9 @@ class CoreTest(unittest.TestCase):
         self.assertEqual('student', info['type'])
 
     def test_getQuiz(self):
-        quiz = self.db.getQuiz(1, 'it', 40)
+        quiz = self.db.getQuiz(1, 1, 'it')
         self.assertEqual(40, len(quiz))
-
-        quiz = self.db.getQuiz(100, 'it', 40)
+        quiz = self.db.getQuiz(1000, 1, 'it')
         self.assertEqual(0, len(quiz))
 
 
