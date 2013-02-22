@@ -11,6 +11,7 @@ from sqlalchemy import select
 from quiz.db.quizdb import QuizDb
 
 
+# TODO: add tests explanations.
 class QbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
@@ -51,6 +52,20 @@ class QbQuizTest(unittest.TestCase):
         for row, id in zip(res, sorted(ids)):
             self.assertEqual(1, row[s.c.user_id])
             self.assertEqual(id, row[s.c.question_id])
+
+    def test_saveQuizUnordered(self):
+        ids = [12, 14, 1]
+        answers = [1, 0, 0]
+        self.db.saveQuizResult(1, ids, answers)
+
+        # quiz stat must contain only '12'
+        s = self.stat
+        res = self.conn.execute(select([s]).order_by(s.c.question_id))
+        rows = res.fetchall()
+
+        self.assertEqual(1, len(rows))
+        self.assertEqual(1, rows[0][s.c.user_id])
+        self.assertEqual(12, rows[0][s.c.question_id])
 
     def test_saveQuizAll(self):
         quiz = self.db.getQuiz(1, 1, 'it')

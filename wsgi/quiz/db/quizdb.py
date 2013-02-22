@@ -3,6 +3,11 @@ from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 
 
+# NOTE: to disable connection pool:
+# from sqlalchemy.pool import NullPool
+# self.engine = create_engine(cfg['database'], echo=verbose,
+#                             poolclass=NullPool)
+
 class QuizDb(UserMixin, QuizMixin):
     """ High-level database operations. """
 
@@ -12,12 +17,14 @@ class QuizDb(UserMixin, QuizMixin):
         QuizMixin.__init__(self)
 
     def __del__(self):
+        print('close db connection')
         self.conn.close()
 
     # Setup db connection and tables
     def _setupDb(self, cfg):
+        print('open connection')
         verbose = cfg['verbose'].lower() == 'true'
-        self.engine = create_engine(cfg['database'], echo=verbose)
+        self.engine = create_engine(cfg['database'], echo=verbose,)
         self.conn = self.engine.connect()
 
         self.meta = MetaData()

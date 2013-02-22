@@ -1,4 +1,5 @@
 from sqlalchemy import select, text
+from sqlalchemy.exc import IntegrityError
 from ..exceptions import QuizCoreError
 
 
@@ -89,12 +90,21 @@ class QuizMixin(object):
         questions = (int(x) for x in questions)
         answers = (int(x) for x in answers)
 
+        # TODO: seems not very optimal way since it creates many list objects.
+        #
+        # We need sorted list of answers to correctly compare in the
+        # 'for row, answer in zip(res, answers)' later, since db server
+        # will return sorted list of questions' IDs.
+        # See also test_saveQuizUnordered() test in the tests/test_db_quiz.py
         try:
-            q = self.questions
-            s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
-            res = self.conn.execute(s)
+            lst = list(sorted(zip(questions, answers), key=lambda pair: pair[0]))
+            questions, answers = zip(*lst)
         except ValueError:
             raise QuizCoreError('Invalid value.')
+
+        q = self.questions
+        s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
+        res = self.conn.execute(s)
 
         if res:
             stat = []
@@ -103,6 +113,10 @@ class QuizMixin(object):
                     stat.append({'user_id': user_id,
                                 'question_id': row[q.c.id]})
 
-            if stat:
-                print(stat)
+        if stat:
+            try:
                 self.conn.execute(self.quiz_stat.insert(), stat)
+            except IntegrityError as e:
+                # seems quiz_stat already contains value from the answers
+                print(e)
+                raise QuizCoreError('Contains already answered questions.')
