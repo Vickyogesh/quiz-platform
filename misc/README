@@ -1,0 +1,7 @@
+Directory layout
+================
+
+dbdata/ - initial data for the database (see dbsetup.py).
+config.ini - Quiz WebService configuration (ready to use as production).
+uwsgi.ini - uWSGI server configuration.
+dbinit.py - Quiz WebService databse init tool.

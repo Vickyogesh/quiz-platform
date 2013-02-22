@@ -7,7 +7,7 @@ static/ - Example html page for the testing web service
           (used if testing is enabled in the config.ini).
           See wsgi.__init__.py for more info.
 data/ - Various data for tests.
-common/ - Common tests configuration.
+tools/  - tools for testing.
 
 
 Running tests
