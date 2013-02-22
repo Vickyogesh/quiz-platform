@@ -73,6 +73,8 @@ parser.add_argument('-n', '--new', action='store_true',
                     help='Create quiz database.')
 parser.add_argument('-s', '--small', action='store_true',
                     help='Create small testing data.')
+parser.add_argument('-c', '--config', default='',
+                    help="Configuration file (default: ../test-data/config.ini).")
 args = parser.parse_args()
 
 
@@ -80,9 +82,15 @@ args = parser.parse_args()
 # Settings setup
 ###########################################################
 
-path = os.path.join(os.path.dirname(__file__),
-                    '..', '..', 'test-data', 'config.ini')
-paths = os.path.split(os.path.abspath(path))
+if len(args.config) == 0:
+    path = os.path.join(os.path.dirname(__file__),
+                        '..', '..',
+                        'test-data',
+                        'config.ini')
+    paths = os.path.split(os.path.abspath(path))
+else:
+    paths = os.path.split(args.config)
+
 Settings.CONFIG_FILE = paths[1]
 settings = Settings([paths[0]])
 
