@@ -42,14 +42,15 @@ class QuizService(ServiceBase):
 
     def on_quiz_post(self, request):
         """ Save quiz results. """
+        user_id = self.session['user_id']
         id_list = self._get_param(request, 'id')
         answers = self._get_param(request, 'answer')
 
-        if not len(id_list) or not len(answers):
+        if not id_list or not answers:
             raise BadRequest('Missing parameter.')
 
         try:
-            self.core.saveQuizResults(id_list, answers)
+            self.core.saveQuizResults(user_id, id_list, answers)
         except QuizCoreError, e:
             raise BadRequest(e.message)
 

@@ -1,5 +1,4 @@
-from .exceptions import QuizCoreError
-from .db import QuizDb
+from .db.quizdb import QuizDb
 
 
 class QuizCore(object):
@@ -12,27 +11,35 @@ class QuizCore(object):
         return self.db.getInfo(username, appkey)
 
     def getQuestionList(self, topic_id, user_id, lang='it'):
-        """
-        Return list of Quiz questions.
+        """ Return list of Quiz questions.
+
+        Args:
+            topic_id:  Topic ID from which get questions for the Quiz.
+            user_id:   User ID for whom Quiz is generated.
+            lang:      Question language. Can be: (it, fr, de).
+
         Question is represented as a dictionary with the following items:
-            id      - question ID in the DB
-            text    - question text
-            answer  - question answer (True/False)
-            image   - image ID to illustrate the question (optional)
+            id        - question ID in the DB
+            text      - question text
+            answer    - question answer (True/False)
+            image     - image ID to illustrate the question (optional)
             image_bis - image type ID (optional)
         """
         res = self.db.getQuiz(topic_id, user_id, lang)
         return {'topic': topic_id, 'questions': res}
 
-    # TODO: implement db update with the answers.
-    def saveQuizResults(self, id_list, answers):
-        if len(id_list) != len(answers):
-            raise QuizCoreError('Parameters length mismatch.')
+    def saveQuizResults(self, user_id, id_list, answers):
+        """ Save quiz result for the user.
 
-        try:
-            for id, answer in zip(id_list, answers):
-                int(id), int(answer)
-                pass
-        except ValueError:
-            raise QuizCoreError('Invalid value.')
-        pass
+        Args:
+            user_id:    ID of the user for whom need to save the quiz.
+            questions:  List of the quesions IDs.
+            answers:    List of questions' answers.
+
+        Raises:
+            QuizCoreError
+
+        .. note::
+           questions and answers must have tha same length.
+        """
+        self.db.saveQuizResult(user_id, id_list, answers)
