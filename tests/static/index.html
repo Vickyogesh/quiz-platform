@@ -54,6 +54,13 @@
           document.getElementById('quiz').style.display = 'block';
     }
 
+    function on_sel(cb)
+    {
+        var table = document.getElementById('quiz_table');
+        var rows = table.getElementsByTagName('input');
+        for each(var checkbox in rows)
+          checkbox.checked = cb.checked
+    }
     function get_quiz()
     {
         var topic = document.getElementById('topic').value;
@@ -73,7 +80,11 @@
         var questions = txt.questions;
 
         var quiz_list = document.getElementById('quiz_list');
-        var html = "<table id='quiz_table'>";
+        var html = "Select all:"+
+        "<input type='checkbox' onchange='on_sel(this)'/>" + 
+        "<table id='quiz_table'>" + 
+        "<tr><th align='right'>N</th><th>Question</th><th>Real answer</th><th>User answer</th></tr>";
+
         var answer = false;
         for (var i = 0; i < questions.length; i++)
         {
@@ -81,8 +92,8 @@
           html += "<tr>";
           html += "<td align='right'>" + (i + 1) + ".</td>";
           html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
-          html += "<td>" + (answer ? "true":"false") + "</td>";
-          html += "<td><input type='checkbox' value='" + questions[i].id +"'></td>";
+          html += "<td align='center'>" + (answer ? "true":"false") + "</td>";
+          html += "<td align='center'><input type='checkbox' value='" + questions[i].id +"'/></td>";
           html += "</tr>";
         }
         quiz_list.innerHTML = html + "</table>";
