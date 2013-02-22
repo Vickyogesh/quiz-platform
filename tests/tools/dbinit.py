@@ -318,8 +318,8 @@ def populate_small():
     ctx.conn.execute(text('TRUNCATE TABLE quiz_stat;'))
 
     chapters = [1, 2, 3]
-    topics = range(2)
-    questions = range(100)
+    topics = range(1, 3)
+    questions = range(1, 101)
 
     print("Creating chapters...")
     sql = text("INSERT INTO chapters VALUES(0, 1, :txt)")
@@ -329,17 +329,19 @@ def populate_small():
     print("Creating topics...")
     sql = text("INSERT INTO topics VALUES(0, :txt, :txt, :txt, :ch)")
     for ch in chapters:
-        for i in topics:
-            ctx.conn.execute(sql, txt='topic %d.%d' % (ch, i + 1), ch=ch)
+        for t in topics:
+            ctx.conn.execute(sql, txt='topic %d.%d' % (ch, t), ch=ch)
 
     print("Creating questions...")
     sql = text("""INSERT INTO questions VALUES
                (0, :txt, :txt, :txt, :ans, '', '', :ch, :topic)""")
+    top = 1
     for ch in chapters:
         for t in topics:
             for q in questions:
-                txt = '%d.%d.%d Question' % (ch, t + 1, q + 1)
-                ctx.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=t)
+                txt = '%d.%d.%d Question' % (ch, t, q)
+                ctx.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=top)
+            top += 1
 
 
 def actions():
