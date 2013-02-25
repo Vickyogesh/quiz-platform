@@ -58,7 +58,7 @@
     {
         var table = document.getElementById('quiz_table');
         var rows = table.getElementsByTagName('input');
-        for each(var checkbox in rows)
+        for(checkbox in rows)
           checkbox.checked = cb.checked
     }
     function get_quiz()
@@ -66,7 +66,10 @@
         var topic = document.getElementById('topic').value;
         var lang = document.getElementById('lang').value;
         var xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', '/v1/quiz?topic='+topic +'&lang='+lang, false);
+        if (lang == 'it')
+          xmlhttp.open('GET', '/v1/quiz/'+topic, false);
+        else
+          xmlhttp.open('GET', '/v1/quiz/'+topic +'?lang='+lang, false);
         xmlhttp.send(null);
 
         if(xmlhttp.status != 200)

@@ -28,19 +28,24 @@ class QuizGetTest(unittest.TestCase):
 
     # Try to get questions without authorization
     def test_getNoAuth(self):
-        r = requests.get(url('/quiz'))
+        r = requests.get(url('/quiz/1'))
         self.assertEqual(401, r.status_code)
 
     # Try to get quiz with invalid topic
     def test_getBadTopic(self):
-        r = self.req.get(url('/quiz'), params={'topic': '1ds'})
-        self.assertEqual(400, r.status_code)
-        self.assertEqual('Invalid topic value.', r.text.splitlines()[-1])
+        r = self.req.get(url('/quiz'))
+        self.assertEqual(405, r.status_code)
+
+        r = self.req.get(url('/quiz/1/fr'))
+        self.assertEqual(404, r.status_code)
+
+        r = self.req.get(url('/quiz/1ds'))
+        self.assertEqual(404, r.status_code)
 
     # Authorize and get quiz list
     # Must return json string with Content-Type: application/json
     def test_get(self):
-        r = self.req.get(url('/quiz'), params={'topic': 1})
+        r = self.req.get(url('/quiz/1'))
         self.assertEqual(200, r.status_code)
         self.assertEqual('application/json', r.headers['content-type'])
 
@@ -52,7 +57,7 @@ class QuizGetTest(unittest.TestCase):
     # Authorize and get quiz list
     # Must return json string with Content-Type: application/json
     def test_getLangDe(self):
-        r = self.req.get(url('/quiz'), params={'topic': 1, 'lang': 'de'})
+        r = self.req.get(url('/quiz/1'), params={'lang': 'de'})
         self.assertEqual(200, r.status_code)
         self.assertEqual('application/json', r.headers['content-type'])
 
@@ -64,7 +69,7 @@ class QuizGetTest(unittest.TestCase):
     # Authorize and get quiz list
     # Must return json string with Content-Type: application/json
     def test_getLangFr(self):
-        r = self.req.get(url('/quiz'), params={'topic': 1, 'lang': 'fr'})
+        r = self.req.get(url('/quiz/1'), params={'lang': 'fr'})
         self.assertEqual(200, r.status_code)
         self.assertEqual('application/json', r.headers['content-type'])
 

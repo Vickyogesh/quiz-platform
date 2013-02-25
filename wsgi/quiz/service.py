@@ -11,7 +11,9 @@ class QuizService(ServiceBase):
 
     def __init__(self, config):
         super(QuizService, self).__init__(config)
-        self.urls.add(Rule('/quiz', methods=['GET'], endpoint='on_quiz_get'))
+        self.urls.add(Rule('/quiz/<int:topic>',
+                      methods=['GET'],
+                      endpoint='on_quiz_get'))
         self.urls.add(Rule('/quiz', methods=['POST'], endpoint='on_quiz_post'))
 
     # TODO: test more
@@ -24,19 +26,12 @@ class QuizService(ServiceBase):
             return val[0].split(',')
         return val
 
-    def on_quiz_get(self, request):
+    def on_quiz_get(self, request, topic):
         """ Get 40 questions from the DB and return them to the client. """
         lang = request.args.get('lang', 'it')
 
-        try:
-            topic_id = int(request.args['topic'])
-        except ValueError:
-            raise BadRequest('Invalid topic value.')
-        except BadRequest:
-            raise BadRequest('Missing parameter.')
-
         user_id = self.session['user_id']
-        quiz = self.core.getQuestionList(topic_id, user_id, lang)
+        quiz = self.core.getQuestionList(topic, user_id, lang)
         result = json.dumps(quiz, separators=(',', ':'))
         return Response(result, content_type='application/json')
 
