@@ -19,9 +19,12 @@ from quiz.settings import Settings
 # Configuration
 ###########################################################
 
-NUM_CHAPTERS = 20
-NUM_TOPICS = 40
-NUM_QUESTIONS = 200
+NUM_CHAPTERS = 10
+NUM_TOPICS = 20
+NUM_QUESTIONS = 600
+NUM_SCHOOLS = 200
+NUM_STUDENTS = 200
+NUM_ANS_QUESTIONS = 340
 
 # application keys
 APPLICATIONS = [
@@ -219,50 +222,76 @@ def create_users():
 
 
 def create_more_users():
-    print("Populating users with more entries...")
-    vals = []
-    for i in range(50):
-        tmp = 'testuser%d' % i
+    print("Populating: %d schools with %d users per school..."
+          % (NUM_SCHOOLS, NUM_STUDENTS))
+
+    for i in range(1, NUM_SCHOOLS):
+        vals = []
+        tmp = 'school%d' % i
         vals.append({
             'name': tmp,
             'login': tmp,
             'passwd': _create_digest(tmp, tmp),
-            'type': 'student'
+            'type': 'school',
+            'school_id': None
         })
-    ctx.conn.execute(ctx.tbl_users.insert(), vals)
+        for j in range(1, NUM_STUDENTS):
+            tmp = 'student%d.%d' % (i, j)
+            vals.append({
+                'name': tmp,
+                'login': tmp,
+                'passwd': _create_digest(tmp, tmp),
+                'type': 'student',
+                'school_id': i
+            })
+        ctx.conn.execute(ctx.tbl_users.insert(), vals)
 
 
 def populate_big():
     print("Preparing to populate with test data...")
-    ctx.conn.execute(text('TRUNCATE TABLE chapter;'))
-    ctx.conn.execute(text('TRUNCATE TABLE topic;'))
+    ctx.conn.execute(text('TRUNCATE TABLE chapters;'))
+    ctx.conn.execute(text('TRUNCATE TABLE topics;'))
     ctx.conn.execute(text('TRUNCATE TABLE questions;'))
     ctx.conn.execute(text('TRUNCATE TABLE quiz_stat;'))
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_chapters;'))
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_topics;'))
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_questions;'))
+    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_qstat;'))
 
     ctx.conn.execute(text(
         '''CREATE PROCEDURE aux_chapters()
         BEGIN
             DECLARE i INT DEFAULT 1;
+            PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, 1, ?)';
+            START TRANSACTION;
             WHILE (i <= {chapters}) DO
-                INSERT INTO chapter VALUES(i, 1, CONCAT('chapter ', i));
+                SET @a = i;
+                SET @b = CONCAT('chapter ', i);
+                EXECUTE stmt USING @a, @b;
                 SET i = i + 1;
             END WHILE;
+            COMMIT;
+            DEALLOCATE PREPARE stmt;
         END;
         CREATE PROCEDURE aux_topics()
         BEGIN
             DECLARE i INT DEFAULT 1;
             DECLARE j INT DEFAULT 1;
+
+            PREPARE stmt FROM 'INSERT INTO topics(text, chapter_id) VALUES(?, ?)';
+            START TRANSACTION;
             WHILE (i <= {chapters}) DO
                 WHILE (j <= {topics}) DO
-                    INSERT INTO topic(text, chapter_id) VALUES(CONCAT('topic ', i, '.', j), i);
+                    SET @a = CONCAT('topic ', i, '.', j);
+                    SET @b = i;
+                    EXECUTE stmt USING @a, @b;
                     SET j = j + 1;
                 END WHILE;
                 SET i = i + 1;
                 SET j = 1;
             END WHILE;
+            COMMIT;
+            DEALLOCATE PREPARE stmt;
         END;
         CREATE PROCEDURE aux_questions()
         BEGIN
@@ -271,10 +300,16 @@ def populate_big():
             DECLARE k INT DEFAULT 1;
             DECLARE n INT DEFAULT 1;
             SET n = {chapters} * {topics};
+
+            PREPARE stmt FROM 'INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(?, 1, ?, ?)';
+            START TRANSACTION;
             WHILE (i <= {chapters}) DO
                 WHILE (j <= n) DO
                     WHILE (k <= {questions}) DO
-                        INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(CONCAT('question ', j, '.', k), 1, i, j);
+                        SET @a = CONCAT('question ', j, '.', k);
+                        SET @b = i;
+                        SET @c = j;
+                        EXECUTE stmt USING @a, @b, @c;
                         SET k = k + 1;
                     END WHILE;
                     SET j = j + 1;
@@ -282,38 +317,70 @@ def populate_big():
                 END WHILE;
                 SET i = i + 1;
             END WHILE;
+            COMMIT;
+            DEALLOCATE PREPARE stmt;
+        END;
+        CREATE PROCEDURE aux_qstat()
+        BEGIN
+            DECLARE user INT DEFAULT 1;
+            DECLARE topic INT DEFAULT 1;
+            DECLARE quest INT DEFAULT 1;
+            DECLARE nun_topics INT DEFAULT 1;
+            DECLARE qid INT DEFAULT 1;
+
+            SET nun_topics = {chapters} * {topics};
+
+            PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?)';
+            START TRANSACTION;
+            WHILE (user <= {num_users}) DO
+                WHILE (topic <= nun_topics) DO
+                    WHILE (quest <= {num_ans}) DO
+                        SET @a = user;
+                        SET @b = quest + (topic - 1) * {questions};
+                        EXECUTE stmt USING @a, @b;
+                        SET quest = quest + 1;
+                    END WHILE;
+                    SET topic = topic + 1;
+                    SET quest = 1;
+                END WHILE;
+                SET user = user + 1;
+                SET topic = 1;
+                SET quest = 1;
+            END WHILE;
+            COMMIT;
+            DEALLOCATE PREPARE stmt;
         END;
         '''.format(chapters=NUM_CHAPTERS,
                    topics=NUM_TOPICS,
-                   questions=NUM_QUESTIONS)))
+                   questions=NUM_QUESTIONS,
+                   num_users=20,
+                   num_ans=NUM_ANS_QUESTIONS)))
 
     print("Populating with test data...")
     ctx.conn.execute(text('call aux_chapters();'))
     ctx.conn.execute(text('call aux_topics();'))
     ctx.conn.execute(text('call aux_questions();'))
+
+    print("Populating quiz stat...")
+    ctx.conn.execute(text('call aux_qstat();'))
+
+    create_more_users()
+
+    print("Do optimize...")
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_chapters;'))
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_topics;'))
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_questions;'))
-    create_more_users()
-    populate_quiz_stat()
-
-
-def populate_quiz_stat():
-    import random
-    print("Populating quiz stat...")
-    sql = text("INSERT INTO quiz_stat VALUES(:id, :quest)")
-    for u in range(1, 5):
-        print('for user %d' % u)
-        for topic in range(1, random.randint(15, 20)):
-            for q in range(1, random.randint(40, 100)):
-                qid = q + (topic - 1) * NUM_QUESTIONS
-                ctx.conn.execute(sql, id=u, quest=qid)
+    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_qstat;'))
+    ctx.conn.execute(text('OPTIMIZE TABLE applications, users, chapters;'))
+    ctx.conn.execute(text('OPTIMIZE TABLE topics;'))
+    ctx.conn.execute(text('OPTIMIZE TABLE questions;'))
+    ctx.conn.execute(text('OPTIMIZE TABLE quiz_stat;'))
 
 
 def populate_small():
     print("Preparing to populate with SMALL test data...")
-    ctx.conn.execute(text('TRUNCATE TABLE chapter;'))
-    ctx.conn.execute(text('TRUNCATE TABLE topic;'))
+    ctx.conn.execute(text('TRUNCATE TABLE chapters;'))
+    ctx.conn.execute(text('TRUNCATE TABLE topics;'))
     ctx.conn.execute(text('TRUNCATE TABLE questions;'))
     ctx.conn.execute(text('TRUNCATE TABLE quiz_stat;'))
 

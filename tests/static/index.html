@@ -58,8 +58,9 @@
     {
         var table = document.getElementById('quiz_table');
         var rows = table.getElementsByTagName('input');
-        for(checkbox in rows)
-          checkbox.checked = cb.checked
+
+        for(var checkbox in rows)
+          rows[checkbox].checked = cb.checked
     }
     function get_quiz()
     {
