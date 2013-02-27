@@ -4,3 +4,9 @@ sphinxcontrib.httpdomain (easy_install sphinxcontrib-httpdomain).
 
 How to build:
     sphinx-build -b html . html
+
+Deploy
+======
+
+To rebuild docs automatically create dir $OPENSHIFT_DATA_DIR/quiz/apidoc.
+See hooks: pre_build and build
