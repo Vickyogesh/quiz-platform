@@ -118,7 +118,7 @@ fi
 
 # Install sphinx to generate documantation (if needed)
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-pip install sphinx sphinxcontrib-httpdomain
+$OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
 fi
 
 
