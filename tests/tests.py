@@ -15,10 +15,12 @@ if not args.tests:
     args.tests = default_tests
 
 if 'core' in args.tests:
-    import core.test_db_quiz
     import core.test_settings
-    suite.addTest(core.test_db_quiz.suite())
+    import core.test_db_quiz
+    import core.test_db_exam
     suite.addTest(core.test_settings.suite())
+    suite.addTest(core.test_db_quiz.suite())
+    suite.addTest(core.test_db_exam.suite())
 
 if 'http' in args.tests:
     import http.test_auth

@@ -13,20 +13,21 @@ class QuizService(ServiceBase):
         super(QuizService, self).__init__(config)
         self.urls.add(Rule('/quiz/<int:topic>',
                       methods=['GET'],
-                      endpoint='on_quiz_get'))
-        self.urls.add(Rule('/quiz', methods=['POST'], endpoint='on_quiz_post'))
+                      endpoint='onQuizGet'))
+        self.urls.add(Rule('/quiz', methods=['POST'], endpoint='onQuizSave'))
+        self.urls.add(Rule('/exam', methods=['GET'], endpoint='onExamGet'))
 
     # TODO: test more
     # If string is passed instead of list then
     # we suppose what comma delimited string is passed
-    # See on_quiz_post()
+    # See onQuizSave()
     def _get_param(self, request, name):
         val = request.form.getlist(name)
         if len(val) == 1 and isinstance(val[0], unicode):
             return val[0].split(',')
         return val
 
-    def on_quiz_get(self, request, topic):
+    def onQuizGet(self, request, topic):
         """ Get 40 questions from the DB and return them to the client. """
         lang = request.args.get('lang', 'it')
 
@@ -35,7 +36,7 @@ class QuizService(ServiceBase):
         result = json.dumps(quiz, separators=(',', ':'))
         return Response(result, content_type='application/json')
 
-    def on_quiz_post(self, request):
+    def onQuizSave(self, request):
         """ Save quiz results. """
         user_id = self.session['user_id']
         id_list = self._get_param(request, 'id')
@@ -50,3 +51,10 @@ class QuizService(ServiceBase):
             raise BadRequest(e.message)
 
         return Response('ok')
+
+    def onExamGet(self, request):
+        """ Get exam. """
+        lang = request.args.get('lang', 'it')
+        exam = self.core.getExam(lang)
+        result = json.dumps(exam, separators=(',', ':'))
+        return Response(result, content_type='application/json')

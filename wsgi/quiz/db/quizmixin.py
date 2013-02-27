@@ -67,13 +67,16 @@ class QuizMixin(object):
         # TODO: maybe preallocate with quiz = [None] * 40?
         quiz = []
         for row in res:
-            quiz.append({
-                'id': int(row[self.questions.c.id]),
+            d = {
+                'id': row[self.questions.c.id],
                 'text': row[txt_lang],
                 'answer': row[self.questions.c.answer],
                 'image': row[self.questions.c.image],
                 'image_bis': row[self.questions.c.image_part]
-            })
+            }
+
+            self._aux_question_delOptionalField(d)
+            quiz.append(d)
         return quiz
 
     def saveQuizResult(self, user_id, questions, answers):

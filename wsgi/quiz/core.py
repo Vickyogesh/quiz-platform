@@ -43,3 +43,6 @@ class QuizCore(object):
            questions and answers must have tha same length.
         """
         self.db.saveQuizResult(user_id, id_list, answers)
+
+    def getExam(self, lang):
+        return self.db.getExam(lang)

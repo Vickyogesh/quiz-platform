@@ -12,7 +12,7 @@ from quiz.db.quizdb import QuizDb
 
 
 # TODO: add tests explanations.
-class QbQuizTest(unittest.TestCase):
+class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.db = QuizDb(self)
@@ -86,7 +86,7 @@ class QbQuizTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(QbQuizTest))
+    suite.addTest(unittest.makeSuite(DbQuizTest))
     return suite
 
 if __name__ == '__main__':

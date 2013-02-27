@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData
 from .usermixin import UserMixin
 from .quizmixin import QuizMixin
+from .exammixin import ExamMixin
 
 
 # NOTE: to disable connection pool:
@@ -8,13 +9,17 @@ from .quizmixin import QuizMixin
 # self.engine = create_engine(cfg['database'], echo=verbose,
 #                             poolclass=NullPool)
 
-class QuizDb(UserMixin, QuizMixin):
+class QuizDb(UserMixin, QuizMixin, ExamMixin):
     """ High-level database operations. """
 
     def __init__(self, settings):
         self._setupDb(settings.dbinfo)
         UserMixin.__init__(self)
         QuizMixin.__init__(self)
+        ExamMixin.__init__(self)
+
+        # used in the _aux_question_delOptionalField()
+        self.__optional_question_fields = ['image', 'image_bis']
 
     def __del__(self):
         print('close db connection')
@@ -36,3 +41,9 @@ class QuizDb(UserMixin, QuizMixin):
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
         self.quiz_stat = self.meta.tables['quiz_stat']
+
+    # Remove None question fileds from the dict d.
+    def _aux_question_delOptionalField(self, d):
+        for x in self.__optional_question_fields:
+            if d[x] == None:
+                del d[x]

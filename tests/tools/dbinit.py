@@ -19,7 +19,7 @@ from quiz.settings import Settings
 # Configuration
 ###########################################################
 
-NUM_CHAPTERS = 10
+NUM_CHAPTERS = 25
 NUM_TOPICS = 20
 NUM_QUESTIONS = 600
 NUM_SCHOOLS = 200
@@ -116,12 +116,12 @@ def setup():
 
 def drop_tables():
     print('Removing tables...')
+    ctx.engine.execute(text('DROP TABLE IF EXISTS quiz_stat;'))
+    ctx.engine.execute(text('DROP TABLE IF EXISTS questions;'))
     ctx.engine.execute(text('DROP TABLE IF EXISTS applications;'))
     ctx.engine.execute(text('DROP TABLE IF EXISTS users;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS chapters;'))
     ctx.engine.execute(text('DROP TABLE IF EXISTS topics;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS questions;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS quiz_stat;'))
+    ctx.engine.execute(text('DROP TABLE IF EXISTS chapters;'))
 
 
 def create_db():
@@ -133,8 +133,7 @@ def create_db():
 def create_tables():
     print('Creating tables...')
     ctx.conn.execute(text(
-        """
-        CREATE TABLE applications(
+        """ CREATE TABLE applications(
             id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
             appkey VARCHAR(50) NOT NULL,
             description VARCHAR(100),
@@ -183,6 +182,7 @@ def create_tables():
             CONSTRAINT PRIMARY KEY (id)
         );
         ALTER TABLE questions ADD INDEX ix_tp(topic_id);
+        ALTER TABLE questions ADD INDEX ix_ch(chapter_id);
 
         CREATE TABLE quiz_stat(
             user_id INTEGER UNSIGNED NOT NULL,
@@ -259,7 +259,7 @@ def populate_big():
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_qstat;'))
 
     ctx.conn.execute(text(
-        '''CREATE PROCEDURE aux_chapters()
+        """CREATE PROCEDURE aux_chapters()
         BEGIN
             DECLARE i INT DEFAULT 1;
             PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, 1, ?)';
@@ -291,31 +291,33 @@ def populate_big():
                 SET j = 1;
             END WHILE;
             COMMIT;
+            update chapters set priority=2 where id > 10;
             DEALLOCATE PREPARE stmt;
         END;
         CREATE PROCEDURE aux_questions()
         BEGIN
-            DECLARE i INT DEFAULT 1;
-            DECLARE j INT DEFAULT 1;
-            DECLARE k INT DEFAULT 1;
+            DECLARE chap INT DEFAULT 1;
+            DECLARE top INT DEFAULT 1;
+            DECLARE quest INT DEFAULT 1;
             DECLARE n INT DEFAULT 1;
             SET n = {chapters} * {topics};
 
             PREPARE stmt FROM 'INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(?, 1, ?, ?)';
             START TRANSACTION;
-            WHILE (i <= {chapters}) DO
-                WHILE (j <= n) DO
-                    WHILE (k <= {questions}) DO
-                        SET @a = CONCAT('question ', j, '.', k);
-                        SET @b = i;
-                        SET @c = j;
+            WHILE (chap <= {chapters}) DO
+                WHILE (top <= {topics}) DO
+                    WHILE (quest <= {questions}) DO
+                        SET @a = CONCAT('question ', chap, '.', top, '.', quest);
+                        SET @b = chap;
+                        SET @c = top + (chap - 1) * {topics};
                         EXECUTE stmt USING @a, @b, @c;
-                        SET k = k + 1;
+                        SET quest = quest + 1;
                     END WHILE;
-                    SET j = j + 1;
-                    SET k = 1;
+                    SET top = top + 1;
+                    SET quest = 1;
                 END WHILE;
-                SET i = i + 1;
+                SET chap = chap + 1;
+                SET top = 1;
             END WHILE;
             COMMIT;
             DEALLOCATE PREPARE stmt;
@@ -350,7 +352,7 @@ def populate_big():
             COMMIT;
             DEALLOCATE PREPARE stmt;
         END;
-        '''.format(chapters=NUM_CHAPTERS,
+        """.format(chapters=NUM_CHAPTERS,
                    topics=NUM_TOPICS,
                    questions=NUM_QUESTIONS,
                    num_users=20,
@@ -362,9 +364,9 @@ def populate_big():
     ctx.conn.execute(text('call aux_questions();'))
 
     print("Populating quiz stat...")
-    ctx.conn.execute(text('call aux_qstat();'))
+    #ctx.conn.execute(text('call aux_qstat();'))
 
-    create_more_users()
+    #create_more_users()
 
     print("Do optimize...")
     ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_chapters;'))

@@ -62,6 +62,29 @@
         for(var checkbox in rows)
           rows[checkbox].checked = cb.checked
     }
+    
+    function show_questions(questions)
+    {
+        var quiz_list = document.getElementById('quiz_list');
+        var html = "Select all:"+
+        "<input type='checkbox' onchange='on_sel(this)'/>" + 
+        "<table id='quiz_table'>" + 
+        "<tr><th align='right'>N</th><th>Question</th><th>Real answer</th><th>User answer</th></tr>";
+
+        var answer = false;
+        for (var i = 0; i < questions.length; i++)
+        {
+          answer = questions[i].answer;
+          html += "<tr>";
+          html += "<td align='right'>" + (i + 1) + ".</td>";
+          html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
+          html += "<td align='center'>" + (answer ? "true":"false") + "</td>";
+          html += "<td align='center'><input type='checkbox' value='" + questions[i].id +"'/></td>";
+          html += "</tr>";
+        }
+        quiz_list.innerHTML = html + "</table>";
+    }
+
     function get_quiz()
     {
         var topic = document.getElementById('topic').value;
@@ -81,26 +104,7 @@
 
         var txt = eval('(' + xmlhttp.responseText + ')');
         var topic_id = txt.topic;
-        var questions = txt.questions;
-
-        var quiz_list = document.getElementById('quiz_list');
-        var html = "Select all:"+
-        "<input type='checkbox' onchange='on_sel(this)'/>" + 
-        "<table id='quiz_table'>" + 
-        "<tr><th align='right'>N</th><th>Question</th><th>Real answer</th><th>User answer</th></tr>";
-
-        var answer = false;
-        for (var i = 0; i < questions.length; i++)
-        {
-          answer = questions[i].answer;
-          html += "<tr>";
-          html += "<td align='right'>" + (i + 1) + ".</td>";
-          html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
-          html += "<td align='center'>" + (answer ? "true":"false") + "</td>";
-          html += "<td align='center'><input type='checkbox' value='" + questions[i].id +"'/></td>";
-          html += "</tr>";
-        }
-        quiz_list.innerHTML = html + "</table>";
+        show_questions(txt.questions)
     }
 
     function send_quiz()
@@ -136,6 +140,27 @@
           alert('Something wrong: ' + xmlhttp.statusText)
 
     }
+
+    function get_exam()
+    {
+        var lang = document.getElementById('lang').value;
+        var xmlhttp = getXmlHttp();
+        if (lang == 'it')
+          xmlhttp.open('GET', '/v1/exam', false);
+        else
+          xmlhttp.open('GET', '/v1/exam?lang='+lang, false);
+        xmlhttp.send(null);
+
+        if(xmlhttp.status != 200)
+        {
+          alert('Something wrong: ' + xmlhttp.statusText);
+          return;
+        }
+
+        var txt = eval('(' + xmlhttp.responseText + ')');
+        show_questions(txt)
+    }
+
    </script>
 </head>
 
@@ -157,6 +182,8 @@
           </select>
      <input type="button" onclick="get_quiz()" value="Get quiz">
      <input type="button" onclick="send_quiz()" value="Send quiz">
+     <input type="button" onclick="get_exam()" value="Exam">
+     <!--input type="button" onclick="send_exam()" value="Send Exam"-->
      <p/>
      <p id='quiz_list'></p>
      </div>
