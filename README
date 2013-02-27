@@ -55,7 +55,7 @@ $OPENSHIFT_DATA_DIR/bin/pip install --use-mirrors -r $OPENSHIFT_REPO_DIR/require
 
 # Generate documantation (if needed)
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-$OPENSHIFT_DATA_DIR/bin/sphinx -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
+$OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
 fi
 
 
