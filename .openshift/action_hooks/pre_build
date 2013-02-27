@@ -50,15 +50,15 @@ python setup.py install
 # cd $OPENSHIFT_TMP_DIR
 # pip install uwsgi
 
-# Install sphinx to generate documantation (if needed)
-if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-pip install sphinx sphinxcontrib-httpdomain
-fi
-
 # cleanup
 cd $OPENSHIFT_TMP_DIR
 rm -rf Python-2.7.3.tar.bz2
 rm -rf setuptools-0.6c11.tar.gz
 rm -rf pip-1.1.tar.gz
 
+fi
+
+# Install sphinx to generate documantation (if needed)
+if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
+pip install sphinx sphinxcontrib-httpdomain
 fi
