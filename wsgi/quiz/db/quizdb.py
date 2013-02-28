@@ -45,5 +45,5 @@ class QuizDb(UserMixin, QuizMixin, ExamMixin):
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):
         for x in self.__optional_question_fields:
-            if d[x] == None:
+            if d[x] is None:
                 del d[x]
