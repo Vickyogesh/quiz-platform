@@ -2,190 +2,137 @@
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Quiz tests</title>
- 
-  <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-  <script type="text/javascript">
-    function getXmlHttp(){
-      var xmlhttp;
-      try {
-        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-      } catch (e) {
-        try {
-          xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        } catch (E) {
-          xmlhttp = false;
-        }
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+  <style type="text/css">
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        border: 1px solid #e5e5e5;
       }
-      if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
-        xmlhttp = new XMLHttpRequest();
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
       }
-      return xmlhttp;
-    }
-
-
-    function auth()
-    {
-        xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', '/v1/authorize', false);
-        xmlhttp.send(null);
-        info = xmlhttp.getResponseHeader('WWW-Authenticate')
-        nonce = info.substring(info.indexOf('"')+1, info.length-1)
-
-        login = document.getElementById('login').value;
-        pass = document.getElementById('passwd').value;
-        dig = CryptoJS.MD5(login + ':' + pass);
-        dig = CryptoJS.MD5(nonce + ':' + dig);
-
-        xmlhttp = getXmlHttp();
-        xmlhttp.open('GET', '/v1/authorize', false);
-        xmlhttp.setRequestHeader('Authorization',
-          'QuizAuth nonce="' + nonce +
-          '", appid="32bfe1c505d4a2a042bafd53993f10ece3ccddca", ' +
-          ' username="' + login + '", digest="' + dig + '"')
-        xmlhttp.send(null);
-
-        if(xmlhttp.status != 200)
-        {
-          alert('Something wrong: ' + xmlhttp.statusText + '\n' + xmlhttp.responseText);
-          document.cookie = 'QUIZSID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-          document.getElementById('quiz').style.display = 'none';
-        }
-        else
-          document.getElementById('quiz').style.display = 'block';
-    }
-
-    function on_sel(cb)
-    {
-        var table = document.getElementById('quiz_table');
-        var rows = table.getElementsByTagName('input');
-
-        for(var checkbox in rows)
-          rows[checkbox].checked = cb.checked
-    }
-    
-    function show_questions(questions)
-    {
-        var quiz_list = document.getElementById('quiz_list');
-        var html = "Select all:"+
-        "<input type='checkbox' onchange='on_sel(this)'/>" + 
-        "<table id='quiz_table'>" + 
-        "<tr><th align='right'>N</th><th>Question</th><th>Real answer</th><th>User answer</th></tr>";
-
-        var answer = false;
-        for (var i = 0; i < questions.length; i++)
-        {
-          answer = questions[i].answer;
-          html += "<tr>";
-          html += "<td align='right'>" + (i + 1) + ".</td>";
-          html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
-          html += "<td align='center'>" + (answer ? "true":"false") + "</td>";
-          html += "<td align='center'><input type='checkbox' value='" + questions[i].id +"'/></td>";
-          html += "</tr>";
-        }
-        quiz_list.innerHTML = html + "</table>";
-    }
-
-    function get_quiz()
-    {
-        var topic = document.getElementById('topic').value;
-        var lang = document.getElementById('lang').value;
-        var xmlhttp = getXmlHttp();
-        if (lang == 'it')
-          xmlhttp.open('GET', '/v1/quiz/'+topic, false);
-        else
-          xmlhttp.open('GET', '/v1/quiz/'+topic +'?lang='+lang, false);
-        xmlhttp.send(null);
-
-        if(xmlhttp.status != 200)
-        {
-          alert('Something wrong: ' + xmlhttp.statusText);
-          return;
-        }
-
-        var txt = eval('(' + xmlhttp.responseText + ')');
-        var topic_id = txt.topic;
-        show_questions(txt.questions)
-    }
-
-    function send_quiz()
-    {
-        var topic = document.getElementById('topic').value;
-        var table = document.getElementById('quiz_table');
-        var rows = table.getElementsByTagName('input');
-
-        var id_list = [];
-        var answer_list = [];
-        for (var i = 0; i < rows.length; i++)
-        {
-          id_list.push(rows[i].value);
-          answer_list.push(rows[i].checked ? 1 : 0);
-        }
-
-        params = "topic=" + topic +
-                 "&id=" + id_list +
-                 "&answer=" + answer_list;
-
-        var xmlhttp = getXmlHttp();
-        xmlhttp.open('POST', '/v1/quiz', false);
-
-        // The service assume we send data as form data, so we need
-        // to add application/x-www-form-urlencoded header.
-        xmlhttp.setRequestHeader('Content-Type',
-                                 'application/x-www-form-urlencoded');
-        xmlhttp.send(params);
-
-        if(xmlhttp.status == 200)
-          alert('Everything is ok.')
-        else
-          alert('Something wrong: ' + xmlhttp.statusText)
-
-    }
-
-    function get_exam()
-    {
-        var lang = document.getElementById('lang').value;
-        var xmlhttp = getXmlHttp();
-        if (lang == 'it')
-          xmlhttp.open('GET', '/v1/exam', false);
-        else
-          xmlhttp.open('GET', '/v1/exam?lang='+lang, false);
-        xmlhttp.send(null);
-
-        if(xmlhttp.status != 200)
-        {
-          alert('Something wrong: ' + xmlhttp.statusText);
-          return;
-        }
-
-        var txt = eval('(' + xmlhttp.responseText + ')');
-        show_questions(txt)
-    }
-
-   </script>
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+      .tabbable {
+        padding-top: 100;
+      }
+      .tab-pane input[type="text"] {
+        height: auto;
+      }
+      #quiztab .well {
+        margin-top: 0px
+      }
+  </style>
 </head>
 
- <body>
-    <form>
-      <p><b>Authorization</b></p>
-      Login: <input type="text" id="login" value="testuser"><p/>
-      Pasword:<input type="password" id="passwd" value="testpasswd"><p/>
-      <p><input type="button" onclick="auth()" value="Send">
-     </form>
-     <hr/>
-     <div id='quiz' style="display:none">
-     <p><b>Quiz</b></p>
-     Topic: <input type="text" id="topic" value="1">
-     Lang: <select id='lang'>
-            <option>it</option>
-            <option>de</option>
-            <option>fr</option>
-          </select>
-     <input type="button" onclick="get_quiz()" value="Get quiz">
-     <input type="button" onclick="send_quiz()" value="Send quiz">
-     <input type="button" onclick="get_exam()" value="Exam">
-     <!--input type="button" onclick="send_exam()" value="Send Exam"-->
-     <p/>
-     <p id='quiz_list'></p>
-     </div>
- </body>
-</html>
+<body>
+
+  <!-- Message box -->
+  <div class="modal hide" id="msg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Error</h3>
+    </div>
+    <div class="modal-body">
+      text
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Close</a>
+    </div>
+  </div> <!-- /modal -->
+
+  <div class="container">
+
+    <!-- Login panel -->
+    <form class="well form-signin">
+      <h2 class="form-signin-heading">Authorization</h2>
+      <input type="text" class="input-block-level" placeholder="Login" id="login" value="testuser">
+      <input type="password" class="input-block-level" placeholder="Password" id="pass" value="testpasswd">
+      <button class="btn btn-large btn-primary" type="button">Go</button>
+    </form>
+
+    <div class="tabbable hide" id="features">
+      <h3>Quiz API v1 features
+        <a class="btn btn-mini btn-link" id="bttQuit">quit</a>
+      </h3>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#quiztab" data-toggle="tab">Quiz</a></li>
+        <li><a href="#examtab" data-toggle="tab">Exam</a></li>
+      </ul>
+      <div class="tab-content">
+
+        <!-- QUIZ CONTENT -->
+        <div class="tab-pane active" id="quiztab">
+
+          <form class="well well-small form-inline">
+            <label class="control-label" for="topic">Topic:</label>
+            <input type="text" class="input-small" id="topic" value="1">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttQuizGet">Get quiz</a>
+            <a class="btn btn-inverse" id="bttQuizSend">Send quiz</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <table class="table table-hover">  <!-- QUIZ TABLE -->
+            <thead>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+                <th><input type="checkbox"></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+
+        </div> <!-- /tab-pane quiztab -->
+
+        <!-- EXAM CONTENT -->
+        <div class="tab-pane" id="examtab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttExamGet">Get Exam</a>
+            <a class="btn btn-inverse" id="bttExamSend">Send Exam</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <table class="table table-hover" id="examtable">  <!-- EXAM TABLE -->
+            <thead>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+                <th><input type="checkbox"></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+
+        </div> <!-- /tab-pane examtab -->
+
+      </div> <!-- /tab-content -->
+    </div> <!-- /tabbable -->
+
+  </div> <!-- /container -->
+
+  <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+  <script src="app.js"></script>
+</body>
