@@ -148,6 +148,7 @@ function onGetQuiz()
 
 function onSendQuiz()
 {
+  var topic = $("#quiztab #topic").val();
   var lst = $("#quiztab table tbody input");
   var id_list = [];
   var answer_list = [];
@@ -162,7 +163,7 @@ function onSendQuiz()
   fd.append("answer", answer_list);
 
   $.ajax({
-    url: "/v1/quiz",
+    url: "/v1/quiz/" + topic,
     data: fd,
     processData: false,
     contentType: false,

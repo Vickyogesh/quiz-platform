@@ -17,11 +17,11 @@ from dbtools import DbTool
 ###########################################################
 
 NUM_CHAPTERS = 25
-NUM_TOPICS = 20
-NUM_QUESTIONS = 600
+NUM_TOPICS = 10
+NUM_QUESTIONS = 200
 NUM_SCHOOLS = 200
-NUM_STUDENTS = 200
-NUM_ANS_QUESTIONS = 340
+NUM_STUDENTS = 4
+NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
 
 
 # def errtable():
@@ -48,7 +48,6 @@ NUM_ANS_QUESTIONS = 340
     # """
     # ctx.engine.execute(sql)
 
-
 class Db(DbTool):
     def __init__(self):
         self.parseArgs()
@@ -68,6 +67,8 @@ class Db(DbTool):
                             help='Create quiz database.')
         parser.add_argument('-s', '--small', action='store_true',
                             help='Create small testing data.')
+        parser.add_argument('--qs', action='store_true',
+                            help='Generate quiz statistics.')
         parser.add_argument('-c', '--config', default=None,
                             help="Configuration file (default: ../test-data/config.ini).")
         self.args = parser.parse_args()
@@ -179,18 +180,22 @@ class Db(DbTool):
                 DECLARE quest INT DEFAULT 1;
                 DECLARE nun_topics INT DEFAULT 1;
                 DECLARE qid INT DEFAULT 1;
+                DECLARE correct INT DEFAULT 1;
 
                 SET nun_topics = {chapters} * {topics};
 
-                PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?)';
+                PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?, ?)';
                 START TRANSACTION;
                 WHILE (user <= {num_users}) DO
                     WHILE (topic <= nun_topics) DO
+                        SET correct = 1;
                         WHILE (quest <= {num_ans}) DO
                             SET @a = user;
-                            SET @b = quest + (topic - 1) * {questions};
-                            EXECUTE stmt USING @a, @b;
+                            SET @b = correct < 2;
+                            SET @c = quest + (topic - 1) * {questions};
+                            EXECUTE stmt USING @a, @b, @c;
                             SET quest = quest + 1;
+                            SET correct = correct + 1;
                         END WHILE;
                         SET topic = topic + 1;
                         SET quest = 1;
@@ -217,8 +222,9 @@ class Db(DbTool):
         print("Populating with test data... questions")
         self.conn.execute('call aux_questions();')
 
-        #print("Populating quiz stat...")
-        #self.conn.execute('call aux_qstat();')
+        if self.args.qs:
+            print("Populating quiz stat...")
+            self.conn.execute('call aux_qstat();')
         #create_more_users()
 
     def fillSmallData(self):

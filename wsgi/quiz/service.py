@@ -14,7 +14,9 @@ class QuizService(ServiceBase):
         self.urls.add(Rule('/quiz/<int:topic>',
                       methods=['GET'],
                       endpoint='onQuizGet'))
-        self.urls.add(Rule('/quiz', methods=['POST'], endpoint='onQuizSave'))
+        self.urls.add(Rule('/quiz/<int:topic>',
+                      methods=['POST'],
+                      endpoint='onQuizSave'))
         self.urls.add(Rule('/exam', methods=['GET'], endpoint='onExamGet'))
 
     # TODO: test more
@@ -36,8 +38,9 @@ class QuizService(ServiceBase):
         result = json.dumps(quiz, separators=(',', ':'))
         return Response(result, content_type='application/json')
 
-    def onQuizSave(self, request):
+    def onQuizSave(self, request, topic):
         """ Save quiz results. """
+
         user_id = self.session['user_id']
         id_list = self._get_param(request, 'id')
         answers = self._get_param(request, 'answer')
@@ -46,7 +49,7 @@ class QuizService(ServiceBase):
             raise BadRequest('Missing parameter.')
 
         try:
-            self.core.saveQuizResults(user_id, id_list, answers)
+            self.core.saveQuizResults(user_id, topic, id_list, answers)
         except QuizCoreError, e:
             raise BadRequest(e.message)
 

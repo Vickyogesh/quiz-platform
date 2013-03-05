@@ -86,8 +86,16 @@ class DbTool(object):
                                     echo=self._verbose)
         self.conn = self.engine.connect()
 
+    def _setupTables(self):
+        print('Setup tables...')
+        self._removeTables()
+        self._createTables()
+        self._createFuncs()
+
     def _removeTables(self):
         print('Removing tables...')
+        self.engine.execute('DROP TABLE IF EXISTS topics_stat;')
+        self.engine.execute('DROP TABLE IF EXISTS errors_stat;')
         self.engine.execute('DROP TABLE IF EXISTS quiz_stat;')
         self.engine.execute('DROP TABLE IF EXISTS questions;')
         self.engine.execute('DROP TABLE IF EXISTS applications;')
@@ -150,7 +158,19 @@ class DbTool(object):
 
             CREATE TABLE quiz_stat(
                 user_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL,
                 question_id INTEGER UNSIGNED NOT NULL
+            );
+
+            CREATE TABLE errors_stat(
+                user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL
+            );
+
+            CREATE TABLE topics_stat(
+                user_id INTEGER UNSIGNED NOT NULL,
+                topic_id INTEGER UNSIGNED NOT NULL,
+                err_percent TINYINT NOT NULL DEFAULT -1
             );
             """))
 
@@ -163,10 +183,48 @@ class DbTool(object):
         self.tbl_questions = self.meta.tables['questions']
         self.tbl_quizstat = self.meta.tables['quiz_stat']
 
-    def _setupTables(self):
-        print('Setup tables...')
-        self._removeTables()
-        self._createTables()
+    def _createFuncs(self):
+        print('Creating function...')
+        self.conn.execute("DROP PROCEDURE IF EXISTS aux_trig_errupdate;")
+        self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_ins;")
+        self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_upd;")
+        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat;")
+        self.conn.execute(text(""" CREATE PROCEDURE aux_trig_errupdate
+            (user INTEGER UNSIGNED, question INTEGER UNSIGNED, isok BOOLEAN)
+            BEGIN
+                IF isok = 1 THEN
+                    DELETE IGNORE FROM errors_stat WHERE
+                        user_id=user AND question_id=question;
+                ELSE
+                    INSERT IGNORE INTO errors_stat VALUES(user, question);
+                END IF;
+            END;
+
+            CREATE TRIGGER trig_errupdate_ins AFTER INSERT ON quiz_stat
+            FOR EACH ROW CALL
+            aux_trig_errupdate(NEW.user_id, NEW.question_id, NEW.is_correct);
+
+            CREATE TRIGGER trig_errupdate_upd AFTER UPDATE ON quiz_stat
+            FOR EACH ROW CALL
+            aux_trig_errupdate(NEW.user_id, NEW.question_id, NEW.is_correct);
+
+            CREATE PROCEDURE update_topic_stat(user INTEGER UNSIGNED, topic INTEGER UNSIGNED)
+            BEGIN
+                SELECT count(*) INTO @err FROM questions WHERE topic_id=topic AND
+                id IN (SELECT question_id FROM quiz_stat WHERE user_id=user AND is_correct=0);
+
+                SELECT max_id - min_id + 1 INTO @num FROM topics WHERE id=topic;
+                SET @err = @err / @num * 100;
+
+                IF @err > 0 AND @err < 1 THEN SET @err = 1;
+                ELSEIF @err > 99 AND @err < 100 THEN SET @err = 99;
+                END IF
+
+                INSERT INTO topics_stat(user_id, topic_id, err_percent)
+                    VALUES(user, topic, @err)
+                ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
+            END;
+            """))
 
     def _fillApps(self):
         print('Populating applications...')
@@ -256,13 +314,21 @@ class DbTool(object):
         self.conn.execute('ALTER TABLE questions ADD INDEX ix_ch(chapter_id);')
 
         print("Creating indices... quiz_stat")
-        self.conn.execute('ALTER TABLE quiz_stat ADD UNIQUE ix_quiz(question_id, user_id);')
+        self.conn.execute('ALTER TABLE quiz_stat ADD UNIQUE ix_quizstat(user_id, question_id);')
+
+        print("Creating indices... errors_stat")
+        self.conn.execute('ALTER TABLE errors_stat ADD UNIQUE ix_errstat(user_id, question_id);')
+
+        print("Creating indices... topics_stat")
+        self.conn.execute('ALTER TABLE topics_stat ADD UNIQUE ix_topicstat(user_id, topic_id);')
 
         print("Doing tables optimizations...")
         self.conn.execute('OPTIMIZE TABLE applications, users, chapters;')
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
         self.conn.execute('OPTIMIZE TABLE quiz_stat;')
+        self.conn.execute('OPTIMIZE TABLE errors_stat;')
+        self.conn.execute('OPTIMIZE TABLE topics_stat;')
 
     def before(self):
         pass

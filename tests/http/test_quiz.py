@@ -34,7 +34,7 @@ class QuizGetTest(unittest.TestCase):
     # Try to get quiz with invalid topic
     def test_getBadTopic(self):
         r = self.req.get(url('/quiz'))
-        self.assertEqual(405, r.status_code)
+        self.assertEqual(404, r.status_code)
 
         r = self.req.get(url('/quiz/1/fr'))
         self.assertEqual(404, r.status_code)
@@ -104,33 +104,33 @@ class QuizPostTest(unittest.TestCase):
 
     # Authorize and send wrong data
     def test_postBad(self):
-        r = self.req.post(url('/quiz'), data={'aa': 12, 'bb': '44'})
+        r = self.req.post(url('/quiz/1'), data={'aa': 12, 'bb': '44'})
         self.assertEqual(400, r.status_code)
         self.assertEqual('Missing parameter.', r.text.splitlines()[-1])
 
     # # Authorize and send data with the wrong len
     def test_postBadLen(self):
-        r = self.req.post(url('/quiz'), data={'id': [12, 2], 'answer': '44'})
+        r = self.req.post(url('/quiz/1'), data={'id': [12, 2], 'answer': '44'})
         self.assertEqual(400, r.status_code)
         self.assertEqual('Parameters length mismatch.', r.text.splitlines()[-1])
 
     # # Authorize and send data with the zero len
     def test_postBadZeroLen(self):
-        r = self.req.post(url('/quiz'), data={'id': [], 'answer': '44'})
+        r = self.req.post(url('/quiz/1'), data={'id': [], 'answer': '44'})
         self.assertEqual(400, r.status_code)
         self.assertEqual('Missing parameter.', r.text.splitlines()[-1])
 
     # # Authorize and send data with the wrong value (only numbers are accepted)
     def test_postBadVal(self):
-        r = self.req.post(url('/quiz'),
-            data={'id': [12, 'abc'], 'answer': [1, 2]})
+        r = self.req.post(url('/quiz/1'),
+                          data={'id': [12, 'abc'], 'answer': [1, 2]})
         self.assertEqual(400, r.status_code)
         self.assertEqual('Invalid value.', r.text.splitlines()[-1])
 
     # # Good request
     def test_postOk(self):
-        r = self.req.post(url('/quiz'),
-            data={'id': [12, '14'], 'answer': [1, 2]})
+        r = self.req.post(url('/quiz/1'),
+                          data={'id': [12, '14'], 'answer': [1, 2]})
         self.assertEqual(200, r.status_code)
         self.assertEqual('ok', r.text.splitlines()[-1])
 
@@ -142,7 +142,8 @@ class QuizPostTest(unittest.TestCase):
 
     # Good request wiht string param
     def test_postOkString(self):
-        r = self.req.post(url('/quiz'), data={'id': "12,14", 'answer': "1,2"})
+        r = self.req.post(url('/quiz/1'),
+                          data={'id': "12,14", 'answer': "1,2"})
         self.assertEqual(200, r.status_code)
         self.assertEqual('ok', r.text.splitlines()[-1])
 
