@@ -53,6 +53,7 @@ class QuizDb(UserMixin, QuizMixin, ExamMixin):
         self.questions = self.meta.tables['questions']
         self.quiz_stat = self.meta.tables['quiz_stat']
         self.errors_stat = self.meta.tables['errors_stat']
+        self.topics_stat = self.meta.tables['topics_stat']
 
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):
