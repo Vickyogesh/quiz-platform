@@ -226,6 +226,10 @@ class Db(DbTool):
             print("Populating quiz stat...")
             self.conn.execute('call aux_qstat();')
         #create_more_users()
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_topics;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_questions;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_qstat;')
 
     def fillSmallData(self):
         print("Preparing to populate with SMALL test data...")

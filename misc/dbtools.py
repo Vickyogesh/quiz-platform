@@ -188,7 +188,7 @@ class DbTool(object):
         self.conn.execute("DROP PROCEDURE IF EXISTS aux_trig_errupdate;")
         self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_ins;")
         self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_upd;")
-        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat;")
+        self.conn.execute("DROP PROCEDURE IF EXISTS update_topic_stat;")
         self.conn.execute(text(""" CREATE PROCEDURE aux_trig_errupdate
             (user INTEGER UNSIGNED, question INTEGER UNSIGNED, isok BOOLEAN)
             BEGIN
@@ -207,7 +207,9 @@ class DbTool(object):
             CREATE TRIGGER trig_errupdate_upd AFTER UPDATE ON quiz_stat
             FOR EACH ROW CALL
             aux_trig_errupdate(NEW.user_id, NEW.question_id, NEW.is_correct);
+            """))
 
+        self.conn.execute(text("""
             CREATE PROCEDURE update_topic_stat(user INTEGER UNSIGNED, topic INTEGER UNSIGNED)
             BEGIN
                 SELECT count(*) INTO @err FROM questions WHERE topic_id=topic AND
@@ -218,7 +220,7 @@ class DbTool(object):
 
                 IF @err > 0 AND @err < 1 THEN SET @err = 1;
                 ELSEIF @err > 99 AND @err < 100 THEN SET @err = 99;
-                END IF
+                END IF;
 
                 INSERT INTO topics_stat(user_id, topic_id, err_percent)
                     VALUES(user, topic, @err)
