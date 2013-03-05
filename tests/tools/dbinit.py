@@ -6,443 +6,264 @@ import os
 import os.path
 import sys
 
-# to use settings
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'misc'))
 
 import argparse
-import hashlib
-from sqlalchemy import create_engine, MetaData, text
-from quiz.settings import Settings
-
+from sqlalchemy import text
+from dbtools import DbTool
 
 ###########################################################
 # Configuration
 ###########################################################
 
 NUM_CHAPTERS = 25
-NUM_TOPICS = 20
-NUM_QUESTIONS = 600
+NUM_TOPICS = 10
+NUM_QUESTIONS = 200
 NUM_SCHOOLS = 200
-NUM_STUDENTS = 200
-NUM_ANS_QUESTIONS = 340
-
-# application keys
-APPLICATIONS = [
-    {
-        'appkey': 'd1053fc29b0e07c7173890db4be19515bc04ae48',
-        'description': 'mobileapp'
-    },
-    {
-        'appkey': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
-        'description': 'webapp'
-    },
-    {
-        'appkey': 'b929d0c46cf5609e0104e50d301b0b8b482e9bfc',
-        'description': 'desktopapp'
-    }]
-
-# Test users
-USERS = [
-    {
-        'name': 'Test User',
-        'login': 'testuser',
-        'passwd': 'testpasswd',
-        'type':'student'
-    },
-    {
-        'name': 'Admin',
-        'login': 'root',
-        'passwd': 'adminpwd',
-        'type':'admin'
-    },
-    {
-        'name': 'Chuck Norris',
-        'login': 'chuck@norris.com',
-        'passwd': 'boo',
-        'type':'school'
-    }]
+NUM_STUDENTS = 4
+NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
 
 
-###########################################################
-# Script arguments
-###########################################################
+# def errtable():
+    # ctx.engine.execute(text('DROP TABLE IF EXISTS error_stat;'))
+    # ctx.engine.execute(text('DROP TABLE IF EXISTS topic_stat;'))
 
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    description='Quiz test databse setup tool.')
-parser.add_argument('-v', '--verbose', action='store_true',
-                    help='Verbose output.')
-parser.add_argument('-n', '--new', action='store_true',
-                    help='Create quiz database.')
-parser.add_argument('-s', '--small', action='store_true',
-                    help='Create small testing data.')
-parser.add_argument('-c', '--config', default='',
-                    help="Configuration file (default: ../test-data/config.ini).")
-args = parser.parse_args()
+    # sql = """ CREATE TABLE topic_stat(
+    #         user_id INTEGER UNSIGNED NOT NULL,
+    #         topic_id INTEGER UNSIGNED NOT NULL,
+    #         error_percent SMALLINT NOT NULL DEFAULT 0
+    #     )
+    #     ALTER TABLE topic_stat ADD UNIQUE ix_err(user_id, topic_id);
 
+    #     CREATE TABLE error_stat(
+    #         user_id INTEGER UNSIGNED NOT NULL,
+    #         question_id INTEGER UNSIGNED NOT NULL
+    #     );
+    #     ALTER TABLE error_stat ADD UNIQUE ix_err(question_id, user_id);
 
-###########################################################
-# Settings setup
-###########################################################
+    #     DROP TRIGGER IF EXISTS tg_error_update;
+    #     CREATE TRIGGER tg_error_update AFTER INSERT ON quiz_stat
+    #     FOR EACH ROW DELETE FROM error_stat
+    #         WHERE user_id=NEW.user_id AND question_id=NEW.question_id;
+    # """
+    # ctx.engine.execute(sql)
 
-if len(args.config) == 0:
-    path = os.path.join(os.path.dirname(__file__),
-                        '..', '..',
-                        'test-data',
-                        'config.ini')
-    paths = os.path.split(os.path.abspath(path))
-else:
-    paths = os.path.split(args.config)
+class Db(DbTool):
+    def __init__(self):
+        self.parseArgs()
+        DbTool.__init__(self,
+                        self.args.verbose,
+                        self.args.new,
+                        self.args.config)
+        self._users = DbTool.TEST_USERS
 
-Settings.CONFIG_FILE = paths[1]
-settings = Settings([paths[0]])
+    def parseArgs(self):
+        parser = argparse.ArgumentParser(
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description='Quiz test databse setup tool.')
+        parser.add_argument('-v', '--verbose', action='store_true',
+                            help='Verbose output.')
+        parser.add_argument('-n', '--new', action='store_true',
+                            help='Create quiz database.')
+        parser.add_argument('-s', '--small', action='store_true',
+                            help='Create small testing data.')
+        parser.add_argument('--qs', action='store_true',
+                            help='Generate quiz statistics.')
+        parser.add_argument('-c', '--config', default=None,
+                            help="Configuration file (default: ../test-data/config.ini).")
+        self.args = parser.parse_args()
 
+    def createUsers(self):
+        print('Populating: %d schools with %d users per school...'
+              % (NUM_SCHOOLS, NUM_STUDENTS))
 
-class Context(object):
-    pass
-ctx = Context()
-
-
-###########################################################
-# Functions
-###########################################################
-
-def setup():
-    print('Setup...')
-    global ctx
-    ctx.engine = create_engine(settings.dbinfo['database'], echo=args.verbose)
-    ctx.conn = ctx.engine.connect()
-
-
-def drop_tables():
-    print('Removing tables...')
-    ctx.engine.execute(text('DROP TABLE IF EXISTS quiz_stat;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS questions;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS applications;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS users;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS topics;'))
-    ctx.engine.execute(text('DROP TABLE IF EXISTS chapters;'))
-
-
-def create_db():
-    print('Creating db...')
-    engine = create_engine(settings.dbinfo['uri'], echo=args.verbose)
-    engine.execute("CREATE DATABASE IF NOT EXISTS quiz")
-
-
-def create_tables():
-    print('Creating tables...')
-    ctx.conn.execute(text(
-        """ CREATE TABLE applications(
-            id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            appkey VARCHAR(50) NOT NULL,
-            description VARCHAR(100),
-            CONSTRAINT PRIMARY KEY (id),
-            CONSTRAINT UNIQUE (appkey)
-        );
-
-        CREATE TABLE users(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-            name VARCHAR(100) NOT NULL,
-            login VARCHAR(100) NOT NULL,
-            passwd VARCHAR(100) NOT NULL,
-            type ENUM('admin', 'school', 'student', 'guest') NOT NULL,
-            school_id INTEGER UNSIGNED,
-            CONSTRAINT PRIMARY KEY (id),
-            CONSTRAINT UNIQUE (login)
-        );
-
-        CREATE TABLE chapters(
-            id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            priority TINYINT UNSIGNED NOT NULL,
-            text VARCHAR(100) NOT NULL,
-            CONSTRAINT PRIMARY KEY (id)
-        );
-
-        CREATE TABLE topics(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-            text VARCHAR(200) NOT NULL,
-            text_fr VARCHAR(200),
-            text_de VARCHAR(200),
-            chapter_id SMALLINT UNSIGNED,
-            CONSTRAINT PRIMARY KEY (id)
-        );
-        ALTER TABLE topics ADD INDEX ix_chid(chapter_id);
-
-        CREATE TABLE questions(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-            text VARCHAR(256) NOT NULL,
-            text_fr VARCHAR(256),
-            text_de VARCHAR(256),
-            answer BOOLEAN NOT NULL,
-            image VARCHAR(10),
-            image_part VARCHAR(10),
-            chapter_id SMALLINT UNSIGNED NOT NULL,
-            topic_id INTEGER UNSIGNED NOT NULL,
-            CONSTRAINT PRIMARY KEY (id)
-        );
-        ALTER TABLE questions ADD INDEX ix_tp(topic_id);
-        ALTER TABLE questions ADD INDEX ix_ch(chapter_id);
-
-        CREATE TABLE quiz_stat(
-            user_id INTEGER UNSIGNED NOT NULL,
-            question_id INTEGER UNSIGNED NOT NULL
-        );
-        ALTER TABLE quiz_stat ADD UNIQUE ix_quiz(question_id, user_id);
-        """))
-
-    ctx.meta = MetaData()
-    ctx.meta.reflect(bind=ctx.engine)
-    ctx.tbl_apps = ctx.meta.tables['applications']
-    ctx.tbl_users = ctx.meta.tables['users']
-    ctx.tbl_chapters = ctx.meta.tables['chapters']
-    ctx.tbl_topics = ctx.meta.tables['topics']
-    ctx.tbl_questions = ctx.meta.tables['questions']
-    ctx.tbl_quizstat = ctx.meta.tables['quiz_stat']
-
-
-def fill_apps():
-    print('Populating applications...')
-    ctx.conn.execute(ctx.tbl_apps.insert(), APPLICATIONS)
-
-
-def _create_digest(username, passwd):
-    m = hashlib.md5()
-    m.update('%s:%s' % (username, passwd))
-    return m.hexdigest()
-
-
-def create_users():
-    print("Populating users with test entries...")
-    vals = []
-    for user in USERS:
-        user['passwd'] = _create_digest(user['login'], user['passwd'])
-        vals.append(user)
-    ctx.conn.execute(ctx.tbl_users.insert(), vals)
-
-
-def create_more_users():
-    print("Populating: %d schools with %d users per school..."
-          % (NUM_SCHOOLS, NUM_STUDENTS))
-
-    for i in range(1, NUM_SCHOOLS):
-        vals = []
-        tmp = 'school%d' % i
-        vals.append({
-            'name': tmp,
-            'login': tmp,
-            'passwd': _create_digest(tmp, tmp),
-            'type': 'school',
-            'school_id': None
-        })
-        for j in range(1, NUM_STUDENTS):
-            tmp = 'student%d.%d' % (i, j)
+        for i in range(1, NUM_SCHOOLS):
+            vals = []
+            tmp = 'school%d' % i
             vals.append({
                 'name': tmp,
                 'login': tmp,
-                'passwd': _create_digest(tmp, tmp),
-                'type': 'student',
-                'school_id': i
+                'passwd': self._create_digest(tmp, tmp),
+                'type': 'school',
+                'school_id': None
             })
-        ctx.conn.execute(ctx.tbl_users.insert(), vals)
+            for j in range(1, NUM_STUDENTS):
+                tmp = 'student%d.%d' % (i, j)
+                vals.append({
+                    'name': tmp,
+                    'login': tmp,
+                    'passwd': self._create_digest(tmp, tmp),
+                    'type': 'student',
+                    'school_id': i
+                })
+            self.conn.execute(self.tbl_users.insert(), vals)
 
+    def fillBigData(self):
+        print("Preparing to populate with test data...")
+        self.conn.execute('TRUNCATE TABLE chapters;')
+        self.conn.execute('TRUNCATE TABLE topics;')
+        self.conn.execute('TRUNCATE TABLE questions;')
+        self.conn.execute('TRUNCATE TABLE quiz_stat;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_topics;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_questions;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_qstat;')
 
-def populate_big():
-    print("Preparing to populate with test data...")
-    ctx.conn.execute(text('TRUNCATE TABLE chapters;'))
-    ctx.conn.execute(text('TRUNCATE TABLE topics;'))
-    ctx.conn.execute(text('TRUNCATE TABLE questions;'))
-    ctx.conn.execute(text('TRUNCATE TABLE quiz_stat;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_chapters;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_topics;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_questions;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_qstat;'))
-
-    ctx.conn.execute(text(
-        """CREATE PROCEDURE aux_chapters()
-        BEGIN
-            DECLARE i INT DEFAULT 1;
-            PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, 1, ?)';
-            START TRANSACTION;
-            WHILE (i <= {chapters}) DO
-                SET @a = i;
-                SET @b = CONCAT('chapter ', i);
-                EXECUTE stmt USING @a, @b;
-                SET i = i + 1;
-            END WHILE;
-            COMMIT;
-            DEALLOCATE PREPARE stmt;
-        END;
-        CREATE PROCEDURE aux_topics()
-        BEGIN
-            DECLARE i INT DEFAULT 1;
-            DECLARE j INT DEFAULT 1;
-
-            PREPARE stmt FROM 'INSERT INTO topics(text, chapter_id) VALUES(?, ?)';
-            START TRANSACTION;
-            WHILE (i <= {chapters}) DO
-                WHILE (j <= {topics}) DO
-                    SET @a = CONCAT('topic ', i, '.', j);
-                    SET @b = i;
+        self.conn.execute(text(
+            """CREATE PROCEDURE aux_chapters()
+            BEGIN
+                DECLARE i INT DEFAULT 1;
+                PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, 1, ?, 0, 0)';
+                START TRANSACTION;
+                WHILE (i <= {chapters}) DO
+                    SET @a = i;
+                    SET @b = CONCAT('chapter ', i);
                     EXECUTE stmt USING @a, @b;
-                    SET j = j + 1;
+                    SET i = i + 1;
                 END WHILE;
-                SET i = i + 1;
-                SET j = 1;
-            END WHILE;
-            COMMIT;
-            update chapters set priority=2 where id > 10;
-            DEALLOCATE PREPARE stmt;
-        END;
-        CREATE PROCEDURE aux_questions()
-        BEGIN
-            DECLARE chap INT DEFAULT 1;
-            DECLARE top INT DEFAULT 1;
-            DECLARE quest INT DEFAULT 1;
-            DECLARE n INT DEFAULT 1;
-            SET n = {chapters} * {topics};
+                COMMIT;
+                DEALLOCATE PREPARE stmt;
+            END;
+            CREATE PROCEDURE aux_topics()
+            BEGIN
+                DECLARE i INT DEFAULT 1;
+                DECLARE j INT DEFAULT 1;
 
-            PREPARE stmt FROM 'INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(?, 1, ?, ?)';
-            START TRANSACTION;
-            WHILE (chap <= {chapters}) DO
-                WHILE (top <= {topics}) DO
-                    WHILE (quest <= {questions}) DO
-                        SET @a = CONCAT('question ', chap, '.', top, '.', quest);
-                        SET @b = chap;
-                        SET @c = top + (chap - 1) * {topics};
-                        EXECUTE stmt USING @a, @b, @c;
-                        SET quest = quest + 1;
-                    END WHILE;
-                    SET top = top + 1;
-                    SET quest = 1;
-                END WHILE;
-                SET chap = chap + 1;
-                SET top = 1;
-            END WHILE;
-            COMMIT;
-            DEALLOCATE PREPARE stmt;
-        END;
-        CREATE PROCEDURE aux_qstat()
-        BEGIN
-            DECLARE user INT DEFAULT 1;
-            DECLARE topic INT DEFAULT 1;
-            DECLARE quest INT DEFAULT 1;
-            DECLARE nun_topics INT DEFAULT 1;
-            DECLARE qid INT DEFAULT 1;
-
-            SET nun_topics = {chapters} * {topics};
-
-            PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?)';
-            START TRANSACTION;
-            WHILE (user <= {num_users}) DO
-                WHILE (topic <= nun_topics) DO
-                    WHILE (quest <= {num_ans}) DO
-                        SET @a = user;
-                        SET @b = quest + (topic - 1) * {questions};
+                PREPARE stmt FROM 'INSERT INTO topics(text, chapter_id) VALUES(?, ?)';
+                START TRANSACTION;
+                WHILE (i <= {chapters}) DO
+                    WHILE (j <= {topics}) DO
+                        SET @a = CONCAT('topic ', i, '.', j);
+                        SET @b = i;
                         EXECUTE stmt USING @a, @b;
-                        SET quest = quest + 1;
+                        SET j = j + 1;
                     END WHILE;
-                    SET topic = topic + 1;
+                    SET i = i + 1;
+                    SET j = 1;
+                END WHILE;
+                COMMIT;
+                update chapters set priority=2 where id > 10;
+                DEALLOCATE PREPARE stmt;
+            END;
+            CREATE PROCEDURE aux_questions()
+            BEGIN
+                DECLARE chap INT DEFAULT 1;
+                DECLARE top INT DEFAULT 1;
+                DECLARE quest INT DEFAULT 1;
+                DECLARE n INT DEFAULT 1;
+                SET n = {chapters} * {topics};
+
+                PREPARE stmt FROM 'INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(?, 1, ?, ?)';
+                START TRANSACTION;
+                WHILE (chap <= {chapters}) DO
+                    WHILE (top <= {topics}) DO
+                        WHILE (quest <= {questions}) DO
+                            SET @a = CONCAT('question ', chap, '.', top, '.', quest);
+                            SET @b = chap;
+                            SET @c = top + (chap - 1) * {topics};
+                            EXECUTE stmt USING @a, @b, @c;
+                            SET quest = quest + 1;
+                        END WHILE;
+                        SET top = top + 1;
+                        SET quest = 1;
+                    END WHILE;
+                    SET chap = chap + 1;
+                    SET top = 1;
+                END WHILE;
+                COMMIT;
+                DEALLOCATE PREPARE stmt;
+            END;
+            CREATE PROCEDURE aux_qstat()
+            BEGIN
+                DECLARE user INT DEFAULT 1;
+                DECLARE topic INT DEFAULT 1;
+                DECLARE quest INT DEFAULT 1;
+                DECLARE nun_topics INT DEFAULT 1;
+                DECLARE qid INT DEFAULT 1;
+                DECLARE correct INT DEFAULT 1;
+
+                SET nun_topics = {chapters} * {topics};
+
+                PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?, ?)';
+                START TRANSACTION;
+                WHILE (user <= {num_users}) DO
+                    WHILE (topic <= nun_topics) DO
+                        SET correct = 1;
+                        WHILE (quest <= {num_ans}) DO
+                            SET @a = user;
+                            SET @b = correct < 2;
+                            SET @c = quest + (topic - 1) * {questions};
+                            EXECUTE stmt USING @a, @b, @c;
+                            SET quest = quest + 1;
+                            SET correct = correct + 1;
+                        END WHILE;
+                        SET topic = topic + 1;
+                        SET quest = 1;
+                    END WHILE;
+                    SET user = user + 1;
+                    SET topic = 1;
                     SET quest = 1;
                 END WHILE;
-                SET user = user + 1;
-                SET topic = 1;
-                SET quest = 1;
-            END WHILE;
-            COMMIT;
-            DEALLOCATE PREPARE stmt;
-        END;
-        """.format(chapters=NUM_CHAPTERS,
-                   topics=NUM_TOPICS,
-                   questions=NUM_QUESTIONS,
-                   num_users=20,
-                   num_ans=NUM_ANS_QUESTIONS)))
+                COMMIT;
+                DEALLOCATE PREPARE stmt;
+            END;
+            """.format(chapters=NUM_CHAPTERS,
+                       topics=NUM_TOPICS,
+                       questions=NUM_QUESTIONS,
+                       num_users=20,
+                       num_ans=NUM_ANS_QUESTIONS)))
 
-    print("Populating with test data...")
-    ctx.conn.execute(text('call aux_chapters();'))
-    ctx.conn.execute(text('call aux_topics();'))
-    ctx.conn.execute(text('call aux_questions();'))
+        print("Populating with test data... chapters")
+        self.conn.execute('call aux_chapters();')
 
-    print("Populating quiz stat...")
-    #ctx.conn.execute(text('call aux_qstat();'))
+        print("Populating with test data... topics")
+        self.conn.execute('call aux_topics();')
 
-    #create_more_users()
+        print("Populating with test data... questions")
+        self.conn.execute('call aux_questions();')
 
-    print("Do optimize...")
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_chapters;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_topics;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_questions;'))
-    ctx.conn.execute(text('DROP PROCEDURE IF EXISTS aux_qstat;'))
-    ctx.conn.execute(text('OPTIMIZE TABLE applications, users, chapters;'))
-    ctx.conn.execute(text('OPTIMIZE TABLE topics;'))
-    ctx.conn.execute(text('OPTIMIZE TABLE questions;'))
-    ctx.conn.execute(text('OPTIMIZE TABLE quiz_stat;'))
+        if self.args.qs:
+            print("Populating quiz stat...")
+            self.conn.execute('call aux_qstat();')
+        #create_more_users()
 
+    def fillSmallData(self):
+        print("Preparing to populate with SMALL test data...")
+        self.conn.execute('TRUNCATE TABLE chapters;')
+        self.conn.execute('TRUNCATE TABLE topics;')
+        self.conn.execute('TRUNCATE TABLE questions;')
+        self.conn.execute('TRUNCATE TABLE quiz_stat;')
 
-def populate_small():
-    print("Preparing to populate with SMALL test data...")
-    ctx.conn.execute(text('TRUNCATE TABLE chapters;'))
-    ctx.conn.execute(text('TRUNCATE TABLE topics;'))
-    ctx.conn.execute(text('TRUNCATE TABLE questions;'))
-    ctx.conn.execute(text('TRUNCATE TABLE quiz_stat;'))
+        chapters = [1, 2, 3]
+        topics = range(1, 3)
+        questions = range(1, 101)
 
-    chapters = [1, 2, 3]
-    topics = range(1, 3)
-    questions = range(1, 101)
+        print("Creating chapters...")
+        sql = text("INSERT INTO chapters VALUES(0, 1, :txt)")
+        for i in chapters:
+            self.conn.execute(sql, txt='chapter %d' % i)
 
-    print("Creating chapters...")
-    sql = text("INSERT INTO chapters VALUES(0, 1, :txt)")
-    for i in chapters:
-        ctx.conn.execute(sql, txt='chapter %d' % i)
+        print("Creating topics...")
+        sql = text("INSERT INTO topics VALUES(0, :txt, :txt, :txt, :ch)")
+        for ch in chapters:
+            for t in topics:
+                self.conn.execute(sql, txt='topic %d.%d' % (ch, t), ch=ch)
 
-    print("Creating topics...")
-    sql = text("INSERT INTO topics VALUES(0, :txt, :txt, :txt, :ch)")
-    for ch in chapters:
-        for t in topics:
-            ctx.conn.execute(sql, txt='topic %d.%d' % (ch, t), ch=ch)
+        print("Creating questions...")
+        sql = text("""INSERT INTO questions VALUES
+                   (0, :txt, :txt, :txt, :ans, '', '', :ch, :topic)""")
+        top = 1
+        for ch in chapters:
+            for t in topics:
+                for q in questions:
+                    txt = '%d.%d.%d Question' % (ch, t, q)
+                    self.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=top)
+                top += 1
 
-    print("Creating questions...")
-    sql = text("""INSERT INTO questions VALUES
-               (0, :txt, :txt, :txt, :ans, '', '', :ch, :topic)""")
-    top = 1
-    for ch in chapters:
-        for t in topics:
-            for q in questions:
-                txt = '%d.%d.%d Question' % (ch, t, q)
-                ctx.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=top)
-            top += 1
+    def fillData(self):
+        if self.args.small:
+            self.fillSmallData()
+        else:
+            self.fillBigData()
 
-
-def actions():
-    drop_tables()
-    create_tables()
-    fill_apps()
-    create_users()
-
-    if args.small:
-        populate_small()
-    else:
-        populate_big()
-
-
-###########################################################
-# Action!
-###########################################################
-
-if args.new:
-    create_db()
-
-setup()
-
-t = ctx.conn.begin()
-try:
-    actions()
-except Exception as e:
-    print(e)
-    print('Rollback changes...')
-    t.rollback()
-except:
-    print('Rollback changes...')
-    t.rollback()
-else:
-    t.commit()
+Db().run()

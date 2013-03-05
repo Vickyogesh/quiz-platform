@@ -1,5 +1,4 @@
 from sqlalchemy import select, text
-from sqlalchemy.exc import IntegrityError
 from ..exceptions import QuizCoreError
 
 
@@ -16,9 +15,15 @@ class QuizMixin(object):
         # See getQuiz() comments for more info.
         self.__getquiz = text(
             """SELECT * FROM (SELECT * FROM questions WHERE id NOT IN (
-            SELECT question_id FROM quiz_stat WHERE user_id=:user_id)
+            SELECT question_id FROM quiz_stat WHERE
+            user_id=:user_id AND is_correct=1)
             AND topic_id=:topic_id LIMIT 100) t ORDER BY RAND() LIMIT 40;""")
         self.__getquiz = self.__getquiz.compile(self.engine)
+
+        self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
+
+        self.__update_stat = text("call update_topic_stat(:user, :topic);")
+        self.__update_stat = self.__update_stat.compile(self.engine)
 
     # Get 40 random questions from for the specified topic which are
     # not answered by the specified user.
@@ -79,7 +84,7 @@ class QuizMixin(object):
             quiz.append(d)
         return quiz
 
-    def saveQuizResult(self, user_id, questions, answers):
+    def saveQuizResult(self, user_id, topic_id, questions, answers):
         if len(questions) != len(answers):
             raise QuizCoreError('Parameters length mismatch.')
 
@@ -110,16 +115,23 @@ class QuizMixin(object):
         res = self.conn.execute(s)
 
         if res:
-            stat = []
+            ans = []
             for row, answer in zip(res, answers):
-                if row[q.c.answer] == answer:
-                    stat.append({'user_id': user_id,
-                                'question_id': row[q.c.id]})
+                ans.append({
+                    'user_id': user_id,
+                    'question_id': row[q.c.id],
+                    'is_correct': row[q.c.answer] == answer
+                })
 
-        if stat:
+        if answers:
+            t = self.conn.begin()
             try:
-                self.conn.execute(self.quiz_stat.insert(), stat)
-            except IntegrityError as e:
-                # seems quiz_stat already contains value from the answers
-                print(e)
-                raise QuizCoreError('Contains already answered questions.')
+                self.conn.execute(self.quiz_stat.insert(
+                                  append_string=self.__add),
+                                  ans)
+                self.conn.execute(self.__update_stat,
+                                  user=user_id, topic=topic_id)
+            except Exception:
+                t.rollback()
+            else:
+                t.commit()

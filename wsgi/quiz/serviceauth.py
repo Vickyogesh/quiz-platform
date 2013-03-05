@@ -89,6 +89,7 @@ class AuthMixin(object):
 
         self.session['app_id'] = data['app_id']
         self.session['user_id'] = data['user_id']
+        self.session['user_name'] = data['name']
         self.session['user_type'] = data['type']
         self.session.save()
         return Response()

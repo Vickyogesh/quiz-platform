@@ -1,5 +1,5 @@
 import random
-from sqlalchemy import select, text
+from sqlalchemy import select, text, func
 
 
 class ExamMixin(object):
@@ -7,16 +7,10 @@ class ExamMixin(object):
     def __init__(self):
 
         # Get chapters info: priority and chapter's questions' id range.
-        query = text(""" SELECT c.priority, q.mn, q.mx FROM chapters c
-                 INNER JOIN (
-                    SELECT chapter_id, min(id) mn, max(id) mx FROM questions
-                    GROUP BY chapter_id
-                 ) q ON c.id = q.chapter_id;""")
-
+        query = text('SELECT priority, min_id, max_id FROM chapters')
         self.__stmt_ch_info = query.compile(self.engine)
 
-        #query = select(text("""SELECT * FROM questions WHERE id IN (?)"""))
-
+    # TODO: maybe create stored procedire to build list of questions?
     def __generate_idList(self):
         id_list = []
 
@@ -25,10 +19,10 @@ class ExamMixin(object):
         # min question ID for the chapter and max question ID for the chapter.
         # Example:
         #
-        # | priority | mn  |  mx
+        # | priority | min_id  |  max_id
         # |----------+-----+------
-        # |     1    |  0  |  100
-        # |     2    | 101 |  200
+        # |     1    |    0    |  100
+        # |     2    |   101   |  200
         #
         # This means what for row 1 we need select one question in the range
         # [0 - 100] and for row 2 we need select two (random) questions
@@ -71,7 +65,7 @@ class ExamMixin(object):
         else:
             txt_lang = q.c.text
 
-        s = select([q], q.c.id.in_(id_list))
+        s = select([q], q.c.id.in_(id_list)).order_by(func.rand())
         res = self.conn.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
@@ -87,7 +81,4 @@ class ExamMixin(object):
             self._aux_question_delOptionalField(d)
             exam.append(d)
 
-        # TODO: there are only 40 rows maybe just add ORDER BY RAND()?
-        # Make it more "random".
-        random.shuffle(exam)
         return exam

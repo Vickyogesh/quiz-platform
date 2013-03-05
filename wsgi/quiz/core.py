@@ -28,7 +28,7 @@ class QuizCore(object):
         res = self.db.getQuiz(topic_id, user_id, lang)
         return {'topic': topic_id, 'questions': res}
 
-    def saveQuizResults(self, user_id, id_list, answers):
+    def saveQuizResults(self, user_id, topic_id, id_list, answers):
         """ Save quiz result for the user.
 
         Args:
@@ -42,7 +42,10 @@ class QuizCore(object):
         .. note::
            questions and answers must have tha same length.
         """
-        self.db.saveQuizResult(user_id, id_list, answers)
+        self.db.saveQuizResult(user_id, topic_id, id_list, answers)
 
     def getExam(self, lang):
         return self.db.getExam(lang)
+
+    def getUserStat(self, user, lang):
+        return self.db.getUserStat(user, lang)

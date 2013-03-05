@@ -9,3 +9,4 @@ Quiz Web Service API v1
 
    auth
    quiz
+   student_stat

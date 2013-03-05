@@ -1,7 +1,18 @@
 from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import Insert
 from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
+
+
+# http://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update
+@compiles(Insert)
+def append_string(insert, compiler, **kw):
+    s = compiler.visit_insert(insert, **kw)
+    if 'append_string' in insert.kwargs:
+        return s + " " + insert.kwargs['append_string']
+    return s
 
 
 # NOTE: to disable connection pool:
@@ -41,9 +52,11 @@ class QuizDb(UserMixin, QuizMixin, ExamMixin):
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
         self.quiz_stat = self.meta.tables['quiz_stat']
+        self.errors_stat = self.meta.tables['errors_stat']
+        self.topics_stat = self.meta.tables['topics_stat']
 
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):
         for x in self.__optional_question_fields:
-            if d[x] == None:
+            if d[x] is None:
                 del d[x]

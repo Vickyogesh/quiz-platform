@@ -2,7 +2,7 @@
 Quiz
 ----
 
-.. http:get:: /quiz/<topic_id>
+.. http:get:: /quiz/(topic_id)
 
    Get quiz for the specified topic and language (optional).
 
@@ -73,12 +73,9 @@ Quiz
 
 
 
-.. http:post:: /quiz
+.. http:post:: /quiz/(topic_id)
 
-   Send quiz results.
-
-   :form topic: Questions topic id
-      (optional – currently not used by the service).
+   Send quiz results for the specified topic.
 
    :form id: List of answered question IDs.
    :form answers: List of answers regarding to id list.
@@ -98,7 +95,3 @@ Quiz
 
    :statuscode 400: Invalid value.
       List element is not a number.
-
-   :statuscode 400: Contains already answered questions.
-      List of answers contains a question(s) which is
-      already answered by the user.

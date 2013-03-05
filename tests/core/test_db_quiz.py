@@ -16,13 +16,19 @@ class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.db = QuizDb(self)
-        self.stat = self.db.quiz_stat
+        self.quiz_stat = self.db.quiz_stat
+        self.topics_stat = self.db.topics_stat
+        self.errors_stat = self.db.errors_stat
         self.questions = self.db.questions
         self.conn = self.db.conn
         self.conn.execute("DELETE from quiz_stat;")
+        self.conn.execute("DELETE from topics_stat;")
+        self.conn.execute("DELETE from errors_stat;")
 
     def tearDown(self):
         self.conn.execute("DELETE from quiz_stat;")
+        self.conn.execute("DELETE from topics_stat;")
+        self.conn.execute("DELETE from errors_stat;")
         self.conn.close()
 
     def test_getInfo(self):
@@ -44,10 +50,10 @@ class DbQuizTest(unittest.TestCase):
         quiz = self.db.getQuiz(1, 1, 'it')
         ids = [x['id'] for x in quiz][:5]
         answers = [1] * 5
-        self.db.saveQuizResult(1, ids, answers)
+        self.db.saveQuizResult(1, 1, ids, answers)
 
         # quiz stat must contain only 'ids'
-        s = self.stat
+        s = self.quiz_stat
         res = self.conn.execute(select([s]).order_by(s.c.question_id))
         for row, id in zip(res, sorted(ids)):
             self.assertEqual(1, row[s.c.user_id])
@@ -56,32 +62,79 @@ class DbQuizTest(unittest.TestCase):
     def test_saveQuizUnordered(self):
         ids = [12, 14, 1]
         answers = [1, 0, 0]
-        self.db.saveQuizResult(1, ids, answers)
+        self.db.saveQuizResult(1, 1, ids, answers)
 
         # quiz stat must contain only '12'
-        s = self.stat
+        s = self.quiz_stat
         res = self.conn.execute(select([s]).order_by(s.c.question_id))
         rows = res.fetchall()
 
+        self.assertEqual(3, len(rows))
+        self.assertEqual(1, rows[0][s.c.user_id])
+        self.assertEqual(1, rows[0][s.c.question_id])
+        self.assertEqual(1, rows[1][s.c.user_id])
+        self.assertEqual(12, rows[1][s.c.question_id])
+        self.assertEqual(1, rows[2][s.c.user_id])
+        self.assertEqual(14, rows[2][s.c.question_id])
+
+    # TODO: fix me - commented out because there are many questions generated
+    # by the test dbinit tool, so this test takes too ling.
+    # def test_saveQuizAll(self):
+    #     quiz = self.db.getQuiz(1, 1, 'it')
+    #     id_list = []
+    #     #while len(quiz):
+    #     for x in xrange(20):
+    #         ids = [x['id'] for x in quiz]
+    #         id_list.extend(ids)
+    #         answers = [1] * len(ids)
+    #         self.db.saveQuizResult(1, ids, answers)
+    #         quiz = self.db.getQuiz(1, 1, 'it')
+
+    #     s = self.quiz_stat
+    #     res = self.conn.execute(select([s]).order_by(s.c.question_id))
+    #     for row, id in zip(res, sorted(id_list)):
+    #         self.assertEqual(1, row[s.c.user_id])
+    #         self.assertEqual(id, row[s.c.question_id])
+
+    def test_errorStat(self):
+        self.db.saveQuizResult(1, 1, [1, 2, 3], [1, 0, 0])
+
+        s = self.errors_stat
+        rows = self.conn.execute(select([s]).order_by(s.c.question_id))
+        rows = rows.fetchall()
+        self.assertEqual(2, len(rows))
+        self.assertEqual(1, rows[0][s.c.user_id])
+        self.assertEqual(2, rows[0][s.c.question_id])
+        self.assertEqual(1, rows[1][s.c.user_id])
+        self.assertEqual(3, rows[1][s.c.question_id])
+
+        self.db.saveQuizResult(1, 1, [1, 2, 3], [1, 1, 0])
+
+        s = self.errors_stat
+        rows = self.conn.execute(select([s]).order_by(s.c.question_id))
+        rows = rows.fetchall()
         self.assertEqual(1, len(rows))
         self.assertEqual(1, rows[0][s.c.user_id])
-        self.assertEqual(12, rows[0][s.c.question_id])
+        self.assertEqual(3, rows[0][s.c.question_id])
 
-    def test_saveQuizAll(self):
-        quiz = self.db.getQuiz(1, 1, 'it')
-        id_list = []
-        while len(quiz):
-            ids = [x['id'] for x in quiz]
-            id_list.extend(ids)
-            answers = [1] * len(ids)
-            self.db.saveQuizResult(1, ids, answers)
-            quiz = self.db.getQuiz(1, 1, 'it')
+    def test_topicStat(self):
+        ids = range(1, 11)
+        answers = [0] * len(ids)
+        self.db.saveQuizResult(1, 1, ids, answers)
 
-        s = self.stat
-        res = self.conn.execute(select([s]).order_by(s.c.question_id))
-        for row, id in zip(res, sorted(id_list)):
-            self.assertEqual(1, row[s.c.user_id])
-            self.assertEqual(id, row[s.c.question_id])
+        s = self.errors_stat
+        rows = self.conn.execute(select([s]).order_by(s.c.question_id))
+        rows = rows.fetchall()
+        self.assertEqual(10, len(rows))
+
+        s = self.topics_stat
+        rows = self.conn.execute(select([s]))
+        rows = rows.fetchall()
+
+        self.assertEqual(1, len(rows))
+        self.assertEqual(1, rows[0][s.c.user_id])
+        self.assertEqual(1, rows[0][s.c.topic_id])
+        self.assertEqual(5, rows[0][s.c.err_percent])
 
 
 def suite():
