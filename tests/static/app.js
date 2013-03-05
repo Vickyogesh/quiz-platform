@@ -141,7 +141,7 @@ function onGetQuiz()
     aux_fillTable($("#quiztab table"), data.questions);
   })
   .error(function(data) {
-    aux_showError(data.statusText);
+    aux_showError(data.responseText);
   });
 }
 //----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ function onGetExam()
     aux_fillTable($("#examtab #examtable"), data);
   })
   .error(function(data) {
-    aux_showError(data.statusText);
+    aux_showError(data.responseText);
   });
 }
 //----------------------------------------------------------------------------
@@ -198,6 +198,64 @@ function onGetExam()
 function onSendExam()
 {
   aux_showError("Not implemented yet!");
+}
+//----------------------------------------------------------------------------
+
+function aux_clearUserStat()
+{
+  $("#studentstattab .row #id").text('N/A');
+  $("#studentstattab .row #name").text('N/A');
+  $("#studentstattab .row #exams").text('N/A');
+  $("#studentstattab tbody tr").remove();
+}
+//----------------------------------------------------------------------------
+
+function aux_fillUserStat(data)
+{
+  var body = $("#studentstattab tbody");
+
+  $("#studentstattab .row #id").text(data.id);
+  $("#studentstattab .row #name").text(data.name);
+
+  var topics = data.topics;
+  for (var t in topics)
+  {
+    var html = "<tr>";
+    html += "<td>" + topics[t].id + ".</td>";
+    html += "<td>" + topics[t].text + "</td>";
+
+    var err = topics[t].errors;
+
+    if (err == -1)
+      html += "<td>" + "<span class='label label-important'>Not enough exercises</span></td>";
+    else if (err >= 20 )
+      html += "<td>" + "<span class='badge badge-important'>" + err + "%</span></td>";
+    else if (err > 0)
+      html += "<td>" + "<span class='badge badge-warning'>" + err + "%</span></td>";
+    else
+      html += "<td>" + "<span class='badge badge-success'>" + err + "%</span></td>";
+
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+function onStudentStat()
+{
+  var user_id = $("#studentstattab #id").val();
+  var lang = $("#studentstattab #lang").val();
+  var data = {}
+  if (lang != "it")
+    data.lang = lang;
+
+  aux_clearUserStat();
+
+  $.getJSON("/v1/student/"+user_id, data, function(data) {
+    aux_fillUserStat(data);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText);
+  });
 }
 //----------------------------------------------------------------------------
 
@@ -220,4 +278,6 @@ $(document).ready(function() {
   $("#examtab #bttExamGet").click(onGetExam);
   $("#examtab #bttExamSend").click(onSendExam);
   $("#examtab table thead input").change(onSelectAllQuestions);
+
+  $("#studentstattab #bttStudentStatGet").click(onStudentStat);
 });

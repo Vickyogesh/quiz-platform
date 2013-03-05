@@ -2,7 +2,7 @@
 Quiz
 ----
 
-.. http:get:: /quiz/<topic_id>
+.. http:get:: /quiz/(topic_id)
 
    Get quiz for the specified topic and language (optional).
 
@@ -73,7 +73,7 @@ Quiz
 
 
 
-.. http:post:: /quiz/<topic_id>
+.. http:post:: /quiz/(topic_id)
 
    Send quiz results for the specified topic.
 

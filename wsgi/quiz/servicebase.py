@@ -1,9 +1,21 @@
 import random
 from werkzeug.exceptions import HTTPException, Unauthorized
-from werkzeug.routing import Map, Rule
+from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request
 from quiz.core import QuizCore
 from quiz.serviceauth import AuthMixin
+
+
+class IdConverter(BaseConverter):
+    def __init__(self, url_map):
+        super(IdConverter, self).__init__(url_map)
+        self.regex = '(?:me|\d+)'
+
+    def to_python(self, value):
+        return value
+
+    def to_url(self, value):
+        return value
 
 
 class ServiceBase(AuthMixin):
@@ -20,7 +32,8 @@ class ServiceBase(AuthMixin):
         random.seed()
         self.settings = settings
         self.core = QuizCore(settings)
-        self.urls = Map([Rule('/authorize', endpoint='on_authorize')])
+        self.urls = Map([Rule('/authorize', endpoint='on_authorize')],
+                        converters={'uid': IdConverter})
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)

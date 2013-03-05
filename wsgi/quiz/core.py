@@ -46,3 +46,6 @@ class QuizCore(object):
 
     def getExam(self, lang):
         return self.db.getExam(lang)
+
+    def getUserStat(self, user, lang):
+        return self.db.getUserStat(user, lang)

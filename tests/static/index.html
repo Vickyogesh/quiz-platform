@@ -66,12 +66,12 @@
       <ul class="nav nav-tabs">
         <li class="active"><a href="#quiztab" data-toggle="tab">Quiz</a></li>
         <li><a href="#examtab" data-toggle="tab">Exam</a></li>
+        <li><a href="#studentstattab" data-toggle="tab">Student Stat</a></li>
       </ul>
       <div class="tab-content">
 
         <!-- QUIZ CONTENT -->
         <div class="tab-pane active" id="quiztab">
-
           <form class="well well-small form-inline">
             <label class="control-label" for="topic">Topic:</label>
             <input type="text" class="input-small" id="topic" value="1">
@@ -96,7 +96,6 @@
             <tbody>
             </tbody>
           </table>
-
         </div> <!-- /tab-pane quiztab -->
 
         <!-- EXAM CONTENT -->
@@ -123,8 +122,44 @@
             <tbody>
             </tbody>
           </table>
-
         </div> <!-- /tab-pane examtab -->
+
+        <!-- STUDENT STAT CONTENT -->
+        <div class="tab-pane" id="studentstattab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="me">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttStudentStatGet">Get Statistics</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <div class="row"><div class="span1">ID:</div>
+            <div class="span3" id="id">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Name:</div>
+            <div class="span3" id="name">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Exams:</div>
+            <div class="span3" id="exams">N/A</div>
+          </div>
+          <p></p>
+          <table class="table table-hover">  <!-- TOPICS STAT TABLE -->
+            <thead>
+              <tr><th colspan="3">Topics statistics</th></tr>
+              <tr>
+                <th>#</th><th width="90%">Topic</th><th>Errors</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane studentstattab -->
 
       </div> <!-- /tab-content -->
     </div> <!-- /tabbable -->

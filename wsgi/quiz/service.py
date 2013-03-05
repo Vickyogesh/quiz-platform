@@ -17,6 +17,12 @@ class QuizService(ServiceBase):
         self.urls.add(Rule('/quiz/<int:topic>',
                       methods=['POST'],
                       endpoint='onQuizSave'))
+        self.urls.add(Rule('/student',
+                      methods=['GET'],
+                      endpoint='onStudentStat'))
+        self.urls.add(Rule('/student/<uid:user>',
+                      methods=['GET'],
+                      endpoint='onStudentStat'))
         self.urls.add(Rule('/exam', methods=['GET'], endpoint='onExamGet'))
 
     # TODO: test more
@@ -50,10 +56,23 @@ class QuizService(ServiceBase):
 
         try:
             self.core.saveQuizResults(user_id, topic, id_list, answers)
-        except QuizCoreError, e:
+        except QuizCoreError as e:
             raise BadRequest(e.message)
 
         return Response('ok')
+
+    def onStudentStat(self, request, user='me'):
+        if user == 'me':
+            user = self.session['user_id']
+        lang = request.args.get('lang', 'it')
+
+        try:
+            stat = self.core.getUserStat(user, lang)
+            result = json.dumps(stat, separators=(',', ':'))
+        except QuizCoreError as e:
+            raise BadRequest(e.message)
+
+        return Response(result, content_type='application/json')
 
     def onExamGet(self, request):
         """ Get exam. """
