@@ -17,6 +17,12 @@ class QuizService(ServiceBase):
         self.urls.add(Rule('/quiz/<int:topic>',
                       methods=['POST'],
                       endpoint='onQuizSave'))
+        self.urls.add(Rule('/errorreview',
+                      methods=['GET'],
+                      endpoint='onErrorReviewGet'))
+        self.urls.add(Rule('/errorreview',
+                      methods=['POST'],
+                      endpoint='onErrorReviewSave'))
         self.urls.add(Rule('/student',
                       methods=['GET'],
                       endpoint='onStudentStat'))
@@ -58,7 +64,6 @@ class QuizService(ServiceBase):
             self.core.saveQuizResults(user_id, topic, id_list, answers)
         except QuizCoreError as e:
             raise BadRequest(e.message)
-
         return Response('ok')
 
     def onStudentStat(self, request, user='me'):
@@ -71,8 +76,32 @@ class QuizService(ServiceBase):
             result = json.dumps(stat, separators=(',', ':'))
         except QuizCoreError as e:
             raise BadRequest(e.message)
-
         return Response(result, content_type='application/json')
+
+    def onErrorReviewGet(self, request):
+        user_id = self.session['user_id']
+        lang = request.args.get('lang', 'it')
+
+        try:
+            res = self.core.getErrorReview(user_id, lang)
+            result = json.dumps(res, separators=(',', ':'))
+        except QuizCoreError as e:
+            raise BadRequest(e.message)
+        return Response(result, content_type='application/json')
+
+    def onErrorReviewSave(self, request):
+        user_id = self.session['user_id']
+        id_list = self._get_param(request, 'id')
+        answers = self._get_param(request, 'answer')
+
+        if not id_list or not answers:
+            raise BadRequest('Missing parameter.')
+
+        try:
+            self.core.saveErrorReview(user_id, id_list, answers)
+        except QuizCoreError as e:
+            raise BadRequest(e.message)
+        return Response('ok')
 
     def onExamGet(self, request):
         """ Get exam. """

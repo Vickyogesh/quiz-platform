@@ -201,6 +201,58 @@ function onSendExam()
 }
 //----------------------------------------------------------------------------
 
+
+function onGetReview()
+{
+  $("#reviewtab table thead input").attr("checked", false);
+
+  var lang = $("#reviewtab #lang").val();
+  var uri = "/v1/errorreview";
+  var data = {}
+  if (lang != "it")
+    data.lang = lang;
+
+  $.getJSON(uri, data, function(data) {
+    aux_fillTable($("#reviewtab table"), data.questions);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText);
+  });
+}
+//----------------------------------------------------------------------------
+
+function onSendReview()
+{
+  var lst = $("#reviewtab table tbody input");
+  var id_list = [];
+  var answer_list = [];
+
+  $("#reviewtab table tbody input").each(function(i){
+    id_list.push(this.value);
+    answer_list.push(this.checked ? 1 : 0);
+  });
+
+  var fd = new FormData();
+  fd.append("id", id_list);
+  fd.append("answer", answer_list);
+
+  $.ajax({
+    url: "/v1/errorreview",
+    data: fd,
+    processData: false,
+    contentType: false,
+    type: "POST",
+    success: function(data) {
+      aux_deselect($("#reviewtab table"));
+      aux_showInfo($("#reviewtab"), "Done!");
+   },
+    error: function(data) {
+      aux_showError(data.responseText);
+    }
+  });
+}
+//----------------------------------------------------------------------------
+
 function aux_clearUserStat()
 {
   $("#studentstattab .row #id").text('N/A');
@@ -278,6 +330,10 @@ $(document).ready(function() {
   $("#examtab #bttExamGet").click(onGetExam);
   $("#examtab #bttExamSend").click(onSendExam);
   $("#examtab table thead input").change(onSelectAllQuestions);
+
+  $("#reviewtab #bttReviewGet").click(onGetReview);
+  $("#reviewtab #bttReviewSend").click(onSendReview);
+  $("#reviewtab table thead input").change(onSelectAllQuestions);
 
   $("#studentstattab #bttStudentStatGet").click(onStudentStat);
 });

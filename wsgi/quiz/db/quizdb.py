@@ -4,6 +4,7 @@ from sqlalchemy.sql.expression import Insert
 from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
+from .reviewmixin import ErrorReviewMixin
 
 
 # http://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update
@@ -20,13 +21,14 @@ def append_string(insert, compiler, **kw):
 # self.engine = create_engine(cfg['database'], echo=verbose,
 #                             poolclass=NullPool)
 
-class QuizDb(UserMixin, QuizMixin, ExamMixin):
+class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
     """ High-level database operations. """
 
     def __init__(self, settings):
         self._setupDb(settings.dbinfo)
         UserMixin.__init__(self)
         QuizMixin.__init__(self)
+        ErrorReviewMixin.__init__(self)
         ExamMixin.__init__(self)
 
         # used in the _aux_question_delOptionalField()

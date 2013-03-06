@@ -49,3 +49,10 @@ class QuizCore(object):
 
     def getUserStat(self, user, lang):
         return self.db.getUserStat(user, lang)
+
+    def getErrorReview(self, user, lang):
+        res = self.db.getErrorReview(user, lang)
+        return {'questions': res}
+
+    def saveErrorReview(self, user, id_list, answers):
+        self.db.saveErrorReview(user, id_list, answers)

@@ -84,7 +84,7 @@ class QuizMixin(object):
             quiz.append(d)
         return quiz
 
-    def saveQuizResult(self, user_id, topic_id, questions, answers):
+    def saveQuestions(self, user_id, questions, answers):
         if len(questions) != len(answers):
             raise QuizCoreError('Parameters length mismatch.')
 
@@ -110,6 +110,7 @@ class QuizMixin(object):
         except ValueError:
             raise QuizCoreError('Invalid value.')
 
+        # select and check answers
         q = self.questions
         s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
         res = self.conn.execute(s)
@@ -123,15 +124,23 @@ class QuizMixin(object):
                     'is_correct': row[q.c.answer] == answer
                 })
 
-        if answers:
-            t = self.conn.begin()
-            try:
+            if ans:
                 self.conn.execute(self.quiz_stat.insert(
                                   append_string=self.__add),
                                   ans)
-                self.conn.execute(self.__update_stat,
-                                  user=user_id, topic=topic_id)
-            except Exception:
-                t.rollback()
-            else:
-                t.commit()
+
+    def updateTopicStat(self, user_id, topic_list):
+        for topic in topic_list:
+            self.conn.execute(self.__update_stat,
+                              user=user_id, topic=topic)
+
+    def saveQuizResult(self, user_id, topic_id, questions, answers):
+        t = self.conn.begin()
+        try:
+            self.saveQuestions(user_id, questions, answers)
+            self.updateTopicStat(user_id, [topic_id])
+        except Exception:
+            t.rollback()
+            raise
+        else:
+            t.commit()
