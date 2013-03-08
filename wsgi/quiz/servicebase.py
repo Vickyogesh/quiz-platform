@@ -96,7 +96,8 @@ class JSONRequest(Request):
 
     @cached_property
     def json(self):
-        if self.headers and 'application/json' in self.headers.get('content-type'):
+        cnt = self.headers.get('content-type')
+        if cnt and 'application/json' in cnt:
             try:
                 data = json.loads(self.data)
             except Exception:
@@ -188,7 +189,6 @@ class ServiceBase(object):
 
     def wsgi_app(self, environ, start_response):
         request = JSONRequest(environ)
-        print request.headers
         response = self.__handleErrorsAsJSON(request)
         try:
             response.headers.add('Access-Control-Allow-Origin', '*')
@@ -210,6 +210,7 @@ class ServiceBase(object):
             appid = data["appid"]
             digest = data["digest"]
         except KeyError:
+            print data
             raise BadRequest('Invalid parameters.')
 
         data = self.core.getUserAndAppInfo(user, appid)
