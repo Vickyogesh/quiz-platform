@@ -61,7 +61,7 @@ class QuizMiddleware(object):
         self._cookie_key = cookie_key
         self._url_key = url_key
         self._url_key_check = url_key + '='
-        self._timeout = timeout
+        self._timeout = str(timeout)
 
     def __call__(self, environ, start_response):
         if environ.get('REQUEST_METHOD') == 'OPTIONS':
@@ -71,7 +71,7 @@ class QuizMiddleware(object):
                 ('Access-Control-Allow-Headers', 'content-type'),
                 ('Content-Type', 'text/html; charset=utf-8'),
                 ('Access-Control-Max-Age', self._timeout),
-                ('Content-Length', 0)
+                ('Content-Length', '0')
             ]
             start_response('200 OK', headers)
             return ''

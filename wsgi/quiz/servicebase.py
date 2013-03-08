@@ -192,7 +192,7 @@ class ServiceBase(object):
         response = self.__handleErrorsAsJSON(request)
         try:
             response.headers.add('Access-Control-Allow-Origin', '*')
-            response.headers.add('Access-Control-Allow-Credentials', True)
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
         except:
             pass
         return response(environ, start_response)
@@ -210,7 +210,6 @@ class ServiceBase(object):
             appid = data["appid"]
             digest = data["digest"]
         except KeyError:
-            print data
             raise BadRequest('Invalid parameters.')
 
         data = self.core.getUserAndAppInfo(user, appid)
