@@ -96,7 +96,7 @@ class JSONRequest(Request):
 
     @cached_property
     def json(self):
-        if 'application/json' in self.headers.get('content-type'):
+        if self.headers and 'application/json' in self.headers.get('content-type'):
             try:
                 data = json.loads(self.data)
             except Exception:
@@ -188,6 +188,7 @@ class ServiceBase(object):
 
     def wsgi_app(self, environ, start_response):
         request = JSONRequest(environ)
+        print request.headers
         response = self.__handleErrorsAsJSON(request)
         try:
             response.headers.add('Access-Control-Allow-Origin', '*')
