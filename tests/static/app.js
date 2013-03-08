@@ -2,11 +2,48 @@
 ** AUX tools.
 *********************************************************/
 
-// Show error dialog
-function aux_showError(msg)
+function get_arg_prefix(url)
 {
-  $("#msg .modal-body").html(msg)
-  $("#msg").modal('show')
+    if (url.indexOf('?') == -1)
+      return "?";
+    else
+      return "&";
+}
+//----------------------------------------------------------------------------
+
+function url(url)
+{
+  var path = url;
+
+  // NOTE: uncomment if you want cross domain requests
+  // var server = "http://127.0.0.1"
+  // var server = "https://quizplatformtest-editricetoni.rhcloud.com"
+  // path = server + url;
+  // if (window.qsid)
+  //   path += get_arg_prefix(path) + "sid=" + window.qsid;
+
+  return path;
+}
+//----------------------------------------------------------------------------
+
+// Show error dialog
+function aux_showError(msg, code)
+{
+  $("#msg .modal-header h3").html('Error: ' + code);
+
+  if (code == 500)
+    $("body").html(msg)
+  else
+  {
+    $("#msg .modal-body").html(msg)
+    $("#msg").modal('show')
+  }
+}
+//----------------------------------------------------------------------------
+
+function aux_showJSONError(data)
+{
+  aux_showError(data.description, data.status)
 }
 //----------------------------------------------------------------------------
 
@@ -66,57 +103,6 @@ function aux_fillTable(tbl, questions)
 }
 //----------------------------------------------------------------------------
 
-
-/*********************************************************
-** Event handlers.
-*********************************************************/
-
-// Remove session cookie, hide features and show login dialog
-function doQuit()
-{
-  $(document).cookie = 'QUIZSID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-  aux_showLogin();
-}
-//----------------------------------------------------------------------------
-
-function onAuth()
-{
-  $.get("/v1/authorize").always(function(data) {
-    if (data.status != 401)
-    {
-      aux_showError("Unexpected response. ");
-      return;
-    }
-
-    var login = $(".form-signin #login").val();
-    var passwd = $(".form-signin #pass").val();
-    var info = data.getResponseHeader("WWW-Authenticate");
-    var nonce = info.substring(info.indexOf('"')+1, info.length-1);
-
-    var digest = CryptoJS.MD5(login + ':' + passwd);
-    digest = CryptoJS.MD5(nonce + ':' + digest);
-
-    var auth = 'QuizAuth nonce="' + nonce +
-      '", appid="32bfe1c505d4a2a042bafd53993f10ece3ccddca", ' +
-      ' username="' + login + '", digest="' + digest + '"';
-
-    $.ajax({
-      url: "/v1/authorize",
-      type: "POST",
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Authorization", auth);
-      },
-      error: function(data) {
-        doQuit();
-        aux_showError(data.responseText);
-      },
-      success: aux_showFeatures
-    });
-
-  });
-}
-//----------------------------------------------------------------------------
-
 function onSelectAllQuestions()
 {
   var state = this.checked;
@@ -126,22 +112,81 @@ function onSelectAllQuestions()
 }
 //----------------------------------------------------------------------------
 
+// Remove session cookie, hide features and show login dialog
+function doQuit()
+{
+  window.qsid = null;
+  aux_showLogin();
+}
+//----------------------------------------------------------------------------
+
+function aux_postJSON(url, data, success)
+{
+  $.ajax({
+    url: url,
+    type: "POST",
+    contentType: "application/json; charset=UTF-8",
+    data: JSON.stringify(data),
+    dataType: "json",
+    success: success
+  });
+}
+//----------------------------------------------------------------------------
+
+
+/*********************************************************
+** Event handlers.
+*********************************************************/
+
+function onAuth()
+{
+  $.getJSON(url("/v1/authorize"), function(data) {
+    // Calculate digest
+    var login = $(".form-signin #login").val();
+    var passwd = $(".form-signin #pass").val();
+    var nonce = data.nonce;
+    var digest = hex_md5(login + ':' + passwd);
+
+    var auth = {
+      nonce: nonce,
+      username: login,
+      appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+      digest: hex_md5(nonce + ':' + digest)
+    };
+
+    // Now we can send authorization data
+    aux_postJSON(url("/v1/authorize"), auth, function (data) {
+      if (data.status != 200) {
+        doQuit();
+        aux_showError("Authorization is not passed.", data.status);
+      }
+      else {
+        window.qsid = data.sid;
+        aux_showFeatures();
+      }
+    });
+
+  }); // GET
+}
+//----------------------------------------------------------------------------
+
 function onGetQuiz()
 {
   $("#quiztab table thead input").attr("checked", false);
 
   var topic = $("#quiztab #topic").val();
   var lang = $("#quiztab #lang").val();
-  var uri = "/v1/quiz/" + topic;
+  var uri = url("/v1/quiz/" + topic);
   var data = {}
+  
   if (lang != "it")
     data.lang = lang;
 
   $.getJSON(uri, data, function(data) {
-    aux_fillTable($("#quiztab table"), data.questions);
-  })
-  .error(function(data) {
-    aux_showError(data.responseText);
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillTable($("#quiztab table"), data.questions);
   });
 }
 //----------------------------------------------------------------------------
@@ -158,22 +203,18 @@ function onSendQuiz()
     answer_list.push(this.checked ? 1 : 0);
   });
 
-  var fd = new FormData();
-  fd.append("id", id_list);
-  fd.append("answer", answer_list);
+  var data = {
+    questions: id_list,
+    answers: answer_list
+  };
 
-  $.ajax({
-    url: "/v1/quiz/" + topic,
-    data: fd,
-    processData: false,
-    contentType: false,
-    type: "POST",
-    success: function(data) {
+  aux_postJSON(url("/v1/quiz/" + topic), data, function (data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+    {
       aux_deselect($("#quiztab table"));
       aux_showInfo($("#quiztab"), "Done!");
-   },
-    error: function(data) {
-      aux_showError(data.responseText);
     }
   });
 }
@@ -183,21 +224,22 @@ function onGetExam()
 {
   var lang = $("#examtab #lang").val();
   var data = {}
+
   if (lang != "it")
     data.lang = lang;
 
-  $.getJSON("/v1/exam", data, function(data) {
-    aux_fillTable($("#examtab #examtable"), data);
-  })
-  .error(function(data) {
-    aux_showError(data.responseText);
+  $.getJSON(url("/v1/exam"), data, function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillTable($("#examtab #examtable"), data.questions);
   });
 }
 //----------------------------------------------------------------------------
 
 function onSendExam()
 {
-  aux_showError("Not implemented yet!");
+  aux_showError("Not implemented yet!", data.status);
 }
 //----------------------------------------------------------------------------
 
@@ -207,16 +249,17 @@ function onGetReview()
   $("#reviewtab table thead input").attr("checked", false);
 
   var lang = $("#reviewtab #lang").val();
-  var uri = "/v1/errorreview";
+  var uri = url("/v1/errorreview");
   var data = {}
+
   if (lang != "it")
     data.lang = lang;
 
   $.getJSON(uri, data, function(data) {
-    aux_fillTable($("#reviewtab table"), data.questions);
-  })
-  .error(function(data) {
-    aux_showError(data.responseText);
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillTable($("#reviewtab table"), data.questions);
   });
 }
 //----------------------------------------------------------------------------
@@ -232,22 +275,18 @@ function onSendReview()
     answer_list.push(this.checked ? 1 : 0);
   });
 
-  var fd = new FormData();
-  fd.append("id", id_list);
-  fd.append("answer", answer_list);
+  var data = {
+    questions: id_list,
+    answers: answer_list
+  };
 
-  $.ajax({
-    url: "/v1/errorreview",
-    data: fd,
-    processData: false,
-    contentType: false,
-    type: "POST",
-    success: function(data) {
+  aux_postJSON(url("/v1/errorreview"), data, function (data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+    {
       aux_deselect($("#reviewtab table"));
       aux_showInfo($("#reviewtab"), "Done!");
-   },
-    error: function(data) {
-      aux_showError(data.responseText);
     }
   });
 }
@@ -302,11 +341,11 @@ function onStudentStat()
 
   aux_clearUserStat();
 
-  $.getJSON("/v1/student/"+user_id, data, function(data) {
+  $.getJSON(url("/v1/student/"+user_id), data, function(data) {
     aux_fillUserStat(data);
   })
   .error(function(data) {
-    aux_showError(data.responseText);
+    aux_showError(data.responseText, data.status);
   });
 }
 //----------------------------------------------------------------------------
@@ -317,6 +356,11 @@ function onStudentStat()
 *********************************************************/
 
 $(document).ready(function() {
+
+  $(document).ajaxError(function() {
+    aux_showError('Unexpected server response.')
+  });
+
   doQuit();
 
   $("#bttQuit").click(doQuit);

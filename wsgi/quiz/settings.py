@@ -31,6 +31,8 @@ class Settings(object):
         for path in paths:
             f = os.path.join(path, Settings.CONFIG_FILE)
             if os.path.exists(f):
+                path = os.path.abspath(path)
+                path = os.path.normcase(path)
                 return (path, f)
         raise Exception("Can't find configuration in " + str(paths))
 
