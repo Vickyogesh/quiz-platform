@@ -174,6 +174,8 @@ class ServiceBase(object):
             if isinstance(response, HTTPException):
                 raise response
         except HTTPException as e:
+            if e.code == 404:   # don't wrap 404 error
+                return e
             res = e.get_response(request.environ)
             response = JSONResponse({
                 'status': e.code,

@@ -1,6 +1,8 @@
 Student Statistics
 ------------------
 
+Student statistics provides learning progress information of the student.
+
 .. http:get:: /student
 
    Get statistics for the current user. Same as :http:get:`/student/me`.
@@ -40,23 +42,24 @@ Student Statistics
    .. sourcecode:: http
 
       HTTP/1.1 200 OK
-      Content-Type: application/json
+      Content-Type: application/json; charset=utf-8
 
       {
-          "id": 42,
-          "name": "Chuck Norris",
-          "topics": [
-              {
-                  "id": 1,
-                  "text": "Topic 1",
-                  "errors": 20
-              },
-              {
-                  "id": 2,
-                  "text": "Topic 2",
-                  "errors": -1
-              }
-          ]
+        "status": 200,
+        "id": 42,
+        "name": "Chuck Norris",
+        "topics": [
+          {
+            "id": 1,
+            "text": "Topic 1",
+            "errors": 20
+          },
+          {
+            "id": 2,
+            "text": "Topic 2",
+            "errors": -1
+          }
+        ]
       }
 
 

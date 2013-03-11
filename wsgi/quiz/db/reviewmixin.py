@@ -1,5 +1,4 @@
 from sqlalchemy import text, select
-from quiz.exceptions import QuizCoreError
 
 
 class ErrorReviewMixin(object):

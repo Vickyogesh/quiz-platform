@@ -1,8 +1,8 @@
+Error Review
+------------
 
-Quiz
-----
-
-Quiz is a list of 40 random questions for the specified topic.
+Error review is a list of 40 random questions where student made a mistake
+(in exam or quiz).
 
   =========  ================================
   Question fields
@@ -14,20 +14,19 @@ Quiz is a list of 40 random questions for the specified topic.
   image_bis  image type (optional)
   =========  ================================
 
+.. http:get:: /errorreview
 
-.. http:get:: /quiz/(topic_id)
-
-   Get quiz for the specified topic and language (optional).
+   Get error review questions.
 
    **Example requests**:
 
    .. sourcecode:: http
 
-      GET /v1/quiz/1 HTTP/1.1
+      GET /v1/errorreview HTTP/1.1
 
    .. sourcecode:: http
 
-      GET /v1/quiz/42?lang=de HTTP/1.1
+      GET /v1/errorreview?lang=fr HTTP/1.1
 
 
    **Example response**:
@@ -39,7 +38,6 @@ Quiz is a list of 40 random questions for the specified topic.
 
       {
         "status": 200,
-        "topic": 1,
         "questions": [
           {
             "answer": 0,
@@ -51,43 +49,34 @@ Quiz is a list of 40 random questions for the specified topic.
             "answer": 1,
             "text": "Question text2",
             "image": 34,
-            "id": 3,
+            "id": 103,
             "image_bis": "b"
           },
           {
             "answer": 1,
             "text": "Question text3",
-            "id": 108
+            "id": 208
           }
         ]
       }
 
-   =========  ======================================
-   Response fields
-   =================================================
-   topic      Quiz topic id
-   questions  List of quiz questions
-   =========  ======================================
-
-   :param topic_id: Topic for which questions are requested.
-
    :query lang: Question language: *it*, *fr*, *de*.
-      This parameter is optional (default: *it*).
+     This parameter is optional (default: *it*).
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
 
 
-.. http:post:: /quiz/(topic_id)
+.. http:post:: /errorreview
 
-   Send quiz results for the specified topic. Client sends list of answered
-   questions and answers. List of questions is not fixed to 40.
+   Send answers for the error review questions.
+   List of questions is not fixed to 40.
 
    **Example request**:
 
    .. sourcecode:: http
 
-      POST /v1/quiz/1 HTTP/1.1
+      POST /v1/errorreview HTTP/1.1
       Content-Type: application/json; charset=utf-8
 
       {
@@ -103,7 +92,7 @@ Quiz is a list of 40 random questions for the specified topic.
       Content-Type: application/json; charset=utf-8
 
       {
-        "status": 200
+        "status": 200,
       }
 
    =========  ==========================
@@ -118,9 +107,6 @@ Quiz is a list of 40 random questions for the specified topic.
               *Number of answers must
               be the same as questions.*
    =========  ==========================
-
-   :param topic_id: Topic of the quiz.
-
 
    :statuscode 200: Everything is ok.
 
