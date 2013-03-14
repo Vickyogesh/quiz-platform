@@ -54,7 +54,7 @@ class Db(DbTool):
                             help='Create quiz database.')
         parser.add_argument('-t', '--test-users', action='store_true',
                             help='Initialize with test users instead of real.')
-        parser.add_argument('-d', '--delimiter', default='$',
+        parser.add_argument('-d', '--delimiter', default=',',
                             help="CSV delimiter (default: '%(default)s').")
         self.args = parser.parse_args()
 
