@@ -1,4 +1,4 @@
-from sqlalchemy import text, select
+from sqlalchemy import text
 
 
 class ErrorReviewMixin(object):
@@ -39,10 +39,6 @@ class ErrorReviewMixin(object):
         t = self.conn.begin()
         try:
             self.saveQuestions(user, id_list, answers)
-            q = self.questions
-            s = select([q.c.topic_id.distinct()], q.c.id.in_(id_list))
-            res = self.conn.execute(s).fetchall()
-            self.updateTopicStat(user, (row[0] for row in res))
         except Exception:
             t.rollback()
             raise

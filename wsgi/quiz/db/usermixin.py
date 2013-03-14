@@ -20,11 +20,14 @@ class UserMixin(object):
         self.__getname = self.__getname.compile(self.engine)
 
         self.__topicstat = text("""
-            SELECT t.id, t.text, t.text_fr, t.text_de, IFNULL(s.err_count,-1)
-            FROM topics t LEFT JOIN
+            SELECT t.id, t.max_id - t.min_id + 1, t.text, t.text_fr, t.text_de,
+            IFNULL(s.err_count,-1) FROM topics t LEFT JOIN
             (SELECT * FROM topics_stat WHERE user_id=:user_id) s
             ON t.id=s.topic_id;""")
         self.__topicstat = self.__topicstat.compile(self.engine)
+
+        self.__examstat = text("SELECT err_count FROM exams WHERE user_id=:user_id;")
+        self.__examstat = self.__examstat.compile(self.engine)
 
     def getInfo(self, login, appkey):
         """ Return user and application info.
@@ -64,22 +67,36 @@ class UserMixin(object):
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
-            lang = 3
+            lang = 4
         elif lang == 'fr':
-            lang = 2
+            lang = 3
         else:
-            lang = 1
+            lang = 2
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.conn.execute(self.__topicstat, user_id=user)
         for row in rows:
+            err = float(row[5]) / row[1] * 100
+
+            if err < 0:
+                err = -1
+            elif 0 < err < 1:
+                err = 1
+            elif 99 < err < 100:
+                err = 99
+
             stat.append({
                 'id': row[0],
                 'text': row[lang],
-                'errors': int(row[4])
+                'errors': int(err)
             })
         return stat
+
+    def __getExamStat(self, user_id):
+        rows = self.conn.execute(self.__examstat, user_id=user_id).fetchall()
+        rows = [x[0] for x in rows]
+        return rows
 
     def getUserStat(self, user, lang):
         name, surname = self._getName(user)
@@ -90,5 +107,6 @@ class UserMixin(object):
             'id': user,
             'name': name,
             'surname': surname,
+            'exams': self.__getExamStat(user),
             'topics': self._getTopicsStat(user, lang)
         }

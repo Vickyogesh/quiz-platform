@@ -1,5 +1,4 @@
 from sqlalchemy import select, text
-from ..exceptions import QuizCoreError
 
 
 # See QuizCore docs for more info
@@ -23,9 +22,6 @@ class QuizMixin(object):
         self.__getquiz = self.__getquiz.compile(self.engine)
 
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
-
-        self.__update_stat = text("call update_topic_stat(:user, :topic);")
-        self.__update_stat = self.__update_stat.compile(self.engine)
 
     # Get 40 random questions from for the specified topic which are
     # not answered by the specified user.
@@ -109,16 +105,10 @@ class QuizMixin(object):
                                   append_string=self.__add),
                                   ans)
 
-    def updateTopicStat(self, user_id, topic_list):
-        pass
-        # for topic in topic_list:
-        #     self.conn.execute(self.__update_stat, user=user_id, topic=topic)
-
     def saveQuizResult(self, user_id, topic_id, questions, answers):
         t = self.conn.begin()
         try:
             self.saveQuestions(user_id, questions, answers)
-            self.updateTopicStat(user_id, [topic_id])
         except Exception:
             t.rollback()
             raise

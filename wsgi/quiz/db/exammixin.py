@@ -140,7 +140,7 @@ class ExamMixin(object):
                 self.conn.execute(self.__upd, is_correct=is_correct,
                                   exam_id=exam_id, question_id=qid)
                 self.conn.execute(self.__upd_examstat, exam_id=exam_id,
-                                  passed=wrong < 4)
+                                  passed=wrong)
         except Exception:
             t.rollback()
             raise

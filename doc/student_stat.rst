@@ -47,7 +47,9 @@ Student statistics provides learning progress information of the student.
       {
         "status": 200,
         "id": 42,
-        "name": "Chuck Norris",
+        "name": "Chuck",
+        "surname": "Norris",
+        "exams": [20, 3, 0, 0],
         "topics": [
           {
             "id": 1,
@@ -63,22 +65,24 @@ Student statistics provides learning progress information of the student.
       }
 
 
-   =========  ======================================
+   =========  ===========================================
    Response fields
-   =================================================
-   id         Student ID
-   name       Full student name
-   exams      (NOT IMPLEMENTED YET)
+   ======================================================
+   id         Student ID.
+   name       Student name.
+   surname    Student surname.
+   exams      List of the number of errors for each exam.
    topics     List of statistics for each topic.
-   =========  ======================================
+   =========  ===========================================
 
    =========  ======================================
    Topic statistics fields
    =================================================
-   id         Topic ID
-   text       Topic text
+   id         Topic ID.
+   text       Topic text.
    errors     Percent of errors for this topic based
-              on quizzes results.
+              on quizzes, exams and error reviews
+              results.
 
               **-1** value means
               that the student did not answer the

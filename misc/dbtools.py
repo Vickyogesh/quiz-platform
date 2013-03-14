@@ -165,7 +165,7 @@ class DbTool(object):
             CREATE TABLE topics_stat(
                 user_id INTEGER UNSIGNED NOT NULL,
                 topic_id INTEGER UNSIGNED NOT NULL,
-                err_count INTEGER NOT NULL DEFAULT 0
+                err_count SMALLINT NOT NULL DEFAULT 0
             );
 
             CREATE TABLE answers(
@@ -179,7 +179,7 @@ class DbTool(object):
                 user_id INTEGER UNSIGNED NOT NULL,
                 start_time DATETIME NOT NULL,
                 end_time DATETIME DEFAULT NULL,
-                passed BOOLEAN NOT NULL DEFAULT FALSE,
+                err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 CONSTRAINT PRIMARY KEY (id)
             );
 
@@ -204,7 +204,7 @@ class DbTool(object):
 
         self.conn.execute("DROP PROCEDURE IF EXISTS update_exam_stat;")
         self.conn.execute(text("""
-            CREATE PROCEDURE update_exam_stat(exam INTEGER UNSIGNED, passed BOOLEAN)
+            CREATE PROCEDURE update_exam_stat(exam INTEGER UNSIGNED, errors SMALLINT UNSIGNED)
             BEGIN
                 DECLARE user INT UNSIGNED;
                 DECLARE err INT;
@@ -216,50 +216,8 @@ class DbTool(object):
                 WHERE e.exam_id=exam
                 ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct);
 
-                UPDATE exams SET end_time=UTC_TIMESTAMP(), passed=passed
+                UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=errors
                 WHERE id=exam;
-            END;
-            """))
-
-        self.conn.execute("DROP PROCEDURE IF EXISTS update_topic_stat;")
-        self.conn.execute(text("""
-            CREATE PROCEDURE update_topic_stat(user INTEGER UNSIGNED, topic INTEGER UNSIGNED)
-            BEGIN
-                SELECT count(*) INTO @err FROM questions WHERE topic_id=topic AND
-                id IN (SELECT question_id FROM answers WHERE user_id=user AND is_correct=0);
-
-                SELECT max_id - min_id + 1 INTO @num FROM topics WHERE id=topic;
-                SET @err = @err / @num * 100;
-
-                IF @err > 0 AND @err < 1 THEN SET @err = 1;
-                ELSEIF @err > 99 AND @err < 100 THEN SET @err = 99;
-                END IF;
-
-                INSERT INTO topics_stat(user_id, topic_id, err_percent)
-                    VALUES(user, topic, @err)
-                ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
-            END;
-            """))
-
-        self.conn.execute("DROP PROCEDURE IF EXISTS count_topic_err;")
-        self.conn.execute(text("""
-            CREATE PROCEDURE count_topic_err
-            (user INTEGER UNSIGNED, question INTEGER UNSIGNED, correct BOOLEAN, is_ins BOOLEAN)
-            BEGIN
-                DECLARE err INT DEFAULT 1;
-                DECLARE topic INTEGER UNSIGNED;
-
-                IF correct = 1 THEN
-                    SET err = -1;
-                END IF;
-
-                IF (is_ins = TRUE AND correct = 0) OR is_ins = FALSE THEN
-                    SELECT topic_id INTO topic FROM questions WHERE id=question;
-
-                    INSERT INTO topics_stat(user_id, topic_id, err_count)
-                        VALUES(user, topic, err)
-                    ON DUPLICATE KEY UPDATE err_count=err_count+VALUES(err_count);
-                END IF;
             END;
             """))
 

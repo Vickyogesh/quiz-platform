@@ -344,15 +344,33 @@ function aux_clearUserStat()
 
 function aux_fillUserStat(data)
 {
+  var html = "";
   var body = $("#studentstattab tbody");
 
   $("#studentstattab .row #id").text(data.id);
   $("#studentstattab .row #name").text(data.name + ' ' + data.surname);
 
+  if (data.exams.length)
+  {
+    var exams = data.exams;
+    for (var i in exams)
+    {
+      var err = exams[i];
+
+      if (err <= 4)
+        html += "<span class='label label-success'>&nbsp;";
+      else
+        html += "<span class='label label-important'>&nbsp;";
+      html += err + '&nbsp;</span>&nbsp;';
+    }
+
+    $("#studentstattab .row #exams").html(html);
+  }
+
   var topics = data.topics;
   for (var t in topics)
   {
-    var html = "<tr>";
+    html = "<tr>";
     html += "<td>" + topics[t].id + ".</td>";
     html += "<td>" + topics[t].text + "</td>";
 
