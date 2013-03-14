@@ -24,30 +24,6 @@ NUM_STUDENTS = 4
 NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
 
 
-# def errtable():
-    # ctx.engine.execute(text('DROP TABLE IF EXISTS error_stat;'))
-    # ctx.engine.execute(text('DROP TABLE IF EXISTS topic_stat;'))
-
-    # sql = """ CREATE TABLE topic_stat(
-    #         user_id INTEGER UNSIGNED NOT NULL,
-    #         topic_id INTEGER UNSIGNED NOT NULL,
-    #         error_percent SMALLINT NOT NULL DEFAULT 0
-    #     )
-    #     ALTER TABLE topic_stat ADD UNIQUE ix_err(user_id, topic_id);
-
-    #     CREATE TABLE error_stat(
-    #         user_id INTEGER UNSIGNED NOT NULL,
-    #         question_id INTEGER UNSIGNED NOT NULL
-    #     );
-    #     ALTER TABLE error_stat ADD UNIQUE ix_err(question_id, user_id);
-
-    #     DROP TRIGGER IF EXISTS tg_error_update;
-    #     CREATE TRIGGER tg_error_update AFTER INSERT ON quiz_stat
-    #     FOR EACH ROW DELETE FROM error_stat
-    #         WHERE user_id=NEW.user_id AND question_id=NEW.question_id;
-    # """
-    # ctx.engine.execute(sql)
-
 class Db(DbTool):
     def __init__(self):
         self.parseArgs()
@@ -103,11 +79,11 @@ class Db(DbTool):
         self.conn.execute('TRUNCATE TABLE chapters;')
         self.conn.execute('TRUNCATE TABLE topics;')
         self.conn.execute('TRUNCATE TABLE questions;')
-        self.conn.execute('TRUNCATE TABLE quiz_stat;')
+        self.conn.execute('TRUNCATE TABLE answers;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_topics;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_questions;')
-        self.conn.execute('DROP PROCEDURE IF EXISTS aux_qstat;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_answers;')
 
         self.conn.execute(text(
             """CREATE PROCEDURE aux_chapters()
@@ -173,7 +149,7 @@ class Db(DbTool):
                 COMMIT;
                 DEALLOCATE PREPARE stmt;
             END;
-            CREATE PROCEDURE aux_qstat()
+            CREATE PROCEDURE aux_answers()
             BEGIN
                 DECLARE user INT DEFAULT 1;
                 DECLARE topic INT DEFAULT 1;
@@ -184,15 +160,15 @@ class Db(DbTool):
 
                 SET nun_topics = {chapters} * {topics};
 
-                PREPARE stmt FROM 'INSERT INTO quiz_stat VALUES(?, ?, ?)';
+                PREPARE stmt FROM 'INSERT INTO answers VALUES(?, ?, ?)';
                 START TRANSACTION;
                 WHILE (user <= {num_users}) DO
                     WHILE (topic <= nun_topics) DO
                         SET correct = 1;
                         WHILE (quest <= {num_ans}) DO
                             SET @a = user;
-                            SET @b = correct < 2;
-                            SET @c = quest + (topic - 1) * {questions};
+                            SET @b = quest + (topic - 1) * {questions};
+                            SET @c = correct < 2;
                             EXECUTE stmt USING @a, @b, @c;
                             SET quest = quest + 1;
                             SET correct = correct + 1;
@@ -223,20 +199,20 @@ class Db(DbTool):
         self.conn.execute('call aux_questions();')
 
         if self.args.qs:
-            print("Populating quiz stat...")
-            self.conn.execute('call aux_qstat();')
+            print("Populating answers...")
+            self.conn.execute('call aux_answers();')
         #create_more_users()
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_topics;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_questions;')
-        self.conn.execute('DROP PROCEDURE IF EXISTS aux_qstat;')
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_answers;')
 
     def fillSmallData(self):
         print("Preparing to populate with SMALL test data...")
         self.conn.execute('TRUNCATE TABLE chapters;')
         self.conn.execute('TRUNCATE TABLE topics;')
         self.conn.execute('TRUNCATE TABLE questions;')
-        self.conn.execute('TRUNCATE TABLE quiz_stat;')
+        self.conn.execute('TRUNCATE TABLE answers;')
 
         chapters = [1, 2, 3]
         topics = range(1, 3)

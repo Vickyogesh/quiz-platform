@@ -44,8 +44,11 @@ class QuizCore(object):
         """
         self.db.saveQuizResult(user_id, topic_id, id_list, answers)
 
-    def getExam(self, lang):
-        return {'questions': self.db.getExam(lang)}
+    def createExam(self, user_id, lang):
+        return self.db.createExam(user_id, lang)
+
+    def saveExam(self, exam_id, questions, answers):
+        self.db.saveExam(exam_id, questions, answers)
 
     def getUserStat(self, user, lang):
         return self.db.getUserStat(user, lang)

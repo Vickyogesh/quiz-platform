@@ -1,7 +1,6 @@
 import hashlib
 import time
 import random
-import sys
 
 try:
     import simplejson as json
@@ -17,6 +16,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest
 from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request, Response
 from quiz.core import QuizCore
+from quiz.exceptions import QuizCoreError
 
 
 class QuizWWWAuthenticate(object):
@@ -181,6 +181,11 @@ class ServiceBase(object):
                 'status': e.code,
                 'description': res.data,
             }, headers=res.headers)
+        except QuizCoreError as e:
+            response = JSONResponse({
+                'status': 400,
+                'description': e.message
+            })
         except Exception as e:
             traceback.print_exc()
             response = JSONResponse({

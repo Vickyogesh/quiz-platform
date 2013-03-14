@@ -9,14 +9,14 @@ class UserMixin(object):
         apps = self.apps
 
         query = select(
-            [users.c.id, users.c.name, users.c.passwd, users.c.type, apps.c.id],
+            [users.c.id, users.c.name, users.c.surname, users.c.passwd, users.c.type, apps.c.id],
             and_(users.c.login == bindparam('login'),
                  apps.c.appkey == bindparam('appkey')),
             use_labels=True
         )
         self.__stmt = query.compile(self.engine)
 
-        self.__getname = select([users.c.name, users.c.type], users.c.id == bindparam('id'))
+        self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
         self.__getname = self.__getname.compile(self.engine)
 
         self.__topicstat = text("""
@@ -47,6 +47,7 @@ class UserMixin(object):
             return {
                 'user_id': row[self.users.c.id],
                 'name': row[self.users.c.name],
+                'surname': row[self.users.c.surname],
                 'passwd': row[self.users.c.passwd],
                 'type': row[self.users.c.type],
                 'app_id': row[self.apps.c.id]
@@ -57,9 +58,9 @@ class UserMixin(object):
         row = row.fetchone()
         if not row:
             raise QuizCoreError('Unknown student.')
-        elif row[1] != 'student':
+        elif row[2] != 'student':
             raise QuizCoreError('Not a student.')
-        return row[0]
+        return row[0], row[1]
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
@@ -81,12 +82,13 @@ class UserMixin(object):
         return stat
 
     def getUserStat(self, user, lang):
-        name = self._getName(user)
+        name, surname = self._getName(user)
         if name is None:
             return {}
 
         return {
             'id': user,
             'name': name,
+            'surname': surname,
             'topics': self._getTopicsStat(user, lang)
         }

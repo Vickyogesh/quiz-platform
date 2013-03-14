@@ -26,18 +26,32 @@ function url(url)
 }
 //----------------------------------------------------------------------------
 
+// Convert ISO date string YYYY-MM-DDTHH:MM:SS to JS Date object
+function aux_dateFromISO(iso_time)
+{
+  MM = ["Jan", "Feb","Mar","Apr","May","Jun","Jul",
+        "Aug","Sep","Oct","Nov", "Dec"];
+
+  iso_time += ' UTC';
+  var expires = iso_time.replace(
+      /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/,
+      function($0,$1,$2,$3,$4,$5,$6){
+          return $3 + " " + MM[$2-1] + " " + $1 + " " + $4 + ":" +$5 + ":" + $6;
+      }
+  )
+
+  var d = new Date();
+  d.setTime(Date.parse(expires))
+  return d;
+}
+//----------------------------------------------------------------------------
+
 // Show error dialog
 function aux_showError(msg, code)
 {
   $("#msg .modal-header h3").html('Error: ' + code);
-
-  if (code == 500)
-    $("body").html(msg)
-  else
-  {
-    $("#msg .modal-body").html(msg)
-    $("#msg").modal('show')
-  }
+  $("#msg .modal-body").html(msg)
+  $("#msg").modal('show')
 }
 //----------------------------------------------------------------------------
 
@@ -232,14 +246,41 @@ function onGetExam()
     if (data.status != 200)
       aux_showJSONError(data);
     else
+    {
+      $("#examtab #examid").attr("exam", data.exam_id);
+      var expires = aux_dateFromISO(data.expires);
+      $("#examtab h4").text("Exam expires at: " + expires.toLocaleString());
       aux_fillTable($("#examtab #examtable"), data.questions);
+    }
   });
 }
 //----------------------------------------------------------------------------
 
 function onSendExam()
 {
-  aux_showError("Not implemented yet!", data.status);
+  var id_list = [];
+  var answer_list = [];
+
+  $("#examtab table tbody input").each(function(i){
+    id_list.push(this.value);
+    answer_list.push(this.checked ? 1 : 0);
+  });
+
+  var data = {
+    exam: $("#examtab #examid").attr("exam"),
+    questions: id_list,
+    answers: answer_list
+  }
+
+  aux_postJSON(url("/v1/exam"), data, function (data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+    {
+      aux_deselect($("#examtab table"));
+      aux_showInfo($("#examtab"), "Done!");
+    }
+  });
 }
 //----------------------------------------------------------------------------
 
@@ -306,7 +347,7 @@ function aux_fillUserStat(data)
   var body = $("#studentstattab tbody");
 
   $("#studentstattab .row #id").text(data.id);
-  $("#studentstattab .row #name").text(data.name);
+  $("#studentstattab .row #name").text(data.name + ' ' + data.surname);
 
   var topics = data.topics;
   for (var t in topics)

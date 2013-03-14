@@ -5,8 +5,8 @@ class ErrorReviewMixin(object):
     """ This mixin provides Error Review feature. Used in QuizDb. """
     def __init__(self):
         self.__geterrors = text(""" SELECT * FROM questions q INNER JOIN
-            (SELECT question_id id FROM errors_stat WHERE user_id=:user_id LIMIT 100) e
-            USING(id) ORDER BY RAND() LIMIT 40;
+            (SELECT question_id id FROM answers WHERE user_id=:user_id
+             AND is_correct=0 LIMIT 100) e USING(id) ORDER BY RAND() LIMIT 40;
         """)
         self.__geterrors = self.__geterrors.compile(self.engine)
 

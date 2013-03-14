@@ -13,11 +13,13 @@ class QuizMixin(object):
     """
     def __init__(self):
         # See getQuiz() comments for more info.
+
         self.__getquiz = text(
-            """SELECT * FROM (SELECT * FROM questions WHERE id NOT IN (
-            SELECT question_id FROM quiz_stat WHERE
-            user_id=:user_id AND is_correct=1)
-            AND topic_id=:topic_id LIMIT 100) t ORDER BY RAND() LIMIT 40;""")
+            """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
+            AND id NOT IN (SELECT question_id FROM answers WHERE
+            user_id=:user_id AND is_correct=1) LIMIT 100) t
+            ORDER BY RAND() LIMIT 40;""")
+
         self.__getquiz = self.__getquiz.compile(self.engine)
 
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
@@ -29,20 +31,21 @@ class QuizMixin(object):
     # not answered by the specified user.
     #
     # Query parts:
-    # * how to get already answered quetions:
+    # * how to get correctly answered quetions:
     #
-    #       SELECT question_id FROM quiz_stat WHERE user_id=1;
+    #       SELECT question_id FROM answers WHERE user_id=1 AND is_correct=1;
     #
     # * how to filter out answered questions for the topic:
     #
     #       SELECT * FROM questions WHERE topic_id=1 AND
-    #       id NOT IN (SELECT question_id FROM quiz_stat WHERE user_id=1);
+    #       id NOT IN (SELECT question_id FROM answers WHERE
+    #       user_id=1 AND is_correct=1);
     #
     # Result query:
     #
-    #   SELECT * FROM (SELECT * FROM questions WHERE id NOT IN (
-    #       SELECT question_id FROM quiz_stat WHERE user_id=1)
-    #   AND topic_id=1 LIMIT 100) t ORDER BY RAND() LIMIT 40;
+    #   SELECT * FROM (SELECT * FROM questions WHERE topic_id=1
+    #   AND id NOT IN (SELECT question_id FROM answers WHERE
+    #   user_id=1 AND is_correct=1) LIMIT 100) t ORDER BY RAND() LIMIT 40;
     #
     # NOTE: to increase ORDER BY RAND() we use very simple trick - just
     # limit subselect before ORDER with 100 rows which ORDER BY RAND()
@@ -55,8 +58,8 @@ class QuizMixin(object):
     #
     # NOTE: another way to filter out answered questions (with JOIN):
     #
-    #   SELECT * FROM questions q LEFT JOIN quiz_stat s
-    #   ON q.id=s.question_id and s.user_id=1
+    #   SELECT * FROM questions q LEFT JOIN answers s
+    #   ON q.id=s.question_id AND s.user_id=1 AND s.is_correct=1
     #   WHERE q.topic_id=1 and user_id is NULL;
     #
     def getQuiz(self, topic_id, user_id, lang):
@@ -85,30 +88,7 @@ class QuizMixin(object):
         return quiz
 
     def saveQuestions(self, user_id, questions, answers):
-        if len(questions) != len(answers):
-            raise QuizCoreError('Parameters length mismatch.')
-
-        # questions must contain integer values since it represents
-        # list of IDs. It's important to have valid list
-        # because select will skip bad values and answers
-        # will not correspond to rows.
-        #
-        # Since sqlalchemy in_() accept iterable object
-        # we may use generator here.
-        questions = (int(x) for x in questions)
-        answers = (int(x) for x in answers)
-
-        # TODO: seems not very optimal way since it creates many list objects.
-        #
-        # We need sorted list of answers to correctly compare in the
-        # 'for row, answer in zip(res, answers)' later, since db server
-        # will return sorted list of questions' IDs.
-        # See also test_saveQuizUnordered() test in the tests/test_db_quiz.py
-        try:
-            lst = list(sorted(zip(questions, answers), key=lambda pair: pair[0]))
-            questions, answers = zip(*lst)
-        except ValueError:
-            raise QuizCoreError('Invalid value.')
+        questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers
         q = self.questions
@@ -125,14 +105,13 @@ class QuizMixin(object):
                 })
 
             if ans:
-                self.conn.execute(self.quiz_stat.insert(
+                self.conn.execute(self.answers.insert(
                                   append_string=self.__add),
                                   ans)
 
     def updateTopicStat(self, user_id, topic_list):
         for topic in topic_list:
-            self.conn.execute(self.__update_stat,
-                              user=user_id, topic=topic)
+            self.conn.execute(self.__update_stat, user=user_id, topic=topic)
 
     def saveQuizResult(self, user_id, topic_id, questions, answers):
         t = self.conn.begin()

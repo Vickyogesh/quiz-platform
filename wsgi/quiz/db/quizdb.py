@@ -1,3 +1,4 @@
+from quiz.exceptions import QuizCoreError
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
@@ -53,12 +54,39 @@ class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
-        self.quiz_stat = self.meta.tables['quiz_stat']
-        self.errors_stat = self.meta.tables['errors_stat']
-        self.topics_stat = self.meta.tables['topics_stat']
+        self.answers = self.meta.tables['answers']
+        self.exams = self.meta.tables['exams']
+        self.exams_stat = self.meta.tables['exams_stat']
 
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):
         for x in self.__optional_question_fields:
             if d[x] is None:
                 del d[x]
+
+    def _aux_prepareLists(self, questions, answers):
+        if len(questions) != len(answers):
+            raise QuizCoreError('Parameters length mismatch.')
+
+        # questions must contain integer values since it represents
+        # list of IDs. It's important to have valid list
+        # because select will skip bad values and answers
+        # will not correspond to rows.
+        #
+        # Since sqlalchemy in_() accept iterable object
+        # we may use generator here.
+        questions = (int(x) for x in questions)
+        answers = (int(x) for x in answers)
+
+        # TODO: seems not very optimal way since it creates many list objects.
+        #
+        # We need sorted list of answers to correctly compare in the
+        # 'for row, answer in zip(res, answers)' later, since db server
+        # will return sorted list of questions' IDs.
+        # See also test_saveQuizUnordered() test in the tests/test_db_quiz.py
+        try:
+            lst = list(sorted(zip(questions, answers), key=lambda pair: pair[0]))
+            questions, answers = zip(*lst)
+        except ValueError:
+            raise QuizCoreError('Invalid value.')
+        return questions, answers

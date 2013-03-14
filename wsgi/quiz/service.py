@@ -28,7 +28,10 @@ class QuizService(ServiceBase):
         self.urls.add(Rule('/student/<uid:user>',
                       methods=['GET'],
                       endpoint='onStudentStat'))
-        self.urls.add(Rule('/exam', methods=['GET'], endpoint='onExamGet'))
+        self.urls.add(Rule('/exam', methods=['GET'],
+                      endpoint='onCreateExam'))
+        self.urls.add(Rule('/exam', methods=['POST'],
+                      endpoint='onSaveExam'))
 
     def onQuizGet(self, request, topic):
         """ Get 40 questions from the DB and return them to the client. """
@@ -49,10 +52,7 @@ class QuizService(ServiceBase):
         except KeyError:
             raise BadRequest('Missing parameter.')
 
-        try:
-            self.core.saveQuizResults(user_id, topic, id_list, answers)
-        except QuizCoreError as e:
-            raise BadRequest(e.message)
+        self.core.saveQuizResults(user_id, topic, id_list, answers)
         return JSONResponse()
 
     def onStudentStat(self, request, user='me'):
@@ -60,20 +60,14 @@ class QuizService(ServiceBase):
             user = self.session['user_id']
         lang = request.args.get('lang', 'it')
 
-        try:
-            stat = self.core.getUserStat(user, lang)
-        except QuizCoreError as e:
-            raise BadRequest(e.message)
+        stat = self.core.getUserStat(user, lang)
         return JSONResponse(stat)
 
     def onErrorReviewGet(self, request):
         user_id = self.session['user_id']
         lang = request.args.get('lang', 'it')
 
-        try:
-            res = self.core.getErrorReview(user_id, lang)
-        except QuizCoreError as e:
-            raise BadRequest(e.message)
+        res = self.core.getErrorReview(user_id, lang)
         return JSONResponse(res)
 
     def onErrorReviewSave(self, request):
@@ -86,14 +80,24 @@ class QuizService(ServiceBase):
         except KeyError:
             raise BadRequest('Missing parameter.')
 
-        try:
-            self.core.saveErrorReview(user_id, id_list, answers)
-        except QuizCoreError as e:
-            raise BadRequest(e.message)
+        self.core.saveErrorReview(user_id, id_list, answers)
         return JSONResponse()
 
-    def onExamGet(self, request):
-        """ Get exam. """
+    def onCreateExam(self, request):
+        user_id = self.session['user_id']
         lang = request.args.get('lang', 'it')
-        exam = self.core.getExam(lang)
+        exam = self.core.createExam(user_id, lang)
         return JSONResponse(exam)
+
+    def onSaveExam(self, request):
+        data = request.json
+
+        try:
+            exam_id = data['exam']
+            questions = data['questions']
+            answers = data['answers']
+        except KeyError:
+            raise BadRequest('Missing parameter.')
+
+        self.core.saveExam(exam_id, questions, answers)
+        return JSONResponse()
