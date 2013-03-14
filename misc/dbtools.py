@@ -165,7 +165,7 @@ class DbTool(object):
             CREATE TABLE topics_stat(
                 user_id INTEGER UNSIGNED NOT NULL,
                 topic_id INTEGER UNSIGNED NOT NULL,
-                err_percent TINYINT NOT NULL DEFAULT -1
+                err_count INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE TABLE answers(
@@ -238,6 +238,61 @@ class DbTool(object):
                 INSERT INTO topics_stat(user_id, topic_id, err_percent)
                     VALUES(user, topic, @err)
                 ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
+            END;
+            """))
+
+        self.conn.execute("DROP PROCEDURE IF EXISTS count_topic_err;")
+        self.conn.execute(text("""
+            CREATE PROCEDURE count_topic_err
+            (user INTEGER UNSIGNED, question INTEGER UNSIGNED, correct BOOLEAN, is_ins BOOLEAN)
+            BEGIN
+                DECLARE err INT DEFAULT 1;
+                DECLARE topic INTEGER UNSIGNED;
+
+                IF correct = 1 THEN
+                    SET err = -1;
+                END IF;
+
+                IF (is_ins = TRUE AND correct = 0) OR is_ins = FALSE THEN
+                    SELECT topic_id INTO topic FROM questions WHERE id=question;
+
+                    INSERT INTO topics_stat(user_id, topic_id, err_count)
+                        VALUES(user, topic, err)
+                    ON DUPLICATE KEY UPDATE err_count=err_count+VALUES(err_count);
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_ins;")
+        self.conn.execute(text("""
+            CREATE TRIGGER count_topic_err_ins AFTER INSERT ON answers FOR EACH
+            ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+
+                IF NEW.is_correct = 1 THEN
+                    INSERT IGNORE INTO topics_stat VALUES(NEW.user_id, topic, 0);
+                ELSE
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_upd;")
+        self.conn.execute(text("""
+            CREATE TRIGGER count_topic_err_upd AFTER UPDATE ON answers FOR EACH
+            ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+
+                IF NEW.is_correct = 1 THEN
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, -1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count-1;
+                ELSE
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                END IF;
             END;
             """))
 

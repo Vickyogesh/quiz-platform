@@ -30,7 +30,7 @@ class QuizService(ServiceBase):
                       endpoint='onStudentStat'))
         self.urls.add(Rule('/exam', methods=['GET'],
                       endpoint='onCreateExam'))
-        self.urls.add(Rule('/exam', methods=['POST'],
+        self.urls.add(Rule('/exam/<int:id>', methods=['POST'],
                       endpoint='onSaveExam'))
 
     def onQuizGet(self, request, topic):
@@ -89,15 +89,14 @@ class QuizService(ServiceBase):
         exam = self.core.createExam(user_id, lang)
         return JSONResponse(exam)
 
-    def onSaveExam(self, request):
+    def onSaveExam(self, request, id):
         data = request.json
 
         try:
-            exam_id = data['exam']
             questions = data['questions']
             answers = data['answers']
         except KeyError:
             raise BadRequest('Missing parameter.')
 
-        self.core.saveExam(exam_id, questions, answers)
+        self.core.saveExam(id, questions, answers)
         return JSONResponse()

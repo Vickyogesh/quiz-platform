@@ -110,8 +110,9 @@ class QuizMixin(object):
                                   ans)
 
     def updateTopicStat(self, user_id, topic_list):
-        for topic in topic_list:
-            self.conn.execute(self.__update_stat, user=user_id, topic=topic)
+        pass
+        # for topic in topic_list:
+        #     self.conn.execute(self.__update_stat, user=user_id, topic=topic)
 
     def saveQuizResult(self, user_id, topic_id, questions, answers):
         t = self.conn.begin()

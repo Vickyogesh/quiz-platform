@@ -17,7 +17,7 @@ class ExamMixin(object):
                                                user_id=0)
         self.__create_exam = self.__create_exam.compile(self.engine)
 
-        self.__expires = text("""SELECT start_time + interval 3 hour
+        self.__expires = text("""SELECT start_time + interval 3 hour, end_time
                               from exams where id=:exam_id""")
         self.__expires = self.__expires.compile(self.engine)
 
@@ -72,7 +72,7 @@ class ExamMixin(object):
 
     def __getExpirationDate(self, exam_id):
         row = self.conn.execute(self.__expires, exam_id=exam_id).fetchone()
-        return row[0]
+        return row[0], row[1]
 
     def __getQuestions(self, questions, lang):
         q = self.questions
@@ -108,13 +108,16 @@ class ExamMixin(object):
         questions = self.__getQuestions(id_list, lang)
 
         # YYYY-MM-DDTHH:MM:SS
-        expires = str(self.__getExpirationDate(exam_id))
+        expires, _ = self.__getExpirationDate(exam_id)
+        expires = str(expires)
         return {'exam_id': exam_id, 'expires': expires, 'questions': questions}
 
     def saveExam(self, exam_id, questions, answers):
-        expires = self.__getExpirationDate(exam_id)
+        expires, end_time = self.__getExpirationDate(exam_id)
         now = datetime.utcnow()
 
+        if end_time:
+            raise QuizCoreError('Exam is already passed.')
         if now > expires:
             raise QuizCoreError('Exam is expired.')
         elif len(answers) != 40:

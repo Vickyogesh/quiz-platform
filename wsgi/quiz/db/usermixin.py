@@ -20,7 +20,7 @@ class UserMixin(object):
         self.__getname = self.__getname.compile(self.engine)
 
         self.__topicstat = text("""
-            SELECT t.id, t.text, t.text_fr, t.text_de, IFNULL(s.err_percent,-1)
+            SELECT t.id, t.text, t.text_fr, t.text_de, IFNULL(s.err_count,-1)
             FROM topics t LEFT JOIN
             (SELECT * FROM topics_stat WHERE user_id=:user_id) s
             ON t.id=s.topic_id;""")

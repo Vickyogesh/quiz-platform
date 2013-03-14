@@ -266,13 +266,13 @@ function onSendExam()
     answer_list.push(this.checked ? 1 : 0);
   });
 
+  var id = $("#examtab #examid").attr("exam");
   var data = {
-    exam: $("#examtab #examid").attr("exam"),
     questions: id_list,
     answers: answer_list
   }
 
-  aux_postJSON(url("/v1/exam"), data, function (data) {
+  aux_postJSON(url("/v1/exam/" + id), data, function (data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else

@@ -1,8 +1,7 @@
-
-Quiz
+Exam
 ----
 
-Quiz is a list of 40 random questions for the specified topic.
+Exam is a list of 40 random questions from all available topics.
 
   =========  =================================
   Question fields
@@ -15,20 +14,20 @@ Quiz is a list of 40 random questions for the specified topic.
   =========  =================================
 
 
-.. http:get:: /quiz/(topic_id)
+.. http:get:: /exam
 
-   Get quiz for the specified topic and language (optional).
+   Get exam for the user.
+   The exam will expire after **3 hrs** since creation.
 
    **Example requests**:
 
    .. sourcecode:: http
 
-      GET /v1/quiz/1 HTTP/1.1
+      GET /v1/exam HTTP/1.1
 
    .. sourcecode:: http
 
-      GET /v1/quiz/42?lang=de HTTP/1.1
-
+      GET /v1/exam?lang=de HTTP/1.1
 
    **Example response**:
 
@@ -39,7 +38,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
       {
         "status": 200,
-        "topic": 1,
+        "exam_id": 9,
+        "expires": "2013-03-14 18:11:21",
         "questions": [
           {
             "answer": 0,
@@ -62,14 +62,15 @@ Quiz is a list of 40 random questions for the specified topic.
         ]
       }
 
-   =========  ======================================
+   =========  ===========================================
    Response fields
-   =================================================
-   topic      Quiz topic id
-   questions  List of quiz questions
-   =========  ======================================
-
-   :param topic_id: Topic for which questions are requested.
+   ======================================================
+   exam_id    Exam ID.
+   expires    Expiration time of the exam (time in UTC).
+              After this time the Service will not accept
+              exam answers.
+   questions  List of exam questions.
+   =========  ===========================================
 
    :query lang: Question language: *it*, *fr*, *de*.
       This parameter is optional (default: *it*).
@@ -78,16 +79,16 @@ Quiz is a list of 40 random questions for the specified topic.
    :statuscode 401: Unauthorized.
 
 
-.. http:post:: /quiz/(topic_id)
+.. http:post:: /exam/(id)
 
-   Send quiz results for the specified topic. Client sends list of answered
-   questions and answers. List of questions is not fixed to 40.
+   Send answers for the specified exam. Client sends list of answered
+   questions and answers. List of questions/answers is fixed to 40.
 
    **Example request**:
 
    .. sourcecode:: http
 
-      POST /v1/quiz/1 HTTP/1.1
+      POST /v1/exam/9 HTTP/1.1
       Content-Type: application/json; charset=utf-8
 
       {
@@ -119,7 +120,7 @@ Quiz is a list of 40 random questions for the specified topic.
               be the same as questions.*
    =========  ===========================
 
-   :param topic_id: Topic of the quiz.
+   :param id: ID of the exam.
 
 
    :statuscode 200: Everything is ok.
@@ -135,5 +136,12 @@ Quiz is a list of 40 random questions for the specified topic.
    :statuscode 400: Parameters length mismatch.
       Lists has different numbers of elements.
 
+   :statuscode 400: Wrong number of answers.
+        There must be 40 answers.
+
    :statuscode 400: Invalid value.
       List element is not a number.
+
+   :statuscode 400: Exam is already passed.
+
+   :statuscode 400: Exam is expired.
