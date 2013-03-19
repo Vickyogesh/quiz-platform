@@ -69,6 +69,7 @@
         <li><a href="#examtab" data-toggle="tab">Exam</a></li>
         <li><a href="#reviewtab" data-toggle="tab">Error Review</a></li>
         <li><a href="#studentstattab" data-toggle="tab">Student Stat</a></li>
+        <li><a href="#examlisttab" data-toggle="tab">Exam list</a></li>
       </ul>
       <div class="tab-content">
 
@@ -190,6 +191,36 @@
             </tbody>
           </table>
         </div> <!-- /tab-pane studentstattab -->
+
+        <!-- ERROR REVIEW CONTENT -->
+        <div class="tab-pane" id="examlisttab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="me">
+            <a class="btn btn-info" id="bttGet">Get Exam List</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <div class="row"><div class="span1">ID:</div>
+            <div class="span3" id="id">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Name:</div>
+            <div class="span3" id="name">N/A</div>
+          </div>
+
+          <table class="table table-hover">  <!-- EXAM LIST TABLE -->
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Num. errors</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane examlisttab -->
 
       </div> <!-- /tab-content -->
     </div> <!-- /tabbable -->

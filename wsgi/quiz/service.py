@@ -32,6 +32,9 @@ class QuizService(ServiceBase):
                       endpoint='onCreateExam'))
         self.urls.add(Rule('/exam/<int:id>', methods=['POST'],
                       endpoint='onSaveExam'))
+        self.urls.add(Rule('/student/<uid:user>/exam',
+                      methods=['GET'],
+                      endpoint='onStudentExams'))
 
     def onQuizGet(self, request, topic):
         """ Get 40 questions from the DB and return them to the client. """
@@ -100,3 +103,9 @@ class QuizService(ServiceBase):
 
         self.core.saveExam(id, questions, answers)
         return JSONResponse()
+
+    def onStudentExams(self, request, user):
+        if user == 'me':
+            user = self.session['user_id']
+        exams = self.core.getExamList(user)
+        return JSONResponse(exams)

@@ -409,6 +409,68 @@ function onStudentStat()
 }
 //----------------------------------------------------------------------------
 
+function aux_clearExamList()
+{
+  $("#examlisttab .row #id").text('N/A');
+  $("#examlisttab .row #name").text('N/A');
+  $("#examlisttab tbody tr").remove();
+}
+//----------------------------------------------------------------------------
+
+function aux_fillExamList(data)
+{
+  var html = "";
+  var body = $("#examlisttab tbody");
+
+  $("#examlisttab .row #id").text(data.id);
+  $("#examlisttab .row #name").text(data.name + ' ' + data.surname);
+
+  var exams = data.exams;
+  for (var t in exams)
+  {
+    var exam = exams[t]
+    var start_time = aux_dateFromISO(exam.start).toLocaleString();
+    var end_time = aux_dateFromISO(exam.end).toLocaleString();
+    html = "<tr>";
+    html += "<td>" + exam.id + ".</td>";
+    html += "<td>" + start_time + "</td>";
+
+    if (exam.status == "expired")
+      html += "<td colspan='2'><span class='badge badge-important'>expired</span></td>";
+    else if (exam.status == "in-progress")
+      html += "<td colspan='2'><span class='badge badge-info'>in progress</span></td>";
+    else
+    {
+      html += "<td>" + end_time + "</td>";
+      if (exam.status == "passed")
+        html += "<td><span class='badge badge-success'>";
+      else
+        html += "<td><span class='badge badge-important'>";
+      html += exam.errors + "</span></td>";
+    }
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+function onStudentExams()
+{
+  var user_id = $("#examlisttab #id").val();
+
+  aux_clearExamList();
+
+  $.getJSON(url("/v1/student/"+user_id+"/exam"), function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillExamList(data);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
 
 /*********************************************************
 ** Setup.
@@ -439,4 +501,6 @@ $(document).ready(function() {
   $("#reviewtab table thead input").change(onSelectAllQuestions);
 
   $("#studentstattab #bttStudentStatGet").click(onStudentStat);
+
+  $("#examlisttab #bttGet").click(onStudentExams);
 });

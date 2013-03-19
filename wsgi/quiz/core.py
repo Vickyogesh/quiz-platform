@@ -59,3 +59,6 @@ class QuizCore(object):
 
     def saveErrorReview(self, user, id_list, answers):
         self.db.saveErrorReview(user, id_list, answers)
+
+    def getExamList(self, user_id):
+        return self.db.getExamList(user_id)
