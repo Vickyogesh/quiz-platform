@@ -36,12 +36,12 @@ class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         self.__optional_question_fields = ['image', 'image_bis']
 
     def __del__(self):
-        print('close db connection')
+        #print('close db connection')
         self.conn.close()
 
     # Setup db connection and tables
     def _setupDb(self, cfg):
-        print('open connection')
+        #print('open connection')
         verbose = cfg['verbose'].lower() == 'true'
         self.engine = create_engine(cfg['database'], echo=verbose,)
         self.conn = self.engine.connect()

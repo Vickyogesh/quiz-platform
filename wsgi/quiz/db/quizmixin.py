@@ -1,4 +1,5 @@
 from sqlalchemy import select, text
+from ..exceptions import QuizCoreError
 
 
 # See QuizCore docs for more info
@@ -81,7 +82,11 @@ class QuizMixin(object):
 
             self._aux_question_delOptionalField(d)
             quiz.append(d)
-        return quiz
+
+        if not quiz:
+            raise QuizCoreError('Invalid topic ID.')
+        else:
+            return quiz
 
     def saveQuestions(self, user_id, questions, answers):
         questions, answers = self._aux_prepareLists(questions, answers)

@@ -151,9 +151,9 @@ class DbTool(object):
 
             CREATE TABLE questions(
                 id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-                text VARCHAR(256) NOT NULL,
-                text_fr VARCHAR(256),
-                text_de VARCHAR(256),
+                text VARCHAR(500) NOT NULL,
+                text_fr VARCHAR(500),
+                text_de VARCHAR(500),
                 answer BOOLEAN NOT NULL,
                 image VARCHAR(10),
                 image_part VARCHAR(10),

@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 from sqlalchemy import select, text, func, bindparam, and_
 from ..exceptions import QuizCoreError
+#from profilestats import profile
 
 
 class ExamMixin(object):
@@ -112,13 +113,14 @@ class ExamMixin(object):
         expires = str(expires)
         return {'exam_id': exam_id, 'expires': expires, 'questions': questions}
 
+    #@profile
     def saveExam(self, exam_id, questions, answers):
         expires, end_time = self.__getExpirationDate(exam_id)
         now = datetime.utcnow()
 
         if end_time:
             raise QuizCoreError('Exam is already passed.')
-        if now > expires:
+        elif now > expires:
             raise QuizCoreError('Exam is expired.')
         elif len(answers) != 40:
             raise QuizCoreError('Wrong number of answers.')
@@ -129,20 +131,16 @@ class ExamMixin(object):
         s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
         res = self.conn.execute(s)
 
-        t = self.conn.begin()
-        try:
-            wrong = 0
-            for row, answer in zip(res, answers):
-                qid = row[q.c.id]
-                is_correct = row[q.c.answer] == answer
-                if not is_correct:
-                    wrong += 1
-                self.conn.execute(self.__upd, is_correct=is_correct,
-                                  exam_id=exam_id, question_id=qid)
-                self.conn.execute(self.__upd_examstat, exam_id=exam_id,
-                                  passed=wrong)
-        except Exception:
-            t.rollback()
-            raise
-        else:
-            t.commit()
+        ans = []
+        wrong = 0
+        for row, answer in zip(res, answers):
+            is_correct = row[q.c.answer] == answer
+            if not is_correct:
+                wrong += 1
+            ans.append({
+                'exam_id': exam_id,
+                'question_id': row[q.c.id],
+                'is_correct': is_correct
+            })
+        self.conn.execute(self.__upd, ans)
+        self.conn.execute(self.__upd_examstat, exam_id=exam_id, passed=wrong)
