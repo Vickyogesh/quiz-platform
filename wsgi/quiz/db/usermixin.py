@@ -26,7 +26,9 @@ class UserMixin(object):
             ON t.id=s.topic_id;""")
         self.__topicstat = self.__topicstat.compile(self.engine)
 
-        self.__examstat = text("SELECT err_count FROM exams WHERE user_id=:user_id;")
+        self.__examstat = text("""SELECT id, err_count, end_time,
+            UTC_TIMESTAMP() > start_time + interval 3 hour
+            FROM exams WHERE user_id=:user_id;""")
         self.__examstat = self.__examstat.compile(self.engine)
 
         self.__examlist = text("""SELECT exams.*,
@@ -48,7 +50,7 @@ class UserMixin(object):
                 type:    Account type.
                 app_pd:  Application ID.
         """
-        res = self.conn.execute(self.__stmt, login=login, appkey=appkey)
+        res = self.__stmt.execute(login=login, appkey=appkey)
         row = res.fetchone()
 
         if row:
@@ -62,7 +64,7 @@ class UserMixin(object):
             }
 
     def _getName(self, user):
-        row = self.conn.execute(self.__getname, id=user)
+        row = self.__getname.execute(id=user)
         row = row.fetchone()
         if not row:
             raise QuizCoreError('Unknown student.')
@@ -80,7 +82,7 @@ class UserMixin(object):
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
-        rows = self.conn.execute(self.__topicstat, user_id=user)
+        rows = self.__topicstat.execute(user_id=user)
         for row in rows:
             err = float(row[5]) / row[1] * 100
 
@@ -99,9 +101,18 @@ class UserMixin(object):
         return stat
 
     def __getExamStat(self, user_id):
-        rows = self.conn.execute(self.__examstat, user_id=user_id).fetchall()
-        rows = [x[0] for x in rows]
-        return rows
+        rows = self.__examstat.execute(user_id=user_id)
+        stat = []
+        for row in rows:
+            end = row[2]
+            expired = row[3]
+            if end:
+                stat.append({'id': row[0], 'status': row[1]})
+            elif expired:
+                stat.append({'id': row[0], 'status': 'expired'})
+            else:
+                stat.append({'id': row[0], 'status': 'in-progress'})
+        return stat
 
     def getUserStat(self, user, lang):
         name, surname = self._getName(user)
@@ -140,7 +151,7 @@ class UserMixin(object):
         }
 
     def _getExamList(self, user_id):
-        rows = self.conn.execute(self.__examlist, user_id=user_id)
+        rows = self.__examlist.execute(user_id=user_id)
         return [self._createExamInfo(row) for row in rows]
 
     def getExamList(self, user_id):

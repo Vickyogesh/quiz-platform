@@ -60,8 +60,7 @@ class QuizMixin(object):
     #   WHERE q.topic_id=1 and user_id is NULL;
     #
     def getQuiz(self, topic_id, user_id, lang):
-        res = self.conn.execute(self.__getquiz,
-                                topic_id=topic_id, user_id=user_id)
+        res = self.__getquiz.execute(topic_id=topic_id, user_id=user_id)
         if lang == 'de':
             txt_lang = self.questions.c.text_de
         elif lang == 'fr':
@@ -94,7 +93,7 @@ class QuizMixin(object):
         # select and check answers
         q = self.questions
         s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
-        res = self.conn.execute(s)
+        res = self.engine.execute(s)
 
         if res:
             ans = []
@@ -106,16 +105,9 @@ class QuizMixin(object):
                 })
 
             if ans:
-                self.conn.execute(self.answers.insert(
-                                  append_string=self.__add),
-                                  ans)
+                with self.engine.begin() as conn:
+                    conn.execute(self.answers.insert(
+                                 append_string=self.__add), ans)
 
     def saveQuizResult(self, user_id, topic_id, questions, answers):
-        t = self.conn.begin()
-        try:
-            self.saveQuestions(user_id, questions, answers)
-        except Exception:
-            t.rollback()
-            raise
-        else:
-            t.commit()
+        self.saveQuestions(user_id, questions, answers)

@@ -20,14 +20,13 @@ class DbQuizTest(unittest.TestCase):
         self.questions = self.db.questions
         self.answers = self.db.answers
         self.topics_stat = self.db.meta.tables['topics_stat']
-        self.conn = self.db.conn
-        self.conn.execute("DELETE from answers;")
-        self.conn.execute("DELETE from topics_stat;")
+        self.engine = self.db.engine
+        self.engine.execute("DELETE from answers;")
+        self.engine.execute("DELETE from topics_stat;")
 
     def tearDown(self):
-        self.conn.execute("DELETE from answers;")
-        self.conn.execute("DELETE from topics_stat;")
-        self.conn.close()
+        self.engine.execute("DELETE from answers;")
+        self.engine.execute("DELETE from topics_stat;")
 
     # TODO: move to separate test
     def test_getInfo(self):
@@ -100,7 +99,7 @@ class DbQuizTest(unittest.TestCase):
         # Check if quiz is saved correctly
         qa = zip(questions, answers)
         s = self.answers
-        res = self.conn.execute(select([s]).order_by(s.c.question_id))
+        res = self.engine.execute(select([s]).order_by(s.c.question_id))
         for row, qa in zip(res, qa):
             self.assertEqual(1, row[s.c.user_id])
             self.assertEqual(qa[0], row[s.c.question_id])
@@ -113,7 +112,7 @@ class DbQuizTest(unittest.TestCase):
         self.db.saveQuizResult(1, 1, questions, answers)
 
         s = self.answers
-        res = self.conn.execute(select([s]).order_by(s.c.question_id))
+        res = self.engine.execute(select([s]).order_by(s.c.question_id))
         rows = res.fetchall()
 
         self.assertEqual(3, len(rows))

@@ -18,14 +18,13 @@ class DbStatTest(unittest.TestCase):
         self.questions = self.db.questions
         self.answers = self.db.answers
         self.topics_stat = self.db.meta.tables['topics_stat']
-        self.conn = self.db.conn
-        self.conn.execute("DELETE from answers;")
-        self.conn.execute("DELETE from topics_stat;")
+        self.engine = self.db.engine
+        self.engine.execute("DELETE from answers;")
+        self.engine.execute("DELETE from topics_stat;")
 
     def tearDown(self):
-        self.conn.execute("DELETE from answers;")
-        self.conn.execute("DELETE from topics_stat;")
-        self.conn.close()
+        self.engine.execute("DELETE from answers;")
+        self.engine.execute("DELETE from topics_stat;")
 
     # Save one question with wrong answer.
     # There must be 1 error for the topic 1, since we have one wrong answer.
@@ -34,7 +33,7 @@ class DbStatTest(unittest.TestCase):
         answers = [0]
         self.db.saveQuizResult(1, 1, questions, answers)
 
-        rows = self.conn.execute("SELECT * FROM topics_stat;")
+        rows = self.engine.execute("SELECT * FROM topics_stat;")
         rows = rows.fetchall()
         self.assertEqual(1, len(rows))
         row = rows[0]
@@ -45,7 +44,7 @@ class DbStatTest(unittest.TestCase):
     def test_quizTopicsStat2(self):
         # Before testing we get topics data: questions ID ranges for each topic
         ranges = {}
-        rows = self.conn.execute("""SELECT id, max_id, min_id FROM topics
+        rows = self.engine.execute("""SELECT id, max_id, min_id FROM topics
             WHERE id IN (1, 3, 5);
         """)
         rows = rows.fetchall()
@@ -62,7 +61,7 @@ class DbStatTest(unittest.TestCase):
         answers = [0] * len(questions)
         self.db.saveQuizResult(1, 1, questions, answers)
 
-        rows = self.conn.execute("SELECT * FROM topics_stat;")
+        rows = self.engine.execute("SELECT * FROM topics_stat;")
         rows = rows.fetchall()
         self.assertEqual(3, len(rows))
 
@@ -91,7 +90,7 @@ class DbStatTest(unittest.TestCase):
         answers = [1] * len(questions)
         self.db.saveQuizResult(1, 1, questions, answers)
 
-        rows = self.conn.execute("SELECT * FROM topics_stat;")
+        rows = self.engine.execute("SELECT * FROM topics_stat;")
         rows = rows.fetchall()
         self.assertEqual(3, len(rows))
 
@@ -115,7 +114,7 @@ class DbStatTest(unittest.TestCase):
     def test_quizTopicsStat3(self):
         # Here we get min question ID for the topic 4
         # and generate 20 questions and correct answers.
-        rows = self.conn.execute("SELECT min_id FROM topics WHERE id=4")
+        rows = self.engine.execute("SELECT min_id FROM topics WHERE id=4")
         min_id = rows.fetchall()[0][0]
         questions = [min_id + m for m in xrange(20)]
         answers = [1] * len(questions)
@@ -124,7 +123,7 @@ class DbStatTest(unittest.TestCase):
         # for the topic 4 and errors count must be zero
         # since we saved only correct answers.
         self.db.saveQuizResult(1, 1, questions, answers)
-        rows = self.conn.execute("SELECT * FROM topics_stat;")
+        rows = self.engine.execute("SELECT * FROM topics_stat;")
         rows = rows.fetchall()
         self.assertEqual(1, len(rows))
 

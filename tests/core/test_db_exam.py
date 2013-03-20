@@ -16,14 +16,14 @@ class DbExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.db = QuizDb(self)
-        self.stat = self.db.quiz_stat
         self.questions = self.db.questions
-        self.conn = self.db.conn
-        # self.conn.execute("DELETE from quiz_stat;")
+        self.engine = self.db.engine
+        self.engine.execute("DELETE from exams_stat;")
+        self.engine.execute("DELETE from exams;")
 
     def tearDown(self):
-        # self.conn.execute("DELETE from quiz_stat;")
-        self.conn.close()
+        self.engine.execute("DELETE from exams_stat;")
+        self.engine.execute("DELETE from exams;")
 
     # Validate each value in the list - check ranges
     def test_getIdList(self):
@@ -32,7 +32,7 @@ class DbExamTest(unittest.TestCase):
             self.assertEqual(40, len(lst))
 
             lst = iter(sorted(lst))
-            res = self.conn.execute(self.db._ExamMixin__stmt_ch_info)
+            res = self.engine.execute(self.db._ExamMixin__stmt_ch_info)
             for row in res:
                 first = row[1]
                 last = row[2]
@@ -42,8 +42,8 @@ class DbExamTest(unittest.TestCase):
                     self.assertTrue(first <= id <= last)
 
     def test_getExam(self):
-        exam = self.db.getExam('it')
-        self.assertEqual(40, len(exam))
+        exam = self.db.createExam(1, 'it')
+        self.assertEqual(40, len(exam['questions']))
 
 
 def suite():

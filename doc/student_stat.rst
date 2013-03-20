@@ -49,7 +49,24 @@ Student statistics provides learning progress information of the student.
         "id": 42,
         "name": "Chuck",
         "surname": "Norris",
-        "exams": [20, 3, 0, 0],
+        "exams": [
+          {
+            "id": 1,
+            "status": 5
+          },
+          {
+            "id": 2,
+            "status": "expored"
+          },
+          {
+            "id": 3,
+            "status": 0
+          },
+          {
+            "id": 4,
+            "status": "in-progress"
+          }
+        ],
         "topics": [
           {
             "id": 1,
@@ -71,9 +88,22 @@ Student statistics provides learning progress information of the student.
    id         Student ID.
    name       Student name.
    surname    Student surname.
-   exams      List of the number of errors for each exam.
+   exams      List of statistics for each exam.
    topics     List of statistics for each topic.
    =========  ===========================================
+
+   =========  ==========================================
+   Exam statistics fields
+   =====================================================
+   id         Exam ID.
+   status     Exam status. It may contain on the
+              following value:
+
+              * *number* - number of errors
+              * *'expired'* - exam is expired 
+              * *'in-progress'* - exam is not passed yet
+   =========  ==========================================
+
 
    =========  ======================================
    Topic statistics fields

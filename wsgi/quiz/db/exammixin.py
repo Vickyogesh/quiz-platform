@@ -49,7 +49,7 @@ class ExamMixin(object):
     # in the range [101 - 200].
     def __generate_idList(self):
         id_list = []
-        res = self.conn.execute(self.__stmt_ch_info)
+        res = self.__stmt_ch_info.execute()
         for row in res:
             min_id = row[1]
             max_id = row[2]
@@ -61,18 +61,20 @@ class ExamMixin(object):
         return id_list
 
     def __initExam(self, user_id, questions):
-        res = self.conn.execute(self.__create_exam, user_id=user_id)
+        res = self.__create_exam.execute(user_id=user_id)
         exam_id = res.inserted_primary_key[0]
 
         # TODO: optimize me
         vals = []
         for q in questions:
             vals.append({'exam_id': exam_id, 'question_id': q})
-        self.conn.execute(self.__set_questions, vals)
+
+        with self.engine.begin() as conn:
+            conn.execute(self.__set_questions, vals)
         return exam_id
 
     def __getExpirationDate(self, exam_id):
-        row = self.conn.execute(self.__expires, exam_id=exam_id).fetchone()
+        row = self.__expires.execute(exam_id=exam_id).fetchone()
         return row[0], row[1]
 
     def __getQuestions(self, questions, lang):
@@ -86,7 +88,7 @@ class ExamMixin(object):
             txt_lang = q.c.text
 
         s = select([q], q.c.id.in_(questions)).order_by(func.rand())
-        res = self.conn.execute(s)
+        res = self.engine.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
         exam = []
@@ -129,7 +131,7 @@ class ExamMixin(object):
 
         q = self.questions
         s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
-        res = self.conn.execute(s)
+        res = self.engine.execute(s)
 
         ans = []
         wrong = 0
@@ -142,5 +144,6 @@ class ExamMixin(object):
                 'question_id': row[q.c.id],
                 'is_correct': is_correct
             })
-        self.conn.execute(self.__upd, ans)
-        self.conn.execute(self.__upd_examstat, exam_id=exam_id, passed=wrong)
+        with self.engine.begin() as conn:
+            conn.execute(self.__upd, ans)
+            conn.execute(self.__upd_examstat, exam_id=exam_id, passed=wrong)

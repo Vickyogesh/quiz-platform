@@ -355,13 +355,14 @@ function aux_fillUserStat(data)
     var exams = data.exams;
     for (var i in exams)
     {
-      var err = exams[i];
+      var exam = exams[i];
+      var status = exam.status
 
-      if (err <= 4)
-        html += "<span class='label label-success'>&nbsp;";
-      else
+      if (status == "expired" || status > 4)
         html += "<span class='label label-important'>&nbsp;";
-      html += err + '&nbsp;</span>&nbsp;';
+      else
+        html += "<span class='label label-success'>&nbsp;";
+      html += status + '&nbsp;</span>&nbsp;';
     }
 
     $("#studentstattab .row #exams").html(html);

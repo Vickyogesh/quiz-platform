@@ -35,16 +35,13 @@ class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
 
-    def __del__(self):
-        #print('close db connection')
-        self.conn.close()
+    # def __del__(self):
+    #     self.conn.close()
 
     # Setup db connection and tables
     def _setupDb(self, cfg):
-        #print('open connection')
         verbose = cfg['verbose'].lower() == 'true'
         self.engine = create_engine(cfg['database'], echo=verbose,)
-        self.conn = self.engine.connect()
 
         self.meta = MetaData()
         self.meta.reflect(bind=self.engine)

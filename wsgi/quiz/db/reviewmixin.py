@@ -11,7 +11,7 @@ class ErrorReviewMixin(object):
         self.__geterrors = self.__geterrors.compile(self.engine)
 
     def getErrorReview(self, user, lang):
-        res = self.conn.execute(self.__geterrors, user_id=user)
+        res = self.__geterrors.execute(user_id=user)
 
         if lang == 'de':
             lang = self.questions.c.text_de
@@ -36,11 +36,4 @@ class ErrorReviewMixin(object):
         return questions
 
     def saveErrorReview(self, user, id_list, answers):
-        t = self.conn.begin()
-        try:
-            self.saveQuestions(user, id_list, answers)
-        except Exception:
-            t.rollback()
-            raise
-        else:
-            t.commit()
+        self.saveQuestions(user, id_list, answers)
