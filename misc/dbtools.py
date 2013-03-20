@@ -43,6 +43,13 @@ class DbTool(object):
             'type': 'student'
         },
         {
+            'name': 'Test',
+            'surname': 'User 2',
+            'login': 'testuser2',
+            'passwd': 'testpasswd2',
+            'type': 'student'
+        },
+        {
             'name': 'Admin',
             'surname': '',
             'login': 'root',
