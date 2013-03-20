@@ -62,3 +62,6 @@ class QuizCore(object):
 
     def getExamList(self, user_id):
         return self.db.getExamList(user_id)
+
+    def getExamInfo(self, exam_id, lang):
+        return self.db.getExamInfo(exam_id, lang)

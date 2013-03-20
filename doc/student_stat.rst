@@ -56,7 +56,7 @@ Student statistics provides learning progress information of the student.
           },
           {
             "id": 2,
-            "status": "expored"
+            "status": "expired"
           },
           {
             "id": 3,

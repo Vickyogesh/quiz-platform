@@ -472,6 +472,80 @@ function onStudentExams()
 }
 //----------------------------------------------------------------------------
 
+function onExamInfo()
+{
+  var exam_id = $("#examinfotab #id").val();
+  var lang = $("#examinfotab #lang").val();
+  var data = {}
+  
+  if (lang != "it")
+    data.lang = lang;
+
+  $.getJSON(url("/v1/exam/"+exam_id), data, function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillExamInfo(data);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function timestring(data)
+{
+  return aux_dateFromISO(data).toLocaleString();
+}
+//----------------------------------------------------------------------------
+
+function aux_fillExamInfo(data)
+{
+  var exam = data.exam;
+  var user = data.user;
+  var questions = data.questions;
+
+  var html = "";
+
+  // exam
+  html = "<dt>ID</dt><dd>" + exam.id + "</dd>";
+  html += "<dt>Start</dt><dd>" + timestring(exam.start) + "</dd>";
+  html += "<dt>End</dt><dd>" + timestring(exam.end) + "</dd>";
+  html += "<dt>Errors</dt><dd>" + exam.errors + "</dd>";
+  html += "<dt>Status</dt><dd>" + exam.status + "</dd>";
+  $("#examinfotab #exam dd").remove();
+  $("#examinfotab #exam dt").remove();
+  $("#examinfotab #exam").append(html);
+
+  // user
+  html = "<dt>ID</dt><dd>" + user.id + "</dd>";
+  html += "<dt>Name</dt><dd>" + user.name + " " + user.surname + "</dd>";
+  $("#examinfotab #user dd").remove();
+  $("#examinfotab #user dt").remove();
+  $("#examinfotab #user").append(html);
+
+  // questions
+  $("#examinfotab table tbody tr").remove();
+  var body = $("#examinfotab table tbody");
+  var answer = false;
+  var ok = "<span class='label label-success'><i class='icon-ok icon-white'></i></span>";
+  var bad = "<span class='label label-important'><i class='icon-remove icon-white'></i></span>";
+  for (var i = 0; i < questions.length; i++)
+  {
+    answer = questions[i].answer;
+    correct = questions[i].is_correct;
+
+    var html = "<tr>";
+    html += "<td>" + (i + 1) + ".</td>";
+    html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
+    html += "<td>" + (answer ? "true":"false") + "</td>";
+
+    html += "<td>" + (correct ? ok:bad) + "</td>";
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
 
 /*********************************************************
 ** Setup.
@@ -504,4 +578,6 @@ $(document).ready(function() {
   $("#studentstattab #bttStudentStatGet").click(onStudentStat);
 
   $("#examlisttab #bttGet").click(onStudentExams);
+
+  $("#examinfotab #bttGet").click(onExamInfo);
 });

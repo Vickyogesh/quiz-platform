@@ -22,6 +22,11 @@ class ExamMixin(object):
                               from exams where id=:exam_id""")
         self.__expires = self.__expires.compile(self.engine)
 
+        self.__getexam = text("""SELECT exams.*,
+            UTC_TIMESTAMP() > start_time + interval 3 hour
+            FROM exams WHERE id=:exam_id""")
+        self.__getexam = self.__getexam.compile(self.engine)
+
         t = self.exams_stat
         self.__set_questions = t.insert().values(exam_id=0, question_id=0)
         self.__set_questions = self.__set_questions.compile(self.engine)
@@ -33,6 +38,11 @@ class ExamMixin(object):
 
         self.__upd_examstat = text("call update_exam_stat(:exam_id, :passed);")
         self.__upd_examstat = self.__upd_examstat.compile(self.engine)
+
+        self.__examquest = text("""SELECT q.*, e.is_correct FROM
+            (SELECT * FROM exams_stat where exam_id=:exam_id) e LEFT JOIN
+            questions q ON e.question_id=q.id;""")
+        self.__examquest = self.__examquest.compile(self.engine)
 
     # Create list of exam questions.
     # At first, we get info about chapters: chapter priority,
@@ -147,3 +157,34 @@ class ExamMixin(object):
         with self.engine.begin() as conn:
             conn.execute(self.__upd, ans)
             conn.execute(self.__upd_examstat, exam_id=exam_id, passed=wrong)
+
+    def getExamInfo(self, exam_id, lang):
+        res = self.__getexam.execute(exam_id=exam_id).fetchone()
+        exam = self._createExamInfo(res)
+        user_id = res[1]
+
+        name, surname = self._getName(user_id)
+        res = self.__examquest.execute(exam_id=exam_id)
+        user = {'id': user_id, 'name': name, 'surname': surname}
+
+        if lang == 'de':
+            txt_lang = 3
+        elif lang == 'fr':
+            txt_lang = 2
+        else:
+            txt_lang = 1
+
+        questions = []
+        for row in res:
+            d = {
+                'id': row[0],
+                'text': row[txt_lang],
+                'answer': row[4],
+                'image': row[5],
+                'image_bis': row[6],
+                'is_correct': row[9]
+            }
+            self._aux_question_delOptionalField(d)
+            questions.append(d)
+
+        return {'exam': exam, 'user': user, 'questions': questions}

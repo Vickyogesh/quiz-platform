@@ -132,13 +132,13 @@ class UserMixin(object):
         errors = exam_db_row[4]
         expired = exam_db_row[5]
 
-        if expired == 1:
-            status = 'expired'
-        elif end:
+        if end:
             if errors > 4:
                 status = 'failed'
             else:
                 status = 'passed'
+        elif expired == 1:
+            status = 'expired'
         else:
             status = 'in-progress'
 

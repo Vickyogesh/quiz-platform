@@ -1,7 +1,6 @@
 from werkzeug.routing import Rule
 from quiz.servicebase import ServiceBase
 from werkzeug.exceptions import BadRequest
-from .exceptions import QuizCoreError
 from .servicebase import JSONResponse
 
 
@@ -30,8 +29,12 @@ class QuizService(ServiceBase):
                       endpoint='onStudentStat'))
         self.urls.add(Rule('/exam', methods=['GET'],
                       endpoint='onCreateExam'))
-        self.urls.add(Rule('/exam/<int:id>', methods=['POST'],
+        self.urls.add(Rule('/exam/<int:id>',
+                      methods=['POST'],
                       endpoint='onSaveExam'))
+        self.urls.add(Rule('/exam/<int:id>',
+                      methods=['GET'],
+                      endpoint='onGetExamInfo'))
         self.urls.add(Rule('/student/<uid:user>/exam',
                       methods=['GET'],
                       endpoint='onStudentExams'))
@@ -103,6 +106,11 @@ class QuizService(ServiceBase):
 
         self.core.saveExam(id, questions, answers)
         return JSONResponse()
+
+    def onGetExamInfo(self, request, id):
+        lang = request.args.get('lang', 'it')
+        info = self.core.getExamInfo(id, lang)
+        return JSONResponse(info)
 
     def onStudentExams(self, request, user):
         if user == 'me':
