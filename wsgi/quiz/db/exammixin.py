@@ -85,6 +85,8 @@ class ExamMixin(object):
 
     def __getExpirationDate(self, exam_id):
         row = self.__expires.execute(exam_id=exam_id).fetchone()
+        if row is None:
+            raise QuizCoreError('Invalid exam ID.')
         return row[0], row[1]
 
     def __getQuestions(self, questions, lang):
@@ -123,7 +125,8 @@ class ExamMixin(object):
         # YYYY-MM-DDTHH:MM:SS
         expires, _ = self.__getExpirationDate(exam_id)
         expires = str(expires)
-        return {'exam_id': exam_id, 'expires': expires, 'questions': questions}
+        exam = {'id': exam_id, 'expires': expires}
+        return {'exam': exam, 'questions': questions}
 
     #@profile
     def saveExam(self, exam_id, questions, answers):
@@ -160,12 +163,14 @@ class ExamMixin(object):
 
     def getExamInfo(self, exam_id, lang):
         res = self.__getexam.execute(exam_id=exam_id).fetchone()
-        exam = self._createExamInfo(res)
-        user_id = res[1]
 
-        name, surname = self._getName(user_id)
+        if res is None:
+            raise QuizCoreError('Invalid exam ID.')
+
+        user_id = res[1]
+        exam = self._createExamInfo(res)
+        student = self._getStudentInfo(user_id)
         res = self.__examquest.execute(exam_id=exam_id)
-        user = {'id': user_id, 'name': name, 'surname': surname}
 
         if lang == 'de':
             txt_lang = 3
@@ -187,4 +192,4 @@ class ExamMixin(object):
             self._aux_question_delOptionalField(d)
             questions.append(d)
 
-        return {'exam': exam, 'user': user, 'questions': questions}
+        return {'exam': exam, 'student': student, 'questions': questions}

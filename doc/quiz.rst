@@ -76,7 +76,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
-   :statuscode 400: Invalid topic ID.
+   :statuscode 400: Invalid topic ID (temprorary removed - need to update quiz
+    algo).
 
 
 .. http:post:: /quiz/(topic_id)

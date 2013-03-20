@@ -247,8 +247,8 @@ function onGetExam()
       aux_showJSONError(data);
     else
     {
-      $("#examtab #examid").attr("exam", data.exam_id);
-      var expires = aux_dateFromISO(data.expires);
+      $("#examtab #examid").attr("exam", data.exam.id);
+      var expires = aux_dateFromISO(data.exam.expires);
       $("#examtab h4").text("Exam expires at: " + expires.toLocaleString());
       aux_fillTable($("#examtab #examtable"), data.questions);
     }
@@ -347,8 +347,8 @@ function aux_fillUserStat(data)
   var html = "";
   var body = $("#studentstattab tbody");
 
-  $("#studentstattab .row #id").text(data.id);
-  $("#studentstattab .row #name").text(data.name + ' ' + data.surname);
+  $("#studentstattab .row #id").text(data.student.id);
+  $("#studentstattab .row #name").text(data.student.name + ' ' + data.student.surname);
 
   if (data.exams.length)
   {
@@ -423,8 +423,8 @@ function aux_fillExamList(data)
   var html = "";
   var body = $("#examlisttab tbody");
 
-  $("#examlisttab .row #id").text(data.id);
-  $("#examlisttab .row #name").text(data.name + ' ' + data.surname);
+  $("#examlisttab .row #id").text(data.student.id);
+  $("#examlisttab .row #name").text(data.student.name + ' ' + data.student.surname);
 
   var exams = data.exams;
   for (var t in exams)
@@ -502,7 +502,7 @@ function timestring(data)
 function aux_fillExamInfo(data)
 {
   var exam = data.exam;
-  var user = data.user;
+  var user = data.student;
   var questions = data.questions;
 
   var html = "";
@@ -547,6 +547,61 @@ function aux_fillExamInfo(data)
 //----------------------------------------------------------------------------
 
 
+function onTopicErrors()
+{
+  var user_id = $("#topicerrtab #id").val();
+  var topic_id = $("#topicerrtab #topic").val();
+  var lang = $("#topicerrtab #lang").val();
+  var data = {}
+  
+  if (lang != "it")
+    data.lang = lang;
+
+  $.getJSON(url("/v1/student/"+user_id+"/topicerrors/"+topic_id), data, function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillTopicErrors(data);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function aux_fillTopicErrors(data)
+{
+  var user = data.student;
+  var questions = data.questions;
+
+  var html = "";
+
+  // user
+  html = "<dt>ID</dt><dd>" + user.id + "</dd>";
+  html += "<dt>Name</dt><dd>" + user.name + " " + user.surname + "</dd>";
+  $("#topicerrtab #user dd").remove();
+  $("#topicerrtab #user dt").remove();
+  $("#topicerrtab #user").append(html);
+
+  // questions
+  $("#topicerrtab table tbody tr").remove();
+  var body = $("#topicerrtab table tbody");
+  var answer = false;
+  for (var i = 0; i < questions.length; i++)
+  {
+    answer = questions[i].answer;
+    correct = questions[i].is_correct;
+
+    var html = "<tr>";
+    html += "<td>" + (i + 1) + ".</td>";
+    html += "<td>(" + questions[i].id +") "+ questions[i].text + "</td>";
+    html += "<td>" + (answer ? "true":"false") + "</td>";
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+
 /*********************************************************
 ** Setup.
 *********************************************************/
@@ -580,4 +635,6 @@ $(document).ready(function() {
   $("#examlisttab #bttGet").click(onStudentExams);
 
   $("#examinfotab #bttGet").click(onExamInfo);
+
+  $("#topicerrtab #bttGet").click(onTopicErrors);
 });

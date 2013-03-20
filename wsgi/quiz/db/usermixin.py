@@ -36,6 +36,12 @@ class UserMixin(object):
             FROM exams WHERE user_id=:user_id;""")
         self.__examlist = self.__examlist.compile(self.engine)
 
+        self.__topicerr = text(
+            """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
+            AND id IN (SELECT question_id FROM answers WHERE
+            user_id=:user_id AND is_correct=0)) t;""")
+        self.__topicerr = self.__topicerr.compile(self.engine)
+
     def getInfo(self, login, appkey):
         """ Return user and application info.
 
@@ -63,14 +69,15 @@ class UserMixin(object):
                 'app_id': row[self.apps.c.id]
             }
 
-    def _getName(self, user):
-        row = self.__getname.execute(id=user)
+    def _getStudentInfo(self, user_id):
+        row = self.__getname.execute(id=user_id)
         row = row.fetchone()
-        if not row:
+
+        if row is None:
             raise QuizCoreError('Unknown student.')
         elif row[2] != 'student':
             raise QuizCoreError('Not a student.')
-        return row[0], row[1]
+        return {'id': user_id, 'name': row[0], 'surname': row[1]}
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
@@ -114,16 +121,12 @@ class UserMixin(object):
                 stat.append({'id': row[0], 'status': 'in-progress'})
         return stat
 
-    def getUserStat(self, user, lang):
-        name, surname = self._getName(user)
-        if name is None:
-            raise QuizCoreError('Unknown student.')
+    def getUserStat(self, user_id, lang):
+        user = self._getStudentInfo(user_id)
         return {
-            'id': user,
-            'name': name,
-            'surname': surname,
-            'exams': self.__getExamStat(user),
-            'topics': self._getTopicsStat(user, lang)
+            'student': user,
+            'exams': self.__getExamStat(user_id),
+            'topics': self._getTopicsStat(user_id, lang)
         }
 
     def _createExamInfo(self, exam_db_row):
@@ -155,12 +158,34 @@ class UserMixin(object):
         return [self._createExamInfo(row) for row in rows]
 
     def getExamList(self, user_id):
-        name, surname = self._getName(user_id)
-        if name is None:
-            raise QuizCoreError('Invalid student ID.')
         return {
-            'id': user_id,
-            'name': name,
-            'surname': surname,
+            'student': self._getStudentInfo(user_id),
             'exams': self._getExamList(user_id)
         }
+
+    def getTopicErrors(self, user_id, topic_id, lang):
+        student = self._getStudentInfo(user_id)
+
+        rows = self.__topicerr.execute(user_id=user_id, topic_id=topic_id)
+
+        if lang == 'de':
+            txt_lang = self.questions.c.text_de
+        elif lang == 'fr':
+            txt_lang = self.questions.c.text_fr
+        else:
+            txt_lang = self.questions.c.text
+
+        # TODO: maybe preallocate with quiz = [None] * 40?
+        questions = []
+        for row in rows:
+            d = {
+                'id': row[self.questions.c.id],
+                'text': row[txt_lang],
+                'answer': row[self.questions.c.answer],
+                'image': row[self.questions.c.image],
+                'image_bis': row[self.questions.c.image_part]
+            }
+
+            self._aux_question_delOptionalField(d)
+            questions.append(d)
+        return {'student': student, 'questions': questions}

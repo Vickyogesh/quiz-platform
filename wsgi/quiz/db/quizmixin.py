@@ -82,12 +82,18 @@ class QuizMixin(object):
             self._aux_question_delOptionalField(d)
             quiz.append(d)
 
-        if not quiz:
-            raise QuizCoreError('Invalid topic ID.')
-        else:
-            return quiz
+        # TODO: we need to validate topic ID and also
+        # put answered questions if there are not enough unanswered
+        # questions for the quiz.
+        return quiz
+
+        # if not quiz:
+        #     raise QuizCoreError('Invalid topic ID.')
+        # else:
+        #     return quiz
 
     def saveQuestions(self, user_id, questions, answers):
+        # TODO: maybe check len(ans) == len(questions) ?
         questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers
@@ -95,19 +101,18 @@ class QuizMixin(object):
         s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
         res = self.engine.execute(s)
 
-        if res:
-            ans = []
-            for row, answer in zip(res, answers):
-                ans.append({
-                    'user_id': user_id,
-                    'question_id': row[q.c.id],
-                    'is_correct': row[q.c.answer] == answer
-                })
+        ans = []
+        for row, answer in zip(res, answers):
+            ans.append({
+                'user_id': user_id,
+                'question_id': row[q.c.id],
+                'is_correct': row[q.c.answer] == answer
+            })
 
-            if ans:
-                with self.engine.begin() as conn:
-                    conn.execute(self.answers.insert(
-                                 append_string=self.__add), ans)
+        if ans:
+            with self.engine.begin() as conn:
+                conn.execute(self.answers.insert(
+                             append_string=self.__add), ans)
 
     def saveQuizResult(self, user_id, topic_id, questions, answers):
         self.saveQuestions(user_id, questions, answers)
