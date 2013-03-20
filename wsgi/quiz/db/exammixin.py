@@ -61,13 +61,10 @@ class ExamMixin(object):
         id_list = []
         res = self.__stmt_ch_info.execute()
         for row in res:
-            min_id = row[1]
-            max_id = row[2]
-            delta = max_id - min_id + 1
-
-            # Create random ID in the range [min_id - max_id]
-            for i in xrange(row[0]):
-                id_list.append(int(min_id + delta * random.random()))
+            # priority = row[0]
+            # min_id = row[1]
+            # max_id = row[2]
+            id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
         return id_list
 
     def __initExam(self, user_id, questions):
