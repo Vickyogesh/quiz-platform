@@ -83,7 +83,7 @@ class DbExamTest(unittest.TestCase):
         now = datetime.utcnow() + timedelta(hours=3)
         delta = now - expires
         delta = abs(delta.total_seconds())
-        self.assertTrue(delta < 5)
+        self.assertTrue(delta <= 5)
 
         ### Check questions
 
@@ -135,7 +135,7 @@ class DbExamTest(unittest.TestCase):
         now = datetime.utcnow()
         delta = now - start
         delta = abs(delta.total_seconds())
-        self.assertTrue(delta < 5)
+        self.assertTrue(delta <= 5)
 
         ### Check exam questions
 
@@ -239,7 +239,7 @@ class DbExamTest(unittest.TestCase):
 
         now = datetime.utcnow()
         delta = abs((now - exam.end).total_seconds())
-        self.assertTrue(delta < 2)
+        self.assertTrue(delta <= 5)
 
     # Check exam info API
     def test_statusNew(self):

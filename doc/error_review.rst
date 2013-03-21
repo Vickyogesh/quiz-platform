@@ -121,5 +121,7 @@ Error review is a list of 40 random questions where student made a mistake
    :statuscode 400: Parameters length mismatch.
       Lists has different numbers of elements.
 
+   :statuscode 400: Empty list.
+
    :statuscode 400: Invalid value.
       List element is not a number.

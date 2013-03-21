@@ -18,9 +18,7 @@ class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.db = QuizDb(self)
-        self.questions = self.db.questions
         self.answers = self.db.answers
-        self.topics_stat = self.db.meta.tables['topics_stat']
         self.engine = self.db.engine
         self.engine.execute("TRUNCATE TABLE answers;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
@@ -70,6 +68,13 @@ class DbQuizTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
+
+        # Try to save empty lists
+        try:
+            self.db.saveQuizResult(1, 1, [], [])
+        except QuizCoreError as e:
+            err = e.message
+        self.assertEqual('Empty list.', err)
 
         # Questions must contain valid ID values (numbers).
         # We set one of the ID to 'bla' to test this.
