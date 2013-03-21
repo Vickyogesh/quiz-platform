@@ -9,38 +9,23 @@ class QuizService(ServiceBase):
 
     def __init__(self, config):
         super(QuizService, self).__init__(config)
-        self.urls.add(Rule('/quiz/<int:topic>',
-                      methods=['GET'],
-                      endpoint='onQuizGet'))
-        self.urls.add(Rule('/quiz/<int:topic>',
-                      methods=['POST'],
-                      endpoint='onQuizSave'))
-        self.urls.add(Rule('/errorreview',
-                      methods=['GET'],
-                      endpoint='onErrorReviewGet'))
-        self.urls.add(Rule('/errorreview',
-                      methods=['POST'],
-                      endpoint='onErrorReviewSave'))
-        self.urls.add(Rule('/student',
-                      methods=['GET'],
-                      endpoint='onStudentStat'))
-        self.urls.add(Rule('/student/<uid:user>',
-                      methods=['GET'],
-                      endpoint='onStudentStat'))
-        self.urls.add(Rule('/exam', methods=['GET'],
-                      endpoint='onCreateExam'))
-        self.urls.add(Rule('/exam/<int:id>',
-                      methods=['POST'],
-                      endpoint='onSaveExam'))
-        self.urls.add(Rule('/exam/<int:id>',
-                      methods=['GET'],
-                      endpoint='onGetExamInfo'))
-        self.urls.add(Rule('/student/<uid:user>/exam',
-                      methods=['GET'],
-                      endpoint='onStudentExams'))
-        self.urls.add(Rule('/student/<uid:user>/topicerrors/<int:id>',
-                      methods=['GET'],
-                      endpoint='onTopicErrors'))
+        self._addRules([
+            ('GET',   '/quiz/<int:topic>',        'onQuizGet'),
+            ('POST',  '/quiz/<int:topic>',        'onQuizSave'),
+            ('GET',   '/errorreview',             'onErrorReviewGet'),
+            ('POST',  '/errorreview',             'onErrorReviewSave'),
+            ('GET',   '/exam',                    'onCreateExam'),
+            ('POST',  '/exam/<int:id>',           'onSaveExam'),
+            ('GET',   '/exam/<int:id>',           'onGetExamInfo'),
+            ('GET',   '/student',                 'onStudentStat'),
+            ('GET',   '/student/<uid:user>',      'onStudentStat'),
+            ('GET',   '/student/<uid:user>/exam', 'onStudentExams'),
+            ('GET',   '/student/<uid:user>/topicerrors/<int:id>', 'onTopicErrors')
+        ])
+
+    def _addRules(self, rules):
+        for rule in rules:
+            self.urls.add(Rule(rule[1], methods=[rule[0]], endpoint=rule[2]))
 
     def onQuizGet(self, request, topic):
         """ Get 40 questions from the DB and return them to the client. """

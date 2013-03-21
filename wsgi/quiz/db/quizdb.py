@@ -80,7 +80,7 @@ class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         # We need sorted list of answers to correctly compare in the
         # 'for row, answer in zip(res, answers)' later, since db server
         # will return sorted list of questions' IDs.
-        # See also test_saveQuizUnordered() test in the tests/test_db_quiz.py
+        # See also test_saveUnordered() test in the tests/test_db_quiz.py
         try:
             lst = list(sorted(zip(questions, answers), key=lambda pair: pair[0]))
             questions, answers = zip(*lst)

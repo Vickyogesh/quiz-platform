@@ -2,7 +2,7 @@ import random
 from datetime import datetime
 from sqlalchemy import select, text, func, bindparam, and_
 from ..exceptions import QuizCoreError
-#from profilestats import profile
+from profilestats import profile
 
 
 class ExamMixin(object):
@@ -44,6 +44,9 @@ class ExamMixin(object):
             questions q ON e.question_id=q.id;""")
         self.__examquest = self.__examquest.compile(self.engine)
 
+        self.__examids = text("SELECT question_id FROM exams_stat WHERE exam_id=:exam_id")
+        self.__examids = self.__examids.compile(self.engine)
+
     # Create list of exam questions.
     # At first, we get info about chapters: chapter priority,
     # min question ID for the chapter and max question ID for the chapter.
@@ -55,15 +58,13 @@ class ExamMixin(object):
     # |     2    |   101   |  200
     #
     # This means what for row 1 we need select one question in the range
-    # [0 - 100] and for row 2 we need select two (random) questions
+    # [1 - 100] and for row 2 we need select two (random) questions
     # in the range [101 - 200].
     def __generate_idList(self):
         id_list = []
         res = self.__stmt_ch_info.execute()
         for row in res:
-            # priority = row[0]
-            # min_id = row[1]
-            # max_id = row[2]
+            # priority = row[0], min_id = row[1], max_id = row[2]
             id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
         return id_list
 
@@ -71,10 +72,7 @@ class ExamMixin(object):
         res = self.__create_exam.execute(user_id=user_id)
         exam_id = res.inserted_primary_key[0]
 
-        # TODO: optimize me
-        vals = []
-        for q in questions:
-            vals.append({'exam_id': exam_id, 'question_id': q})
+        vals = [{'exam_id': exam_id, 'question_id': q} for q in questions]
 
         with self.engine.begin() as conn:
             conn.execute(self.__set_questions, vals)
@@ -137,15 +135,21 @@ class ExamMixin(object):
         elif len(answers) != 40:
             raise QuizCoreError('Wrong number of answers.')
 
+        res = self.__examids.execute(exam_id=exam_id)
+        exam_questons = [row[0] for row in res]
+
         questions, answers = self._aux_prepareLists(questions, answers)
 
         q = self.questions
-        s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
+        s = select([q.c.id, q.c.answer], q.c.id.in_(exam_questons))
         res = self.engine.execute(s)
 
         ans = []
         wrong = 0
-        for row, answer in zip(res, answers):
+        for row, answer, qq, eq in zip(res, answers, questions, exam_questons):
+            if qq != eq:
+                raise QuizCoreError('Invalid question ID.')
+
             is_correct = row[q.c.answer] == answer
             if not is_correct:
                 wrong += 1

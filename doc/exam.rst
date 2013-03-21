@@ -131,29 +131,21 @@ Exam is a list of 40 random questions from all available topics.
 
 
    :statuscode 200: Everything is ok.
-
    :statuscode 401: Unauthorized.
-
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.
-
    :statuscode 400: Missing parameter.
       At least one of the parameters missing.
-
    :statuscode 400: Parameters length mismatch.
       Lists has different numbers of elements.
-
    :statuscode 400: Wrong number of answers.
         There must be 40 answers.
-
    :statuscode 400: Invalid exam ID.
-
    :statuscode 400: Invalid value.
       List element is not a number.
-
    :statuscode 400: Exam is already passed.
-
    :statuscode 400: Exam is expired.
+   :statuscode 400: Invalid question ID.
 
 
 .. http:get:: /exam/(id)

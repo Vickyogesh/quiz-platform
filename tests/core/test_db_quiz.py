@@ -12,7 +12,8 @@ from quiz.db.quizdb import QuizDb
 from quiz.exceptions import QuizCoreError
 
 
-# TODO: add tests explanations.
+# Test: generate and save quiz.
+# NOTE: question lang and optional fileds are not tested.
 class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
@@ -21,12 +22,12 @@ class DbQuizTest(unittest.TestCase):
         self.answers = self.db.answers
         self.topics_stat = self.db.meta.tables['topics_stat']
         self.engine = self.db.engine
-        self.engine.execute("DELETE from answers;")
-        self.engine.execute("DELETE from topics_stat;")
+        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     def tearDown(self):
-        self.engine.execute("DELETE from answers;")
-        self.engine.execute("DELETE from topics_stat;")
+        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     # TODO: move to separate test
     def test_getInfo(self):
@@ -37,12 +38,11 @@ class DbQuizTest(unittest.TestCase):
         self.assertEqual(3, info['app_id'])
         self.assertEqual('student', info['type'])
 
-    def test_getQuiz(self):
-        # Generate quiz for the user with ID 1 and topic ID 1,
-        # questions text must be 'italian'.
+    # Generate quiz for the user with ID 1 and topic ID 1,
+    # questions text must be 'italian', number of questions must be 40.
+    def test_get(self):
         quiz = self.db.getQuiz(1, 1, 'it')
 
-        # Reqult must contain list of 40 questions
         self.assertEqual(40, len(quiz))
 
         # Pick random question to check it's fields
@@ -54,14 +54,12 @@ class DbQuizTest(unittest.TestCase):
         self.assertTrue('text' in question)
         self.assertTrue('answer' in question)
 
-        # Get quiz for the topic with with wrong id - must throw exception
-        try:
-            quiz = self.db.getQuiz(9000, 12, 'it')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid topic ID.', err)
+        # Get quiz for the topic with with wrong id - must return empty list
+        quiz = self.db.getQuiz(9000, 12, 'it')
+        self.assertEqual(0, len(quiz))
 
-    def test_saveQuiz(self):
+    # Testing wrong data processing.
+    def test_saveBadData(self):
         quiz = self.db.getQuiz(1, 1, 'it')
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -74,6 +72,7 @@ class DbQuizTest(unittest.TestCase):
         self.assertEqual('Parameters length mismatch.', err)
 
         # Questions must contain valid ID values (numbers).
+        # We set one of the ID to 'bla' to test this.
         try:
             answers = [0] * len(questions)
             q = questions[:]
@@ -84,6 +83,7 @@ class DbQuizTest(unittest.TestCase):
         self.assertEqual('Invalid value.', err)
 
         # Answers must contain 1 or 0.
+        # We fill answers with non-numbers.
         try:
             answers = ['bla'] * len(questions)
             self.db.saveQuizResult(1, 1, questions, answers)
@@ -91,9 +91,18 @@ class DbQuizTest(unittest.TestCase):
             err = e.message
         self.assertEqual('Invalid value.', err)
 
-        # Put some correct answers
+    # Test normal behaviour.
+    def test_save(self):
+        quiz = self.db.getQuiz(1, 1, 'it')
+        questions = [x['id'] for x in quiz]
+        questions = list(sorted(questions))
+
+        # Init answers with wrong answers :)
         answers = [0] * len(questions)
+
+        # Put some correct answers
         answers[0:5] = [1] * 5
+
         self.db.saveQuizResult(1, 1, questions, answers)
 
         # Check if quiz is saved correctly
@@ -105,11 +114,10 @@ class DbQuizTest(unittest.TestCase):
             self.assertEqual(qa[0], row[s.c.question_id])
             self.assertEqual(qa[1], row[s.c.is_correct])
 
-    def test_saveQuizUnordered(self):
+    # Test unordered question list.
+    def test_saveUnordered(self):
         # unordered questions must be saved correctly
-        questions = [12, 14, 1]
-        answers = [1, 0, 0]
-        self.db.saveQuizResult(1, 1, questions, answers)
+        self.db.saveQuizResult(1, 1, [12, 14, 1], [1, 0, 0])
 
         s = self.answers
         res = self.engine.execute(select([s]).order_by(s.c.question_id))
@@ -123,24 +131,40 @@ class DbQuizTest(unittest.TestCase):
         self.assertEqual(1, rows[2][s.c.user_id])
         self.assertEqual(14, rows[2][s.c.question_id])
 
-    # TODO: fix me - commented out because there are many questions generated
-    # by the test dbinit tool, so this test takes too ling.
-    # def test_saveQuizAll(self):
-    #     quiz = self.db.getQuiz(1, 1, 'it')
-    #     id_list = []
-    #     #while len(quiz):
-    #     for x in xrange(20):
-    #         ids = [x['id'] for x in quiz]
-    #         id_list.extend(ids)
-    #         answers = [1] * len(ids)
-    #         self.db.saveQuizResult(1, ids, answers)
-    #         quiz = self.db.getQuiz(1, 1, 'it')
+    # Test if answered questions are not present in future quezzes.
+    def test_random(self):
+        quiz = self.db.getQuiz(1, 1, 'it')
+        questions = [x['id'] for x in quiz]
+        questions = list(sorted(questions))
 
-    #     s = self.answers
-    #     res = self.conn.execute(select([s]).order_by(s.c.question_id))
-    #     for row, id in zip(res, sorted(id_list)):
-    #         self.assertEqual(1, row[s.c.user_id])
-    #         self.assertEqual(id, row[s.c.question_id])
+        # We set correct answers for questions 2 and 5.
+        answers = [0] * len(questions)
+        answers[2] = 1
+        answers[5] = 1
+        q2, q3 = questions[2], questions[5]
+
+        self.db.saveQuizResult(1, 1, questions, answers)
+
+        # Simulate 10 new quzzes and check if
+        # answered questions are present in them.
+        for x in xrange(10):
+            quiz = self.db.getQuiz(1, 1, 'it')
+            questions = [x['id'] for x in quiz]
+            self.assertTrue(q2 not in questions)
+            self.assertTrue(q3 not in questions)
+
+    # If all questions are answered then next quiz will be empty.
+    def test_saveall(self):
+        quiz = self.db.getQuiz(1, 1, 'it')
+        questions = [x['id'] for x in quiz]
+
+        while questions:
+            self.db.saveQuizResult(1, 1, questions, [1] * len(questions))
+            quiz = self.db.getQuiz(1, 1, 'it')
+            questions = [x['id'] for x in quiz]
+
+        quiz = self.db.getQuiz(1, 1, 'it')
+        self.assertEqual(0, len(quiz))
 
     # def test_errorStat(self):
     #     self.db.saveQuizResult(1, 1, [1, 2, 3], [1, 0, 0])
