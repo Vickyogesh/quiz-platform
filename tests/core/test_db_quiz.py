@@ -171,46 +171,6 @@ class DbQuizTest(unittest.TestCase):
         quiz = self.db.getQuiz(1, 1, 'it')
         self.assertEqual(0, len(quiz))
 
-    # def test_errorStat(self):
-    #     self.db.saveQuizResult(1, 1, [1, 2, 3], [1, 0, 0])
-
-    #     s = self.errors_stat
-    #     rows = self.conn.execute(select([s]).order_by(s.c.question_id))
-    #     rows = rows.fetchall()
-    #     self.assertEqual(2, len(rows))
-    #     self.assertEqual(1, rows[0][s.c.user_id])
-    #     self.assertEqual(2, rows[0][s.c.question_id])
-    #     self.assertEqual(1, rows[1][s.c.user_id])
-    #     self.assertEqual(3, rows[1][s.c.question_id])
-
-    #     self.db.saveQuizResult(1, 1, [1, 2, 3], [1, 1, 0])
-
-    #     s = self.errors_stat
-    #     rows = self.conn.execute(select([s]).order_by(s.c.question_id))
-    #     rows = rows.fetchall()
-    #     self.assertEqual(1, len(rows))
-    #     self.assertEqual(1, rows[0][s.c.user_id])
-    #     self.assertEqual(3, rows[0][s.c.question_id])
-
-    # def test_topicStat(self):
-    #     ids = range(1, 11)
-    #     answers = [0] * len(ids)
-    #     self.db.saveQuizResult(1, 1, ids, answers)
-
-    #     s = self.errors_stat
-    #     rows = self.conn.execute(select([s]).order_by(s.c.question_id))
-    #     rows = rows.fetchall()
-    #     self.assertEqual(10, len(rows))
-
-    #     s = self.topics_stat
-    #     rows = self.conn.execute(select([s]))
-    #     rows = rows.fetchall()
-
-    #     self.assertEqual(1, len(rows))
-    #     self.assertEqual(1, rows[0][s.c.user_id])
-    #     self.assertEqual(1, rows[0][s.c.topic_id])
-    #     self.assertEqual(5, rows[0][s.c.err_percent])
-
 
 def suite():
     suite = unittest.TestSuite()

@@ -15,7 +15,7 @@ from quiz.db.quizdb import QuizDb
 ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 
 
-# Test: generate exam, save exam.
+# Test: generate exam, save exam, exam's errors counting.
 class DbExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
