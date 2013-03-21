@@ -20,11 +20,13 @@ if 'core' in args.tests:
     import core.test_db_exam
     import core.test_db_review
     import core.test_db_topicstat
+    import core.test_db_stat
     suite.addTest(core.test_settings.suite())
     suite.addTest(core.test_db_quiz.suite())
     suite.addTest(core.test_db_exam.suite())
     suite.addTest(core.test_db_review.suite())
     suite.addTest(core.test_db_topicstat.suite())
+    suite.addTest(core.test_db_stat.suite())
 
 if 'http' in args.tests:
     import http.test_auth
