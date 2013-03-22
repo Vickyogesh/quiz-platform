@@ -4,6 +4,8 @@ Quiz Web Service repo layout
 misc/ - Contains tools, initial db data and documentation
 tests/ - Web service tests
 wsg/ - Quiz web service itself
+test-data/ - Local configurations and other files. Used only for local testing.
+             This folder is not included to the repo.
 
 
 OpenShift hooks (scripts)
@@ -51,12 +53,28 @@ fi
 --- .openshift/action_hooks/build ---
 $OPENSHIFT_DATA_DIR/bin/pip install --use-mirrors -r $OPENSHIFT_REPO_DIR/requirements.txt
 
+# Generate documantation (if needed)
+if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
+$OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
+fi
+
 
 --- .openshift/action_hooks/pre_build ---
 #!/bin/bash
+
+# create quiz data directory
 if [ ! -d $OPENSHIFT_DATA_DIR/quiz ]; then
 mkdir $OPENSHIFT_DATA_DIR/quiz
+fi
+
+# copy app config
+if [ ! -f $OPENSHIFT_DATA_DIR/quiz/config.ini ]; then
 cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz
+fi
+
+# copy uwsgi config
+if [ ! -f $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini ]; then
+cp $OPENSHIFT_REPO_DIR/misc/uwsgi.ini $OPENSHIFT_DATA_DIR/quiz
 fi
 
 if [ ! -d $OPENSHIFT_DATA_DIR/bin ]; then
@@ -98,10 +116,20 @@ rm -rf pip-1.1.tar.gz
 
 fi
 
+# Install sphinx to generate documantation (if needed)
+if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
+$OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
+fi
+
 
 --- .openshift/action_hooks/start ---
-# NOTE: -L option is for testing!
-$OPENSHIFT_DATA_DIR/bin/uwsgi -L --master --process 2 -s $OPENSHIFT_INTERNAL_IP:$OPENSHIFT_INTERNAL_PORT --socket-protocol http --pp $OPENSHIFT_REPO_DIR/wsgi -w application:app -d $OPENSHIFT_DIY_LOG_DIR/app.log --pidfile $OPENSHIFT_TMP_DIR/uwsgi.pid
+$OPENSHIFT_DATA_DIR/bin/uwsgi --ini $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini
+
+
+--- .openshift/cron/daily/del_old_session ---
+#!/bin/bash
+# Remove session files which are older than one day.
+find $OPENSHIFT_DATA_DIR/quiz/sessions -mtime +1 -type f -exec rm {} \;
 
 
 4) Setup quiz database with dbsetup tool
@@ -124,3 +152,5 @@ How to use git flow to work with production and testing repos
 now you have two tracked branches:
     master - production repo
     develop - testing repo
+
+NOTE: set push.default=upstream to push from develop branch

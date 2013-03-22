@@ -1,0 +1,38 @@
+Tests directory layout
+======================
+
+core/ - Quiz Web Service core logic tests
+http/ - Quiz Web Service API tests using HTTP requests
+static/ - Example html page for the testing web service
+          (used if testing is enabled in the config.ini).
+          See wsgi.__init__.py for more info.
+data/ - Various data for tests.
+tools/  - tools for testing.
+
+
+Running tests
+=============
+
+To run tests you may use tests.py script or run them individually.
+
+Run
+    tests.py -h
+to get help or just run it without arguments.
+
+NOTE: to run http test server must be started before
+
+
+Hints
+=====
+
+This secton provides info about various tips & hints which
+helps to develop and test the project.
+
+How to push local branch to remote (upstream) master
+----------------------------------------------------
+
+    git push <remote> <local branch name>:<remote branch to push into>
+
+Example:
+
+    git push test feature/name:master
