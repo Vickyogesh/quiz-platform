@@ -8,24 +8,28 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import unittest
 from sqlalchemy import select
 from tests_common import db_uri
-from quiz.db.quizdb import QuizDb
+from quiz.core.core import QuizCore
 
 
 # Test: topic statistics calculation in various situations.
 class DbTopicStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.db = QuizDb(self)
-        self.answers = self.db.answers
-        self.topics_stat = self.db.meta.tables['topics_stat']
-        self.engine = self.db.engine
-        self.engine.execute("DELETE from answers;")
-        self.engine.execute("DELETE from topics_stat;")
+        self.core = QuizCore(self)
+        self.answers = self.core.answers
+        self.topics_stat = self.core.meta.tables['topics_stat']
+        self.engine = self.core.engine
+        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE exams;")
         self.topic_info = self._getTopicInfo()
 
     def tearDown(self):
-        self.engine.execute("DELETE from answers;")
-        self.engine.execute("DELETE from topics_stat;")
+        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE exams;")
 
     # Helper function to get number of questions in all topics.
     def _getTopicInfo(self):
@@ -36,7 +40,7 @@ class DbTopicStatTest(unittest.TestCase):
     def test_empty(self):
         # Try to get stat for invalid user.
         # Even for invalid user it returns statistics (with empty values)
-        stat = self.db._getTopicsStat(1000, 'it')
+        stat = self.core._getTopicsStat(1000, 'it')
         self.assertEqual(len(self.topic_info), len(stat))
 
         # Check statistics fields
@@ -129,13 +133,13 @@ class DbTopicStatTest(unittest.TestCase):
         # stat for each topic will be updated.
 
         # Pass exam (set all answers to wrong)
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
         exam_id = info['exam']['id']
         questions = list(sorted([q['id'] for q in info['questions']]))
-        self.db.saveExam(exam_id, questions, [0] * len(questions))
+        self.core.saveExam(exam_id, questions, [0] * len(questions))
 
         # Get exam topics
-        q = self.db.questions
+        q = self.core.questions
         sel = select([q.c.topic_id]).where(q.c.id.in_(questions))
         sel = sel.group_by(q.c.topic_id)
         res = self.engine.execute(sel)

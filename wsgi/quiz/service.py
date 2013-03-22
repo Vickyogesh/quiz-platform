@@ -32,7 +32,7 @@ class QuizService(ServiceBase):
         lang = request.args.get('lang', 'it')
 
         user_id = self.session['user_id']
-        quiz = self.core.getQuestionList(topic, user_id, lang)
+        quiz = self.core.getQuiz(topic, user_id, lang)
         return JSONResponse(quiz)
 
     def onQuizSave(self, request, topic):
@@ -46,7 +46,7 @@ class QuizService(ServiceBase):
         except KeyError:
             raise BadRequest('Missing parameter.')
 
-        self.core.saveQuizResults(user_id, topic, id_list, answers)
+        self.core.saveQuiz(user_id, topic, id_list, answers)
         return JSONResponse()
 
     def onStudentStat(self, request, user='me'):

@@ -1,10 +1,8 @@
 from sqlalchemy import select, text
-from ..exceptions import QuizCoreError
 
 
-# See QuizCore docs for more info
 class QuizMixin(object):
-    """ Mixin for working with quiz information. Used in QuizDb.
+    """Mixin for working with quiz information. Used in QuizCore.
 
     QuizMixin provides the followin features:
         * quiz construction;
@@ -60,6 +58,20 @@ class QuizMixin(object):
     #   WHERE q.topic_id=1 and user_id is NULL;
     #
     def getQuiz(self, topic_id, user_id, lang):
+        """Return list of Quiz questions.
+
+        Args:
+            topic_id:  Topic ID from which get questions for the Quiz.
+            user_id:   User ID for whom Quiz is generated.
+            lang:      Question language. Can be: (it, fr, de).
+
+        Question is represented as a dictionary with the following items:
+            id        - question ID in the DB
+            text      - question text
+            answer    - question answer (True/False)
+            image     - image ID to illustrate the question (optional)
+            image_bis - image type ID (optional)
+        """
         res = self.__getquiz.execute(topic_id=topic_id, user_id=user_id)
         if lang == 'de':
             txt_lang = self.questions.c.text_de
@@ -85,15 +97,9 @@ class QuizMixin(object):
         # TODO: we need to validate topic ID and also
         # put answered questions if there are not enough unanswered
         # questions for the quiz.
-        return quiz
-
-        # if not quiz:
-        #     raise QuizCoreError('Invalid topic ID.')
-        # else:
-        #     return quiz
+        return {'topic': topic_id, 'questions': quiz}
 
     def saveQuestions(self, user_id, questions, answers):
-        # TODO: maybe check len(ans) == len(questions) ?
         questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers
@@ -114,5 +120,18 @@ class QuizMixin(object):
                 conn.execute(self.answers.insert(
                              append_string=self.__add), ans)
 
-    def saveQuizResult(self, user_id, topic_id, questions, answers):
+    def saveQuiz(self, user_id, topic_id, questions, answers):
+        """Save quiz answers for the user.
+
+        Args:
+            user_id:    ID of the user for whom need to save the quiz.
+            questions:  List of the quesions IDs.
+            answers:    List of questions' answers.
+
+        Raises:
+            QuizCoreError
+
+        .. note::
+           questions and answers must have tha same length.
+        """
         self.saveQuestions(user_id, questions, answers)

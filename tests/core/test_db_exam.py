@@ -8,9 +8,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import unittest
 from datetime import datetime, timedelta
 from collections import namedtuple
-from quiz.exceptions import QuizCoreError
 from tests_common import db_uri
-from quiz.db.quizdb import QuizDb
+from quiz.core.core import QuizCore
+from quiz.core.exceptions import QuizCoreError
 
 ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 
@@ -19,9 +19,9 @@ ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 class DbExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.db = QuizDb(self)
-        self.questions = self.db.questions
-        self.engine = self.db.engine
+        self.core = QuizCore(self)
+        self.questions = self.core.questions
+        self.engine = self.core.engine
         self.engine.execute("TRUNCATE TABLE exams_stat;")
         self.engine.execute("TRUNCATE TABLE exams;")
         self.engine.execute("TRUNCATE TABLE answers;")
@@ -36,7 +36,7 @@ class DbExamTest(unittest.TestCase):
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
     def test_questionIds(self):
-        ids = self.db._ExamMixin__generate_idList()
+        ids = self.core._ExamMixin__generate_idList()
         ids = list(sorted(ids))
 
         # Get ranges:
@@ -44,7 +44,7 @@ class DbExamTest(unittest.TestCase):
         # |----------+-----+------
         # |     1    |    1    |  100
         # |     2    |   101   |  200
-        chapters_info = self.db._ExamMixin__stmt_ch_info.execute()
+        chapters_info = self.core._ExamMixin__stmt_ch_info.execute()
         index = 0
 
         # Check if item in ids is in correct range.
@@ -63,7 +63,7 @@ class DbExamTest(unittest.TestCase):
 
     # Test new exam fields.
     def test_newFields(self):
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
 
         # Check return value
         # there must be 'exam' and 'question' fields.
@@ -108,7 +108,7 @@ class DbExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from exams_stat").fetchone()
         self.assertEqual(0, res[0])
 
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
 
         # After new exam generation there must be one entry in the
         # 'exams' table which describes exam and also 'exams_stat'
@@ -162,33 +162,33 @@ class DbExamTest(unittest.TestCase):
     def test_saveWrong(self):
         # try to save non-existent exam
         try:
-            self.db.saveExam(1, [], [])
+            self.core.saveExam(1, [], [])
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid exam ID.', err)
 
         # We have to create exam before continue testing
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
         exam_id = info['exam']['id']
 
         # Try to save with wrong number of answers
         # NOTE: answers length will be checked before questions.
         try:
-            self.db.saveExam(exam_id, [], [])
+            self.core.saveExam(exam_id, [], [])
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Wrong number of answers.', err)
 
         # Try to save with wrong number of questions
         try:
-            self.db.saveExam(exam_id, [], [0] * 40)
+            self.core.saveExam(exam_id, [], [0] * 40)
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
 
         # Try to save with wrong questions' IDs
         try:
-            self.db.saveExam(exam_id, [0] * 40, [0] * 40)
+            self.core.saveExam(exam_id, [0] * 40, [0] * 40)
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid question ID.', err)
@@ -198,7 +198,7 @@ class DbExamTest(unittest.TestCase):
         # validation so we can pass fake values.
         try:
             self.engine.execute("UPDATE exams SET start_time='1999-01-12'")
-            self.db.saveExam(exam_id, [0] * 40, [0] * 40)
+            self.core.saveExam(exam_id, [0] * 40, [0] * 40)
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Exam is expired.', err)
@@ -212,7 +212,7 @@ class DbExamTest(unittest.TestCase):
 
     # Check normal exam save
     def test_save(self):
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
         exam_id = info['exam']['id']
         questions = [q['id'] for q in info['questions']]
         questions = list(sorted(questions))
@@ -220,7 +220,7 @@ class DbExamTest(unittest.TestCase):
         # Make 5 errors
         answers = [1] * 40
         answers[:5] = [0] * 5
-        self.db.saveExam(exam_id, questions, answers)
+        self.core.saveExam(exam_id, questions, answers)
 
         ### Check answers
 
@@ -245,17 +245,17 @@ class DbExamTest(unittest.TestCase):
     def test_statusNew(self):
         # Try to get infor for non-existent exam
         try:
-            self.db.getExamInfo(1, 'it')
+            self.core.getExamInfo(1, 'it')
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid exam ID.', err)
 
         # Check status for the fresh exam
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
         exam_id = info['exam']['id']
         exam_questions = info['questions']
 
-        info = self.db.getExamInfo(exam_id, 'it')
+        info = self.core.getExamInfo(exam_id, 'it')
         exam = info['exam']
         student = info['student']
         questions = info['questions']
@@ -283,12 +283,12 @@ class DbExamTest(unittest.TestCase):
     # Helper function to create exam & save answers.
     # Returns result exam info
     def _passExam(self, answers):
-        info = self.db.createExam(1, 'it')
+        info = self.core.createExam(1, 'it')
         exam_id = info['exam']['id']
         questions = list(sorted([q['id'] for q in info['questions']]))
 
-        self.db.saveExam(exam_id, questions, answers)
-        return self.db.getExamInfo(exam_id, 'it')
+        self.core.saveExam(exam_id, questions, answers)
+        return self.core.getExamInfo(exam_id, 'it')
 
     # Check passed status.
     # We can make up to 4 errors

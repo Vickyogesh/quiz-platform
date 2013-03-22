@@ -1,14 +1,13 @@
 import random
 from datetime import datetime
 from sqlalchemy import select, text, func, bindparam, and_
-from ..exceptions import QuizCoreError
-from profilestats import profile
+#from profilestats import profile
+from .exceptions import QuizCoreError
 
 
 class ExamMixin(object):
-    """ Mixin for working with exams. Used in QuizDb. """
+    """Mixin for working with exams. Used in QuizCore."""
     def __init__(self):
-
         # Get chapters info: priority and chapter's questions' id range.
         query = text('SELECT priority, min_id, max_id FROM chapters')
         self.__stmt_ch_info = query.compile(self.engine)

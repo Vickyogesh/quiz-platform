@@ -1,9 +1,9 @@
 from sqlalchemy import select, text, bindparam, and_
-from quiz.exceptions import QuizCoreError
+from .exceptions import QuizCoreError
 
 
 class UserMixin(object):
-    """ Mixin for working with user information. Used in QuizDb. """
+    """Mixin for working with user information. Used in QuizCore."""
     def __init__(self):
         users = self.users
         apps = self.apps
@@ -42,8 +42,8 @@ class UserMixin(object):
             user_id=:user_id AND is_correct=0)) t;""")
         self.__topicerr = self.__topicerr.compile(self.engine)
 
-    def getInfo(self, login, appkey):
-        """ Return user and application info.
+    def getUserAndAppInfo(self, login, appkey):
+        """Return user and application info.
 
         Args:
             login:  User's login

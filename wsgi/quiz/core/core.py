@@ -1,7 +1,7 @@
-from quiz.exceptions import QuizCoreError
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
+from .exceptions import QuizCoreError
 from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
@@ -17,13 +17,8 @@ def append_string(insert, compiler, **kw):
     return s
 
 
-# NOTE: to disable connection pool:
-# from sqlalchemy.pool import NullPool
-# self.engine = create_engine(cfg['database'], echo=verbose,
-#                             poolclass=NullPool)
-
-class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
-    """ High-level database operations. """
+class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
+    """ Core quiz logic. """
 
     def __init__(self, settings):
         self._setupDb(settings.dbinfo)
@@ -34,9 +29,6 @@ class QuizDb(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
-
-    # def __del__(self):
-    #     self.conn.close()
 
     # Setup db connection and tables
     def _setupDb(self, cfg):

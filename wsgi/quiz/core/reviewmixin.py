@@ -2,7 +2,7 @@ from sqlalchemy import text
 
 
 class ErrorReviewMixin(object):
-    """ This mixin provides Error Review feature. Used in QuizDb. """
+    """This mixin provides Error Review feature. Used in QuizCore."""
     def __init__(self):
         self.__geterrors = text(""" SELECT * FROM questions q INNER JOIN
             (SELECT question_id id FROM answers WHERE user_id=:user_id
@@ -33,7 +33,7 @@ class ErrorReviewMixin(object):
 
             self._aux_question_delOptionalField(d)
             questions.append(d)
-        return questions
+        return {'questions': questions}
 
     def saveErrorReview(self, user, id_list, answers):
         self.saveQuestions(user, id_list, answers)

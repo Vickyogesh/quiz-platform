@@ -15,13 +15,12 @@ from werkzeug.utils import cached_property
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest
 from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request, Response
-from quiz.core import QuizCore
-from quiz.exceptions import QuizCoreError
+from quiz.core.core import QuizCore
+from quiz.core.exceptions import QuizCoreError
 
 
 class QuizWWWAuthenticate(object):
     """"Provides simple WWW-Authenticate header for the Quiz service."""
-
     def __init__(self):
         self.random = random.random()
         self.time = time.time()
@@ -44,7 +43,6 @@ class QuizAuthorization(object):
     Expected header format:
         QuizAuth nonce="...", appid="...", username="...", digest="..."
     """
-
     def __init__(self, header):
         """Construct object from the header text.
         If header is invalid then is_valid will be False.
@@ -113,7 +111,6 @@ class JSONResponse(Response):
     It converts response param to the JSON string and set
     contetn type to application/json, also 'status' filed will be added.
     """
-
     default_json = '{"status":200}'
     json_separators = (',', ':')
 
@@ -138,7 +135,6 @@ class ServiceBase(object):
     authorization and session validation.
     Subclass needs to fill self.urls map.
     """
-
     def __init__(self, settings):
         random.seed()
         self.settings = settings
