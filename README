@@ -134,7 +134,7 @@ find $OPENSHIFT_DATA_DIR/quiz/sessions -mtime +1 -type f -exec rm {} \;
 
 4) Setup quiz database with dbsetup tool
 cd $OPENSHIFT_REPO_DIR
-$OPENSHIFT_DATA_DIR/bin/python misc/dbsetup.py -nif -u real -c misc/config.ini
+$OPENSHIFT_DATA_DIR/bin/python misc/dbinit.py -n -c misc/config.ini
 
 
 Develop flow
