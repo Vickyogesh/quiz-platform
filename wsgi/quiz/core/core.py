@@ -31,9 +31,15 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         self.__optional_question_fields = ['image', 'image_bis']
 
     # Setup db connection and tables
+    # NOTE: MySQL features an automatic connection close behavior,
+    # for connections that have been idle for eight hours or more.
+    # See:
+    # http://docs.sqlalchemy.org/en/rel_0_8/dialects/mysql.html#connection-timeouts
+    # http://www.sqlalchemy.org/trac/wiki/FAQ#MySQLserverhasgoneaway
     def _setupDb(self, cfg):
         verbose = cfg['verbose'].lower() == 'true'
-        self.engine = create_engine(cfg['database'], echo=verbose,)
+        self.engine = create_engine(cfg['database'], echo=verbose,
+                                    pool_recycle=3600)
 
         self.meta = MetaData()
         self.meta.reflect(bind=self.engine)
