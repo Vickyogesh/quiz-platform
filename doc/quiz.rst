@@ -4,15 +4,15 @@ Quiz
 
 Quiz is a list of 40 random questions for the specified topic.
 
-  =========  ================================
+  =========  =================================
   Question fields
-  ===========================================
-  id         question ID
-  text       question text
-  answer     question answer (True=1/False=0)
-  image      image ID (optional)
-  image_bis  image type (optional)
-  =========  ================================
+  ============================================
+  id         Question ID.
+  text       Question text.
+  answer     Question answer (True=1/False=0).
+  image      Image ID (optional).
+  image_bis  Image type (optional).
+  =========  =================================
 
 
 .. http:get:: /quiz/(topic_id)
@@ -76,6 +76,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 400: Invalid topic ID (temprorary removed - need to update quiz
+    algo).
 
 
 .. http:post:: /quiz/(topic_id)
@@ -91,7 +93,7 @@ Quiz is a list of 40 random questions for the specified topic.
       Content-Type: application/json; charset=utf-8
 
       {
-        "questions": [1,2,3,10]
+        "questions": [1,2,3,10],
         "answers": [1,0,0,1]
       }
 
@@ -106,10 +108,10 @@ Quiz is a list of 40 random questions for the specified topic.
         "status": 200
       }
 
-   =========  ==========================
+   =========  ===========================
    Request fields
-   =====================================
-   questions  List of answered questions
+   ======================================
+   questions  List of answered questions.
    answers    List of answers.
 
               *1* - Positive answer;
@@ -117,7 +119,7 @@ Quiz is a list of 40 random questions for the specified topic.
 
               *Number of answers must
               be the same as questions.*
-   =========  ==========================
+   =========  ===========================
 
    :param topic_id: Topic of the quiz.
 
@@ -134,6 +136,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 400: Parameters length mismatch.
       Lists has different numbers of elements.
+
+   :statuscode 400: Empty list.
 
    :statuscode 400: Invalid value.
       List element is not a number.

@@ -126,6 +126,12 @@ fi
 $OPENSHIFT_DATA_DIR/bin/uwsgi --ini $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini
 
 
+--- .openshift/cron/daily/del_old_session ---
+#!/bin/bash
+# Remove session files which are older than one day.
+find $OPENSHIFT_DATA_DIR/quiz/sessions -mtime +1 -type f -exec rm {} \;
+
+
 4) Setup quiz database with dbsetup tool
 cd $OPENSHIFT_REPO_DIR
 $OPENSHIFT_DATA_DIR/bin/python misc/dbsetup.py -nif -u real -c misc/config.ini

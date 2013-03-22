@@ -80,7 +80,7 @@ Error review is a list of 40 random questions where student made a mistake
       Content-Type: application/json; charset=utf-8
 
       {
-        "questions": [1,2,3,10]
+        "questions": [1,2,3,10],
         "answers": [1,0,0,1]
       }
 
@@ -120,6 +120,8 @@ Error review is a list of 40 random questions where student made a mistake
 
    :statuscode 400: Parameters length mismatch.
       Lists has different numbers of elements.
+
+   :statuscode 400: Empty list.
 
    :statuscode 400: Invalid value.
       List element is not a number.

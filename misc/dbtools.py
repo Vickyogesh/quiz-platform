@@ -36,19 +36,29 @@ class DbTool(object):
 
     TEST_USERS = [
         {
-            'name': 'Test User',
+            'name': 'Test',
+            'surname': 'User',
             'login': 'testuser',
             'passwd': 'testpasswd',
             'type': 'student'
         },
         {
+            'name': 'Test',
+            'surname': 'User 2',
+            'login': 'testuser2',
+            'passwd': 'testpasswd2',
+            'type': 'student'
+        },
+        {
             'name': 'Admin',
+            'surname': '',
             'login': 'root',
             'passwd': 'adminpwd',
             'type': 'admin'
         },
         {
-            'name': 'Chuck Norris',
+            'name': 'Chuck',
+            'surname': 'Norris',
             'login': 'chuck@norris.com',
             'passwd': 'boo',
             'type': 'school'
@@ -94,9 +104,11 @@ class DbTool(object):
 
     def _removeTables(self):
         print('Removing tables...')
+        self.engine.execute('DROP TABLE IF EXISTS answers;')
         self.engine.execute('DROP TABLE IF EXISTS topics_stat;')
-        self.engine.execute('DROP TABLE IF EXISTS errors_stat;')
-        self.engine.execute('DROP TABLE IF EXISTS quiz_stat;')
+        self.engine.execute('DROP TABLE IF EXISTS exams;')
+        self.engine.execute('DROP TABLE IF EXISTS exams_stat;')
+
         self.engine.execute('DROP TABLE IF EXISTS questions;')
         self.engine.execute('DROP TABLE IF EXISTS applications;')
         self.engine.execute('DROP TABLE IF EXISTS users;')
@@ -116,6 +128,7 @@ class DbTool(object):
             CREATE TABLE users(
                 id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(100) NOT NULL,
+                surname VARCHAR(100) NOT NULL DEFAULT '',
                 login VARCHAR(100) NOT NULL,
                 passwd VARCHAR(100) NOT NULL,
                 type ENUM('admin', 'school', 'student', 'guest') NOT NULL,
@@ -145,9 +158,9 @@ class DbTool(object):
 
             CREATE TABLE questions(
                 id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-                text VARCHAR(256) NOT NULL,
-                text_fr VARCHAR(256),
-                text_de VARCHAR(256),
+                text VARCHAR(500) NOT NULL,
+                text_fr VARCHAR(500),
+                text_de VARCHAR(500),
                 answer BOOLEAN NOT NULL,
                 image VARCHAR(10),
                 image_part VARCHAR(10),
@@ -156,21 +169,31 @@ class DbTool(object):
                 CONSTRAINT PRIMARY KEY (id)
             );
 
-            CREATE TABLE quiz_stat(
-                user_id INTEGER UNSIGNED NOT NULL,
-                is_correct BOOLEAN NOT NULL,
-                question_id INTEGER UNSIGNED NOT NULL
-            );
-
-            CREATE TABLE errors_stat(
-                user_id INTEGER UNSIGNED NOT NULL,
-                question_id INTEGER UNSIGNED NOT NULL
-            );
-
             CREATE TABLE topics_stat(
                 user_id INTEGER UNSIGNED NOT NULL,
                 topic_id INTEGER UNSIGNED NOT NULL,
-                err_percent TINYINT NOT NULL DEFAULT -1
+                err_count SMALLINT NOT NULL DEFAULT 0
+            );
+
+            CREATE TABLE answers(
+                user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL DEFAULT FALSE
+            );
+
+            CREATE TABLE exams(
+                id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id INTEGER UNSIGNED NOT NULL,
+                start_time DATETIME NOT NULL,
+                end_time DATETIME DEFAULT NULL,
+                err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+                CONSTRAINT PRIMARY KEY (id)
+            );
+
+            CREATE TABLE exams_stat(
+                exam_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL DEFAULT FALSE
             );
             """))
 
@@ -181,50 +204,60 @@ class DbTool(object):
         self.tbl_chapters = self.meta.tables['chapters']
         self.tbl_topics = self.meta.tables['topics']
         self.tbl_questions = self.meta.tables['questions']
-        self.tbl_quizstat = self.meta.tables['quiz_stat']
+        self.answers = self.meta.tables['answers']
 
     def _createFuncs(self):
         print('Creating function...')
-        self.conn.execute("DROP PROCEDURE IF EXISTS aux_trig_errupdate;")
-        self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_ins;")
-        self.conn.execute("DROP TRIGGER IF EXISTS trig_errupdate_upd;")
-        self.conn.execute("DROP PROCEDURE IF EXISTS update_topic_stat;")
-        self.conn.execute(text(""" CREATE PROCEDURE aux_trig_errupdate
-            (user INTEGER UNSIGNED, question INTEGER UNSIGNED, isok BOOLEAN)
+
+        self.conn.execute("DROP PROCEDURE IF EXISTS update_exam_stat;")
+        self.conn.execute(text("""
+            CREATE PROCEDURE update_exam_stat(exam INTEGER UNSIGNED, errors SMALLINT UNSIGNED)
             BEGIN
-                IF isok = 1 THEN
-                    DELETE IGNORE FROM errors_stat WHERE
-                        user_id=user AND question_id=question;
-                ELSE
-                    INSERT IGNORE INTO errors_stat VALUES(user, question);
-                END IF;
+                DECLARE user INT UNSIGNED;
+                DECLARE err INT;
+
+                SELECT user_id INTO user FROM exams WHERE id=exam;
+
+                INSERT INTO answers(user_id, question_id, is_correct)
+                SELECT user, e.question_id, e.is_correct FROM exams_stat e
+                WHERE e.exam_id=exam
+                ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct);
+
+                UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=errors
+                WHERE id=exam;
             END;
-
-            CREATE TRIGGER trig_errupdate_ins AFTER INSERT ON quiz_stat
-            FOR EACH ROW CALL
-            aux_trig_errupdate(NEW.user_id, NEW.question_id, NEW.is_correct);
-
-            CREATE TRIGGER trig_errupdate_upd AFTER UPDATE ON quiz_stat
-            FOR EACH ROW CALL
-            aux_trig_errupdate(NEW.user_id, NEW.question_id, NEW.is_correct);
             """))
 
+        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_ins;")
         self.conn.execute(text("""
-            CREATE PROCEDURE update_topic_stat(user INTEGER UNSIGNED, topic INTEGER UNSIGNED)
-            BEGIN
-                SELECT count(*) INTO @err FROM questions WHERE topic_id=topic AND
-                id IN (SELECT question_id FROM quiz_stat WHERE user_id=user AND is_correct=0);
+            CREATE TRIGGER count_topic_err_ins AFTER INSERT ON answers FOR EACH
+            ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
 
-                SELECT max_id - min_id + 1 INTO @num FROM topics WHERE id=topic;
-                SET @err = @err / @num * 100;
-
-                IF @err > 0 AND @err < 1 THEN SET @err = 1;
-                ELSEIF @err > 99 AND @err < 100 THEN SET @err = 99;
+                IF NEW.is_correct = 1 THEN
+                    INSERT IGNORE INTO topics_stat VALUES(NEW.user_id, topic, 0);
+                ELSE
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
                 END IF;
+            END;
+            """))
 
-                INSERT INTO topics_stat(user_id, topic_id, err_percent)
-                    VALUES(user, topic, @err)
-                ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
+        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_upd;")
+        self.conn.execute(text("""
+            CREATE TRIGGER count_topic_err_upd AFTER UPDATE ON answers FOR EACH
+            ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+
+                IF NEW.is_correct = 1 THEN
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, -1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count-1;
+                ELSE
+                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                END IF;
             END;
             """))
 
@@ -315,22 +348,24 @@ class DbTool(object):
         self.conn.execute('ALTER TABLE questions ADD INDEX ix_tp(topic_id);')
         self.conn.execute('ALTER TABLE questions ADD INDEX ix_ch(chapter_id);')
 
-        print("Creating indices... quiz_stat")
-        self.conn.execute('ALTER TABLE quiz_stat ADD UNIQUE ix_quizstat(user_id, question_id);')
-
-        print("Creating indices... errors_stat")
-        self.conn.execute('ALTER TABLE errors_stat ADD UNIQUE ix_errstat(user_id, question_id);')
-
         print("Creating indices... topics_stat")
         self.conn.execute('ALTER TABLE topics_stat ADD UNIQUE ix_topicstat(user_id, topic_id);')
+
+        print("Creating indices... answers")
+        self.conn.execute('ALTER TABLE answers ADD UNIQUE ix_answers(user_id, question_id);')
+
+        print("Creating indices... exams")
+        self.conn.execute('ALTER TABLE exams ADD INDEX ix_exams(user_id);')
+
+        print("Creating indices... exams_stat")
+        self.conn.execute('ALTER TABLE exams_stat ADD UNIQUE ix_examsstat(exam_id, question_id);')
 
         print("Doing tables optimizations...")
         self.conn.execute('OPTIMIZE TABLE applications, users, chapters;')
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
-        self.conn.execute('OPTIMIZE TABLE quiz_stat;')
-        self.conn.execute('OPTIMIZE TABLE errors_stat;')
         self.conn.execute('OPTIMIZE TABLE topics_stat;')
+        self.conn.execute('OPTIMIZE TABLE answers;')
 
     def before(self):
         pass

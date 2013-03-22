@@ -1,7 +1,6 @@
 import hashlib
 import time
 import random
-import sys
 
 try:
     import simplejson as json
@@ -16,18 +15,18 @@ from werkzeug.utils import cached_property
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest
 from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request, Response
-from quiz.core import QuizCore
+from quiz.core.core import QuizCore
+from quiz.core.exceptions import QuizCoreError
 
 
 class QuizWWWAuthenticate(object):
-    """" Provides simple WWW-Authenticate header for the Quiz service. """
-
+    """"Provides simple WWW-Authenticate header for the Quiz service."""
     def __init__(self):
         self.random = random.random()
         self.time = time.time()
 
     def to_header(self):
-        """ Convert the stored values into a WWW-Authenticate header. """
+        """Convert the stored values into a WWW-Authenticate header."""
         m = hashlib.md5()
         m.update('{0}:{1}'.format(self.random, self.time))
         return 'QuizAuth nonce="%s"' % m.hexdigest()
@@ -39,15 +38,13 @@ class QuizWWWAuthenticate(object):
 
 
 class QuizAuthorization(object):
-    """"
-    Represents an Authorization header sent by the client.
+    """"Represents an Authorization header sent by the client.
+
     Expected header format:
         QuizAuth nonce="...", appid="...", username="...", digest="..."
     """
-
     def __init__(self, header):
-        """
-        Construct object from the header text.
+        """Construct object from the header text.
         If header is invalid then is_valid will be False.
         """
         try:
@@ -70,7 +67,7 @@ class QuizAuthorization(object):
 
 
 class IdConverter(BaseConverter):
-    """ Converter to use in Rules.
+    """Converter to use in Rules.
 
     Provides int or 'me' identifiers.
     """
@@ -86,7 +83,7 @@ class IdConverter(BaseConverter):
 
 
 class JSONRequest(Request):
-    """ JSON Requests.
+    """JSON Requests.
 
     Converts response data to the JSON object.
     You may acces to the data via request.json.
@@ -109,12 +106,11 @@ class JSONRequest(Request):
 
 
 class JSONResponse(Response):
-    """ Provides JSON response.
+    """Provides JSON response.
 
     It converts response param to the JSON string and set
     contetn type to application/json, also 'status' filed will be added.
     """
-
     default_json = '{"status":200}'
     json_separators = (',', ':')
 
@@ -133,14 +129,12 @@ class JSONResponse(Response):
 
 
 class ServiceBase(object):
-    """
-    Base class for web service.
+    """Base class for web service.
 
     Features: URL routing, HTTP errors processing,
     authorization and session validation.
     Subclass needs to fill self.urls map.
     """
-
     def __init__(self, settings):
         random.seed()
         self.settings = settings
@@ -181,6 +175,11 @@ class ServiceBase(object):
                 'status': e.code,
                 'description': res.data,
             }, headers=res.headers)
+        except QuizCoreError as e:
+            response = JSONResponse({
+                'status': 400,
+                'description': e.message
+            })
         except Exception as e:
             traceback.print_exc()
             response = JSONResponse({

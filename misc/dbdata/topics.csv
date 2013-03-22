@@ -1,46 +1,46 @@
-"id"$"nome_it"$"id_capitolo"$"quiz"$"nome_fr"$"nome_de"
-40$"Responsabilità civile, penale, amministrativa"$23$"1,6"$""$""
-1$"Definizioni stradali e di traffico"$1$"1,22"$""$""
-2$"Definizioni e classificazione dei veicoli"$1$"23,33"$""$""
-3$"Doveri del conducente ed uso responsabile della strada"$1$"34,40"$""$""
-4$"Riguardo verso gli utenti deboli della strada"$1$"41,50"$""$""
-5$"Segnali di pericolo"$2$"1,54"$""$""
-6$"Segnali di divieto"$3$"1,45"$""$""
-7$"Segnali di obbligo"$4$"1,40"$""$""
-8$"Segnali di precedenza"$5$"1,20"$""$""
-9$"Segnaletica orizzontale"$6$"1,30"$""$""
-10$"Segnalazioni semaforiche"$7$"1,20"$""$""
-11$"Segnalazioni degli agenti del traffico"$7$"21,27"$""$""
-12$"Segnali di indicazione"$8$"1,61"$""$""
-13$"Segnali complementari"$9$"1,8"$""$""
-14$"Segnali temporanei e di cantiere"$9$"9,20"$""$""
-15$"Pannelli integrativi dei segnali"$10$"1,26"$""$""
-16$"Pericolo e intralcio alla circolazione - Limiti di velocità"$11$"1,19"$""$""
-17$"Distanza di sicurezza"$12$"1,15"$""$""
-18$"Norme sulla circolazione dei veicoli"$13$"1,7"$""$""
-19$"Posizione dei veicoli sulla carreggiata"$13$"8,11"$""$""
-20$"Cambio di direzione o di corsia (svolta)"$13$"12,27"$""$""
-21$"Comportamento agli incroci "$13$"28,31"$""$""
-22$"Norme sulla precedenza"$13$"32,34"$""$""
-23$"Comportamento in presenza di cortei - Obblighi verso i veicoli di polizia"$13$"35,37"$""$""
-24$"Esempi di precedenza (ordine di precedenza agli incroci)"$14$"1,49"$""$""
-25$"Norme sul sorpasso"$15$"1,10"$""$""
-26$"Fermata, sosta, arresto e partenza"$16$"1,23"$""$""
-27$"Ingombro della carreggiata"$17$"1,4"$""$""
-28$"Segnalazione di veicolo fermo"$17$"5,8"$""$""
-29$"Norme sulla circolazione in autostrada e strade extraurbane principali"$17$"9,16"$""$""
-30$"Trasporto di persone"$17$"17,19"$""$""
-31$"Carico dei veicoli - Pannelli sui veicoli"$17$"20,24"$""$""
-32$"Traino dei veicoli e dei veicoli in avaria"$17$"25,26"$""$""
-33$"Rischi nella guida"$17$"27,35"$""$""
-34$"Uso delle luci - Uso dei dispositivi acustici - Spie e simboli"$18$"1,12"$""$""
-35$"Equipaggiamento - Cinture e sistemi di ritenuta per bambini - Casco"$19$"1,5"$""$""
-36$"Documenti di circolazione del veicolo"$20$"1,3"$""$""
-37$"Comportamenti per prevenire incidenti - Comportamento in caso di incidente"$21$"1,11"$""$""
-38$"Guida in relazione alle condizioni psicofisiche - Alcool, droga e farmaci"$22$"1,8"$""$""
-39$"Primo soccorso"$22$"9,21"$""$""
-41$"Assicurazione R.C.A. - Altre forme assicurative legate al veicolo"$23$"7,14"$""$""
-42$"Limitazione dei consumi - Rispetto dell'ambiente - Inquinamento"$24$"1,15"$""$""
-43$"Stabilità e tenuta di strada del veicolo"$25$"1,9"$""$""
-44$"Elementi del veicolo importanti per la sicurezza - Manutenzione ed uso"$25$"10,16"$""$""
-45$"Comportamenti e cautele di guida"$25$"17,19"$""$""
+id,nome_it,id_capitolo,quiz,nome_fr,nome_de
+1,Definizioni stradali e di traffico,1,1.22,,
+2,Definizioni e classificazione dei veicoli,1,23.33,,
+3,Doveri del conducente ed uso responsabile della strada,1,34.4,,
+4,Riguardo verso gli utenti deboli della strada,1,41.5,,
+5,Segnali di pericolo,2,1.54,,
+6,Segnali di divieto,3,1.45,,
+7,Segnali di obbligo,4,1.4,,
+8,Segnali di precedenza,5,1.2,,
+9,Segnaletica orizzontale,6,1.3,,
+10,Segnalazioni semaforiche,7,1.2,,
+11,Segnalazioni degli agenti del traffico,7,21.27,,
+12,Segnali di indicazione,8,1.61,,
+13,Segnali complementari,9,1.8,,
+14,Segnali temporanei e di cantiere,9,9.2,,
+15,Pannelli integrativi dei segnali,10,1.26,,
+16,Pericolo e intralcio alla circolazione - Limiti di velocità,11,1.19,,
+17,Distanza di sicurezza,12,1.15,,
+18,Norme sulla circolazione dei veicoli,13,1.7,,
+19,Posizione dei veicoli sulla carreggiata,13,8.11,,
+20,Cambio di direzione o di corsia (svolta),13,12.27,,
+21,Comportamento agli incroci ,13,28.31,,
+22,Norme sulla precedenza,13,32.34,,
+23,Comportamento in presenza di cortei - Obblighi verso i veicoli di polizia,13,35.37,,
+24,Esempi di precedenza (ordine di precedenza agli incroci),14,1.49,,
+25,Norme sul sorpasso,15,1.1,,
+26,"Fermata, sosta, arresto e partenza",16,1.23,,
+27,Ingombro della carreggiata,17,1.4,,
+28,Segnalazione di veicolo fermo,17,5.8,,
+29,Norme sulla circolazione in autostrada e strade extraurbane principali,17,9.16,,
+30,Trasporto di persone,17,17.19,,
+31,Carico dei veicoli - Pannelli sui veicoli,17,20.24,,
+32,Traino dei veicoli e dei veicoli in avaria,17,25.26,,
+33,Rischi nella guida,17,27.35,,
+34,Uso delle luci - Uso dei dispositivi acustici - Spie e simboli,18,1.12,,
+35,Equipaggiamento - Cinture e sistemi di ritenuta per bambini - Casco,19,1.5,,
+36,Documenti di circolazione del veicolo,20,1.3,,
+37,Comportamenti per prevenire incidenti - Comportamento in caso di incidente,21,1.11,,
+38,"Guida in relazione alle condizioni psicofisiche - Alcool, droga e farmaci",22,1.8,,
+39,Primo soccorso,22,9.21,,
+40,"Responsabilità civile, penale, amministrativa",23,1.6,,
+41,Assicurazione R.C.A. - Altre forme assicurative legate al veicolo,23,7.14,,
+42,Limitazione dei consumi - Rispetto dell'ambiente - Inquinamento,24,1.15,,
+43,Stabilità e tenuta di strada del veicolo,25,1.9,,
+44,Elementi del veicolo importanti per la sicurezza - Manutenzione ed uso,25,10.16,,
+45,Comportamenti e cautele di guida,25,17.19,,

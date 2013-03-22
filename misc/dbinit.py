@@ -54,7 +54,7 @@ class Db(DbTool):
                             help='Create quiz database.')
         parser.add_argument('-t', '--test-users', action='store_true',
                             help='Initialize with test users instead of real.')
-        parser.add_argument('-d', '--delimiter', default='$',
+        parser.add_argument('-d', '--delimiter', default=',',
                             help="CSV delimiter (default: '%(default)s').")
         self.args = parser.parse_args()
 
@@ -83,10 +83,13 @@ class Db(DbTool):
                 if is_first:
                     is_first = False
                     continue
+                text = row[1]
+                text_fr = row[4] or text
+                text_de = row[5] or text
                 lines.append({
-                    'text': row[1],
-                    'text_fr': row[4],
-                    'text_de': row[5],
+                    'text': text,
+                    'text_fr': text_fr,
+                    'text_de': text_de,
                     'chapter_id': row[2]
                 })
             self.conn.execute(self.tbl_topics.insert(), lines)

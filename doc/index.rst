@@ -9,6 +9,7 @@ Quiz Web Service API v1
 
    auth
    quiz
+   exam
    error_review
    student_stat
 
