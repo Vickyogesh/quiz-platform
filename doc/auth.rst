@@ -42,12 +42,12 @@ with the user's authorization information.
 
      * nonce - server nonce
      * appid - application ID
-     * username - user login
+     * login - user login
      * digest - authorization digest
 
    Digest formula::
 
-     HA1 = MD5(username:password)
+     HA1 = MD5(login:password)
      DIGEST = MD5(nonce:H1)
 
    After successful authorization the service creates a session and
@@ -67,7 +67,7 @@ with the user's authorization information.
 
       {
         "nonce": "cf7d8c2e4511132eb3acf7082e9147d9",
-        "username": "testuser",
+        "login": "testuser",
         "appid": "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
         "digest": "2389ce38fd88cfcdce0484269cbbccb2"
       }
