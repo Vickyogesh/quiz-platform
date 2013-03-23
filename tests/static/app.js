@@ -164,7 +164,7 @@ function onAuth()
 
     var auth = {
       nonce: nonce,
-      username: login,
+      login: login,
       appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
       digest: hex_md5(nonce + ':' + digest)
     };
@@ -176,6 +176,10 @@ function onAuth()
         aux_showError("Authorization is not passed.", data.status);
       }
       else {
+        var name = data.user.name;
+        if (data.user.surname)
+          name += ' ' + data.user.surname;
+        $("#features #uname").text(data.user.type + ': ' + name)
         window.qsid = data.sid;
         aux_showFeatures();
       }

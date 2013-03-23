@@ -10,7 +10,6 @@ except ImportError:
     print "Using json to process JSON"
 
 import traceback
-from werkzeug.http import parse_dict_header
 from werkzeug.utils import cached_property
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest
 from werkzeug.routing import Map, Rule, BaseConverter
@@ -35,35 +34,6 @@ class QuizWWWAuthenticate(object):
         m = hashlib.md5()
         m.update('{0}:{1}'.format(self.random, self.time))
         return {'nonce': m.hexdigest()}
-
-
-class QuizAuthorization(object):
-    """"Represents an Authorization header sent by the client.
-
-    Expected header format:
-        QuizAuth nonce="...", appid="...", username="...", digest="..."
-    """
-    def __init__(self, header):
-        """Construct object from the header text.
-        If header is invalid then is_valid will be False.
-        """
-        try:
-            self.header = self._parseHeader(header)
-            self.appkey = self.header['appid']
-            self.user = self.header['username']
-            self.digest = self.header['digest']
-            self.nonce = self.header['nonce']
-            self.is_valid = True
-        except KeyError:
-            self.is_valid = False
-
-    # helper function: removes leading "QuizAuth "
-    # and parses header to the dict.
-    def _parseHeader(self, header):
-        if not header.startswith('QuizAuth '):
-            raise KeyError
-        else:
-            return parse_dict_header(header[9:])
 
 
 class IdConverter(BaseConverter):
@@ -207,13 +177,13 @@ class ServiceBase(object):
     def __onValidateAuth(self, request, data):
         try:
             nonce = data["nonce"]
-            user = data["username"]
+            login = data["login"]
             appid = data["appid"]
             digest = data["digest"]
         except KeyError:
             raise BadRequest('Invalid parameters.')
 
-        data = self.core.getUserAndAppInfo(user, appid)
+        data = self.core.getUserAndAppInfo(login, appid)
 
         if not data or not self.__check_digest(nonce, digest, data['passwd']):
             raise BadRequest('Authorization is invalid.')
@@ -221,6 +191,7 @@ class ServiceBase(object):
         self.session['app_id'] = data['app_id']
         self.session['user_id'] = data['user_id']
         self.session['user_name'] = data['name']
+        self.session['user_surname'] = data['surname']
         self.session['user_type'] = data['type']
         self.session.save()
 
@@ -228,7 +199,18 @@ class ServiceBase(object):
         # sid = self.session.__dict__['_headers']['cookie_out']
         # sid = sid[sid.find('=') + 1:sid.find(';')]
         sid = self.session.id
-        return JSONResponse({'sid': sid})
+
+        user = {
+            'id': data['user_id'],
+            'name': data['name'],
+            'surname': data['surname'],
+            'type': data['type']
+        }
+
+        if user['surname'] is None:
+            del user['surname']
+
+        return JSONResponse({'sid': sid, 'user': user})
 
     def on_authorize(self, request):
         try:
