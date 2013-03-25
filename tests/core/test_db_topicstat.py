@@ -16,19 +16,19 @@ class DbTopicStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.core = QuizCore(self)
-        self.answers = self.core.answers
-        self.topics_stat = self.core.meta.tables['topics_stat']
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE quiz_answers;")
+        self.engine.execute("TRUNCATE TABLE exam_answers;")
         self.engine.execute("TRUNCATE TABLE exams;")
         self.topic_info = self._getTopicInfo()
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE quiz_answers;")
+        self.engine.execute("TRUNCATE TABLE exam_answers;")
         self.engine.execute("TRUNCATE TABLE exams;")
 
     # Helper function to get number of questions in all topics.
@@ -36,7 +36,7 @@ class DbTopicStatTest(unittest.TestCase):
         res = self.engine.execute("SELECT id, max_id - min_id + 1 FROM topics")
         return [row[1] for row in res]
 
-    # Check stat if there are no answers
+    # Check stat if there are no enough info
     def test_empty(self):
         # Try to get stat for invalid user.
         # Even for invalid user it returns statistics (with empty values)
@@ -50,81 +50,63 @@ class DbTopicStatTest(unittest.TestCase):
             self.assertTrue('id' in x)
             self.assertTrue('text' in x)
 
-    # Check stat algo for topics with empty answers
-    def test_fresh(self):
-        ans = self.answers
+    # Check triggers algo for one topic
+    def test_singleTopic(self):
+        err = self.core.errors
 
-        # We put one correct answer.
-        # In this situation nothing happens since we don't update
-        # existing answer and trigger linked to answers will not update
-        # topics_stat.err_count.
-        # See _createFuncs() in misc/dbtools.py for more info about
-        # triggers logic.
-        ins = ans.insert().values(user_id=1, question_id=1, is_correct=1)
+        # Put one question to the errors table.
+        ins = err.insert().values(user_id=1, question_id=1)
         self.engine.execute(ins)
 
-        # we can skip filtering rules since table is empty initially.
+        # We must have one error for the topic.
+        # We can skip filtering rules since table is empty initially.
         res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        self.assertEqual(1, res[0])
 
-        # result is zero because answers table trigger adds row
-        # with err_count=0 for the topic because answer is correct.
-        self.assertFalse(res[0])
-
-        # now we insert wrong answer for the topic 2
-        qid = self.topic_info[0] + 1  # first question for the topic 2
-        ins = ans.insert().values(user_id=1, question_id=qid, is_correct=0)
+        # Put more questions.
+        ins = err.insert().values([{'user_id': 1, 'question_id': 2},
+                                   {'user_id': 1, 'question_id': 3}])
         self.engine.execute(ins)
 
-        # Now we have two rows:
-        #   topic1 err_cout=0
-        #   topic2 err_cout=1
-        # Second row is added by the trigger on new wrong answer
-        res = self.engine.execute("SELECT topic_id, err_count from topics_stat")
-        data = [(row[0], row[1]) for row in res]
-
-        self.assertEqual((1, 0), data[0])
-        self.assertEqual((2, 1), data[1])
-
-    # Check errors number update
-    def test_update(self):
-        # Let's create a bunch of correct answers
-        answers = [{'user_id': 1, 'question_id': x, 'is_correct': 1}
-                   for x in xrange(1, 10)]
-
-        ins = self.answers.insert().values(answers)
-        self.engine.execute(ins)
-
-        # At this point we have one row in the topics_stat
-        # for the topic 1 with err_count=0.
-        # Now we set some answers as wrong.
-        ans = self.answers
-        upd = ans.update()
-        upd = upd.where(ans.c.question_id.in_([1, 2, 3])).values(is_correct=0)
-        self.engine.execute(upd)
-
-        # Errors count for the topic 1 must be updated.
         res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(3, res[0])
 
-        # Now set some wrong answers to correct again
-        upd = ans.update()
-        upd = upd.where(ans.c.question_id.in_([2, 3])).values(is_correct=1)
-        self.engine.execute(upd)
+        # Remove two questions from the erros table
+        d = err.delete().where(err.c.question_id.in_([1, 3]))
+        self.engine.execute(d)
 
-        # And err_count have to decrease.
+        # Now we again have only one error
         res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(1, res[0])
 
-        # if we insert more correct answers then err_count will be unchanged.
-        ins = self.answers.insert().values(user_id=1, question_id=20, is_correct=1)
+        # Remove last error
+        d = err.delete().where(err.c.question_id == 2)
+        self.engine.execute(d)
+        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        self.assertEqual(0, res[0])
+
+    # Check triggers algo for multiple topics
+    def test_multiTopic(self):
+        err = self.core.errors
+
+        # Set errors for the topics: 1, 2, 11, 51
+        ins = err.insert().values([{'user_id': 1, 'question_id': 2},
+                                   {'user_id': 1, 'question_id': 3},
+                                   {'user_id': 1, 'question_id': 201},
+                                   {'user_id': 1, 'question_id': 205},
+                                   {'user_id': 1, 'question_id': 250},
+                                   {'user_id': 1, 'question_id': 2001},
+                                   {'user_id': 1, 'question_id': 2005},
+                                   {'user_id': 1, 'question_id': 10001}
+                                   ])
         self.engine.execute(ins)
 
-        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
-        self.assertEqual(1, res[0])
-
-        # Let's check topic id
-        res = self.engine.execute("SELECT topic_id from topics_stat").fetchone()
-        self.assertEqual(1, res[0])
+        res = self.engine.execute("SELECT topic_id, err_count from topics_stat")
+        data = [(row[0], row[1]) for row in res]
+        self.assertEqual((1, 2), data[0])
+        self.assertEqual((2, 3), data[1])
+        self.assertEqual((11, 2), data[2])
+        self.assertEqual((51, 1), data[3])
 
     # Check topic stat on exam
     def test_exam(self):

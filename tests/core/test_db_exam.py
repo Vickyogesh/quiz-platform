@@ -22,15 +22,15 @@ class DbExamTest(unittest.TestCase):
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE exam_answers;")
         self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
+        self.engine.execute("TRUNCATE TABLE exam_answers;")
         self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     # Check if generated ids are in correct question ranges.
@@ -105,17 +105,24 @@ class DbExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(0, res[0])
 
-        res = self.engine.execute("SELECT count(*) from exams_stat").fetchone()
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
+        self.assertEqual(0, res[0])
+
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
         self.assertEqual(0, res[0])
 
         info = self.core.createExam(1, 'it')
 
         # After new exam generation there must be one entry in the
-        # 'exams' table which describes exam and also 'exams_stat'
-        # must contain 40 exam questions.
+        # 'exams' table which describes exam and also 'exam_answers'
+        # and 'errors' must contain 40 exam questions.
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(1, res[0])
-        res = self.engine.execute("SELECT count(*) from exams_stat").fetchone()
+
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
+        self.assertEqual(40, res[0])
+
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
         self.assertEqual(40, res[0])
 
         ### Check exam metadata
@@ -140,7 +147,7 @@ class DbExamTest(unittest.TestCase):
         ### Check exam questions
 
         res = self.engine.execute(
-            "SELECT question_id,is_correct from exams_stat WHERE exam_id="
+            "SELECT question_id,is_correct from exam_answers WHERE exam_id="
             + str(exam_id))
 
         table_questions = []
@@ -157,6 +164,13 @@ class DbExamTest(unittest.TestCase):
 
         # every answer must be wrong by default
         self.assertEqual(answers, [0] * 40)
+
+        ### Check errors questions
+
+        res = self.engine.execute("SELECT question_id from errors")
+        err_questions = [row[0] for row in res]
+        err_questions = list(sorted(err_questions))
+        self.assertEqual(questions, err_questions)
 
     # Check exam saving with wrong data
     def test_saveWrong(self):
@@ -225,7 +239,7 @@ class DbExamTest(unittest.TestCase):
         ### Check answers
 
         res = self.engine.execute(
-            "SELECT question_id,is_correct from exams_stat WHERE exam_id="
+            "SELECT question_id,is_correct from exam_answers WHERE exam_id="
             + str(exam_id))
 
         for row, a in zip(res, answers):
@@ -240,6 +254,12 @@ class DbExamTest(unittest.TestCase):
         now = datetime.utcnow()
         delta = abs((now - exam.end).total_seconds())
         self.assertTrue(delta <= 5)
+
+        ### Check errors
+        res = self.engine.execute("SELECT question_id from errors")
+        err_questions = [row[0] for row in res]
+        err_questions = list(sorted(err_questions))
+        self.assertEqual(questions[0:5], err_questions)
 
     # Check exam info API
     def test_statusNew(self):

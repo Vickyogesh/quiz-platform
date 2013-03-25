@@ -17,11 +17,11 @@ class DbReviewTest(unittest.TestCase):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.core = QuizCore(self)
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     # Check: get review for invalid user - must return empty list
@@ -37,9 +37,9 @@ class DbReviewTest(unittest.TestCase):
 
     # Check: fill some answers and get wrong ones.
     def test_get(self):
-        # Put 5 answers where 3 of them are wrong.
-        self.engine.execute("""INSERT INTO answers values (1, 1, 1),
-            (1, 2, 1), (1, 3, 0), (1, 4, 0), (1, 5, 0)""")
+        # Put 3 wrong answers.
+        self.engine.execute("""INSERT INTO errors values
+                            (1, 3), (1, 4), (1, 5)""")
 
         # Error review must contain only questions with ids 3, 4, 5.
         review = self.core.getErrorReview(1, 'it')
@@ -90,17 +90,20 @@ class DbReviewTest(unittest.TestCase):
 
     # Check: normal save
     def test_save(self):
-        self.core.saveErrorReview(100, [1, 2, 3, 4, 5], [1, 1, 0, 0, 0])
+        # set initial errors
+        self.engine.execute("""INSERT INTO errors values
+                            (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6)""")
 
-        res = self.engine.execute("SELECT question_id, is_correct FROM answers")
-        data = [(row[0], row[1]) for row in res]
-        data = list(sorted(data, key=lambda pair: pair[0]))
+        self.core.saveErrorReview(1, [1, 2, 3, 4, 5], [1, 1, 0, 0, 0])
 
-        self.assertEqual((1, 1), data[0])
-        self.assertEqual((2, 1), data[1])
-        self.assertEqual((3, 0), data[2])
-        self.assertEqual((4, 0), data[3])
-        self.assertEqual((5, 0), data[4])
+        res = self.engine.execute("SELECT question_id FROM errors")
+        data = [row[0] for row in res]
+        data = list(sorted(data))
+
+        self.assertEqual(3, data[0])
+        self.assertEqual(4, data[1])
+        self.assertEqual(5, data[2])
+        self.assertEqual(6, data[3])
 
 
 def suite():

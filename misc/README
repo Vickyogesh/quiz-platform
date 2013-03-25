@@ -5,3 +5,59 @@ dbdata/ - initial data for the database (see dbsetup.py).
 config.ini - Quiz WebService configuration (ready to use as production).
 uwsgi.ini - uWSGI server configuration.
 dbinit.py - Quiz WebService databse init tool.
+
+
+Brief algo
+==========
+
+0) quiz by topic, exam and errors are almost 3 different worlds
+
+1) quiz and exam puts questions to error DB
+
+2) quiz has a memory of the questions made in the "quiz by topic" mode.
+In the quiz, every time a question is sent,
+it's temporarily removed from the DB for that student
+so that there are no questions duplicates you do exercises and exercises
+
+3) errors of the exam are sent to error DB.
+
+4) statistics use the error DB and stored somewhere the number
+of exercises performed.
+
+5) error review removes questions from error DB
+
+6) exam removes questions from error BD
+
+7) statistics of topics now, last week and last month
+
+
+Database structure
+==================
+
+applications
+users
+chapters
+topics
+questions
+
+topics_stat
+
+* errors - contains questions with wrong answers (from quizzes and exams).
+  Attached triggers:
+    - on insert add row for the question's topic into topics_stat with err_count=1
+      or set err_count = err_count+1 if row is already present
+    - on delete add row for the question's topic into topics_stat with err_count=0
+      or set err_count = err_count-1 if row is already present
+
+* quiz_answers - contains questions already provided in the quizzes
+  Attached triggers:
+    - on insert wrong answer it will put question into errors table.
+
+* exam_answers - contains exam questions and user answers
+  Attached triggers:
+    - on insert question it will put question into errors table.
+    - on update answer it will put question into errors table if
+      answer if wrong or remove question from the errors table if
+      answer if correct.
+
+* exams - contains list of generated exams

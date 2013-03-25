@@ -141,3 +141,6 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 400: Invalid value.
       List element is not a number.
+
+   :statuscode 400: Already answered.
+      Answers already sent to the server for the current quiz.

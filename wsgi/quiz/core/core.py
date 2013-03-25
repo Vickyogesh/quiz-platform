@@ -49,9 +49,10 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
-        self.answers = self.meta.tables['answers']
+        self.errors = self.meta.tables['errors']
+        self.quiz_answers = self.meta.tables['quiz_answers']
+        self.exam_answers = self.meta.tables['exam_answers']
         self.exams = self.meta.tables['exams']
-        self.exams_stat = self.meta.tables['exams_stat']
 
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):

@@ -38,8 +38,8 @@ class UserMixin(object):
 
         self.__topicerr = text(
             """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
-            AND id IN (SELECT question_id FROM answers WHERE
-            user_id=:user_id AND is_correct=0)) t;""")
+            AND id IN (SELECT question_id FROM errors WHERE
+            user_id=:user_id)) t;""")
         self.__topicerr = self.__topicerr.compile(self.engine)
 
     def getUserAndAppInfo(self, login, appkey):

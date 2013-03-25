@@ -18,13 +18,15 @@ class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.core = QuizCore(self)
-        self.answers = self.core.answers
+        self.quiz_answers = self.core.quiz_answers
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
+        self.engine.execute("TRUNCATE TABLE quiz_answers;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE answers;")
+        self.engine.execute("TRUNCATE TABLE errors;")
+        self.engine.execute("TRUNCATE TABLE quiz_answers;")
         self.engine.execute("TRUNCATE TABLE topics_stat;")
 
     # TODO: move to separate test
@@ -117,7 +119,7 @@ class DbQuizTest(unittest.TestCase):
 
         # Check if quiz is saved correctly
         qa = zip(questions, answers)
-        s = self.answers
+        s = self.quiz_answers
         res = self.engine.execute(select([s]).order_by(s.c.question_id))
         for row, qa in zip(res, qa):
             self.assertEqual(1, row[s.c.user_id])
@@ -129,7 +131,7 @@ class DbQuizTest(unittest.TestCase):
         # unordered questions must be saved correctly
         self.core.saveQuiz(1, 1, [12, 14, 1], [1, 0, 0])
 
-        s = self.answers
+        s = self.quiz_answers
         res = self.engine.execute(select([s]).order_by(s.c.question_id))
         rows = res.fetchall()
 
@@ -148,10 +150,11 @@ class DbQuizTest(unittest.TestCase):
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
 
-        # We set correct answers for questions 2 and 5.
+        # We set one correct and one wrong answer
+        # for questions 2 and 5.
         answers = [0] * len(questions)
         answers[2] = 1
-        answers[5] = 1
+        answers[5] = 0
         q2, q3 = questions[2], questions[5]
 
         self.core.saveQuiz(1, 1, questions, answers)

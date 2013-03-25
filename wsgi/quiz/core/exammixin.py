@@ -26,7 +26,7 @@ class ExamMixin(object):
             FROM exams WHERE id=:exam_id""")
         self.__getexam = self.__getexam.compile(self.engine)
 
-        t = self.exams_stat
+        t = self.exam_answers
         self.__set_questions = t.insert().values(exam_id=0, question_id=0)
         self.__set_questions = self.__set_questions.compile(self.engine)
 
@@ -35,16 +35,21 @@ class ExamMixin(object):
                                       t.c.question_id == bindparam('question_id')))
         self.__upd = self.__upd.compile(self.engine)
 
-        self.__upd_examstat = text("call update_exam_stat(:exam_id, :passed);")
-        self.__upd_examstat = self.__upd_examstat.compile(self.engine)
+        # self.__upd_examstat = text("call update_exam_stat(:exam_id, :passed);")
+        # self.__upd_examstat = self.__upd_examstat.compile(self.engine)
 
         self.__examquest = text("""SELECT q.*, e.is_correct FROM
-            (SELECT * FROM exams_stat where exam_id=:exam_id) e LEFT JOIN
+            (SELECT * FROM exam_answers where exam_id=:exam_id) e LEFT JOIN
             questions q ON e.question_id=q.id;""")
         self.__examquest = self.__examquest.compile(self.engine)
 
-        self.__examids = text("SELECT question_id FROM exams_stat WHERE exam_id=:exam_id")
+        self.__examids = text("SELECT question_id FROM exam_answers WHERE exam_id=:exam_id")
         self.__examids = self.__examids.compile(self.engine)
+
+        self.__updexaminfo = text("""
+            UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=:errors
+            WHERE id=:exam_id""")
+        self.__updexaminfo = self.__updexaminfo.compile(self.engine)
 
     # Create list of exam questions.
     # At first, we get info about chapters: chapter priority,
@@ -77,6 +82,7 @@ class ExamMixin(object):
             conn.execute(self.__set_questions, vals)
         return exam_id
 
+    # Return expiration date and exam end time (if set).
     def __getExpirationDate(self, exam_id):
         row = self.__expires.execute(exam_id=exam_id).fetchone()
         if row is None:
@@ -159,7 +165,7 @@ class ExamMixin(object):
             })
         with self.engine.begin() as conn:
             conn.execute(self.__upd, ans)
-            conn.execute(self.__upd_examstat, exam_id=exam_id, passed=wrong)
+            conn.execute(self.__updexaminfo, exam_id=exam_id, errors=wrong)
 
     def getExamInfo(self, exam_id, lang):
         res = self.__getexam.execute(exam_id=exam_id).fetchone()

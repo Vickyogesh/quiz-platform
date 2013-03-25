@@ -104,10 +104,11 @@ class DbTool(object):
 
     def _removeTables(self):
         print('Removing tables...')
-        self.engine.execute('DROP TABLE IF EXISTS answers;')
+        self.engine.execute('DROP TABLE IF EXISTS errors;')
+        self.engine.execute('DROP TABLE IF EXISTS quiz_answers;')
         self.engine.execute('DROP TABLE IF EXISTS topics_stat;')
         self.engine.execute('DROP TABLE IF EXISTS exams;')
-        self.engine.execute('DROP TABLE IF EXISTS exams_stat;')
+        self.engine.execute('DROP TABLE IF EXISTS exam_answers;')
 
         self.engine.execute('DROP TABLE IF EXISTS questions;')
         self.engine.execute('DROP TABLE IF EXISTS applications;')
@@ -175,8 +176,19 @@ class DbTool(object):
                 err_count SMALLINT NOT NULL DEFAULT 0
             );
 
-            CREATE TABLE answers(
+            CREATE TABLE errors(
                 user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL
+            );
+
+            CREATE TABLE quiz_answers(
+                user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL DEFAULT FALSE
+            );
+
+            CREATE TABLE exam_answers(
+                exam_id INTEGER UNSIGNED NOT NULL,
                 question_id INTEGER UNSIGNED NOT NULL,
                 is_correct BOOLEAN NOT NULL DEFAULT FALSE
             );
@@ -189,12 +201,6 @@ class DbTool(object):
                 err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 CONSTRAINT PRIMARY KEY (id)
             );
-
-            CREATE TABLE exams_stat(
-                exam_id INTEGER UNSIGNED NOT NULL,
-                question_id INTEGER UNSIGNED NOT NULL,
-                is_correct BOOLEAN NOT NULL DEFAULT FALSE
-            );
             """))
 
         self.meta = MetaData()
@@ -204,59 +210,64 @@ class DbTool(object):
         self.tbl_chapters = self.meta.tables['chapters']
         self.tbl_topics = self.meta.tables['topics']
         self.tbl_questions = self.meta.tables['questions']
-        self.answers = self.meta.tables['answers']
 
     def _createFuncs(self):
         print('Creating function...')
 
-        self.conn.execute("DROP PROCEDURE IF EXISTS update_exam_stat;")
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_quiz;")
         self.conn.execute(text("""
-            CREATE PROCEDURE update_exam_stat(exam INTEGER UNSIGNED, errors SMALLINT UNSIGNED)
-            BEGIN
-                DECLARE user INT UNSIGNED;
-                DECLARE err INT;
-
-                SELECT user_id INTO user FROM exams WHERE id=exam;
-
-                INSERT INTO answers(user_id, question_id, is_correct)
-                SELECT user, e.question_id, e.is_correct FROM exams_stat e
-                WHERE e.exam_id=exam
-                ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct);
-
-                UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=errors
-                WHERE id=exam;
-            END;
-            """))
-
-        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_ins;")
-        self.conn.execute(text("""
-            CREATE TRIGGER count_topic_err_ins AFTER INSERT ON answers FOR EACH
+            CREATE TRIGGER update_err_quiz AFTER INSERT ON quiz_answers FOR EACH
             ROW BEGIN
-                DECLARE topic INTEGER UNSIGNED;
-                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
-
-                IF NEW.is_correct = 1 THEN
-                    INSERT IGNORE INTO topics_stat VALUES(NEW.user_id, topic, 0);
-                ELSE
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                IF NEW.is_correct = 0 THEN
+                    INSERT IGNORE INTO errors VALUES(NEW.user_id, NEW.question_id);
                 END IF;
             END;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_upd;")
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_examadd;")
         self.conn.execute(text("""
-            CREATE TRIGGER count_topic_err_upd AFTER UPDATE ON answers FOR EACH
+            CREATE TRIGGER update_err_examadd AFTER INSERT ON exam_answers FOR EACH
             ROW BEGIN
-                DECLARE topic INTEGER UNSIGNED;
+                DECLARE user INT UNSIGNED;
+                SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
+                INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_add;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_topic_stat_add AFTER INSERT ON errors FOR EACH
+            ROW BEGIN
+                DECLARE topic INT UNSIGNED;
                 SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+                INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                ON DUPLICATE KEY UPDATE err_count = err_count + 1;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_del;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_topic_stat_del AFTER DELETE ON errors FOR EACH
+            ROW BEGIN
+                DECLARE topic INT UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=OLD.question_id;
+                INSERT INTO topics_stat VALUES(OLD.user_id, topic, 0)
+                ON DUPLICATE KEY UPDATE err_count = err_count - 1;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_exam;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_err_exam AFTER UPDATE ON exam_answers FOR EACH
+            ROW BEGIN
+                DECLARE user INT UNSIGNED;
+                SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
 
                 IF NEW.is_correct = 1 THEN
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, -1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count-1;
+                    DELETE FROM errors WHERE user_id=user
+                    AND question_id=NEW.question_id;
                 ELSE
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                    INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
                 END IF;
             END;
             """))
@@ -351,21 +362,26 @@ class DbTool(object):
         print("Creating indices... topics_stat")
         self.conn.execute('ALTER TABLE topics_stat ADD UNIQUE ix_topicstat(user_id, topic_id);')
 
-        print("Creating indices... answers")
-        self.conn.execute('ALTER TABLE answers ADD UNIQUE ix_answers(user_id, question_id);')
+        print("Creating indices... errors")
+        self.conn.execute('ALTER TABLE errors ADD UNIQUE ix_errors(user_id, question_id);')
+
+        print("Creating indices... quiz_answers")
+        self.conn.execute('ALTER TABLE quiz_answers ADD UNIQUE ix_quiz_answers(user_id, question_id);')
 
         print("Creating indices... exams")
         self.conn.execute('ALTER TABLE exams ADD INDEX ix_exams(user_id);')
 
-        print("Creating indices... exams_stat")
-        self.conn.execute('ALTER TABLE exams_stat ADD UNIQUE ix_examsstat(exam_id, question_id);')
+        print("Creating indices... exam_answers")
+        self.conn.execute('ALTER TABLE exam_answers ADD UNIQUE ix_exam_answers(exam_id, question_id);')
 
         print("Doing tables optimizations...")
         self.conn.execute('OPTIMIZE TABLE applications, users, chapters;')
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
         self.conn.execute('OPTIMIZE TABLE topics_stat;')
-        self.conn.execute('OPTIMIZE TABLE answers;')
+        self.conn.execute('OPTIMIZE TABLE errors;')
+        self.conn.execute('OPTIMIZE TABLE quiz_answers;')
+        self.conn.execute('OPTIMIZE TABLE exam_answers;')
 
     def before(self):
         pass
