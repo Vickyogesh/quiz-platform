@@ -108,7 +108,8 @@ class QuizMixin(object):
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions:
-            self.engine.execute(self.quiz_answers.delete())
+            t = self.quiz_answers
+            self.engine.execute(t.delete().where(t.c.user_id == user_id))
             questions = self._getQuizQuestions(topic_id, user_id, lang)
 
         return {'topic': topic_id, 'questions': questions}

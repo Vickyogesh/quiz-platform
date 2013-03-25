@@ -169,19 +169,20 @@ class DbQuizTest(unittest.TestCase):
             self.assertTrue(q3 not in questions)
 
     # If all questions are answered then next quiz will be empty.
-    def test_saveall(self):
-        quiz = self.core.getQuiz(1, 1, 'it')
-        quiz = quiz['questions']
-        questions = [x['id'] for x in quiz]
+    # Not true: quiz always return questions.
+    # def test_saveall(self):
+    #     quiz = self.core.getQuiz(1, 1, 'it')
+    #     quiz = quiz['questions']
+    #     questions = [x['id'] for x in quiz]
 
-        while questions:
-            self.core.saveQuiz(1, 1, questions, [1] * len(questions))
-            quiz = self.core.getQuiz(1, 1, 'it')
-            quiz = quiz['questions']
-            questions = [x['id'] for x in quiz]
+    #     while questions:
+    #         self.core.saveQuiz(1, 1, questions, [1] * len(questions))
+    #         quiz = self.core.getQuiz(1, 1, 'it')
+    #         quiz = quiz['questions']
+    #         questions = [x['id'] for x in quiz]
 
-        quiz = self.core.getQuiz(1, 1, 'it')
-        self.assertEqual(0, len(quiz['questions']))
+    #     quiz = self.core.getQuiz(1, 1, 'it')
+    #     self.assertEqual(0, len(quiz['questions']))
 
 
 def suite():
