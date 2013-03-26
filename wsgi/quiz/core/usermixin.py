@@ -42,6 +42,13 @@ class UserMixin(object):
             user_id=:user_id)) t;""")
         self.__topicerr = self.__topicerr.compile(self.engine)
 
+        self.__lastvisit = text("""UPDATE users SET last_visit=UTC_TIMESTAMP()
+                                WHERE id=:user_id""")
+        self.__lastvisit = self.__lastvisit.compile(self.engine)
+
+    def updateUserLastVisit(self, user_id):
+        self.engine.execute(self.__lastvisit, user_id=user_id)
+
     def getUserAndAppInfo(self, login, appkey):
         """Return user and application info.
 
@@ -56,6 +63,18 @@ class UserMixin(object):
                 type:    Account type.
                 app_pd:  Application ID.
         """
+        if login == 'admin':
+            res = self.engine.execute(text("SELECT id FROM applications WHERE appkey=:k"),
+                                      k=appkey).fetchone()
+            return {
+                'user_id': 0,
+                'name': 'admin',
+                'surname': None,
+                'passwd': self.admin_passwd,
+                'type': 'admin',
+                'app_id': res[0]
+            }
+
         res = self.__stmt.execute(login=login, appkey=appkey)
         row = res.fetchone()
 
@@ -75,7 +94,7 @@ class UserMixin(object):
 
         if row is None:
             raise QuizCoreError('Unknown student.')
-        elif row[2] != 'student':
+        elif row[2] != 'student' and row[2] != 'guest':
             raise QuizCoreError('Not a student.')
         return {'id': user_id, 'name': row[0], 'surname': row[1]}
 

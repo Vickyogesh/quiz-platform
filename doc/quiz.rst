@@ -17,6 +17,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
 .. http:get:: /quiz/(topic_id)
 
+   **Access**: student, guest
+
    Get quiz for the specified topic and language (optional).
 
    **Example requests**:
@@ -81,6 +83,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
 
 .. http:post:: /quiz/(topic_id)
+
+   **Access**: student, guest
 
    Send quiz results for the specified topic. Client sends list of answered
    questions and answers. List of questions is not fixed to 40.

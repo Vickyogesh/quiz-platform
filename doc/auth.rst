@@ -9,6 +9,8 @@ with the user's authorization information.
 
 .. http:get:: /authorize
 
+   **Access**: all
+
    Request authorization parameters.
 
    The Service returns **nonce** which user have to use to build
@@ -35,6 +37,8 @@ with the user's authorization information.
 
 
 .. http:post:: /authorize
+
+   **Access**: all
 
    Authorize.
 

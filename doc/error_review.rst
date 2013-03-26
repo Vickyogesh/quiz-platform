@@ -16,6 +16,8 @@ Error review is a list of 40 random questions where student made a mistake
 
 .. http:get:: /errorreview
 
+   **Access**: student, guest
+
    Get error review questions.
 
    **Example requests**:
@@ -68,6 +70,8 @@ Error review is a list of 40 random questions where student made a mistake
 
 
 .. http:post:: /errorreview
+
+   **Access**: student, guest
 
    Send answers for the error review questions.
    List of questions is not fixed to 40.

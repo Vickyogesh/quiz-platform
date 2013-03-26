@@ -63,7 +63,7 @@ class DbExamTest(unittest.TestCase):
 
     # Test new exam fields.
     def test_newFields(self):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
 
         # Check return value
         # there must be 'exam' and 'question' fields.
@@ -111,7 +111,7 @@ class DbExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from errors").fetchone()
         self.assertEqual(0, res[0])
 
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
 
         # After new exam generation there must be one entry in the
         # 'exams' table which describes exam and also 'exam_answers'
@@ -135,7 +135,7 @@ class DbExamTest(unittest.TestCase):
         err_count = res[4]
 
         self.assertEqual(info['exam']['id'], exam_id)
-        self.assertEqual(1, user_id)
+        self.assertEqual(3, user_id)
         self.assertEqual(0, err_count)
         self.assertEqual(None, end)
 
@@ -182,7 +182,7 @@ class DbExamTest(unittest.TestCase):
         self.assertEqual('Invalid exam ID.', err)
 
         # We have to create exam before continue testing
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
 
         # Try to save with wrong number of answers
@@ -226,7 +226,7 @@ class DbExamTest(unittest.TestCase):
 
     # Check normal exam save
     def test_save(self):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
         questions = [q['id'] for q in info['questions']]
         questions = list(sorted(questions))
@@ -248,7 +248,7 @@ class DbExamTest(unittest.TestCase):
         ### Check exam metadata
         # We don't check start time
         exam = self._getExamInfo(exam_id)
-        self.assertEqual(1, exam.user_id)
+        self.assertEqual(3, exam.user_id)
         self.assertEqual(5, exam.err_count)
 
         now = datetime.utcnow()
@@ -271,7 +271,7 @@ class DbExamTest(unittest.TestCase):
         self.assertEqual('Invalid exam ID.', err)
 
         # Check status for the fresh exam
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
         exam_questions = info['questions']
 
@@ -281,7 +281,7 @@ class DbExamTest(unittest.TestCase):
         questions = info['questions']
 
         # Check student
-        self.assertEqual(1, student['id'])
+        self.assertEqual(3, student['id'])
         self.assertEqual('Test', student['name'])
         self.assertEqual('User', student['surname'])
 
@@ -303,7 +303,7 @@ class DbExamTest(unittest.TestCase):
     # Helper function to create exam & save answers.
     # Returns result exam info
     def _passExam(self, answers):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
         questions = list(sorted([q['id'] for q in info['questions']]))
 

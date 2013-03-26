@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
+import hashlib
 from quiz.settings import Settings
 
 
@@ -69,6 +70,16 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual('4e50d30', info['session.secret'])
         self.assertEqual('/tmp/data/sessions/data', info['session.data_dir'])
         self.assertEqual('/tmp/data/sessions/lock', info['session.lock_dir'])
+
+    def test_main(self):
+        Settings.CONFIG_FILE = 'config3.ini'
+        settings = Settings([self.path], verbose=False)
+        main = settings.main
+
+        m = hashlib.md5()
+        m.update('admin:ari09Xsw_')
+        self.assertEqual(m.hexdigest(), main['admin_password'])
+        self.assertEqual(10, main['guest_allowed_requests'])
 
 
 def suite():

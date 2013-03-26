@@ -5,6 +5,8 @@ Exam is a list of 40 random questions from all available topics.
 
 .. http:get:: /exam
 
+   **Access**: student, guest
+
    Get exam for the user.
    The exam will expire after **3 hrs** since creation.
 
@@ -88,6 +90,8 @@ Exam is a list of 40 random questions from all available topics.
 
 .. http:post:: /exam/(id)
 
+   **Access**: student, guest
+
    Send answers for the specified exam. Client sends list of answered
    questions and answers. List of questions/answers is fixed to 40.
 
@@ -156,6 +160,8 @@ Exam is a list of 40 random questions from all available topics.
 
 
 .. http:get:: /exam/(id)
+
+   **Access**: school, student, guest
 
    Get information about specified exam.
 

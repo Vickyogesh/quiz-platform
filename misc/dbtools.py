@@ -7,7 +7,7 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'wsgi'))
 
 import hashlib
-from sqlalchemy import create_engine, MetaData, text
+from sqlalchemy import create_engine, MetaData, text, func
 from quiz.settings import Settings
 
 
@@ -26,50 +26,46 @@ class DbTool(object):
             'description': 'desktopapp'
         }]
 
-    REAL_USERS = [
-        {
-            'name': 'Admin',
-            'login': 'root',
-            'passwd': 'ari09Xsw_',
-            'type': 'admin'
-        }]
-
     TEST_USERS = [
+        {
+            'name': 'Chuck Norris School',
+            'surname': '',
+            'login': 'chuck@norris.com',
+            'passwd': 'boo',
+            'type': 'school',
+            'school_id': 0
+        },
+        {
+            'name': 'Chuck Norris School',
+            'surname': '',
+            'login': 'chuck@norris.com-guest',
+            'passwd': 'chuck@norris.com-guest',
+            'type': 'guest',
+            'school_id': 1
+        },
         {
             'name': 'Test',
             'surname': 'User',
             'login': 'testuser',
             'passwd': 'testpasswd',
-            'type': 'student'
+            'type': 'student',
+            'school_id': 1
         },
         {
             'name': 'Test',
             'surname': 'User 2',
             'login': 'testuser2',
             'passwd': 'testpasswd2',
-            'type': 'student'
-        },
-        {
-            'name': 'Admin',
-            'surname': '',
-            'login': 'root',
-            'passwd': 'adminpwd',
-            'type': 'admin'
-        },
-        {
-            'name': 'Chuck',
-            'surname': 'Norris',
-            'login': 'chuck@norris.com',
-            'passwd': 'boo',
-            'type': 'school'
+            'type': 'student',
+            'school_id': 1
         }]
 
     def __init__(self, verbose=False, create_db=False, cfg_path=None):
         self.start_time = time.time()
-        self._users = DbTool.REAL_USERS
         self._verbose = verbose
         self._readSettints(cfg_path)
         self._setup(create_db)
+        self.put_users = False
 
     def _readSettints(self, path=None):
         if path is None:
@@ -104,17 +100,9 @@ class DbTool(object):
 
     def _removeTables(self):
         print('Removing tables...')
-        self.engine.execute('DROP TABLE IF EXISTS errors;')
-        self.engine.execute('DROP TABLE IF EXISTS quiz_answers;')
-        self.engine.execute('DROP TABLE IF EXISTS topics_stat;')
-        self.engine.execute('DROP TABLE IF EXISTS exams;')
-        self.engine.execute('DROP TABLE IF EXISTS exam_answers;')
-
-        self.engine.execute('DROP TABLE IF EXISTS questions;')
-        self.engine.execute('DROP TABLE IF EXISTS applications;')
-        self.engine.execute('DROP TABLE IF EXISTS users;')
-        self.engine.execute('DROP TABLE IF EXISTS topics;')
-        self.engine.execute('DROP TABLE IF EXISTS chapters;')
+        metadata = MetaData(bind=self.engine)
+        metadata.reflect()
+        metadata.drop_all()
 
     def _createTables(self):
         print('Creating tables...')
@@ -132,8 +120,16 @@ class DbTool(object):
                 surname VARCHAR(100) NOT NULL DEFAULT '',
                 login VARCHAR(100) NOT NULL,
                 passwd VARCHAR(100) NOT NULL,
-                type ENUM('admin', 'school', 'student', 'guest') NOT NULL,
+                type ENUM('school', 'student', 'guest') NOT NULL,
                 school_id INTEGER UNSIGNED,
+                last_visit TIMESTAMP NOT NULL DEFAULT 0,
+                CONSTRAINT PRIMARY KEY (id, school_id)
+            );
+
+            CREATE TABLE guest_access(
+                id INTEGER UNSIGNED NOT NULL,
+                num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+                period_end DATETIME NOT NULL,
                 CONSTRAINT PRIMARY KEY (id)
             );
 
@@ -214,6 +210,28 @@ class DbTool(object):
     def _createFuncs(self):
         print('Creating function...')
 
+        self.conn.execute("DROP TRIGGER IF EXISTS guestaccess_add;")
+        self.conn.execute(text("""
+            CREATE TRIGGER guestaccess_add AFTER INSERT ON users FOR EACH
+            ROW BEGIN
+                IF NEW.type = 'guest' THEN
+                    INSERT IGNORE INTO guest_access VALUES(NEW.id, 0,
+                        UTC_TIMESTAMP()+ interval 1 hour);
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS guestaccess_update;")
+        self.conn.execute(text("""
+            CREATE TRIGGER guestaccess_update AFTER UPDATE ON users FOR EACH
+            ROW BEGIN
+                IF NEW.type = 'guest' THEN
+                    UPDATE guest_access SET num_requests = num_requests + 1
+                    WHERE id=NEW.id;
+                END IF;
+            END;
+            """))
+
         self.conn.execute("DROP TRIGGER IF EXISTS update_err_quiz;")
         self.conn.execute(text("""
             CREATE TRIGGER update_err_quiz AFTER INSERT ON quiz_answers FOR EACH
@@ -279,12 +297,15 @@ class DbTool(object):
     def _create_digest(self, username, passwd):
         m = hashlib.md5()
         m.update('%s:%s' % (username, passwd))
+        print username, passwd, m.hexdigest()
         return m.hexdigest()
 
     def _fillUsers(self):
+        if not self.put_users:
+            return
         print("Populating users...")
         vals = []
-        for user in self._users:
+        for user in DbTool.TEST_USERS:
             user['passwd'] = self._create_digest(user['login'], user['passwd'])
             vals.append(user)
         self.conn.execute(self.tbl_users.insert(), vals)

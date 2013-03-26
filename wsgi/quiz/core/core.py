@@ -6,6 +6,7 @@ from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
 from .reviewmixin import ErrorReviewMixin
+from .guestmixin import GuestMixin
 
 
 # http://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update
@@ -17,7 +18,7 @@ def append_string(insert, compiler, **kw):
     return s
 
 
-class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
+class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin):
     """ Core quiz logic. """
 
     def __init__(self, settings):
@@ -26,9 +27,13 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         QuizMixin.__init__(self)
         ErrorReviewMixin.__init__(self)
         ExamMixin.__init__(self)
+        GuestMixin.__init__(self)
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
+
+        self.admin_passwd = settings.main['admin_password']
+        self.guest_allowed_requests = settings.main['guest_allowed_requests']
 
     # Setup db connection and tables
     # NOTE: MySQL features an automatic connection close behavior,

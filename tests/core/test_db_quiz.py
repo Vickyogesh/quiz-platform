@@ -35,14 +35,14 @@ class DbQuizTest(unittest.TestCase):
         appkey = 'b929d0c46cf5609e0104e50d301b0b8b482e9bfc'
         info = self.core.getUserAndAppInfo(name, appkey)
         self.assertEqual('aa4a5443cb91ee1810785314651e5dd1', info['passwd'])
-        self.assertEqual(1, info['user_id'])
+        self.assertEqual(3, info['user_id'])
         self.assertEqual(3, info['app_id'])
         self.assertEqual('student', info['type'])
 
     # Generate quiz for the user with ID 1 and topic ID 1,
     # questions text must be 'italian', number of questions must be 40.
     def test_get(self):
-        quiz = self.core.getQuiz(1, 1, 'it')
+        quiz = self.core.getQuiz(3, 1, 'it')
         questions = quiz['questions']
 
         self.assertEqual(1, quiz['topic'])
@@ -58,26 +58,26 @@ class DbQuizTest(unittest.TestCase):
         self.assertTrue('answer' in question)
 
         # Get quiz for the topic with with wrong id - must return empty list
-        quiz = self.core.getQuiz(9000, 12, 'it')
+        quiz = self.core.getQuiz(12, 9000, 'it')
         self.assertEqual(0, len(quiz['questions']))
 
     # Testing wrong data processing.
     def test_saveBadData(self):
-        quiz = self.core.getQuiz(1, 1, 'it')
+        quiz = self.core.getQuiz(3, 1, 'it')
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
 
         # Length of questions and answers must be the same
         try:
-            self.core.saveQuiz(1, 1, questions, [0, 0, 0])
+            self.core.saveQuiz(3, 1, questions, [0, 0, 0])
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
 
         # Try to save empty lists
         try:
-            self.core.saveQuiz(1, 1, [], [])
+            self.core.saveQuiz(3, 1, [], [])
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Empty list.', err)
@@ -88,7 +88,7 @@ class DbQuizTest(unittest.TestCase):
             answers = [0] * len(questions)
             q = questions[:]
             q[3] = 'bla'
-            self.core.saveQuiz(1, 1, q, answers)
+            self.core.saveQuiz(3, 1, q, answers)
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid value.', err)
@@ -97,14 +97,14 @@ class DbQuizTest(unittest.TestCase):
         # We fill answers with non-numbers.
         try:
             answers = ['bla'] * len(questions)
-            self.core.saveQuiz(1, 1, questions, answers)
+            self.core.saveQuiz(3, 1, questions, answers)
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid value.', err)
 
     # Test normal behaviour.
     def test_save(self):
-        quiz = self.core.getQuiz(1, 1, 'it')
+        quiz = self.core.getQuiz(3, 1, 'it')
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -115,37 +115,37 @@ class DbQuizTest(unittest.TestCase):
         # Put some correct answers
         answers[0:5] = [1] * 5
 
-        self.core.saveQuiz(1, 1, questions, answers)
+        self.core.saveQuiz(3, 1, questions, answers)
 
         # Check if quiz is saved correctly
         qa = zip(questions, answers)
         s = self.quiz_answers
         res = self.engine.execute(select([s]).order_by(s.c.question_id))
         for row, qa in zip(res, qa):
-            self.assertEqual(1, row[s.c.user_id])
+            self.assertEqual(3, row[s.c.user_id])
             self.assertEqual(qa[0], row[s.c.question_id])
             self.assertEqual(qa[1], row[s.c.is_correct])
 
     # Test unordered question list.
     def test_saveUnordered(self):
         # unordered questions must be saved correctly
-        self.core.saveQuiz(1, 1, [12, 14, 1], [1, 0, 0])
+        self.core.saveQuiz(3, 1, [12, 14, 1], [1, 0, 0])
 
         s = self.quiz_answers
         res = self.engine.execute(select([s]).order_by(s.c.question_id))
         rows = res.fetchall()
 
         self.assertEqual(3, len(rows))
-        self.assertEqual(1, rows[0][s.c.user_id])
+        self.assertEqual(3, rows[0][s.c.user_id])
         self.assertEqual(1, rows[0][s.c.question_id])
-        self.assertEqual(1, rows[1][s.c.user_id])
+        self.assertEqual(3, rows[1][s.c.user_id])
         self.assertEqual(12, rows[1][s.c.question_id])
-        self.assertEqual(1, rows[2][s.c.user_id])
+        self.assertEqual(3, rows[2][s.c.user_id])
         self.assertEqual(14, rows[2][s.c.question_id])
 
     # Test if answered questions are not present in future quezzes.
     def test_random(self):
-        quiz = self.core.getQuiz(1, 1, 'it')
+        quiz = self.core.getQuiz(3, 1, 'it')
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -157,12 +157,12 @@ class DbQuizTest(unittest.TestCase):
         answers[5] = 0
         q2, q3 = questions[2], questions[5]
 
-        self.core.saveQuiz(1, 1, questions, answers)
+        self.core.saveQuiz(3, 1, questions, answers)
 
         # Simulate 10 new quzzes and check if
         # answered questions are present in them.
         for x in xrange(10):
-            quiz = self.core.getQuiz(1, 1, 'it')
+            quiz = self.core.getQuiz(3, 1, 'it')
             quiz = quiz['questions']
             questions = [x['id'] for x in quiz]
             self.assertTrue(q2 not in questions)

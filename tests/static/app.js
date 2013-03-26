@@ -407,7 +407,10 @@ function onStudentStat()
   aux_clearUserStat();
 
   $.getJSON(url("/v1/student/"+user_id), data, function(data) {
-    aux_fillUserStat(data);
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillUserStat(data);
   })
   .error(function(data) {
     aux_showError(data.responseText, data.status);

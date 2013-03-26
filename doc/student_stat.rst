@@ -5,6 +5,8 @@ Student statistics provides learning progress information of the student.
 
 .. http:get:: /student
 
+   **Access**: student, guest
+
    Get statistics for the current user. Same as :http:get:`/student/me`.
    
    .. seealso:: :http:get:`/student/(id)`
@@ -12,12 +14,16 @@ Student statistics provides learning progress information of the student.
 
 .. http:get:: /student/me
 
+   **Access**: student, guest
+
    Get statistics for the current user. Same as :http:get:`/student`.
    
    .. seealso:: :http:get:`/student/(id)`
 
 
 .. http:get:: /student/(id)
+
+   **Access**: school, student, guest
 
    Get statistics for the student with specified ID.
    If **id** is *me* then current user id is used.
@@ -140,6 +146,8 @@ Student statistics provides learning progress information of the student.
 
 .. http:get:: /student/(id)/exam
 
+   **Access**: school, student, guest
+
    Get exam list for the student with specified ID.
    If **id** is *me* then current user id is used.
 
@@ -256,6 +264,8 @@ Student statistics provides learning progress information of the student.
 
 
 .. http:get:: /student/(id)/topicerrors/(topic_id)
+
+   **Access**: school, student, guest
 
    Get questions with wrong answers for the specified topic.
 

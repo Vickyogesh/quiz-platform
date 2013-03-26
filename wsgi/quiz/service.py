@@ -1,114 +1,136 @@
-from werkzeug.routing import Rule
-from quiz.servicebase import ServiceBase
-from werkzeug.exceptions import BadRequest
-from .servicebase import JSONResponse
+from werkzeug.exceptions import BadRequest, Forbidden
+from .wsgi import QuizApp, JSONResponse
+
+app = QuizApp()
 
 
-class QuizService(ServiceBase):
-    """ Quiz web service. """
+@app.get('/quiz/<int:topic>', access=['student', 'guest'])
+def create_quiz(topic):
+    """ Get 40 questions from the DB and return them to the client. """
+    user_id = app.getUserId()
+    lang = app.getLang()
+    quiz = app.core.getQuiz(user_id, topic, lang)
+    return JSONResponse(quiz)
 
-    def __init__(self, config):
-        super(QuizService, self).__init__(config)
-        self._addRules([
-            ('GET',   '/quiz/<int:topic>',        'onQuizGet'),
-            ('POST',  '/quiz/<int:topic>',        'onQuizSave'),
-            ('GET',   '/errorreview',             'onErrorReviewGet'),
-            ('POST',  '/errorreview',             'onErrorReviewSave'),
-            ('GET',   '/exam',                    'onCreateExam'),
-            ('POST',  '/exam/<int:id>',           'onSaveExam'),
-            ('GET',   '/exam/<int:id>',           'onGetExamInfo'),
-            ('GET',   '/student',                 'onStudentStat'),
-            ('GET',   '/student/<uid:user>',      'onStudentStat'),
-            ('GET',   '/student/<uid:user>/exam', 'onStudentExams'),
-            ('GET',   '/student/<uid:user>/topicerrors/<int:id>', 'onTopicErrors')
-        ])
 
-    def _addRules(self, rules):
-        for rule in rules:
-            self.urls.add(Rule(rule[1], methods=[rule[0]], endpoint=rule[2]))
+@app.post('/quiz/<int:topic>', access=['student', 'guest'])
+def save_quiz(topic):
+    """ Save quiz results. """
+    user_id = app.getUserId()
+    data = app.request.json
 
-    def onQuizGet(self, request, topic):
-        """ Get 40 questions from the DB and return them to the client. """
-        lang = request.args.get('lang', 'it')
+    try:
+        id_list = data['questions']
+        answers = data['answers']
+    except KeyError:
+        raise BadRequest('Missing parameter.')
 
-        user_id = self.session['user_id']
-        quiz = self.core.getQuiz(topic, user_id, lang)
-        return JSONResponse(quiz)
+    app.core.saveQuiz(user_id, topic, id_list, answers)
+    return JSONResponse()
 
-    def onQuizSave(self, request, topic):
-        """ Save quiz results. """
-        user_id = self.session['user_id']
-        data = request.json
 
-        try:
-            id_list = data['questions']
-            answers = data['answers']
-        except KeyError:
-            raise BadRequest('Missing parameter.')
+@app.get('/student', access=['student', 'school', 'guest'])
+@app.get('/student/<uid:user>', access=['student', 'school', 'guest'])
+def get_student_stat(user='me'):
+    user_id = app.getUserId(user)
+    lang = app.getLang()
 
-        self.core.saveQuiz(user_id, topic, id_list, answers)
-        return JSONResponse()
+    # Student and guest can access only to their own data.
+    utype = app.session['user_type']
+    uid = app.session['user_id']
 
-    def onStudentStat(self, request, user='me'):
-        if user == 'me':
-            user = self.session['user_id']
-        lang = request.args.get('lang', 'it')
+    if utype != 'school' and uid != user_id:
+        raise Forbidden
 
-        stat = self.core.getUserStat(user, lang)
-        return JSONResponse(stat)
+    stat = app.core.getUserStat(user_id, lang)
+    return JSONResponse(stat)
 
-    def onErrorReviewGet(self, request):
-        user_id = self.session['user_id']
-        lang = request.args.get('lang', 'it')
 
-        res = self.core.getErrorReview(user_id, lang)
-        return JSONResponse(res)
+@app.get('/errorreview', access=['student', 'guest'])
+def get_error_review():
+    user_id = app.getUserId()
+    lang = app.getLang()
+    res = app.core.getErrorReview(user_id, lang)
+    return JSONResponse(res)
 
-    def onErrorReviewSave(self, request):
-        user_id = self.session['user_id']
-        data = request.json
 
-        try:
-            id_list = data['questions']
-            answers = data['answers']
-        except KeyError:
-            raise BadRequest('Missing parameter.')
+@app.post('/errorreview', access=['student', 'guest'])
+def save_error_review():
+    user_id = app.getUserId()
+    data = app.request.json
 
-        self.core.saveErrorReview(user_id, id_list, answers)
-        return JSONResponse()
+    try:
+        id_list = data['questions']
+        answers = data['answers']
+    except KeyError:
+        raise BadRequest('Missing parameter.')
 
-    def onCreateExam(self, request):
-        user_id = self.session['user_id']
-        lang = request.args.get('lang', 'it')
-        exam = self.core.createExam(user_id, lang)
-        return JSONResponse(exam)
+    app.core.saveErrorReview(user_id, id_list, answers)
+    return JSONResponse()
 
-    def onSaveExam(self, request, id):
-        data = request.json
 
-        try:
-            questions = data['questions']
-            answers = data['answers']
-        except KeyError:
-            raise BadRequest('Missing parameter.')
+@app.get('/exam', access=['student', 'guest'])
+def create_exam():
+    user_id = app.getUserId()
+    lang = app.getLang()
+    exam = app.core.createExam(user_id, lang)
+    return JSONResponse(exam)
 
-        self.core.saveExam(id, questions, answers)
-        return JSONResponse()
 
-    def onGetExamInfo(self, request, id):
-        lang = request.args.get('lang', 'it')
-        info = self.core.getExamInfo(id, lang)
-        return JSONResponse(info)
+@app.post('/exam/<int:id>', access=['student', 'guest'])
+def save_exam(id):
+    data = app.request.json
 
-    def onStudentExams(self, request, user):
-        if user == 'me':
-            user = self.session['user_id']
-        exams = self.core.getExamList(user)
-        return JSONResponse(exams)
+    try:
+        questions = data['questions']
+        answers = data['answers']
+    except KeyError:
+        raise BadRequest('Missing parameter.')
 
-    def onTopicErrors(self, request, user, id):
-        if user == 'me':
-            user = self.session['user_id']
-        lang = request.args.get('lang', 'it')
-        info = self.core.getTopicErrors(user, id, lang)
-        return JSONResponse(info)
+    app.core.saveExam(id, questions, answers)
+    return JSONResponse()
+
+
+@app.get('/exam/<int:id>', access=['student', 'guest', 'school'])
+def get_exam_info(id):
+    lang = app.getLang()
+    info = app.core.getExamInfo(id, lang)
+
+    # Students can access only to their own data.
+    user_id = info['student']['id']
+    utype = app.session['user_type']
+    uid = app.session['user_id']
+    if utype != 'school' and uid != user_id:
+        raise Forbidden
+
+    return JSONResponse(info)
+
+
+@app.get('/student/<uid:user>/exam', access=['student', 'guest', 'school'])
+def get_student_exams(user):
+    user_id = app.getUserId(user)
+
+    # Students can access only to their own data.
+    utype = app.session['user_type']
+    uid = app.session['user_id']
+    if utype != 'school' and uid != user_id:
+        raise Forbidden
+
+    exams = app.core.getExamList(user_id)
+    return JSONResponse(exams)
+
+
+@app.get('/student/<uid:user>/topicerrors/<int:id>',
+         access=['student', 'guest', 'school'])
+def get_topic_error(user, id):
+    user_id = app.getUserId(user)
+    lang = app.getLang()
+
+    # Students can access only to their own data.
+    utype = app.session['user_type']
+    uid = app.session['user_id']
+    if utype != 'school' and uid != user_id:
+        raise Forbidden
+
+    info = app.core.getTopicErrors(user_id, id, lang)
+    return JSONResponse(info)
