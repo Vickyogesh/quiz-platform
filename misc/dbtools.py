@@ -7,7 +7,7 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'wsgi'))
 
 import hashlib
-from sqlalchemy import create_engine, MetaData, text, func
+from sqlalchemy import create_engine, MetaData, text
 from quiz.settings import Settings
 
 
