@@ -19,6 +19,7 @@ ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 class DbExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
+        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine

@@ -17,6 +17,7 @@ from quiz.core.exceptions import QuizCoreError
 class DbQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
+        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.quiz_answers = self.core.quiz_answers
         self.engine = self.core.engine

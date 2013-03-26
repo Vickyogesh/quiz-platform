@@ -7,6 +7,8 @@ from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
 from .reviewmixin import ErrorReviewMixin
 from .guestmixin import GuestMixin
+from .adminmixin import AdminMixin
+from .schoolmixin import SchoolMixin
 
 
 # http://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update
@@ -18,7 +20,8 @@ def append_string(insert, compiler, **kw):
     return s
 
 
-class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin):
+class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
+               AdminMixin, SchoolMixin):
     """ Core quiz logic. """
 
     def __init__(self, settings):
@@ -28,6 +31,8 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin):
         ErrorReviewMixin.__init__(self)
         ExamMixin.__init__(self)
         GuestMixin.__init__(self)
+        AdminMixin.__init__(self)
+        SchoolMixin.__init__(self)
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']

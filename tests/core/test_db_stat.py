@@ -14,6 +14,7 @@ from quiz.core.core import QuizCore
 class DbStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
+        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.engine = self.core.engine
         self.engine.execute("TRUNCATE TABLE answers;")

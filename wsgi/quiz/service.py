@@ -134,3 +134,18 @@ def get_topic_error(user, id):
 
     info = app.core.getTopicErrors(user_id, id, lang)
     return JSONResponse(info)
+
+
+@app.post('/newschool', access=['admin'])
+def add_school():
+    data = app.request.json
+
+    try:
+        name = data['name']
+        login = data['login']
+        passwd = data['passwd']
+    except KeyError:
+        raise BadRequest('Missing parameter.')
+
+    res = app.core.createSchool(name, login, passwd)
+    return JSONResponse(res)
