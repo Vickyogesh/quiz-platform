@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
-from tests_common import db_uri
+from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from sqlalchemy import select
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
@@ -14,21 +14,17 @@ from quiz.core.exceptions import QuizCoreError
 
 # Test: generate and save quiz.
 # NOTE: question lang and optional fileds are not tested.
-class DbQuizTest(unittest.TestCase):
+class CoreQuizTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.quiz_answers = self.core.quiz_answers
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE quiz_answers;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE quiz_answers;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onTearDown(self.engine)
 
     # TODO: move to separate test
     def test_getInfo(self):
@@ -75,6 +71,7 @@ class DbQuizTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
+        err = ''
 
         # Try to save empty lists
         try:
@@ -82,6 +79,7 @@ class DbQuizTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Empty list.', err)
+        err = ''
 
         # Questions must contain valid ID values (numbers).
         # We set one of the ID to 'bla' to test this.
@@ -93,6 +91,7 @@ class DbQuizTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid value.', err)
+        err = ''
 
         # Answers must contain 1 or 0.
         # We fill answers with non-numbers.
@@ -188,7 +187,7 @@ class DbQuizTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(DbQuizTest))
+    suite.addTest(unittest.makeSuite(CoreQuizTest))
     return suite
 
 if __name__ == '__main__':

@@ -6,24 +6,22 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
-from tests_common import db_uri
+from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
 
 
 # Test: get error review and save answers.
-class DbReviewTest(unittest.TestCase):
+class CoreReviewTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onTearDown(self.engine)
 
     # Check: get review for invalid user - must return empty list
     def test_getWrongUser(self):
@@ -60,6 +58,7 @@ class DbReviewTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
+        err = ''
 
         # Empty answers
         try:
@@ -67,6 +66,7 @@ class DbReviewTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
+        err = ''
 
         # Empty all
         try:
@@ -74,6 +74,7 @@ class DbReviewTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Empty list.', err)
+        err = ''
 
         # Wrong questions
         try:
@@ -81,6 +82,7 @@ class DbReviewTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid value.', err)
+        err = ''
 
         # Wrong answers
         try:
@@ -109,7 +111,7 @@ class DbReviewTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(DbReviewTest))
+    suite.addTest(unittest.makeSuite(CoreReviewTest))
     return suite
 
 if __name__ == '__main__':

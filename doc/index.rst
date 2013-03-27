@@ -12,6 +12,8 @@ Quiz Web Service API v1
    exam
    error_review
    student_stat
+   admin
+   school
 
 
 General Information

@@ -10,7 +10,7 @@ import hashlib
 from quiz.settings import Settings
 
 
-class SettingsTest(unittest.TestCase):
+class CoreSettingsTest(unittest.TestCase):
     def setUp(self):
         Settings.CONFIG_FILE = 'config.ini'
         self.path = os.path.join(os.path.dirname(__file__), '..', 'data')
@@ -84,7 +84,7 @@ class SettingsTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SettingsTest))
+    suite.addTest(unittest.makeSuite(CoreSettingsTest))
     return suite
 
 if __name__ == '__main__':

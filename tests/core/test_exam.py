@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import unittest
 from datetime import datetime, timedelta
 from collections import namedtuple
-from tests_common import db_uri
+from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
 
@@ -16,23 +16,17 @@ ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 
 
 # Test: generate exam, save exam, exam's errors counting.
-class DbExamTest(unittest.TestCase):
+class CoreExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
         self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE exam_answers;")
-        self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE exam_answers;")
-        self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onTearDown(self.engine)
 
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
@@ -181,6 +175,7 @@ class DbExamTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid exam ID.', err)
+        err = ''
 
         # We have to create exam before continue testing
         info = self.core.createExam(3, 'it')
@@ -193,6 +188,7 @@ class DbExamTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Wrong number of answers.', err)
+        err = ''
 
         # Try to save with wrong number of questions
         try:
@@ -200,6 +196,7 @@ class DbExamTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Parameters length mismatch.', err)
+        err = ''
 
         # Try to save with wrong questions' IDs
         try:
@@ -207,6 +204,7 @@ class DbExamTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Invalid question ID.', err)
+        err = ''
 
         # Make exam expired and try to save answers
         # NOTE: expiration date will be checked before questions
@@ -374,7 +372,7 @@ class DbExamTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(DbExamTest))
+    suite.addTest(unittest.makeSuite(CoreExamTest))
     return suite
 
 if __name__ == '__main__':

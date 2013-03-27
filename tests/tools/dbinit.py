@@ -61,7 +61,7 @@ class Db(DbTool):
                 'login': tmp,
                 'passwd': self._create_digest(tmp, tmp),
                 'type': 'school',
-                'school_id': None
+                'school_id': 0
             })
             for j in range(1, NUM_STUDENTS):
                 tmp = 'student%d.%d' % (i, j)
@@ -242,10 +242,27 @@ class Db(DbTool):
                     self.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=top)
                 top += 1
 
+    # see tests/core/test_admin.py
+    def createTestFunc(self):
+        sql = """CREATE PROCEDURE aux_create_test_users() BEGIN
+            TRUNCATE TABLE users;
+            """
+
+        lst = []
+        for x in DbTool.TEST_USERS:
+            lst.append("""INSERT INTO users(name, surname, login, passwd,
+            type, school_id) VALUES ('{name}', '{surname}', '{login}',
+            '{passwd}', '{type}', {school_id});""".format(**x))
+
+        sql += '\n'.join(lst) + ' END;'
+        self.conn.execute('DROP PROCEDURE IF EXISTS aux_create_test_users;')
+        self.conn.execute(sql)
+
     def fillData(self):
         if self.args.small:
             self.fillSmallData()
         else:
             self.fillBigData()
+        self.createTestFunc()
 
 Db().run()

@@ -12,6 +12,30 @@ def url(path):
     return test_server + path
 
 
+def cleanupdb_onSetup(engine, drop_users=False):
+    with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE quiz_answers;")
+        conn.execute("TRUNCATE TABLE exam_answers;")
+        conn.execute("TRUNCATE TABLE exams;")
+        conn.execute("TRUNCATE TABLE errors;")
+        conn.execute("TRUNCATE TABLE topics_stat;")
+        if drop_users:
+            conn.execute("TRUNCATE TABLE users;")
+            conn.execute("TRUNCATE TABLE guest_access;")
+
+
+def cleanupdb_onTearDown(engine):
+    with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE quiz_answers;")
+        conn.execute("TRUNCATE TABLE exam_answers;")
+        conn.execute("TRUNCATE TABLE exams;")
+        conn.execute("TRUNCATE TABLE errors;")
+        conn.execute("TRUNCATE TABLE topics_stat;")
+        conn.execute("TRUNCATE TABLE guest_access;")
+        conn.execute("call aux_create_test_users();")
+    engine.dispose()
+
+
 def _getNonce(header):
     return header[16:-1]
 
