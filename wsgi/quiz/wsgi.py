@@ -319,6 +319,9 @@ class QuizApp(object):
         app = QuizMiddleware(app, settings.session['session.key'])
         return app
 
+    def isAdmin(self):
+        return self.session['user_type'] == 'admin'
+
     def getUserId(self, uid=None):
         """Get user ID based on uid value.
 

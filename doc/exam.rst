@@ -86,6 +86,7 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
 
 .. http:post:: /exam/(id)
@@ -136,6 +137,7 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.
@@ -266,5 +268,6 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Invalid exam ID.
 

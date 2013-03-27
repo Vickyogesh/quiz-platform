@@ -140,6 +140,7 @@ Student statistics provides learning progress information of the student.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Unknown student - User with specified **id** is not present.
    :statuscode 400: Not a student - User with specified **id** is not a student.
 
@@ -259,6 +260,7 @@ Student statistics provides learning progress information of the student.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Unknown student - User with specified **id** is not present.
    :statuscode 400: Not a student - User with specified **id** is not a student.
 
@@ -349,3 +351,4 @@ Student statistics provides learning progress information of the student.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.

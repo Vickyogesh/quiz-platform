@@ -1,4 +1,5 @@
 import hashlib
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError, StatementError
 from .exceptions import QuizCoreError
 
@@ -11,6 +12,10 @@ class AdminMixin(object):
                                              passwd=None, type='school',
                                              school_id=0)
         self.__create = self.__create.compile(self.engine)
+
+        t = self.users
+        self.__list = t.select(t.c.type == 'school')
+        self.__list = self.__list.compile(self.engine)
 
     def __create_guest_passwd(self, login):
         m = hashlib.md5()
@@ -42,3 +47,19 @@ class AdminMixin(object):
         except StatementError:
             raise QuizCoreError('Invalid parameters.')
         return {'id': school_id}
+
+    def getSchoolList(self):
+        res = self.__list.execute()
+        lst = [{'id': row[0], 'name': row[1], 'login': row[3]} for row in res]
+        return {'schools': lst}
+
+    # TODO: test me
+    def deleteSchool(self, id):
+        # Check if this is school id.
+        # See SchoolMixin._checkSchoolId().
+        self._checkSchoolId(id)
+
+        # We have to remove all related data like students and their data.
+        t = self.users
+        dl = t.delete().where(or_(t.c.id == id, t.c.school_id == id))
+        self.engine.execute(dl)

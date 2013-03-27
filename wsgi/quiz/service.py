@@ -136,6 +136,12 @@ def get_topic_error(user, id):
     return JSONResponse(info)
 
 
+@app.get('/admin/schools', access=['admin'])
+def school_list():
+    res = app.core.getSchoolList()
+    return JSONResponse(res)
+
+
 @app.post('/admin/newschool', access=['admin'])
 def add_school():
     data = app.request.json
@@ -148,6 +154,19 @@ def add_school():
         raise BadRequest('Missing parameter.')
 
     res = app.core.createSchool(name, login, passwd)
+    return JSONResponse(res)
+
+
+@app.get('/school/<uid:id>/students', access=['school', 'admin'])
+def student_list(id):
+    school_id = app.getUserId(id)
+
+    if not app.isAdmin():
+        uid = app.session['user_id']
+        if uid != school_id:
+            raise Forbidden
+
+    res = app.core.getStudentList(school_id)
     return JSONResponse(res)
 
 

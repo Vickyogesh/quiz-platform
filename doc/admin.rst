@@ -1,11 +1,61 @@
 Administration
 --------------
 
+.. http:get:: /admin/schools
+
+   **Access**: admin
+
+   Get list of registered schools.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /admin/schools HTTP/1.1
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "status": 200,
+        "schools": [
+          {
+            "id": 1,
+            "name": "Chuck Norris School",
+            "login": "chuck@norris.com"
+          },
+          {
+            "id": 5,
+            "name": "Rambo School",
+            "login": "rambo@rambo.com"
+          }
+        ]
+      }
+
+   =========  ===========================================
+   schools fields
+   ======================================================
+   id         School ID.
+   name       School name.
+   login      School login.
+   =========  ===========================================
+
+   :statuscode 200: Everything is ok.
+   :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
+
+
 .. http:post:: /admin/newschool
 
    **Access**: admin
 
    Create new school and guest student for this school.
+
+   **Example request**:
 
    .. sourcecode:: http
 
@@ -39,6 +89,7 @@ Administration
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Invalid parameters.
    :statuscode 400: Already exists.
         School with the same login is already exists.

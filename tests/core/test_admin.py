@@ -82,7 +82,7 @@ class CoreAdminTest(unittest.TestCase):
         pwd = self.core._AdminMixin__create_guest_passwd('somelogin-guest')
         self.assertEqual(pwd, res['passwd'])
 
-    # Check creation of the school with already existent login.
+    # Check: creation of the school with already existent login.
     def test_duplicates(self):
         self.core.createSchool('someschool', 'somelogin', 'pass')
         try:
@@ -90,6 +90,38 @@ class CoreAdminTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Already exists.', err)
+
+    # Check: get list of schools.
+    def test_schoolList(self):
+        # Check empty schools
+        info = self.core.getSchoolList()
+        self.assertEqual(0, len(info['schools']))
+
+        # Check list
+        self.core.createSchool('someschool1', 'somelogin1', 'pass')
+        self.core.createSchool('someschool2', 'somelogin2', 'pass')
+        self.core.createSchool('someschool3', 'somelogin3', 'pass')
+
+        info = self.core.getSchoolList()
+        info = info['schools']
+        self.assertEqual(3, len(info))
+
+        school = info[0]
+        self.assertEqual(1, school['id'])
+        self.assertEqual('someschool1', school['name'])
+        self.assertEqual('somelogin1', school['login'])
+
+        # NOTE: next schools will have ids = 3, 5
+        # since there are also guest users.
+        school = info[1]
+        self.assertEqual(3, school['id'])
+        self.assertEqual('someschool2', school['name'])
+        self.assertEqual('somelogin2', school['login'])
+
+        school = info[2]
+        self.assertEqual(5, school['id'])
+        self.assertEqual('someschool3', school['name'])
+        self.assertEqual('somelogin3', school['login'])
 
 
 def suite():

@@ -77,6 +77,7 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Invalid topic ID (temprorary removed - need to update quiz
     algo).
 
@@ -130,6 +131,7 @@ Quiz is a list of 40 random questions for the specified topic.
    :statuscode 200: Everything is ok.
 
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.

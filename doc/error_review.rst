@@ -67,6 +67,7 @@ Error review is a list of 40 random questions where student made a mistake
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
 
 .. http:post:: /errorreview
@@ -115,6 +116,7 @@ Error review is a list of 40 random questions where student made a mistake
    :statuscode 200: Everything is ok.
 
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.

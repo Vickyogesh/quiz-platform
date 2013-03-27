@@ -62,7 +62,7 @@ class CoreSchoolTest(unittest.TestCase):
             self.core.createStudent('a', 'b', 'v', 'b', 12)
         except QuizCoreError as e:
             err = e.message
-        self.assertEqual('Unknown school.', err)
+        self.assertEqual('Invalid school ID.', err)
 
     # Check normal situation.
     # NOTE: since by default there are 4 users then
@@ -82,6 +82,54 @@ class CoreSchoolTest(unittest.TestCase):
         except QuizCoreError as e:
             err = e.message
         self.assertEqual('Already exists.', err)
+
+    # Check: list of students with wrong data.
+    def test_studentListBad(self):
+        # Non-existent id
+        try:
+            self.core.getStudentList(1000)
+        except QuizCoreError as e:
+            err = e.message
+        self.assertEqual('Invalid school ID.', err)
+        err = ''
+
+        # Not a school id
+        try:
+            self.core.getStudentList(3)
+        except QuizCoreError as e:
+            err = e.message
+        self.assertEqual('Invalid school ID.', err)
+        err = ''
+
+    # Check: list of students.
+    def test_studentList(self):
+        # By default we have one school.
+        # See misc/dbtools.py
+        info = self.core.getStudentList(1)
+
+        students = info['students']
+        self.assertEqual(3, len(students))
+
+        student = students[0]
+        self.assertEqual(2, student['id'])
+        self.assertEqual('Chuck Norris School', student['name'])
+        self.assertEqual('', student['surname'])
+        self.assertEqual('chuck@norris.com-guest', student['login'])
+        self.assertEqual('guest', student['type'])
+
+        student = students[1]
+        self.assertEqual(3, student['id'])
+        self.assertEqual('Test', student['name'])
+        self.assertEqual('User', student['surname'])
+        self.assertEqual('testuser', student['login'])
+        self.assertEqual('student', student['type'])
+
+        student = students[2]
+        self.assertEqual(4, student['id'])
+        self.assertEqual('Test', student['name'])
+        self.assertEqual('User 2', student['surname'])
+        self.assertEqual('testuser2', student['login'])
+        self.assertEqual('student', student['type'])
 
 
 def suite():
