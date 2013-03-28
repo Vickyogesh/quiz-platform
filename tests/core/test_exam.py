@@ -66,8 +66,8 @@ class CoreExamTest(unittest.TestCase):
         ### Check exam
 
         exam = info['exam']
-        self.assertTrue('id' in exam)
-        self.assertTrue('expires' in exam)
+        self.assertIn('id', exam)
+        self.assertIn('expires', exam)
 
         # Check expiration date
         # format: 2013-03-21 12:04:12

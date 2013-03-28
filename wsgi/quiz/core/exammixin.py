@@ -137,6 +137,8 @@ class ExamMixin(object):
             raise QuizCoreError('Exam is already passed.')
         elif now > expires:
             raise QuizCoreError('Exam is expired.')
+        elif not isinstance(answers, list):
+            raise QuizCoreError('Invalid value.')
         elif len(answers) != 40:
             raise QuizCoreError('Wrong number of answers.')
 
