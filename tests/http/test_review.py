@@ -7,12 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import requests
 import unittest
 import json
-from tests_common import url, createAuthFor
+from sqlalchemy import create_engine
+from tests_common import db_uri, url, createAuthFor
 
 
 # Quiz get requests (/quiz)
 # For more info see tests/core/test_quiz.py
-class HttpQuizTest(unittest.TestCase):
+class HttpReviewTest(unittest.TestCase):
     def setUp(self):
         self.req = requests.Session()
 
@@ -26,70 +27,60 @@ class HttpQuizTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, r.json()['status'])
 
-    # Check: get quiz with invalid URL
-    def test_getBad(self):
-        r = self.req.get(url('/quiz'))
-        self.assertEqual(404, r.status_code)
+        self.engine = create_engine(db_uri, echo=False)
+        self.engine.execute("INSERT IGNORE INTO errors VALUES (1, 1),(1,2)")
 
-        r = self.req.get(url('/quiz/1/fr'))
-        self.assertEqual(404, r.status_code)
+    def tearDown(self):
+        self.engine.dispose()
 
-        r = self.req.get(url('/quiz/1ds'))
-        self.assertEqual(404, r.status_code)
-
-    # Check: get quiz
+    # Check: get review
     def test_get(self):
-        r = self.req.get(url('/quiz/1'))
+        r = self.req.get(url('/errorreview'))
         self.assertEqual(200, r.status_code)
 
         data = r.json()
-        self.assertEqual(1, data['topic'])
-        self.assertEqual(40, len(data['questions']))
+        self.assertGreaterEqual(2, len(data['questions']))
 
         question = data['questions'][0]
         self.assertIn('id', question)
         self.assertIn('text', question)
         self.assertIn('answer', question)
 
-    # Check: get quiz with lang
+    # Check: get review with lang
     # TODO: how to check the language?
     def test_getLang(self):
-        r = self.req.get(url('/quiz/1'), params={'lang': 'de'})
+        r = self.req.get(url('/errorreview'), params={'lang': 'de'})
         self.assertEqual(200, r.status_code)
         data = r.json()
-        self.assertEqual(1, data['topic'])
-        self.assertEqual(40, len(data['questions']))
+        self.assertGreaterEqual(2, len(data['questions']))
 
-        r = self.req.get(url('/quiz/1'), params={'lang': 'fr'})
+        r = self.req.get(url('/errorreview'), params={'lang': 'fr'})
         self.assertEqual(200, r.status_code)
         data = r.json()
-        self.assertEqual(1, data['topic'])
-        self.assertEqual(40, len(data['questions']))
+        self.assertGreaterEqual(2, len(data['questions']))
 
-        r = self.req.get(url('/quiz/1'), params={'lang': 'it'})
+        r = self.req.get(url('/errorreview'), params={'lang': 'it'})
         self.assertEqual(200, r.status_code)
         data = r.json()
-        self.assertEqual(1, data['topic'])
-        self.assertEqual(40, len(data['questions']))
+        self.assertGreaterEqual(2, len(data['questions']))
 
         # if lang is not fr, de or it then it will be used
-        r = self.req.get(url('/quiz/1'), params={'lang': 'russian'})
+        r = self.req.get(url('/errorreview'), params={'lang': 'russian'})
         self.assertEqual(200, r.status_code)
         data = r.json()
-        self.assertEqual(1, data['topic'])
-        self.assertEqual(40, len(data['questions']))
+        self.assertGreaterEqual(2, len(data['questions']))
 
-    # Check: save with bad data
+    # Check: save with bad values
     def test_saveBad(self):
         # Check: not a json
-        r = self.req.post(url('/quiz/1'))
+        r = self.req.post(url('/errorreview'))
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Not a JSON.', data['description'])
 
         # Check: empty json
-        r = self.req.post(url('/quiz/1'), data='{}', headers=self.headers)
+        r = self.req.post(url('/errorreview'), data='{}', headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
@@ -97,7 +88,7 @@ class HttpQuizTest(unittest.TestCase):
 
         # Check: missing params
         data = json.dumps({'questions': 0})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
@@ -105,7 +96,7 @@ class HttpQuizTest(unittest.TestCase):
 
         # Check: missing params
         data = json.dumps({'answers': 0})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
@@ -115,21 +106,21 @@ class HttpQuizTest(unittest.TestCase):
         ### NOTE: we don't check all errors since core tests does this.
 
         data = json.dumps({'questions': 0, 'answers': 0})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid value.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': [1]})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Parameters length mismatch.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': []})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(400, data['status'])
@@ -138,7 +129,7 @@ class HttpQuizTest(unittest.TestCase):
     # Check: save normal
     def test_save(self):
         data = json.dumps({'questions': [1, 2, 3, 4], 'answers': [1, 1, 1, 0]})
-        r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
+        r = self.req.post(url('/errorreview'), data=data, headers=self.headers)
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, data['status'])
@@ -146,7 +137,7 @@ class HttpQuizTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(HttpQuizTest))
+    suite.addTest(unittest.makeSuite(HttpReviewTest))
     return suite
 
 if __name__ == '__main__':

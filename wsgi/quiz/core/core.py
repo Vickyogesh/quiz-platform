@@ -72,10 +72,15 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
                 del d[x]
 
     def _aux_prepareLists(self, questions, answers):
-        if len(questions) != len(answers):
-            raise QuizCoreError('Parameters length mismatch.')
-        elif not answers:
-            raise QuizCoreError('Empty list.')
+        try:
+            if len(questions) != len(answers):
+                raise QuizCoreError('Parameters length mismatch.')
+            elif not answers:
+                raise QuizCoreError('Empty list.')
+        except QuizCoreError:
+            raise
+        except Exception:
+            raise QuizCoreError('Invalid value.')
 
         # questions must contain integer values since it represents
         # list of IDs. It's important to have valid list
