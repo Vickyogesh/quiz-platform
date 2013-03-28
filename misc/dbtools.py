@@ -26,21 +26,20 @@ class DbTool(object):
             'description': 'desktopapp'
         }]
 
+    TEST_SCHOOLS = [
+        {
+            'name': 'Chuck Norris School',
+            'login': 'chuck@norris.com',
+            'passwd': 'boo'
+        }
+    ]
     TEST_USERS = [
         {
-            'name': 'Chuck Norris School',
-            'surname': '',
-            'login': 'chuck@norris.com',
-            'passwd': 'boo',
-            'type': 'school',
-            'school_id': 0
-        },
-        {
-            'name': 'Chuck Norris School',
-            'surname': '',
-            'login': 'chuck@norris.com-guest',
-            'passwd': 'chuck@norris.com-guest',
-            'type': 'guest',
+            'name': 'Test2',
+            'surname': 'User2',
+            'login': 'testuser2',
+            'passwd': 'testpasswd2',
+            'type': 'student',
             'school_id': 1
         },
         {
@@ -48,14 +47,6 @@ class DbTool(object):
             'surname': 'User',
             'login': 'testuser',
             'passwd': 'testpasswd',
-            'type': 'student',
-            'school_id': 1
-        },
-        {
-            'name': 'Test',
-            'surname': 'User 2',
-            'login': 'testuser2',
-            'passwd': 'testpasswd2',
             'type': 'student',
             'school_id': 1
         }]
@@ -114,14 +105,23 @@ class DbTool(object):
                 CONSTRAINT PRIMARY KEY (id)
             );
 
+            CREATE TABLE schools(
+                id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(100) NOT NULL,
+                login VARCHAR(100) NOT NULL,
+                passwd VARCHAR(100) NOT NULL,
+                CONSTRAINT PRIMARY KEY (id),
+                CONSTRAINT UNIQUE (login)
+            );
+
             CREATE TABLE users(
                 id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(100) NOT NULL,
-                surname VARCHAR(100) NOT NULL DEFAULT '',
+                surname VARCHAR(100) NOT NULL,
                 login VARCHAR(100) NOT NULL,
                 passwd VARCHAR(100) NOT NULL,
-                type ENUM('school', 'student', 'guest') NOT NULL,
-                school_id INTEGER UNSIGNED,
+                type ENUM('student', 'guest') NOT NULL,
+                school_id INTEGER UNSIGNED NOT NULL,
                 last_visit TIMESTAMP NOT NULL DEFAULT 0,
                 CONSTRAINT PRIMARY KEY (id, school_id)
             );
@@ -203,12 +203,22 @@ class DbTool(object):
         self.meta.reflect(bind=self.engine)
         self.tbl_apps = self.meta.tables['applications']
         self.tbl_users = self.meta.tables['users']
+        self.tbl_schools = self.meta.tables['schools']
         self.tbl_chapters = self.meta.tables['chapters']
         self.tbl_topics = self.meta.tables['topics']
         self.tbl_questions = self.meta.tables['questions']
 
     def _createFuncs(self):
         print('Creating function...')
+
+        self.conn.execute("DROP TRIGGER IF EXISTS add_guest;")
+        self.conn.execute(text("""
+            CREATE TRIGGER add_guest AFTER INSERT ON schools FOR EACH
+            ROW INSERT IGNORE INTO users
+                (name, surname, login, passwd, type, school_id) VALUES
+                (NEW.name, '', CONCAT(NEW.login, '-guest'),
+                 MD5(CONCAT(NEW.login, '-guest:guest')), 'guest', NEW.id);
+            """))
 
         self.conn.execute("DROP TRIGGER IF EXISTS guestaccess_add;")
         self.conn.execute(text("""
@@ -297,13 +307,19 @@ class DbTool(object):
     def _create_digest(self, username, passwd):
         m = hashlib.md5()
         m.update('%s:%s' % (username, passwd))
-        print username, passwd, m.hexdigest()
+        #print username, passwd, m.hexdigest()
         return m.hexdigest()
 
     def _fillUsers(self):
         if not self.put_users:
             return
         print("Populating users...")
+        vals = []
+        for user in DbTool.TEST_SCHOOLS:
+            user['passwd'] = self._create_digest(user['login'], user['passwd'])
+            vals.append(user)
+        self.conn.execute(self.tbl_schools.insert(), vals)
+
         vals = []
         for user in DbTool.TEST_USERS:
             user['passwd'] = self._create_digest(user['login'], user['passwd'])
@@ -396,13 +412,17 @@ class DbTool(object):
         self.conn.execute('ALTER TABLE exam_answers ADD UNIQUE ix_exam_answers(exam_id, question_id);')
 
         print("Doing tables optimizations...")
-        self.conn.execute('OPTIMIZE TABLE applications, users, chapters;')
+        self.conn.execute('OPTIMIZE TABLE applications;')
+        self.conn.execute('OPTIMIZE TABLE chapters;')
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
         self.conn.execute('OPTIMIZE TABLE topics_stat;')
         self.conn.execute('OPTIMIZE TABLE errors;')
         self.conn.execute('OPTIMIZE TABLE quiz_answers;')
         self.conn.execute('OPTIMIZE TABLE exam_answers;')
+        self.conn.execute('OPTIMIZE TABLE users;')
+        self.conn.execute('OPTIMIZE TABLE schools;')
+        self.conn.execute('OPTIMIZE TABLE guest_access;')
 
     def before(self):
         pass

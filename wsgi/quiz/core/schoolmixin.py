@@ -1,4 +1,3 @@
-from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, StatementError
 from .exceptions import QuizCoreError
 
@@ -9,13 +8,13 @@ class SchoolMixin(object):
         self.__create = self.users.insert()
         self.__create = self.__create.values(name=None, surname=None,
                                              login=None, passwd=None,
-                                             type='student', school_id=0)
+                                             school_id=0)
         self.__create = self.__create.compile(self.engine)
 
     def _checkSchoolId(self, school_id):
         try:
-            t = self.users
-            sel = t.select(and_(t.c.id == school_id, t.c.type == 'school'))
+            t = self.schools
+            sel = t.select(t.c.id == school_id)
             res = self.engine.execute(sel).fetchone()
         except SQLAlchemyError:
             res = None
@@ -36,7 +35,7 @@ class SchoolMixin(object):
             self._checkSchoolId(school)
             with self.engine.begin() as conn:
                 res = conn.execute(self.__create, name=name, surname=surname,
-                                   login=login, passwd=passwd, type='school',
+                                   login=login, passwd=passwd,
                                    school_id=school)
                 user_id = res.inserted_primary_key[0]
         except IntegrityError:

@@ -357,36 +357,31 @@ class QuizApp(object):
         try:
             nonce = data["nonce"]
             login = data["login"]
-            appid = data["appid"]
+            appkey = data["appid"]
             digest = data["digest"]
         except KeyError:
             raise BadRequest('Invalid parameters.')
 
-        data = self.core.getUserAndAppInfo(login, appid)
-
-        if not data or not _check_digest(nonce, digest, data['passwd']):
+        try:
+            appid = self.core.getAppId(appkey)
+            user = self.core.getUserInfo(login, with_passwd=True)
+        except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        self.session['app_id'] = data['app_id']
-        self.session['user_id'] = data['user_id']
-        self.session['user_name'] = data['name']
-        #self.session['user_surname'] = data['surname']
-        self.session['user_type'] = data['type']
+        if not _check_digest(nonce, digest, user['passwd']):
+            raise BadRequest('Authorization is invalid.')
+
+        del user['login']
+        self.session['app_id'] = appid
+        self.session['user_id'] = user['id']
+        self.session['user_name'] = user['name']
+        #self.session['user_surname'] = user['surname']
+        self.session['user_type'] = user['type']
         self.session.save()
 
         # NOTE: we you want to use 'beaker.session.secret' then use:
         # sid = self.session.__dict__['_headers']['cookie_out']
         # sid = sid[sid.find('=') + 1:sid.find(';')]
         sid = self.session.id
-
-        user = {
-            'id': data['user_id'],
-            'name': data['name'],
-            'surname': data['surname'],
-            'type': data['type']
-        }
-
-        if user['surname'] is None:
-            del user['surname']
 
         return JSONResponse({'sid': sid, 'user': user})

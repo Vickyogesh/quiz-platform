@@ -175,7 +175,7 @@ class ExamMixin(object):
 
         user_id = res[1]
         exam = self._createExamInfo(res)
-        student = self._getStudentInfo(user_id)
+        student = self._getStudentById(user_id)
         res = self.__examquest.execute(exam_id=exam_id)
 
         if lang == 'de':

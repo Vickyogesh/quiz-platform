@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
+import hashlib
 from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
@@ -56,30 +57,32 @@ class CoreAdminTest(unittest.TestCase):
             err = e.message
         self.assertEqual('Invalid parameters.', err)
 
+    def _create_digest(self, username):
+        m = hashlib.md5()
+        m.update('%s:guest' % username)
+        return m.hexdigest()
+
     # Check normal situation.
     def test_normal(self):
         info = self.core.createSchool('someschool', 'somelogin', 'pass')
         self.assertEqual(1, info['id'])
 
-        res = self.engine.execute('SELECT * from users WHERE type="school"')
+        res = self.engine.execute('SELECT * from schools')
         res = res.fetchone()
         self.assertEqual(1, res['id'])
-        self.assertEqual(0, res['school_id'])
         self.assertEqual('someschool', res['name'])
-        self.assertEqual('', res['surname'])
-        self.assertEqual('school', res['type'])
         self.assertEqual('somelogin', res['login'])
 
         # School guest must be created additionally to the school.
         res = self.engine.execute('SELECT * from users WHERE type="guest"')
         res = res.fetchone()
-        self.assertEqual(2, res['id'])
+        self.assertEqual(1, res['id'])
         self.assertEqual(1, res['school_id'])
         self.assertEqual('someschool', res['name'])
         self.assertEqual('', res['surname'])
         self.assertEqual('guest', res['type'])
         self.assertEqual('somelogin-guest', res['login'])
-        pwd = self.core._AdminMixin__create_guest_passwd('somelogin-guest')
+        pwd = self._create_digest('somelogin-guest')
         self.assertEqual(pwd, res['passwd'])
 
     # Check: creation of the school with already existent login.
@@ -93,7 +96,7 @@ class CoreAdminTest(unittest.TestCase):
 
     # Check: get list of schools.
     def test_schoolList(self):
-        # Check empty schools
+        # Test empty
         info = self.core.getSchoolList()
         self.assertEqual(0, len(info['schools']))
 
@@ -114,12 +117,12 @@ class CoreAdminTest(unittest.TestCase):
         # NOTE: next schools will have ids = 3, 5
         # since there are also guest users.
         school = info[1]
-        self.assertEqual(3, school['id'])
+        self.assertEqual(2, school['id'])
         self.assertEqual('someschool2', school['name'])
         self.assertEqual('somelogin2', school['login'])
 
         school = info[2]
-        self.assertEqual(5, school['id'])
+        self.assertEqual(3, school['id'])
         self.assertEqual('someschool3', school['name'])
         self.assertEqual('somelogin3', school['login'])
 

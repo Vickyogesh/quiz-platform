@@ -1,4 +1,3 @@
-import hashlib
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError, StatementError
 from .exceptions import QuizCoreError
@@ -7,20 +6,12 @@ from .exceptions import QuizCoreError
 class AdminMixin(object):
     """This mixin provides administration features. Used in QuizCore."""
     def __init__(self):
-        self.__create = self.users.insert()
-        self.__create = self.__create.values(name=None, surname=None, login=None,
-                                             passwd=None, type='school',
-                                             school_id=0)
+        self.__create = self.schools.insert()
+        self.__create = self.__create.values(name=None, login=None, passwd=None)
         self.__create = self.__create.compile(self.engine)
 
-        t = self.users
-        self.__list = t.select(t.c.type == 'school')
+        self.__list = self.schools.select()
         self.__list = self.__list.compile(self.engine)
-
-    def __create_guest_passwd(self, login):
-        m = hashlib.md5()
-        m.update('%s:guest' % login)
-        return m.hexdigest()
 
     def createSchool(self, name, login, passwd):
         # Check if params are strings and they are not empty
@@ -32,16 +23,11 @@ class AdminMixin(object):
 
         try:
             with self.engine.begin() as conn:
-                res = conn.execute(self.__create, name=name, surname='',
-                                   login=login, passwd=passwd, type='school')
+                # NOTE: guest will be created by the trigger.
+                # See _createFuncs() in the misc/dbtools.py
+                res = conn.execute(self.__create, name=name, login=login,
+                                   passwd=passwd)
                 school_id = res.inserted_primary_key[0]
-
-                # We aslo add guest user for this
-                guest_login = login + '-guest'
-                conn.execute(self.__create, name=name, surname='',
-                             login=guest_login,
-                             passwd=self.__create_guest_passwd(guest_login),
-                             type='guest', school_id=school_id)
         except IntegrityError:
             raise QuizCoreError('Already exists.')
         except StatementError:
@@ -50,7 +36,7 @@ class AdminMixin(object):
 
     def getSchoolList(self):
         res = self.__list.execute()
-        lst = [{'id': row[0], 'name': row[1], 'login': row[3]} for row in res]
+        lst = [{'id': row[0], 'name': row[1], 'login': row[2]} for row in res]
         return {'schools': lst}
 
     # TODO: test me

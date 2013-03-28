@@ -55,6 +55,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.meta.reflect(bind=self.engine)
 
         self.apps = self.meta.tables['applications']
+        self.schools = self.meta.tables['schools']
         self.users = self.meta.tables['users']
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']

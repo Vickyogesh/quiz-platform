@@ -5,8 +5,20 @@ from .exceptions import QuizCoreError
 class UserMixin(object):
     """Mixin for working with user information. Used in QuizCore."""
     def __init__(self):
-        users = self.users
         apps = self.apps
+        users = self.users
+
+        self.__appid = text("SELECT id FROM applications WHERE appkey=:appkey")
+        self.__appid = self.__appid.compile(self.engine)
+
+        self.__school = text("SELECT * FROM schools WHERE login=:login")
+        self.__school = self.__school.compile(self.engine)
+
+        self.__user_by_login = text("SELECT * FROM users WHERE login=:login")
+        self.__user_by_login = self.__user_by_login.compile(self.engine)
+
+        self.__user_by_id = text("SELECT * FROM users WHERE id=:id")
+        self.__user_by_id = self.__user_by_id.compile(self.engine)
 
         query = select(
             [users.c.id, users.c.name, users.c.surname, users.c.passwd, users.c.type, apps.c.id],
@@ -49,54 +61,63 @@ class UserMixin(object):
     def updateUserLastVisit(self, user_id):
         self.engine.execute(self.__lastvisit, user_id=user_id)
 
-    def getUserAndAppInfo(self, login, appkey):
-        """Return user and application info.
+    def getAppId(self, appkey):
+        res = self.__appid.execute(appkey=appkey).fetchone()
+        if res is None:
+            raise QuizCoreError('Unknown application ID.')
+        return res[0]
 
-        Args:
-            login:  User's login
-            appkey: Application key
+    def _getSchoolByLogin(self, login, with_passwd=False):
+        row = self.__school.execute(login=login).fetchone()
+        if row is None:
+            raise QuizCoreError('Unknown school.')
+        d = {'id': row[0], 'name': row[1], 'login': row[2], 'type': 'school'}
+        if with_passwd:
+            d['passwd'] = row[3]
+        return d
 
-        Returns:
-            Dict with the following keys:
-                user_id: ID in the database.
-                passwd:  Password (md5 hash).
-                type:    Account type.
-                app_pd:  Application ID.
-        """
-        if login == 'admin':
-            res = self.engine.execute(text("SELECT id FROM applications WHERE appkey=:k"),
-                                      k=appkey).fetchone()
-            return {
-                'user_id': 0,
-                'name': 'admin',
-                'surname': None,
-                'passwd': self.admin_passwd,
-                'type': 'admin',
-                'app_id': res[0]
-            }
+    def __studentFromRow(self, row, with_passwd):
+        d = {'id': row[0], 'name': row[1], 'surname': row[2],
+             'login': row[3], 'type': row[5], 'school_id': row[6]}
+        if with_passwd:
+            d['passwd'] = row[4]
+        return d
 
-        res = self.__stmt.execute(login=login, appkey=appkey)
-        row = res.fetchone()
-
-        if row:
-            return {
-                'user_id': row[self.users.c.id],
-                'name': row[self.users.c.name],
-                'surname': row[self.users.c.surname],
-                'passwd': row[self.users.c.passwd],
-                'type': row[self.users.c.type],
-                'app_id': row[self.apps.c.id]
-            }
-
-    def _getStudentInfo(self, user_id):
-        row = self.__getname.execute(id=user_id)
-        row = row.fetchone()
-
+    def _getStudentById(self, user_id, with_passwd=False):
+        row = self.__user_by_id.execute(id=user_id).fetchone()
         if row is None:
             raise QuizCoreError('Unknown student.')
-        elif row[2] != 'student' and row[2] != 'guest':
-            raise QuizCoreError('Not a student.')
-        return {'id': user_id, 'name': row[0], 'surname': row[1]}
+        return self.__studentFromRow(row, with_passwd)
+
+    def _getStudentByLogin(self, login, with_passwd=False):
+        row = self.__user_by_login.execute(login=login).fetchone()
+        if row is None:
+            raise QuizCoreError('Unknown student.')
+        return self.__studentFromRow(row, with_passwd)
+
+    def getUserInfo(self, login, with_passwd=False):
+        if login == 'admin':
+            d = {
+                'id': 0,
+                'name': 'admin',
+                'login': 'admin',
+                'type': 'admin',
+            }
+            if with_passwd:
+                d['passwd'] = self.admin_passwd
+            return d
+
+        info = None
+        try:
+            info = self._getStudentByLogin(login, with_passwd)
+        except QuizCoreError:
+            try:
+                info = self._getSchoolByLogin(login, with_passwd)
+            except QuizCoreError:
+                pass
+        if info is None:
+            raise QuizCoreError('Unknown user.')
+        return info
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
@@ -141,7 +162,7 @@ class UserMixin(object):
         return stat
 
     def getUserStat(self, user_id, lang):
-        user = self._getStudentInfo(user_id)
+        user = self._getStudentById(user_id)
         return {
             'student': user,
             'exams': self.__getExamStat(user_id),
@@ -178,12 +199,12 @@ class UserMixin(object):
 
     def getExamList(self, user_id):
         return {
-            'student': self._getStudentInfo(user_id),
+            'student': self._getStudentById(user_id),
             'exams': self._getExamList(user_id)
         }
 
     def getTopicErrors(self, user_id, topic_id, lang):
-        student = self._getStudentInfo(user_id)
+        student = self._getStudentById(user_id)
 
         rows = self.__topicerr.execute(user_id=user_id, topic_id=topic_id)
 

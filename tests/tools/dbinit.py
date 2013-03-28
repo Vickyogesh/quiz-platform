@@ -245,8 +245,16 @@ class Db(DbTool):
     # see tests/core/test_admin.py
     def createTestFunc(self):
         sql = """CREATE PROCEDURE aux_create_test_users() BEGIN
+            TRUNCATE TABLE schools;
             TRUNCATE TABLE users;
             """
+
+        lst = []
+        for x in DbTool.TEST_SCHOOLS:
+            lst.append("""INSERT INTO schools VALUES
+            (0, '{name}', '{login}',
+            '{passwd}');""".format(**x))
+        sql += '\n'.join(lst)
 
         lst = []
         for x in DbTool.TEST_USERS:

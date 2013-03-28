@@ -20,6 +20,7 @@ def cleanupdb_onSetup(engine, drop_users=False):
         conn.execute("TRUNCATE TABLE errors;")
         conn.execute("TRUNCATE TABLE topics_stat;")
         if drop_users:
+            conn.execute("TRUNCATE TABLE schools;")
             conn.execute("TRUNCATE TABLE users;")
             conn.execute("TRUNCATE TABLE guest_access;")
 

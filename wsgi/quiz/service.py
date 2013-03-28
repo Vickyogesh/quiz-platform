@@ -39,7 +39,9 @@ def get_student_stat(user='me'):
     utype = app.session['user_type']
     uid = app.session['user_id']
 
-    if utype != 'school' and uid != user_id:
+    print user_id, uid
+    if (utype == 'school' and user == 'me')\
+       or utype != 'school' and uid != user_id:
         raise Forbidden
 
     stat = app.core.getUserStat(user_id, lang)
@@ -113,7 +115,9 @@ def get_student_exams(user):
     # Students can access only to their own data.
     utype = app.session['user_type']
     uid = app.session['user_id']
-    if utype != 'school' and uid != user_id:
+
+    if (utype == 'school' and user == 'me')\
+       or utype != 'school' and uid != user_id:
         raise Forbidden
 
     exams = app.core.getExamList(user_id)

@@ -65,11 +65,11 @@ class CoreSchoolTest(unittest.TestCase):
         self.assertEqual('Invalid school ID.', err)
 
     # Check normal situation.
-    # NOTE: since by default there are 4 users then
-    # new user id will be 5.
+    # NOTE: since by default there are 3 users then
+    # new user id will be 4.
     def test_normal(self):
         info = self.core.createStudent('name1', 'surnm1', 'login1', 'pass1', 1)
-        self.assertEqual(5, info['id'])
+        self.assertEqual(4, info['id'])
         self.assertEqual('name1', info['name'])
         self.assertEqual('surnm1', info['surname'])
 
@@ -111,24 +111,24 @@ class CoreSchoolTest(unittest.TestCase):
         self.assertEqual(3, len(students))
 
         student = students[0]
-        self.assertEqual(2, student['id'])
+        self.assertEqual(1, student['id'])
         self.assertEqual('Chuck Norris School', student['name'])
         self.assertEqual('', student['surname'])
         self.assertEqual('chuck@norris.com-guest', student['login'])
         self.assertEqual('guest', student['type'])
 
         student = students[1]
+        self.assertEqual(2, student['id'])
+        self.assertEqual('Test2', student['name'])
+        self.assertEqual('User2', student['surname'])
+        self.assertEqual('testuser2', student['login'])
+        self.assertEqual('student', student['type'])
+
+        student = students[2]
         self.assertEqual(3, student['id'])
         self.assertEqual('Test', student['name'])
         self.assertEqual('User', student['surname'])
         self.assertEqual('testuser', student['login'])
-        self.assertEqual('student', student['type'])
-
-        student = students[2]
-        self.assertEqual(4, student['id'])
-        self.assertEqual('Test', student['name'])
-        self.assertEqual('User 2', student['surname'])
-        self.assertEqual('testuser2', student['login'])
         self.assertEqual('student', student['type'])
 
 
