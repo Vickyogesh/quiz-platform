@@ -1,4 +1,5 @@
 from sqlalchemy import select, text, bindparam, and_
+from sqlalchemy.exc import SQLAlchemyError
 from .exceptions import QuizCoreError
 
 
@@ -62,13 +63,19 @@ class UserMixin(object):
         self.engine.execute(self.__lastvisit, user_id=user_id)
 
     def getAppId(self, appkey):
-        res = self.__appid.execute(appkey=appkey).fetchone()
-        if res is None:
+        try:
+            row = self.__appid.execute(appkey=appkey).fetchone()
+        except SQLAlchemyError:
+            row = None
+        if row is None:
             raise QuizCoreError('Unknown application ID.')
-        return res[0]
+        return row[0]
 
     def _getSchoolByLogin(self, login, with_passwd=False):
-        row = self.__school.execute(login=login).fetchone()
+        try:
+            row = self.__school.execute(login=login).fetchone()
+        except SQLAlchemyError:
+            row = None
         if row is None:
             raise QuizCoreError('Unknown school.')
         d = {'id': row[0], 'name': row[1], 'login': row[2], 'type': 'school'}
@@ -84,13 +91,19 @@ class UserMixin(object):
         return d
 
     def _getStudentById(self, user_id, with_passwd=False):
-        row = self.__user_by_id.execute(id=user_id).fetchone()
+        try:
+            row = self.__user_by_id.execute(id=user_id).fetchone()
+        except SQLAlchemyError:
+            row = None
         if row is None:
             raise QuizCoreError('Unknown student.')
         return self.__studentFromRow(row, with_passwd)
 
     def _getStudentByLogin(self, login, with_passwd=False):
-        row = self.__user_by_login.execute(login=login).fetchone()
+        try:
+            row = self.__user_by_login.execute(login=login).fetchone()
+        except SQLAlchemyError:
+            row = None
         if row is None:
             raise QuizCoreError('Unknown student.')
         return self.__studentFromRow(row, with_passwd)

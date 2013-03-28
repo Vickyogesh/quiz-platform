@@ -270,7 +270,7 @@ class CoreExamTest(unittest.TestCase):
         self.assertEqual('Invalid exam ID.', err)
 
         # Check status for the fresh exam
-        info = self.core.createExam(3, 'it')
+        info = self.core.createExam(4, 'it')
         exam_id = info['exam']['id']
         exam_questions = info['questions']
 
@@ -280,7 +280,7 @@ class CoreExamTest(unittest.TestCase):
         questions = info['questions']
 
         # Check student
-        self.assertEqual(3, student['id'])
+        self.assertEqual(4, student['id'])
         self.assertEqual('Test', student['name'])
         self.assertEqual('User', student['surname'])
 

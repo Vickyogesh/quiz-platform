@@ -35,16 +35,19 @@ def get_student_stat(user='me'):
     user_id = app.getUserId(user)
     lang = app.getLang()
 
-    # Student and guest can access only to their own data.
+    uid = app.getUserId()
     utype = app.session['user_type']
-    uid = app.session['user_id']
-
-    print user_id, uid
-    if (utype == 'school' and user == 'me')\
-       or utype != 'school' and uid != user_id:
-        raise Forbidden
 
     stat = app.core.getUserStat(user_id, lang)
+
+    # School can access to it's students only.
+    if utype == 'school' and (user == 'me' or uid != stat['student']['school_id']):
+        raise Forbidden('Forbidden.')
+
+    # Students can access only to their own exams.
+    elif utype != 'school' and uid != stat['student']['id']:
+        raise Forbidden('Forbidden.')
+
     return JSONResponse(stat)
 
 
@@ -82,7 +85,6 @@ def create_exam():
 @app.post('/exam/<int:id>', access=['student', 'guest'])
 def save_exam(id):
     data = app.request.json
-
     try:
         questions = data['questions']
         answers = data['answers']
@@ -98,12 +100,16 @@ def get_exam_info(id):
     lang = app.getLang()
     info = app.core.getExamInfo(id, lang)
 
-    # Students can access only to their own data.
-    user_id = info['student']['id']
+    uid = app.getUserId()
     utype = app.session['user_type']
-    uid = app.session['user_id']
-    if utype != 'school' and uid != user_id:
-        raise Forbidden
+
+    # School can access to exams of it's students only.
+    if utype == 'school' and uid != info['student']['school_id']:
+        raise Forbidden('Forbidden.')
+
+    # Students can access only to their own exams.
+    elif utype != 'school' and uid != info['student']['id']:
+        raise Forbidden('Forbidden.')
 
     return JSONResponse(info)
 
@@ -113,14 +119,20 @@ def get_student_exams(user):
     user_id = app.getUserId(user)
 
     # Students can access only to their own data.
+    uid = app.getUserId()
     utype = app.session['user_type']
-    uid = app.session['user_id']
 
-    if (utype == 'school' and user == 'me')\
-       or utype != 'school' and uid != user_id:
-        raise Forbidden
+    if utype == 'school' and user == 'me':
+        raise Forbidden('Forbidden.')
+    elif utype != 'school' and uid != user_id:
+        raise Forbidden('Forbidden.')
 
     exams = app.core.getExamList(user_id)
+
+    # School can access to exams of it's students only.
+    if utype == 'school' and uid != exams['student']['school_id']:
+        raise Forbidden('Forbidden.')
+
     return JSONResponse(exams)
 
 
@@ -134,7 +146,7 @@ def get_topic_error(user, id):
     utype = app.session['user_type']
     uid = app.session['user_id']
     if utype != 'school' and uid != user_id:
-        raise Forbidden
+        raise Forbidden('Forbidden.')
 
     info = app.core.getTopicErrors(user_id, id, lang)
     return JSONResponse(info)
@@ -168,7 +180,9 @@ def student_list(id):
     if not app.isAdmin():
         uid = app.session['user_id']
         if uid != school_id:
-            raise Forbidden
+            raise Forbidden('Forbidden.')
+    elif id == 'me':
+        raise Forbidden('Forbidden.')
 
     res = app.core.getStudentList(school_id)
     return JSONResponse(res)
@@ -181,7 +195,7 @@ def add_student(id):
 
     uid = app.session['user_id']
     if uid != school_id:
-        raise Forbidden
+        raise Forbidden('Forbidden.')
 
     try:
         name = data['name']

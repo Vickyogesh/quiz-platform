@@ -12,7 +12,7 @@ import hashlib
 import time
 
 from werkzeug.utils import cached_property
-from werkzeug.exceptions import HTTPException, BadRequest, Forbidden
+from werkzeug.exceptions import HTTPException, BadRequest, Unauthorized, Forbidden
 from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request, Response
 from beaker.middleware import SessionMiddleware
@@ -180,7 +180,7 @@ class QuizApp(object):
             res = e.get_response(request.environ)
             response = JSONResponse({
                 'status': e.code,
-                'description': res.data,
+                'description': e.get_description(request.environ),
             }, headers=res.headers)
         except QuizCoreError as e:
             response = JSONResponse({
@@ -207,7 +207,7 @@ class QuizApp(object):
         if self.__can_access(access):
             return self.__call_handler(access, handler, args)
         else:
-            raise Forbidden()
+            raise Forbidden('Forbidden.')
 
     # Check access to the API + session validation.
     # How access is implemented:
@@ -226,9 +226,9 @@ class QuizApp(object):
             return True
         try:
             user_type = self.session['user_type']
-            can = '*' in access or user_type in access
         except Exception:
-            can = False
+            raise Unauthorized('Unauthorized.')
+        can = '*' in access or user_type in access
         return can
 
     # Store last visit timestamp for all users (except admin)
@@ -242,7 +242,7 @@ class QuizApp(object):
             uid = self.session['user_id']
             if utype == 'guest':
                 if not self.core.processGuestAccess(uid):
-                    raise Forbidden()
+                    raise Forbidden('Forbidden.')
             if utype != 'admin':
                 self.core.updateUserLastVisit(uid)
 

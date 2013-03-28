@@ -31,6 +31,11 @@ class DbTool(object):
             'name': 'Chuck Norris School',
             'login': 'chuck@norris.com',
             'passwd': 'boo'
+        },
+        {
+            'name': 'School2',
+            'login': 'school2',
+            'passwd': 'boo'
         }
     ]
     TEST_USERS = [

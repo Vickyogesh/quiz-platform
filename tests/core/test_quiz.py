@@ -35,7 +35,7 @@ class CoreQuizTest(unittest.TestCase):
         user = self.core.getUserInfo(name, with_passwd=True)
 
         self.assertEqual('aa4a5443cb91ee1810785314651e5dd1', user['passwd'])
-        self.assertEqual(3, user['id'])
+        self.assertEqual(4, user['id'])
         self.assertEqual(3, appid)
         self.assertEqual('student', user['type'])
 

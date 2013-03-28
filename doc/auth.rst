@@ -118,3 +118,5 @@ with the user's authorization information.
 
    :statuscode 400: Authorization is invalid:
       client sent wrong auth data.
+
+    :statuscode 400: Not a JSON.
