@@ -96,6 +96,82 @@ Administration
         School with the same login is already exists.
 
 
+.. http:delete:: /admin/school/(id)
+
+   **Access**: admin
+
+   Delete school.
+
+   .. note:: All school's students and their data will be removed too.
+
+   .. note:: You also may use :http:post:`/admin/school/(id)`.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      DELETE /admin/school/1 HTTP/1.1
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "status": 200
+      }
+
+   :param id: School ID.
+
+   :statuscode 200: Everything is ok.
+   :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
+   :statuscode 400: Invalid school ID.
+
+
+.. http:post:: /admin/school/(id)
+
+   **Access**: admin
+
+   Delete school.
+
+   .. important:: You always have to provide *action=delete*
+    as a query parameter.
+
+   .. seealso:: :http:delete:`/admin/school/(id)`
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      POST /admin/school/1?action=delete HTTP/1.1
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "status": 200
+      }
+
+   :param id: School ID.
+
+   :query action: Required parameter. Must be '*delete*'.
+
+   :statuscode 200: Everything is ok.
+   :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
+   :statuscode 400: Invalid action.
+   :statuscode 400: Invalid request.
+   :statuscode 400: Invalid school ID.
+
+
+
 Guest account
 ^^^^^^^^^^^^^
 

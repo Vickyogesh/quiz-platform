@@ -53,9 +53,9 @@ class CoreQuizTest(unittest.TestCase):
         # if values are null for these fields. So we
         # do not check them.
         question = questions[20]
-        self.assertTrue('id' in question)
-        self.assertTrue('text' in question)
-        self.assertTrue('answer' in question)
+        self.assertIn('id', question)
+        self.assertIn('text', question)
+        self.assertIn('answer', question)
 
         # Get quiz for the topic with with wrong id - must return empty list
         quiz = self.core.getQuiz(12, 9000, 'it')
@@ -69,41 +69,26 @@ class CoreQuizTest(unittest.TestCase):
         questions = list(sorted(questions))
 
         # Length of questions and answers must be the same
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Parameters length mismatch.'):
             self.core.saveQuiz(3, 1, questions, [0, 0, 0])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Parameters length mismatch.', err)
-        err = ''
 
         # Try to save empty lists
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Empty list.'):
             self.core.saveQuiz(3, 1, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Empty list.', err)
-        err = ''
 
         # Questions must contain valid ID values (numbers).
         # We set one of the ID to 'bla' to test this.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid value.'):
             answers = [0] * len(questions)
             q = questions[:]
             q[3] = 'bla'
             self.core.saveQuiz(3, 1, q, answers)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid value.', err)
-        err = ''
 
         # Answers must contain 1 or 0.
         # We fill answers with non-numbers.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid value.'):
             answers = ['bla'] * len(questions)
             self.core.saveQuiz(3, 1, questions, answers)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid value.', err)
 
     # Test normal behaviour.
     def test_save(self):
@@ -168,8 +153,8 @@ class CoreQuizTest(unittest.TestCase):
             quiz = self.core.getQuiz(3, 1, 'it')
             quiz = quiz['questions']
             questions = [x['id'] for x in quiz]
-            self.assertTrue(q2 not in questions)
-            self.assertTrue(q3 not in questions)
+            self.assertNotIn(q2, questions)
+            self.assertNotIn(q3, questions)
 
     # If all questions are answered then next quiz will be empty.
     # Not true: quiz always return questions.

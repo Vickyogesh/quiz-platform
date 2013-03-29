@@ -311,6 +311,15 @@ class QuizApp(object):
         """
         return self.route(rule, access=access, methods=['GET'])
 
+    def delete(self, rule, access=None):
+        """A decorator that is used to register DELETE request handler.
+
+        Example:
+            @app.delete('/some_url', access=['*'])
+            def handler(): ...
+        """
+        return self.route(rule, access=access, methods=['DELETE'])
+
     @staticmethod
     def wrap(app):
         """Add sessions and CORS requests support to the app."""

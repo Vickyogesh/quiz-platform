@@ -7,6 +7,7 @@ import requests
 import unittest
 import json
 from sqlalchemy import create_engine, text
+from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
 from tests_common import db_uri, url, createAuthFor, HttpStatusTest
 
 
@@ -18,13 +19,19 @@ def http_post(path):
     return requests.post(url(path))
 
 
+def http_del(path):
+    return requests.delete(url(path))
+
+
 # Test: access to the API for various types of users.
 class HttpAccessTest(HttpStatusTest):
     def setUp(self):
         self.engine = create_engine(db_uri, echo=False)
+        cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
         self.engine.dispose()
+        cleanupdb_onTearDown(self.engine)
 
     # Check: unauthorized access to the API
     def test_noauth(self):
@@ -50,11 +57,16 @@ class HttpAccessTest(HttpStatusTest):
 
         self.assertHttp_Unauthorized(http_get('/admin/schools'))
         self.assertHttp_Unauthorized(http_post('/admin/newschool'))
+        self.assertHttp_Unauthorized(http_del('/admin/school/1'))
+        self.assertHttp_Unauthorized(http_post('/admin/school/1'))
 
         self.assertHttp_Unauthorized(http_get('/school/me/students'))
         self.assertHttp_Unauthorized(http_get('/school/1/students'))
         self.assertHttp_Unauthorized(http_post('/school/me/newstudent'))
         self.assertHttp_Unauthorized(http_post('/school/1/newstudent'))
+        self.assertHttp_Unauthorized(http_del('/school/1/student/1'))
+        self.assertHttp_Unauthorized(http_del('/school/me/student/1'))
+        self.assertHttp_Unauthorized(http_post('/school/1/student/1'))
 
     ### Test access privileges
 
@@ -99,11 +111,16 @@ class HttpAccessTest(HttpStatusTest):
 
         self.assertHttp_Forbidden(req.get(url('/admin/schools')))
         self.assertHttp_Forbidden(req.post(url('/admin/newschool')))
+        self.assertHttp_Forbidden(req.delete(url('/admin/school/1')))
+        self.assertHttp_Forbidden(req.post(url('/admin/school/1')))
 
         self.assertHttp_Forbidden(req.get(url('/school/me/students')))
         self.assertHttp_Forbidden(req.get(url('/school/1/students')))
         self.assertHttp_Forbidden(req.post(url('/school/me/newstudent')))
         self.assertHttp_Forbidden(req.post(url('/school/1/newstudent')))
+        self.assertHttp_Forbidden(req.delete(url('/school/1/student/1')))
+        self.assertHttp_Forbidden(req.delete(url('/school/me/student/1')))
+        self.assertHttp_Forbidden(req.post(url('/school/1/student/1')))
 
     def _resetGuest(self):
         self.engine.execute(text("UPDATE guest_access SET num_requests=0"))
@@ -145,11 +162,16 @@ class HttpAccessTest(HttpStatusTest):
         self._resetGuest()
         self.assertHttp_Forbidden(req.get(url('/admin/schools')))
         self.assertHttp_Forbidden(req.post(url('/admin/newschool')))
+        self.assertHttp_Forbidden(req.delete(url('/admin/school/1')))
+        self.assertHttp_Forbidden(req.post(url('/admin/school/1')))
 
         self.assertHttp_Forbidden(req.get(url('/school/me/students')))
         self.assertHttp_Forbidden(req.get(url('/school/1/students')))
         self.assertHttp_Forbidden(req.post(url('/school/me/newstudent')))
         self.assertHttp_Forbidden(req.post(url('/school/1/newstudent')))
+        self.assertHttp_Forbidden(req.delete(url('/school/1/student/1')))
+        self.assertHttp_Forbidden(req.delete(url('/school/me/student/1')))
+        self.assertHttp_Forbidden(req.post(url('/school/1/student/1')))
 
     # Check avaliable API for school
     def test_school(self):
@@ -174,6 +196,7 @@ class HttpAccessTest(HttpStatusTest):
 
         self.assertHttp_Forbidden(req.get(url('/student/me/exam')))
         self.assertHttp_Ok(req.get(url('/student/1/exam')))
+        self.assertHttp_Forbidden(req.get(url('/student/2/exam')))
 
         # student from another school (school guest)
         self.assertHttp_Forbidden(req.get(url('/student/2/exam')))
@@ -181,13 +204,20 @@ class HttpAccessTest(HttpStatusTest):
         self.assertHttp_NotForbidden(req.get(url('/student/me/topicerrors/1')))
         self.assertHttp_NotForbidden(req.get(url('/student/1/topicerrors/1')))
 
+        self.assertHttp_Forbidden(req.get(url('/student/2/topicerrors/1')))
+
         self.assertHttp_Forbidden(req.get(url('/admin/schools')))
         self.assertHttp_Forbidden(req.post(url('/admin/newschool')))
+        self.assertHttp_Forbidden(req.delete(url('/admin/school/1')))
+        self.assertHttp_Forbidden(req.post(url('/admin/school/1')))
 
         self.assertHttp_Ok(req.get(url('/school/me/students')))
         self.assertHttp_Ok(req.get(url('/school/1/students')))
         self.assertHttp_NotForbidden(req.post(url('/school/me/newstudent')))
         self.assertHttp_NotForbidden(req.post(url('/school/1/newstudent')))
+        self.assertHttp_NotForbidden(req.delete(url('/school/1/student/1')))
+        self.assertHttp_NotForbidden(req.delete(url('/school/me/student/1')))
+        self.assertHttp_NotForbidden(req.post(url('/school/1/student/1')))
 
     # Check avaliable API for admin
     def test_admin(self):
@@ -217,11 +247,16 @@ class HttpAccessTest(HttpStatusTest):
 
         self.assertHttp_Ok(req.get(url('/admin/schools')))
         self.assertHttp_NotForbidden(req.post(url('/admin/newschool')))
+        self.assertHttp_NotForbidden(req.delete(url('/admin/school/1')))
+        self.assertHttp_NotForbidden(req.post(url('/admin/school/1')))
 
         self.assertHttp_Forbidden(req.get(url('/school/me/students')))
-        self.assertHttp_Ok(req.get(url('/school/1/students')))
+        self.assertHttp_NotForbidden(req.get(url('/school/1/students')))
         self.assertHttp_Forbidden(req.post(url('/school/me/newstudent')))
         self.assertHttp_Forbidden(req.post(url('/school/1/newstudent')))
+        self.assertHttp_Forbidden(req.delete(url('/school/1/student/1')))
+        self.assertHttp_Forbidden(req.delete(url('/school/me/student/1')))
+        self.assertHttp_Forbidden(req.post(url('/school/1/student/1')))
 
 
 def suite():

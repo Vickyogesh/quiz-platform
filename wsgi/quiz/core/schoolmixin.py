@@ -53,3 +53,14 @@ class SchoolMixin(object):
         lst = [{'id': r[0], 'name': r[1], 'surname': r[2], 'login': r[3],
                 'type': r[5]} for r in res]
         return {'students': lst}
+
+    def deleteStudent(self, school_id, student_id):
+        self._checkSchoolId(school_id)
+
+        user = self._getStudentById(student_id)
+        if user['school_id'] != school_id:
+            raise QuizCoreError('Unknown student.')
+
+        dl = self.users.delete().where(self.users.c.id == student_id)
+        self.engine.execute(dl)
+        return {}

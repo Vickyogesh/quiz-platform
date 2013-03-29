@@ -44,7 +44,7 @@ class CoreSettingsTest(unittest.TestCase):
         self.assertEqual('mysql://quiz:quiz@192.168.56.101/', info['uri'])
         self.assertEqual('False', info['verbose'])
         self.assertEqual('quiz', info['dbname'])
-        self.assertTrue('params' not in info)
+        self.assertNotIn('params', info)
         self.assertEqual('mysql://quiz:quiz@192.168.56.101/quiz',
                          info['database'])
 

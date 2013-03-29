@@ -90,9 +90,9 @@ class CoreExamTest(unittest.TestCase):
         # if values are null for these fields. So we
         # do not check them.
         question = questions[20]
-        self.assertTrue('id' in question)
-        self.assertTrue('text' in question)
-        self.assertTrue('answer' in question)
+        self.assertIn('id', question)
+        self.assertIn('text', question)
+        self.assertIn('answer', question)
 
     # Test if for new exam 'exams' and 'exams_stat' tables are filled
     def test_newDBTables(self):
@@ -170,12 +170,8 @@ class CoreExamTest(unittest.TestCase):
     # Check exam saving with wrong data
     def test_saveWrong(self):
         # try to save non-existent exam
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid exam ID.'):
             self.core.saveExam(1, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid exam ID.', err)
-        err = ''
 
         # We have to create exam before continue testing
         info = self.core.createExam(3, 'it')
@@ -183,38 +179,23 @@ class CoreExamTest(unittest.TestCase):
 
         # Try to save with wrong number of answers
         # NOTE: answers length will be checked before questions.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Wrong number of answers.'):
             self.core.saveExam(exam_id, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Wrong number of answers.', err)
-        err = ''
 
         # Try to save with wrong number of questions
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Parameters length mismatch.'):
             self.core.saveExam(exam_id, [], [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Parameters length mismatch.', err)
-        err = ''
 
         # Try to save with wrong questions' IDs
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid question ID.'):
             self.core.saveExam(exam_id, [0] * 40, [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid question ID.', err)
-        err = ''
 
         # Make exam expired and try to save answers
         # NOTE: expiration date will be checked before questions
         # validation so we can pass fake values.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Exam is expired.'):
             self.engine.execute("UPDATE exams SET start_time='1999-01-12'")
             self.core.saveExam(exam_id, [0] * 40, [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Exam is expired.', err)
 
     # Helper function to get exam metadate dirrectly from the DB.
     def _getExamInfo(self, id):
@@ -263,11 +244,8 @@ class CoreExamTest(unittest.TestCase):
     # Check exam info API
     def test_statusNew(self):
         # Try to get infor for non-existent exam
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid exam ID.'):
             self.core.getExamInfo(1, 'it')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid exam ID.', err)
 
         # Check status for the fresh exam
         info = self.core.createExam(4, 'it')

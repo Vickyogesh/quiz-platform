@@ -1,4 +1,3 @@
-from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError, StatementError
 from .exceptions import QuizCoreError
 
@@ -39,13 +38,16 @@ class AdminMixin(object):
         lst = [{'id': row[0], 'name': row[1], 'login': row[2]} for row in res]
         return {'schools': lst}
 
-    # TODO: test me
+    # NOTE: triggers will delete school's users and
+    # their data on school delete.
+    # See _createFuncs() in the misc/dbtools.py
     def deleteSchool(self, id):
         # Check if this is school id.
         # See SchoolMixin._checkSchoolId().
         self._checkSchoolId(id)
 
         # We have to remove all related data like students and their data.
-        t = self.users
-        dl = t.delete().where(or_(t.c.id == id, t.c.school_id == id))
+        t = self.schools
+        dl = t.delete().where(t.c.id == id)
         self.engine.execute(dl)
+        return {}

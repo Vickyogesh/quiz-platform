@@ -149,6 +149,11 @@ def get_topic_error(user, id):
         raise Forbidden('Forbidden.')
 
     info = app.core.getTopicErrors(user_id, id, lang)
+
+    # School can access to exams of it's students only.
+    if utype == 'school' and uid != info['student']['school_id']:
+        raise Forbidden('Forbidden.')
+
     return JSONResponse(info)
 
 
@@ -170,6 +175,20 @@ def add_school():
         raise BadRequest('Missing parameter.')
 
     res = app.core.createSchool(name, login, passwd)
+    return JSONResponse(res)
+
+
+@app.post('/admin/school/<int:id>', access=['admin'])
+@app.delete('/admin/school/<int:id>', access=['admin'])
+def delete_school(id):
+    if app.request.method == 'POST':
+        action = app.request.args.get('action', None)
+        if action != 'delete':
+            raise BadRequest('Invalid action.')
+        elif app.request.data is not None:
+            raise BadRequest('Invalid request.')
+
+    res = app.core.deleteSchool(id)
     return JSONResponse(res)
 
 
@@ -206,4 +225,23 @@ def add_student(id):
         raise BadRequest('Missing parameter.')
 
     res = app.core.createStudent(name, surname, login, passwd, school_id)
+    return JSONResponse(res)
+
+
+@app.post('/school/<uid:id>/student/<int:student>', access=['school'])
+@app.delete('/school/<uid:id>/student/<int:student>', access=['school'])
+def delete_student(id, student):
+    if app.request.method == 'POST':
+        action = app.request.args.get('action', None)
+        if action != 'delete':
+            raise BadRequest('Invalid action.')
+        elif app.request.data is not None:
+            raise BadRequest('Invalid request.')
+
+    school_id = app.getUserId(id)
+    uid = app.session['user_id']
+    if uid != school_id:
+        raise Forbidden('Forbidden.')
+
+    res = app.core.deleteStudent(id, student)
     return JSONResponse(res)

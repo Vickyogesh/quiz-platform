@@ -32,7 +32,7 @@ class QuizMiddleware(object):
         QuizMiddleware will send the following preflight response:
 
             Access-Control-Allow-Origin: *
-            Access-Control-Allow-Methods: GET, POST, OPTIONS
+            Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS
             Access-Control-Allow-Headers: content-type
             Content-Type: text/html; charset=utf-8
             Access-Control-Max-Age: <timeout>
@@ -67,7 +67,7 @@ class QuizMiddleware(object):
         if environ.get('REQUEST_METHOD') == 'OPTIONS':
             headers = [
                 ('Access-Control-Allow-Origin', '*'),
-                ('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'),
+                ('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS'),
                 ('Access-Control-Allow-Headers', 'content-type'),
                 ('Content-Type', 'text/html; charset=utf-8'),
                 ('Access-Control-Max-Age', self._timeout),

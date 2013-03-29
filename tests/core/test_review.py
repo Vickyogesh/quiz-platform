@@ -53,43 +53,24 @@ class CoreReviewTest(unittest.TestCase):
         self.core.saveErrorReview(100, [1], [1])
 
         # Empty questions
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Parameters length mismatch.'):
             self.core.saveErrorReview(1, [], [1])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Parameters length mismatch.', err)
-        err = ''
 
         # Empty answers
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Parameters length mismatch.'):
             self.core.saveErrorReview(1, [1], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Parameters length mismatch.', err)
-        err = ''
 
         # Empty all
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Empty list.'):
             self.core.saveErrorReview(1, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Empty list.', err)
-        err = ''
 
         # Wrong questions
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid value.'):
             self.core.saveErrorReview(1, ['b', 1], [1, 1])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid value.', err)
-        err = ''
 
         # Wrong answers
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid value.'):
             self.core.saveErrorReview(1, [1, 1], ['b', 1])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid value.', err)
 
     # Check: normal save
     def test_save(self):

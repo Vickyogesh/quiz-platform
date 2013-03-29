@@ -27,35 +27,20 @@ class CoreAdminTest(unittest.TestCase):
     # Check invalid params
     def test_createSchoolBad(self):
         # Empty values
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid parameters.'):
             self.core.createSchool(None, None, None)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid parameters.', err)
-        err = ''
 
         # Empty values again
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid parameters.'):
             self.core.createSchool(1, 2, None)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid parameters.', err)
-        err = ''
 
         ### Wrong type of values
 
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid parameters.'):
             self.core.createSchool('', '', '')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid parameters.', err)
-        err = ''
 
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid parameters.'):
             self.core.createSchool(1, 1, '22')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid parameters.', err)
 
     def _create_digest(self, username):
         m = hashlib.md5()
@@ -88,11 +73,8 @@ class CoreAdminTest(unittest.TestCase):
     # Check: creation of the school with already existent login.
     def test_duplicates(self):
         self.core.createSchool('someschool', 'somelogin', 'pass')
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Already exists.'):
             self.core.createSchool('someschool', 'somelogin', 'pass')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Already exists.', err)
 
     # Check: get list of schools.
     def test_schoolList(self):
@@ -125,6 +107,73 @@ class CoreAdminTest(unittest.TestCase):
         self.assertEqual(3, school['id'])
         self.assertEqual('someschool3', school['name'])
         self.assertEqual('somelogin3', school['login'])
+
+    # Check: delete school. Here we test how triggres works actually.
+    # Triggres are created in the _createFuncs() (misc/dbtools.py):
+    #   * on_del_school
+    #   * on_del_user
+    #   * on_del_exam
+    def test_deleteSchool(self):
+        # Check non-existent scholl delete
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid school ID.'):
+            self.core.deleteSchool(1)
+
+        # Add one school and fill with some data
+        self.core.createSchool('school', 'login', 'pass')
+
+        # We have guest so let's use it: create exam and answer some questions.
+        # See core/test_exam.py for more info.
+        info = self.core.createExam(1, 'it')
+        questions = [q['id'] for q in info['questions']]
+        questions = list(sorted(questions))
+        answers = [1] * 40
+        answers[:5] = [0] * 5  # make some errors
+        self.core.saveExam(1, questions, answers)
+
+        # Put some quiz answers
+        # See core/test_quiz.py for more info.
+        self.core.saveQuiz(1, 1, [10, 12, 13], [1, 1, 0])
+
+        # Now we must have rows in the following tables:
+        # exams, exam_answers, topics_stat, errors, quiz_answers;
+        # and also in schools, users, guest_access.
+        res = self.engine.execute("SELECT count(*) from exams").fetchone()
+        self.assertEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
+        self.assertEqual(40, res[0])
+        res = self.engine.execute("SELECT count(*) from topics_stat").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from quiz_answers").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from schools").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from users").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from guest_access").fetchone()
+        self.assertLessEqual(1, res[0])
+
+        # Now we can delete school and see
+        # if all generated date will be removed too.
+        self.core.deleteSchool(1)
+
+        res = self.engine.execute("SELECT count(*) from exams").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from topics_stat").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from quiz_answers").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from schools").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from users").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from guest_access").fetchone()
+        self.assertEqual(0, res[0])
 
 
 def suite():

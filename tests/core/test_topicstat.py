@@ -40,8 +40,8 @@ class CoreTopicStatTest(unittest.TestCase):
         for x in stat:
             # -1 means not enough data to calc stat to the topic
             self.assertEqual(-1, x['errors'])
-            self.assertTrue('id' in x)
-            self.assertTrue('text' in x)
+            self.assertIn('id', x)
+            self.assertIn('text', x)
 
     # Check triggers algo for one topic
     def test_singleTopic(self):

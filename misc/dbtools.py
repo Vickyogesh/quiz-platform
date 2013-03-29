@@ -216,6 +216,35 @@ class DbTool(object):
     def _createFuncs(self):
         print('Creating function...')
 
+        ### Delete users
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_school;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_school
+            BEFORE DELETE ON schools FOR EACH ROW
+            DELETE FROM users WHERE school_id=OLD.id;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_user;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_user
+            BEFORE DELETE ON users FOR EACH ROW BEGIN
+                DELETE FROM errors WHERE user_id=OLD.id;
+                DELETE FROM quiz_answers WHERE user_id=OLD.id;
+                DELETE FROM exams WHERE user_id=OLD.id;
+                DELETE FROM topics_stat WHERE user_id=OLD.id;
+                IF OLD.type = 'guest' THEN
+                    DELETE FROM guest_access WHERE id=OLD.id;
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_exam;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_exam
+            BEFORE DELETE ON exams FOR EACH ROW
+            DELETE FROM exam_answers WHERE exam_id=OLD.id;
+            """))
+
+        ### Logic
+
         self.conn.execute("DROP TRIGGER IF EXISTS add_guest;")
         self.conn.execute(text("""
             CREATE TRIGGER add_guest AFTER INSERT ON schools FOR EACH
