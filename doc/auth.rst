@@ -1,4 +1,3 @@
-
 Authorization
 -------------
 
@@ -8,6 +7,8 @@ authorization parameters. And then send :http:post:`/authorize`
 with the user's authorization information.
 
 .. http:get:: /authorize
+
+   **Access**: all
 
    Request authorization parameters.
 
@@ -35,6 +36,8 @@ with the user's authorization information.
 
 
 .. http:post:: /authorize
+
+   **Access**: all
 
    Authorize.
 
@@ -115,3 +118,5 @@ with the user's authorization information.
 
    :statuscode 400: Authorization is invalid:
       client sent wrong auth data.
+
+    :statuscode 400: Not a JSON.

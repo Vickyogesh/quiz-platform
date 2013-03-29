@@ -5,6 +5,8 @@ Student statistics provides learning progress information of the student.
 
 .. http:get:: /student
 
+   **Access**: student, guest
+
    Get statistics for the current user. Same as :http:get:`/student/me`.
    
    .. seealso:: :http:get:`/student/(id)`
@@ -12,12 +14,16 @@ Student statistics provides learning progress information of the student.
 
 .. http:get:: /student/me
 
+   **Access**: student, guest
+
    Get statistics for the current user. Same as :http:get:`/student`.
    
    .. seealso:: :http:get:`/student/(id)`
 
 
 .. http:get:: /student/(id)
+
+   **Access**: school, student, guest
 
    Get statistics for the student with specified ID.
    If **id** is *me* then current user id is used.
@@ -134,11 +140,14 @@ Student statistics provides learning progress information of the student.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Unknown student - User with specified **id** is not present.
    :statuscode 400: Not a student - User with specified **id** is not a student.
 
 
 .. http:get:: /student/(id)/exam
+
+   **Access**: school, student, guest
 
    Get exam list for the student with specified ID.
    If **id** is *me* then current user id is used.
@@ -171,31 +180,24 @@ Student statistics provides learning progress information of the student.
         "exams": [
           {
             "id": 1,
-            "status": 5
+            "start": "2013-03-29 07:12:11",
+            "end": "2013-03-29 07:20:00",
+            "errors": 5,
+            "status": "failed"
           },
           {
             "id": 2,
+            "start": "2013-03-29 07:25:11",
+            "end": "None",
+            "errors": 0,
             "status": "expired"
           },
           {
             "id": 3,
-            "status": 0
-          },
-          {
-            "id": 4,
+            "start": "2013-03-29 11:12:42",
+            "end": "None",
+            "errors": 0,
             "status": "in-progress"
-          }
-        ],
-        "topics": [
-          {
-            "id": 1,
-            "text": "Topic 1",
-            "errors": 20
-          },
-          {
-            "id": 2,
-            "text": "Topic 2",
-            "errors": -1
           }
         ]
       }
@@ -206,56 +208,36 @@ Student statistics provides learning progress information of the student.
    ======================================================
    student    Information about the student.
    exams      List of statistics for each exam.
-   topics     List of statistics for each topic.
-   =========  ===========================================
-
-   =========  ===========================================
-   student fields
-   ======================================================
-   id         Student ID.
-   name       Student name.
-   surname    Student surname.
    =========  ===========================================
 
    =========  ==========================================
    exams fields
    =====================================================
    id         Exam ID.
+   start      Exam start date (UTC).
+   end        Exam end date (UTC).
+   errors     Number of wrong answers.
    status     Exam status. It may contain on the
               following value:
 
-              * *number* - number of errors
-              * *'expired'* - exam is expired 
+              * *'passed'* - exam is passed successfully
+              * *'failed'* - exam is failed
+              * *'expired'* - exam is expired
               * *'in-progress'* - exam is not passed yet
    =========  ==========================================
 
-
-   =========  ======================================
-   topics fields
-   =================================================
-   id         Topic ID.
-   text       Topic text.
-   errors     Percent of errors for this topic based
-              on quizzes, exams and error reviews
-              results.
-
-              **-1** value means
-              that the student did not answer the
-              questions in this topic.
-   =========  ======================================
-
    :param id: Student ID.
-
-   :query lang: Topic text language: *it*, *fr*, *de*.
-      This parameter is optional (default: *it*).
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Unknown student - User with specified **id** is not present.
    :statuscode 400: Not a student - User with specified **id** is not a student.
 
 
 .. http:get:: /student/(id)/topicerrors/(topic_id)
+
+   **Access**: school, student, guest
 
    Get questions with wrong answers for the specified topic.
 
@@ -339,3 +321,4 @@ Student statistics provides learning progress information of the student.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.

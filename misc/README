@@ -35,12 +35,16 @@ Database structure
 ==================
 
 applications
-users
 chapters
 topics
 questions
-
 topics_stat
+
+* users - Registered users (students, schools and schools' guests).
+  Attached triggers:
+    - on insert if user is guest then add row to the guest_access table
+    - on update if user is guest then update num_requests
+      in the guest_access table.
 
 * errors - contains questions with wrong answers (from quizzes and exams).
   Attached triggers:
@@ -61,3 +65,6 @@ topics_stat
       answer if correct.
 
 * exams - contains list of generated exams
+
+* guest_access - contains information about guest requests to provide/control
+  limited access for the guest users.

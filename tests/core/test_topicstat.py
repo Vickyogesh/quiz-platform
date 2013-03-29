@@ -7,29 +7,22 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 import unittest
 from sqlalchemy import select
-from tests_common import db_uri
+from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 
 
 # Test: topic statistics calculation in various situations.
-class DbTopicStatTest(unittest.TestCase):
+class CoreTopicStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
+        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
-        self.engine.execute("TRUNCATE TABLE quiz_answers;")
-        self.engine.execute("TRUNCATE TABLE exam_answers;")
-        self.engine.execute("TRUNCATE TABLE exams;")
+        cleanupdb_onSetup(self.engine)
         self.topic_info = self._getTopicInfo()
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE errors;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
-        self.engine.execute("TRUNCATE TABLE quiz_answers;")
-        self.engine.execute("TRUNCATE TABLE exam_answers;")
-        self.engine.execute("TRUNCATE TABLE exams;")
+        cleanupdb_onTearDown(self.engine)
 
     # Helper function to get number of questions in all topics.
     def _getTopicInfo(self):
@@ -47,8 +40,8 @@ class DbTopicStatTest(unittest.TestCase):
         for x in stat:
             # -1 means not enough data to calc stat to the topic
             self.assertEqual(-1, x['errors'])
-            self.assertTrue('id' in x)
-            self.assertTrue('text' in x)
+            self.assertIn('id', x)
+            self.assertIn('text', x)
 
     # Check triggers algo for one topic
     def test_singleTopic(self):
@@ -137,7 +130,7 @@ class DbTopicStatTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(DbTopicStatTest))
+    suite.addTest(unittest.makeSuite(CoreTopicStatTest))
     return suite
 
 if __name__ == '__main__':

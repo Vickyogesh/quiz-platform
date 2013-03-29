@@ -6,6 +6,9 @@ from .usermixin import UserMixin
 from .quizmixin import QuizMixin
 from .exammixin import ExamMixin
 from .reviewmixin import ErrorReviewMixin
+from .guestmixin import GuestMixin
+from .adminmixin import AdminMixin
+from .schoolmixin import SchoolMixin
 
 
 # http://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update
@@ -17,7 +20,8 @@ def append_string(insert, compiler, **kw):
     return s
 
 
-class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
+class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
+               AdminMixin, SchoolMixin):
     """ Core quiz logic. """
 
     def __init__(self, settings):
@@ -26,9 +30,15 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         QuizMixin.__init__(self)
         ErrorReviewMixin.__init__(self)
         ExamMixin.__init__(self)
+        GuestMixin.__init__(self)
+        AdminMixin.__init__(self)
+        SchoolMixin.__init__(self)
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
+
+        self.admin_passwd = settings.main['admin_password']
+        self.guest_allowed_requests = settings.main['guest_allowed_requests']
 
     # Setup db connection and tables
     # NOTE: MySQL features an automatic connection close behavior,
@@ -45,6 +55,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
         self.meta.reflect(bind=self.engine)
 
         self.apps = self.meta.tables['applications']
+        self.schools = self.meta.tables['schools']
         self.users = self.meta.tables['users']
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']
@@ -61,10 +72,15 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin):
                 del d[x]
 
     def _aux_prepareLists(self, questions, answers):
-        if len(questions) != len(answers):
-            raise QuizCoreError('Parameters length mismatch.')
-        elif not answers:
-            raise QuizCoreError('Empty list.')
+        try:
+            if len(questions) != len(answers):
+                raise QuizCoreError('Parameters length mismatch.')
+            elif not answers:
+                raise QuizCoreError('Empty list.')
+        except QuizCoreError:
+            raise
+        except Exception:
+            raise QuizCoreError('Invalid value.')
 
         # questions must contain integer values since it represents
         # list of IDs. It's important to have valid list

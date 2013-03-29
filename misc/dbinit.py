@@ -23,9 +23,7 @@ class Db(DbTool):
                         self.args.verbose,
                         self.args.new,
                         self.args.config)
-
-        if self.args.test_users:
-            self._users = DbTool.TEST_USERS
+        self.put_users = self.args.test_users
 
     def parseArgs(self):
         parser = argparse.ArgumentParser(

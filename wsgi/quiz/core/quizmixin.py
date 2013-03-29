@@ -62,7 +62,7 @@ class QuizMixin(object):
     #
     # NOTE: if quiz answers will not be returned then current questions
     # may be appear in future quizzes.
-    def _getQuizQuestions(self, topic_id, user_id, lang):
+    def _getQuizQuestions(self, user_id, topic_id, lang):
         res = self.__getquiz.execute(topic_id=topic_id, user_id=user_id)
         if lang == 'de':
             txt_lang = self.questions.c.text_de
@@ -86,12 +86,12 @@ class QuizMixin(object):
             quiz.append(d)
         return quiz
 
-    def getQuiz(self, topic_id, user_id, lang):
+    def getQuiz(self, user_id, topic_id, lang):
         """Return list of Quiz questions.
 
         Args:
-            topic_id:  Topic ID from which get questions for the Quiz.
             user_id:   User ID for whom Quiz is generated.
+            topic_id:  Topic ID from which get questions for the Quiz.
             lang:      Question language. Can be: (it, fr, de).
 
         Question is represented as a dictionary with the following items:
@@ -103,14 +103,14 @@ class QuizMixin(object):
         """
 
         # TODO: we need to validate topic ID.
-        questions = self._getQuizQuestions(topic_id, user_id, lang)
+        questions = self._getQuizQuestions(user_id, topic_id, lang)
 
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions:
             t = self.quiz_answers
             self.engine.execute(t.delete().where(t.c.user_id == user_id))
-            questions = self._getQuizQuestions(topic_id, user_id, lang)
+            questions = self._getQuizQuestions(user_id, topic_id, lang)
 
         return {'topic': topic_id, 'questions': questions}
 

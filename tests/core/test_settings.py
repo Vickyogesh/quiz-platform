@@ -6,10 +6,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
+import hashlib
 from quiz.settings import Settings
 
 
-class SettingsTest(unittest.TestCase):
+class CoreSettingsTest(unittest.TestCase):
     def setUp(self):
         Settings.CONFIG_FILE = 'config.ini'
         self.path = os.path.join(os.path.dirname(__file__), '..', 'data')
@@ -43,7 +44,7 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual('mysql://quiz:quiz@192.168.56.101/', info['uri'])
         self.assertEqual('False', info['verbose'])
         self.assertEqual('quiz', info['dbname'])
-        self.assertTrue('params' not in info)
+        self.assertNotIn('params', info)
         self.assertEqual('mysql://quiz:quiz@192.168.56.101/quiz',
                          info['database'])
 
@@ -70,10 +71,20 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual('/tmp/data/sessions/data', info['session.data_dir'])
         self.assertEqual('/tmp/data/sessions/lock', info['session.lock_dir'])
 
+    def test_main(self):
+        Settings.CONFIG_FILE = 'config3.ini'
+        settings = Settings([self.path], verbose=False)
+        main = settings.main
+
+        m = hashlib.md5()
+        m.update('admin:ari09Xsw_')
+        self.assertEqual(m.hexdigest(), main['admin_password'])
+        self.assertEqual(10, main['guest_allowed_requests'])
+
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SettingsTest))
+    suite.addTest(unittest.makeSuite(CoreSettingsTest))
     return suite
 
 if __name__ == '__main__':

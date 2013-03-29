@@ -1,5 +1,24 @@
 import argparse
 import unittest
+import imp
+import os
+
+
+def all_tests(dest, tests_path):
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, tests_path)
+    base, _, files = os.walk(path).next()
+    for f in files:
+        fname = os.path.join(base, f)
+        info = os.path.basename(f).split('.')
+        if info[1] != 'py':
+            continue
+        try:
+            mod = imp.load_source(info[0], fname)
+            dest.addTest(mod.suite())
+        except Exception:
+            print "[SKIP] %s.%s" % (tests_path, info[0])
+
 
 default_tests = ['core', 'http']
 suite = unittest.TestSuite()
@@ -9,29 +28,13 @@ parser.add_argument('-t', '--tests',
                     help='Test to run (by default run all tests).',
                     choices=default_tests,
                     action='append')
-args = parser.parse_args()
+parser.add_argument('-v', '--verbosity', type=int, default=1, metavar='NUM',
+                    help='Output verbosity level (default: %(default)s)')
 
+args = parser.parse_args()
 if not args.tests:
     args.tests = default_tests
+for p in args.tests:
+    all_tests(suite, p)
 
-if 'core' in args.tests:
-    import core.test_settings
-    import core.test_db_quiz
-    import core.test_db_exam
-    import core.test_db_review
-    import core.test_db_topicstat
-    import core.test_db_stat
-    suite.addTest(core.test_settings.suite())
-    suite.addTest(core.test_db_quiz.suite())
-    suite.addTest(core.test_db_exam.suite())
-    suite.addTest(core.test_db_review.suite())
-    suite.addTest(core.test_db_topicstat.suite())
-    suite.addTest(core.test_db_stat.suite())
-
-if 'http' in args.tests:
-    import http.test_auth
-    import http.test_quiz
-    suite.addTest(http.test_auth.suite())
-    suite.addTest(http.test_quiz.suite())
-
-unittest.TextTestRunner(verbosity=2).run(suite)
+unittest.TextTestRunner(verbosity=args.verbosity).run(suite)
