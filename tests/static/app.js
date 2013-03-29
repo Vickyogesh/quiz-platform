@@ -635,8 +635,28 @@ function onDoAddSchool()
       aux_showJSONError(data);
     else
       aux_showInfo($("#admintab"), "Done!");
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
   });
+}
+//----------------------------------------------------------------------------
 
+function onDelSchool(p, school_id)
+{
+  $.ajax({
+    url: url("/admin/school/" + school_id),
+    type: "DELETE",
+    success: function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      $(p).toggleClass("btn-danger");
+    }
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
 }
 //----------------------------------------------------------------------------
 
@@ -653,6 +673,8 @@ function aux_fillSchools(data)
     html += "<td>" + lst[i].id + ".</td>";
     html += "<td>" + lst[i].name + "</td>";
     html += "<td>" + lst[i].login + "</td>";
+    html += "<td><a class='btn btn-danger' onclick='onDelSchool(this, " + lst[i].id + ")'>"
+      + "Delete</a></td>";
     body.append(html);
   }
 }
@@ -707,7 +729,25 @@ function onDoAddStudent()
 }
 //----------------------------------------------------------------------------
 
-function aux_fillStudents(data)
+function onDelStudent(p, school_id, student_id)
+{
+  $.ajax({
+    url: url("/school/" + school_id + "/student/" + student_id),
+    type: "DELETE",
+    success: function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      $(p).toggleClass("btn-danger");
+    }
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function aux_fillStudents(data, school_id)
 {
   var html = "";
   var lst = data.students;
@@ -720,6 +760,9 @@ function aux_fillStudents(data)
     html += "<td>" + lst[i].id + ".</td>";
     html += "<td>" + lst[i].name + " " + lst[i].surname + "</td>";
     html += "<td>" + lst[i].login + "</td>";
+    html += "<td><a class='btn btn-danger' "
+      + "onclick='onDelStudent(this, \"" + school_id + "\"," + lst[i].id + ")'>"
+      + "Delete</a></td>";
     body.append(html);
   }
 }
@@ -733,7 +776,7 @@ function onStudentlList()
     if (data.status != 200)
       aux_showJSONError(data);
     else
-      aux_fillStudents(data);
+      aux_fillStudents(data, sid);
   })
   .error(function(data) {
     aux_showError(data.responseText, data.status);
