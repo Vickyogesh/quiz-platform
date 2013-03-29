@@ -18,7 +18,7 @@ def http_post(path):
     return requests.post(url(path))
 
 
-# Test: access to the API for various types of users
+# Test: access to the API for various types of users.
 class HttpAccessTest(HttpStatusTest):
     def setUp(self):
         self.engine = create_engine(db_uri, echo=False)

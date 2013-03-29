@@ -90,6 +90,7 @@ Administration
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
    :statuscode 403: Forbidden.
+   :statuscode 400: Missing parameter.
    :statuscode 400: Invalid parameters.
    :statuscode 400: Already exists.
         School with the same login is already exists.

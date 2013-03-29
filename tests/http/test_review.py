@@ -11,8 +11,8 @@ from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
 
 
-# Quiz get requests (/quiz)
-# For more info see tests/core/test_quiz.py
+# Test: error review http requests: /errorreview;
+# For more info see tests/core/test_review.py
 class HttpReviewTest(unittest.TestCase):
     def setUp(self):
         self.req = requests.Session()

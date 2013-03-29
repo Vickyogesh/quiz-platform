@@ -12,8 +12,8 @@ from tests_common import db_uri, url, createAuthFor
 from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
 
 
-# Quiz get requests (/quiz)
-# For more info see tests/core/test_quiz.py
+# Test: Exam http requests: /exam, /exam/<id>;
+# For more info see tests/core/test_exam.py
 class HttpExamTest(unittest.TestCase):
     def setUp(self):
         self.req = requests.Session()

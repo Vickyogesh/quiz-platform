@@ -10,7 +10,7 @@ import json
 from tests_common import url, createAuthFor
 
 
-# Quiz get requests (/quiz)
+# Test: Quiz http requests: /quiz, /quiz/<id>;
 # For more info see tests/core/test_quiz.py
 class HttpQuizTest(unittest.TestCase):
     def setUp(self):

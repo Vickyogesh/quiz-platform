@@ -9,6 +9,7 @@ import json
 from tests_common import url, createAuthData, createAuthFor
 
 
+# Test: authorization http requests: /authorize;
 class HttpAuthTest(unittest.TestCase):
     def setUp(self):
         self.req = requests.Session()
