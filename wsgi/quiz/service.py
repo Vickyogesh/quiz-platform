@@ -185,7 +185,7 @@ def delete_school(id):
         action = app.request.args.get('action', None)
         if action != 'delete':
             raise BadRequest('Invalid action.')
-        elif app.request.data is not None:
+        elif len(app.request.data):
             raise BadRequest('Invalid request.')
 
     res = app.core.deleteSchool(id)
@@ -235,7 +235,7 @@ def delete_student(id, student):
         action = app.request.args.get('action', None)
         if action != 'delete':
             raise BadRequest('Invalid action.')
-        elif app.request.data is not None:
+        elif len(app.request.data):
             raise BadRequest('Invalid request.')
 
     school_id = app.getUserId(id)
@@ -243,5 +243,5 @@ def delete_student(id, student):
     if uid != school_id:
         raise Forbidden('Forbidden.')
 
-    res = app.core.deleteStudent(id, student)
+    res = app.core.deleteStudent(school_id, student)
     return JSONResponse(res)

@@ -114,6 +114,69 @@ class HttpAdminTest(unittest.TestCase):
         self.assertEqual(400, data['status'])
         self.assertEqual('Already exists.', data['description'])
 
+    # Check: delete school via bad requests
+    def test_delSchoolBad(self):
+        # Check: malformed request (no action param)
+        r = self.req.post(url('/admin/school/200'), data='{}', headers=self.headers)
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid action.', data['description'])
+
+        # Check: malformed request (send some post data)
+        r = self.req.post(url('/admin/school/200?action=delete'),
+                          data='{}', headers=self.headers)
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid request.', data['description'])
+
+        # Check: delete non-existent school
+        r = self.req.post(url('/admin/school/200?action=delete'),
+                          headers=self.headers)
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid school ID.', data['description'])
+
+        # Check: delete non-existent school with HTTP DELETE
+        r = self.req.delete(url('/admin/school/200'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid school ID.', data['description'])
+
+    # Check: delete school via POST request
+    def test_delSchoolPost(self):
+        # Create one school
+        data = json.dumps({'name': 'some', 'login': 'log', 'passwd': 'hello'})
+        r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+        self.assertEqual(1, data['id'])
+
+        r = self.req.post(url('/admin/school/1?action=delete'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
+    # Check: delete school via DELETE request
+    def test_delSchoolDelete(self):
+        # Create one school
+        data = json.dumps({'name': 'some', 'login': 'log', 'passwd': 'hello'})
+        r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+        self.assertEqual(1, data['id'])
+
+        # Check: delete non-existent school with HTTP DELETE
+        r = self.req.delete(url('/admin/school/1'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
 
 def suite():
     suite = unittest.TestSuite()

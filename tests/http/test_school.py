@@ -138,6 +138,57 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(400, data['status'])
         self.assertEqual('Already exists.', data['description'])
 
+    # Check: delete student via bad requests
+    def test_delStudentBad(self):
+        # Check: malformed request (no action param)
+        r = self.req.post(url('/school/1/student/1'), data='{}')
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid action.', data['description'])
+
+        # Check: malformed request (send some post data)
+        r = self.req.post(url('/school/1/student/1?action=delete'), data='{}')
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Invalid request.', data['description'])
+
+        # Check: delete non-existent school
+        r = self.req.post(url('/school/100/student/1?action=delete'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(403, data['status'])
+        self.assertEqual('Forbidden.', data['description'])
+
+        # Check: delete non-existent school with HTTP DELETE
+        r = self.req.delete(url('/school/100/student/1'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(403, data['status'])
+        self.assertEqual('Forbidden.', data['description'])
+
+        # Check: delete student from another school
+        r = self.req.delete(url('/school/me/student/2'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Unknown student.', data['description'])
+
+    # Check: delete student via POST requests
+    def test_delStudentPost(self):
+        r = self.req.post(url('/school/1/student/1?action=delete'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
+    # Check: delete student via POST requests
+    def test_delStudentDelete(self):
+        r = self.req.delete(url('/school/1/student/1'))
+        self.assertEqual(200, r.status_code)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
 
 def suite():
     suite = unittest.TestSuite()
