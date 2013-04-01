@@ -120,3 +120,51 @@ with the user's authorization information.
       client sent wrong auth data.
 
     :statuscode 400: Not a JSON.
+
+
+.. http:get:: /authorize/status
+
+   **Access**: all
+
+   Get authorization status. If user is authorized then response will contain
+   information about the user, otherwise unauthorized error will be returned.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /v1/authorize/status HTTP/1.1
+
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "status": 401,
+        "user": {
+          "id": 12,
+          "name": "Bill",
+          "surname": "Gates",
+          "type": "student",
+          "school_id": 21
+        }
+      }
+
+
+   =========  =======================================
+   user fields
+   ==================================================
+   id         User ID.
+   name       User name (or school name).
+   surname    User surname. Only for students.
+   type       User type: *student*, *school*,
+              *guest*, *admin*.
+   school_id  Student's school ID. Only for students.
+   =========  =======================================
+
+   :statuscode 200: Everything is ok.
+   :statuscode 401: Unauthorized.

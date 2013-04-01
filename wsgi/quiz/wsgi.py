@@ -356,7 +356,7 @@ class QuizApp(object):
         """Handle 'New authorization' request.
         Return JSON with auth data.
 
-        :seealso: ;class:`QuizWWWAuthenticate`.
+        :seealso: :class:`QuizWWWAuthenticate`.
         """
         return JSONResponse(QuizWWWAuthenticate().to_dict(), status=401)
 
@@ -380,13 +380,13 @@ class QuizApp(object):
         if not _check_digest(nonce, digest, user['passwd']):
             raise BadRequest('Authorization is invalid.')
 
-        del user['login']
         self.session['app_id'] = appid
         self.session['user_id'] = user['id']
         self.session['user_name'] = user['name']
-        #self.session['user_surname'] = user['surname']
+        self.session['user_login'] = user['login']
         self.session['user_type'] = user['type']
         self.session.save()
+        del user['login']
 
         # NOTE: we you want to use 'beaker.session.secret' then use:
         # sid = self.session.__dict__['_headers']['cookie_out']

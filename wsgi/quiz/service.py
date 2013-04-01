@@ -1,7 +1,18 @@
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden, Unauthorized
 from .wsgi import QuizApp, JSONResponse
 
 app = QuizApp()
+
+
+@app.get('/authorize/status')
+def get_authorize_status():
+    try:
+        login = app.session['user_login']
+        user = app.core.getUserInfo(login)
+    except KeyError:
+        raise Unauthorized('Unauthorized.')
+    del user['login']
+    return JSONResponse({'user': user})
 
 
 @app.get('/quiz/<int:topic>', access=['student', 'guest'])
@@ -244,4 +255,20 @@ def delete_student(id, student):
         raise Forbidden('Forbidden.')
 
     res = app.core.deleteStudent(school_id, student)
+    return JSONResponse(res)
+
+
+# TODO: implement me
+@app.get('/school/<uid:id>', access=['school', 'admin'])
+def school_stat(id):
+    school_id = app.getUserId(id)
+
+    if not app.isAdmin():
+        uid = app.session['user_id']
+        if uid != school_id:
+            raise Forbidden('Forbidden.')
+    elif id == 'me':
+        raise Forbidden('Forbidden.')
+
+    res = {}
     return JSONResponse(res)
