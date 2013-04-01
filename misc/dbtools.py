@@ -26,50 +26,42 @@ class DbTool(object):
             'description': 'desktopapp'
         }]
 
-    REAL_USERS = [
+    TEST_SCHOOLS = [
         {
-            'name': 'Admin',
-            'login': 'root',
-            'passwd': 'ari09Xsw_',
-            'type': 'admin'
-        }]
-
+            'name': 'Chuck Norris School',
+            'login': 'chuck@norris.com',
+            'passwd': 'boo'
+        },
+        {
+            'name': 'School2',
+            'login': 'school2',
+            'passwd': 'boo'
+        }
+    ]
     TEST_USERS = [
+        {
+            'name': 'Test2',
+            'surname': 'User2',
+            'login': 'testuser2',
+            'passwd': 'testpasswd2',
+            'type': 'student',
+            'school_id': 1
+        },
         {
             'name': 'Test',
             'surname': 'User',
             'login': 'testuser',
             'passwd': 'testpasswd',
-            'type': 'student'
-        },
-        {
-            'name': 'Test',
-            'surname': 'User 2',
-            'login': 'testuser2',
-            'passwd': 'testpasswd2',
-            'type': 'student'
-        },
-        {
-            'name': 'Admin',
-            'surname': '',
-            'login': 'root',
-            'passwd': 'adminpwd',
-            'type': 'admin'
-        },
-        {
-            'name': 'Chuck',
-            'surname': 'Norris',
-            'login': 'chuck@norris.com',
-            'passwd': 'boo',
-            'type': 'school'
+            'type': 'student',
+            'school_id': 1
         }]
 
     def __init__(self, verbose=False, create_db=False, cfg_path=None):
         self.start_time = time.time()
-        self._users = DbTool.REAL_USERS
         self._verbose = verbose
         self._readSettints(cfg_path)
         self._setup(create_db)
+        self.put_users = False
 
     def _readSettints(self, path=None):
         if path is None:
@@ -104,16 +96,9 @@ class DbTool(object):
 
     def _removeTables(self):
         print('Removing tables...')
-        self.engine.execute('DROP TABLE IF EXISTS answers;')
-        self.engine.execute('DROP TABLE IF EXISTS topics_stat;')
-        self.engine.execute('DROP TABLE IF EXISTS exams;')
-        self.engine.execute('DROP TABLE IF EXISTS exams_stat;')
-
-        self.engine.execute('DROP TABLE IF EXISTS questions;')
-        self.engine.execute('DROP TABLE IF EXISTS applications;')
-        self.engine.execute('DROP TABLE IF EXISTS users;')
-        self.engine.execute('DROP TABLE IF EXISTS topics;')
-        self.engine.execute('DROP TABLE IF EXISTS chapters;')
+        metadata = MetaData(bind=self.engine)
+        metadata.reflect()
+        metadata.drop_all()
 
     def _createTables(self):
         print('Creating tables...')
@@ -125,14 +110,31 @@ class DbTool(object):
                 CONSTRAINT PRIMARY KEY (id)
             );
 
+            CREATE TABLE schools(
+                id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(100) NOT NULL,
+                login VARCHAR(100) NOT NULL,
+                passwd VARCHAR(100) NOT NULL,
+                CONSTRAINT PRIMARY KEY (id),
+                CONSTRAINT UNIQUE (login)
+            );
+
             CREATE TABLE users(
                 id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(100) NOT NULL,
-                surname VARCHAR(100) NOT NULL DEFAULT '',
+                surname VARCHAR(100) NOT NULL,
                 login VARCHAR(100) NOT NULL,
                 passwd VARCHAR(100) NOT NULL,
-                type ENUM('admin', 'school', 'student', 'guest') NOT NULL,
-                school_id INTEGER UNSIGNED,
+                type ENUM('student', 'guest') NOT NULL,
+                school_id INTEGER UNSIGNED NOT NULL,
+                last_visit TIMESTAMP NOT NULL DEFAULT 0,
+                CONSTRAINT PRIMARY KEY (id, school_id)
+            );
+
+            CREATE TABLE guest_access(
+                id INTEGER UNSIGNED NOT NULL,
+                num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+                period_end DATETIME NOT NULL,
                 CONSTRAINT PRIMARY KEY (id)
             );
 
@@ -175,8 +177,19 @@ class DbTool(object):
                 err_count SMALLINT NOT NULL DEFAULT 0
             );
 
-            CREATE TABLE answers(
+            CREATE TABLE errors(
                 user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL
+            );
+
+            CREATE TABLE quiz_answers(
+                user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL DEFAULT FALSE
+            );
+
+            CREATE TABLE exam_answers(
+                exam_id INTEGER UNSIGNED NOT NULL,
                 question_id INTEGER UNSIGNED NOT NULL,
                 is_correct BOOLEAN NOT NULL DEFAULT FALSE
             );
@@ -189,74 +202,134 @@ class DbTool(object):
                 err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 CONSTRAINT PRIMARY KEY (id)
             );
-
-            CREATE TABLE exams_stat(
-                exam_id INTEGER UNSIGNED NOT NULL,
-                question_id INTEGER UNSIGNED NOT NULL,
-                is_correct BOOLEAN NOT NULL DEFAULT FALSE
-            );
             """))
 
         self.meta = MetaData()
         self.meta.reflect(bind=self.engine)
         self.tbl_apps = self.meta.tables['applications']
         self.tbl_users = self.meta.tables['users']
+        self.tbl_schools = self.meta.tables['schools']
         self.tbl_chapters = self.meta.tables['chapters']
         self.tbl_topics = self.meta.tables['topics']
         self.tbl_questions = self.meta.tables['questions']
-        self.answers = self.meta.tables['answers']
 
     def _createFuncs(self):
         print('Creating function...')
 
-        self.conn.execute("DROP PROCEDURE IF EXISTS update_exam_stat;")
-        self.conn.execute(text("""
-            CREATE PROCEDURE update_exam_stat(exam INTEGER UNSIGNED, errors SMALLINT UNSIGNED)
-            BEGIN
-                DECLARE user INT UNSIGNED;
-                DECLARE err INT;
+        ### Delete users
 
-                SELECT user_id INTO user FROM exams WHERE id=exam;
-
-                INSERT INTO answers(user_id, question_id, is_correct)
-                SELECT user, e.question_id, e.is_correct FROM exams_stat e
-                WHERE e.exam_id=exam
-                ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct);
-
-                UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=errors
-                WHERE id=exam;
-            END;
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_school;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_school
+            BEFORE DELETE ON schools FOR EACH ROW
+            DELETE FROM users WHERE school_id=OLD.id;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_ins;")
-        self.conn.execute(text("""
-            CREATE TRIGGER count_topic_err_ins AFTER INSERT ON answers FOR EACH
-            ROW BEGIN
-                DECLARE topic INTEGER UNSIGNED;
-                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
-
-                IF NEW.is_correct = 1 THEN
-                    INSERT IGNORE INTO topics_stat VALUES(NEW.user_id, topic, 0);
-                ELSE
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_user;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_user
+            BEFORE DELETE ON users FOR EACH ROW BEGIN
+                DELETE FROM errors WHERE user_id=OLD.id;
+                DELETE FROM quiz_answers WHERE user_id=OLD.id;
+                DELETE FROM exams WHERE user_id=OLD.id;
+                DELETE FROM topics_stat WHERE user_id=OLD.id;
+                IF OLD.type = 'guest' THEN
+                    DELETE FROM guest_access WHERE id=OLD.id;
                 END IF;
             END;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS count_topic_err_upd;")
+        self.conn.execute("DROP TRIGGER IF EXISTS on_del_exam;")
+        self.conn.execute(text("""CREATE TRIGGER on_del_exam
+            BEFORE DELETE ON exams FOR EACH ROW
+            DELETE FROM exam_answers WHERE exam_id=OLD.id;
+            """))
+
+        ### Logic
+
+        self.conn.execute("DROP TRIGGER IF EXISTS add_guest;")
         self.conn.execute(text("""
-            CREATE TRIGGER count_topic_err_upd AFTER UPDATE ON answers FOR EACH
+            CREATE TRIGGER add_guest AFTER INSERT ON schools FOR EACH
+            ROW INSERT IGNORE INTO users
+                (name, surname, login, passwd, type, school_id) VALUES
+                (NEW.name, '', CONCAT(NEW.login, '-guest'),
+                 MD5(CONCAT(NEW.login, '-guest:guest')), 'guest', NEW.id);
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS guestaccess_add;")
+        self.conn.execute(text("""
+            CREATE TRIGGER guestaccess_add AFTER INSERT ON users FOR EACH
             ROW BEGIN
-                DECLARE topic INTEGER UNSIGNED;
+                IF NEW.type = 'guest' THEN
+                    INSERT IGNORE INTO guest_access VALUES(NEW.id, 0,
+                        UTC_TIMESTAMP()+ interval 1 hour);
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS guestaccess_update;")
+        self.conn.execute(text("""
+            CREATE TRIGGER guestaccess_update AFTER UPDATE ON users FOR EACH
+            ROW BEGIN
+                IF NEW.type = 'guest' THEN
+                    UPDATE guest_access SET num_requests = num_requests + 1
+                    WHERE id=NEW.id;
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_quiz;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_err_quiz AFTER INSERT ON quiz_answers FOR EACH
+            ROW BEGIN
+                IF NEW.is_correct = 0 THEN
+                    INSERT IGNORE INTO errors VALUES(NEW.user_id, NEW.question_id);
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_examadd;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_err_examadd AFTER INSERT ON exam_answers FOR EACH
+            ROW BEGIN
+                DECLARE user INT UNSIGNED;
+                SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
+                INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_add;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_topic_stat_add AFTER INSERT ON errors FOR EACH
+            ROW BEGIN
+                DECLARE topic INT UNSIGNED;
                 SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+                INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
+                ON DUPLICATE KEY UPDATE err_count = err_count + 1;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_del;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_topic_stat_del AFTER DELETE ON errors FOR EACH
+            ROW BEGIN
+                DECLARE topic INT UNSIGNED;
+                SELECT topic_id INTO topic FROM questions WHERE id=OLD.question_id;
+                INSERT INTO topics_stat VALUES(OLD.user_id, topic, 0)
+                ON DUPLICATE KEY UPDATE err_count = err_count - 1;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS update_err_exam;")
+        self.conn.execute(text("""
+            CREATE TRIGGER update_err_exam AFTER UPDATE ON exam_answers FOR EACH
+            ROW BEGIN
+                DECLARE user INT UNSIGNED;
+                SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
 
                 IF NEW.is_correct = 1 THEN
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, -1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count-1;
+                    DELETE FROM errors WHERE user_id=user
+                    AND question_id=NEW.question_id;
                 ELSE
-                    INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
-                    ON DUPLICATE KEY UPDATE err_count=err_count+1;
+                    INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
                 END IF;
             END;
             """))
@@ -268,12 +341,21 @@ class DbTool(object):
     def _create_digest(self, username, passwd):
         m = hashlib.md5()
         m.update('%s:%s' % (username, passwd))
+        #print username, passwd, m.hexdigest()
         return m.hexdigest()
 
     def _fillUsers(self):
+        if not self.put_users:
+            return
         print("Populating users...")
         vals = []
-        for user in self._users:
+        for user in DbTool.TEST_SCHOOLS:
+            user['passwd'] = self._create_digest(user['login'], user['passwd'])
+            vals.append(user)
+        self.conn.execute(self.tbl_schools.insert(), vals)
+
+        vals = []
+        for user in DbTool.TEST_USERS:
             user['passwd'] = self._create_digest(user['login'], user['passwd'])
             vals.append(user)
         self.conn.execute(self.tbl_users.insert(), vals)
@@ -351,21 +433,30 @@ class DbTool(object):
         print("Creating indices... topics_stat")
         self.conn.execute('ALTER TABLE topics_stat ADD UNIQUE ix_topicstat(user_id, topic_id);')
 
-        print("Creating indices... answers")
-        self.conn.execute('ALTER TABLE answers ADD UNIQUE ix_answers(user_id, question_id);')
+        print("Creating indices... errors")
+        self.conn.execute('ALTER TABLE errors ADD UNIQUE ix_errors(user_id, question_id);')
+
+        print("Creating indices... quiz_answers")
+        self.conn.execute('ALTER TABLE quiz_answers ADD UNIQUE ix_quiz_answers(user_id, question_id);')
 
         print("Creating indices... exams")
         self.conn.execute('ALTER TABLE exams ADD INDEX ix_exams(user_id);')
 
-        print("Creating indices... exams_stat")
-        self.conn.execute('ALTER TABLE exams_stat ADD UNIQUE ix_examsstat(exam_id, question_id);')
+        print("Creating indices... exam_answers")
+        self.conn.execute('ALTER TABLE exam_answers ADD UNIQUE ix_exam_answers(exam_id, question_id);')
 
         print("Doing tables optimizations...")
-        self.conn.execute('OPTIMIZE TABLE applications, users, chapters;')
+        self.conn.execute('OPTIMIZE TABLE applications;')
+        self.conn.execute('OPTIMIZE TABLE chapters;')
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
         self.conn.execute('OPTIMIZE TABLE topics_stat;')
-        self.conn.execute('OPTIMIZE TABLE answers;')
+        self.conn.execute('OPTIMIZE TABLE errors;')
+        self.conn.execute('OPTIMIZE TABLE quiz_answers;')
+        self.conn.execute('OPTIMIZE TABLE exam_answers;')
+        self.conn.execute('OPTIMIZE TABLE users;')
+        self.conn.execute('OPTIMIZE TABLE schools;')
+        self.conn.execute('OPTIMIZE TABLE guest_access;')
 
     def before(self):
         pass

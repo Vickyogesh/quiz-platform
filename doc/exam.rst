@@ -5,6 +5,8 @@ Exam is a list of 40 random questions from all available topics.
 
 .. http:get:: /exam
 
+   **Access**: student, guest
+
    Get exam for the user.
    The exam will expire after **3 hrs** since creation.
 
@@ -84,9 +86,12 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
 
 .. http:post:: /exam/(id)
+
+   **Access**: student, guest
 
    Send answers for the specified exam. Client sends list of answered
    questions and answers. List of questions/answers is fixed to 40.
@@ -132,6 +137,7 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.
@@ -156,6 +162,8 @@ Exam is a list of 40 random questions from all available topics.
 
 
 .. http:get:: /exam/(id)
+
+   **Access**: school, student, guest
 
    Get information about specified exam.
 
@@ -260,5 +268,6 @@ Exam is a list of 40 random questions from all available topics.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Invalid exam ID.
 

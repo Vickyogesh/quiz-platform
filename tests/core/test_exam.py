@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import unittest
 from datetime import datetime, timedelta
 from collections import namedtuple
-from tests_common import db_uri
+from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
 
@@ -16,22 +16,17 @@ ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
 
 
 # Test: generate exam, save exam, exam's errors counting.
-class DbExamTest(unittest.TestCase):
+class CoreExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
+        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
-        self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE answers;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
-        self.engine.execute("TRUNCATE TABLE exams_stat;")
-        self.engine.execute("TRUNCATE TABLE exams;")
-        self.engine.execute("TRUNCATE TABLE answers;")
-        self.engine.execute("TRUNCATE TABLE topics_stat;")
+        cleanupdb_onTearDown(self.engine)
 
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
@@ -63,7 +58,7 @@ class DbExamTest(unittest.TestCase):
 
     # Test new exam fields.
     def test_newFields(self):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
 
         # Check return value
         # there must be 'exam' and 'question' fields.
@@ -71,8 +66,8 @@ class DbExamTest(unittest.TestCase):
         ### Check exam
 
         exam = info['exam']
-        self.assertTrue('id' in exam)
-        self.assertTrue('expires' in exam)
+        self.assertIn('id', exam)
+        self.assertIn('expires', exam)
 
         # Check expiration date
         # format: 2013-03-21 12:04:12
@@ -95,9 +90,9 @@ class DbExamTest(unittest.TestCase):
         # if values are null for these fields. So we
         # do not check them.
         question = questions[20]
-        self.assertTrue('id' in question)
-        self.assertTrue('text' in question)
-        self.assertTrue('answer' in question)
+        self.assertIn('id', question)
+        self.assertIn('text', question)
+        self.assertIn('answer', question)
 
     # Test if for new exam 'exams' and 'exams_stat' tables are filled
     def test_newDBTables(self):
@@ -105,17 +100,24 @@ class DbExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(0, res[0])
 
-        res = self.engine.execute("SELECT count(*) from exams_stat").fetchone()
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
         self.assertEqual(0, res[0])
 
-        info = self.core.createExam(1, 'it')
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        self.assertEqual(0, res[0])
+
+        info = self.core.createExam(3, 'it')
 
         # After new exam generation there must be one entry in the
-        # 'exams' table which describes exam and also 'exams_stat'
-        # must contain 40 exam questions.
+        # 'exams' table which describes exam and also 'exam_answers'
+        # and 'errors' must contain 40 exam questions.
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(1, res[0])
-        res = self.engine.execute("SELECT count(*) from exams_stat").fetchone()
+
+        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
+        self.assertEqual(40, res[0])
+
+        res = self.engine.execute("SELECT count(*) from errors").fetchone()
         self.assertEqual(40, res[0])
 
         ### Check exam metadata
@@ -128,7 +130,7 @@ class DbExamTest(unittest.TestCase):
         err_count = res[4]
 
         self.assertEqual(info['exam']['id'], exam_id)
-        self.assertEqual(1, user_id)
+        self.assertEqual(3, user_id)
         self.assertEqual(0, err_count)
         self.assertEqual(None, end)
 
@@ -140,7 +142,7 @@ class DbExamTest(unittest.TestCase):
         ### Check exam questions
 
         res = self.engine.execute(
-            "SELECT question_id,is_correct from exams_stat WHERE exam_id="
+            "SELECT question_id,is_correct from exam_answers WHERE exam_id="
             + str(exam_id))
 
         table_questions = []
@@ -158,50 +160,42 @@ class DbExamTest(unittest.TestCase):
         # every answer must be wrong by default
         self.assertEqual(answers, [0] * 40)
 
+        ### Check errors questions
+
+        res = self.engine.execute("SELECT question_id from errors")
+        err_questions = [row[0] for row in res]
+        err_questions = list(sorted(err_questions))
+        self.assertEqual(questions, err_questions)
+
     # Check exam saving with wrong data
     def test_saveWrong(self):
         # try to save non-existent exam
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid exam ID.'):
             self.core.saveExam(1, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid exam ID.', err)
 
         # We have to create exam before continue testing
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
 
         # Try to save with wrong number of answers
         # NOTE: answers length will be checked before questions.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Wrong number of answers.'):
             self.core.saveExam(exam_id, [], [])
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Wrong number of answers.', err)
 
         # Try to save with wrong number of questions
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Parameters length mismatch.'):
             self.core.saveExam(exam_id, [], [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Parameters length mismatch.', err)
 
         # Try to save with wrong questions' IDs
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid question ID.'):
             self.core.saveExam(exam_id, [0] * 40, [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid question ID.', err)
 
         # Make exam expired and try to save answers
         # NOTE: expiration date will be checked before questions
         # validation so we can pass fake values.
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Exam is expired.'):
             self.engine.execute("UPDATE exams SET start_time='1999-01-12'")
             self.core.saveExam(exam_id, [0] * 40, [0] * 40)
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Exam is expired.', err)
 
     # Helper function to get exam metadate dirrectly from the DB.
     def _getExamInfo(self, id):
@@ -212,7 +206,7 @@ class DbExamTest(unittest.TestCase):
 
     # Check normal exam save
     def test_save(self):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
         questions = [q['id'] for q in info['questions']]
         questions = list(sorted(questions))
@@ -225,7 +219,7 @@ class DbExamTest(unittest.TestCase):
         ### Check answers
 
         res = self.engine.execute(
-            "SELECT question_id,is_correct from exams_stat WHERE exam_id="
+            "SELECT question_id,is_correct from exam_answers WHERE exam_id="
             + str(exam_id))
 
         for row, a in zip(res, answers):
@@ -234,24 +228,27 @@ class DbExamTest(unittest.TestCase):
         ### Check exam metadata
         # We don't check start time
         exam = self._getExamInfo(exam_id)
-        self.assertEqual(1, exam.user_id)
+        self.assertEqual(3, exam.user_id)
         self.assertEqual(5, exam.err_count)
 
         now = datetime.utcnow()
         delta = abs((now - exam.end).total_seconds())
         self.assertTrue(delta <= 5)
 
+        ### Check errors
+        res = self.engine.execute("SELECT question_id from errors")
+        err_questions = [row[0] for row in res]
+        err_questions = list(sorted(err_questions))
+        self.assertEqual(questions[0:5], err_questions)
+
     # Check exam info API
     def test_statusNew(self):
         # Try to get infor for non-existent exam
-        try:
+        with self.assertRaisesRegexp(QuizCoreError, 'Invalid exam ID.'):
             self.core.getExamInfo(1, 'it')
-        except QuizCoreError as e:
-            err = e.message
-        self.assertEqual('Invalid exam ID.', err)
 
         # Check status for the fresh exam
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(4, 'it')
         exam_id = info['exam']['id']
         exam_questions = info['questions']
 
@@ -261,7 +258,7 @@ class DbExamTest(unittest.TestCase):
         questions = info['questions']
 
         # Check student
-        self.assertEqual(1, student['id'])
+        self.assertEqual(4, student['id'])
         self.assertEqual('Test', student['name'])
         self.assertEqual('User', student['surname'])
 
@@ -283,7 +280,7 @@ class DbExamTest(unittest.TestCase):
     # Helper function to create exam & save answers.
     # Returns result exam info
     def _passExam(self, answers):
-        info = self.core.createExam(1, 'it')
+        info = self.core.createExam(3, 'it')
         exam_id = info['exam']['id']
         questions = list(sorted([q['id'] for q in info['questions']]))
 
@@ -353,7 +350,7 @@ class DbExamTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(DbExamTest))
+    suite.addTest(unittest.makeSuite(CoreExamTest))
     return suite
 
 if __name__ == '__main__':

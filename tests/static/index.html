@@ -61,9 +61,8 @@
     </form>
 
     <div class="tabbable hide" id="features">
-      <h3>Quiz API v1 features
-        <a class="btn btn-mini btn-link" id="bttQuit">quit</a>
-      </h3>
+      <h3>Quiz API v1 features</h3>
+      <h5><span id="uname"></span><a class="btn btn-mini btn-link" id="bttQuit">quit</a></h5>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#quiztab" data-toggle="tab">Quiz</a></li>
         <li><a href="#examtab" data-toggle="tab">Exam</a></li>
@@ -72,6 +71,8 @@
         <li><a href="#examlisttab" data-toggle="tab">Exam List</a></li>
         <li><a href="#examinfotab" data-toggle="tab">Exam Info</a></li>
         <li><a href="#topicerrtab" data-toggle="tab">Topic Errors</a></li>
+        <li><a href="#admintab" data-toggle="tab">Admin</a></li>
+        <li><a href="#schooltab" data-toggle="tab">School</a></li>
       </ul>
       <div class="tab-content">
 
@@ -290,6 +291,110 @@
             </tbody>
           </table>
         </div> <!-- /tab-pane examinfotab -->
+
+        <!-- ADMIN CONTENT -->
+        <div class="tab-pane" id="admintab">
+
+          <!-- Message box -->
+          <div class="modal hide" id="admin_add">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3>Add school</h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label class="control-label" for="name">Name</label>
+                  <div class="controls"><input type="text" id="name" placeholder="School name"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Login</label>
+                  <div class="controls"><input type="text" id="login" placeholder="Login"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Password</label>
+                  <div class="controls"><input type="text" id="passwd" placeholder="Password"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-success" data-dismiss="modal">Add</a>
+            </div>
+          </div> <!-- /modal -->
+
+          <form class="well well-small form-inline">
+            <a class="btn btn-info" id="bttAdd">Add school</a>
+            <a class="btn btn-info" id="bttGet">Get school list</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <p></p>
+          <table class="table table-hover">  <!-- ADMIN TABLE -->
+            <thead>
+              <tr><th colspan="3">Schools</th></tr>
+              <tr>
+                <th>#</th><th>Name</th><th>Login</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane admintab -->
+
+        <!-- SCHOOL CONTENT -->
+        <div class="tab-pane" id="schooltab">
+
+          <!-- Message box -->
+          <div class="modal hide" id="school_add">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3>Add student</h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label class="control-label" for="name">Name</label>
+                  <div class="controls"><input type="text" id="name" placeholder="Name"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="surname">Surname</label>
+                  <div class="controls"><input type="text" id="surname" placeholder="Surname"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Login</label>
+                  <div class="controls"><input type="text" id="login" placeholder="Login"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Password</label>
+                  <div class="controls"><input type="text" id="passwd" placeholder="Password"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-success" data-dismiss="modal">Add</a>
+            </div>
+          </div> <!-- /modal -->
+
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">School ID:</label>
+            <input type="text" class="input-small" id="school_id" value="me">
+            <a class="btn btn-info" id="bttAdd">Add student</a>
+            <a class="btn btn-info" id="bttGet">Get student list</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <p></p>
+          <table class="table table-hover">  <!-- SCHOOL TABLE -->
+            <thead>
+              <tr><th colspan="3">Students</th></tr>
+              <tr>
+                <th>#</th><th>Name</th><th>Login</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane schooltab -->
 
       </div> <!-- /tab-content -->
     </div> <!-- /tabbable -->

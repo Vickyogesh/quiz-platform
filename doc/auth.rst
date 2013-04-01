@@ -1,4 +1,3 @@
-
 Authorization
 -------------
 
@@ -8,6 +7,8 @@ authorization parameters. And then send :http:post:`/authorize`
 with the user's authorization information.
 
 .. http:get:: /authorize
+
+   **Access**: all
 
    Request authorization parameters.
 
@@ -36,26 +37,29 @@ with the user's authorization information.
 
 .. http:post:: /authorize
 
+   **Access**: all
+
    Authorize.
 
    To authorize clinet sends JSON with the following fields:
 
      * nonce - server nonce
      * appid - application ID
-     * username - user login
+     * login - user login
      * digest - authorization digest
 
    Digest formula::
 
-     HA1 = MD5(username:password)
+     HA1 = MD5(login:password)
      DIGEST = MD5(nonce:H1)
 
    After successful authorization the service creates a session and
    send response with the JSON which contains session ID in the filed *sid*
    and also in the cookie (*QUIZSID*).
-
-   For cross-domain requests the client have to pass *sid* parameter in the URL,
-   otherwize session ID will be passed in the cookie.
+   For cross-domain requests the client have to pass *sid* parameter
+   in the URL for future requests, otherwise session ID will be passed
+   in the cookie if possible.
+   In the *user* field server sends information about authorized user.
 
    **Example request**:
 
@@ -66,7 +70,7 @@ with the user's authorization information.
 
       {
         "nonce": "cf7d8c2e4511132eb3acf7082e9147d9",
-        "username": "testuser",
+        "login": "testuser",
         "appid": "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
         "digest": "2389ce38fd88cfcdce0484269cbbccb2"
       }
@@ -81,9 +85,31 @@ with the user's authorization information.
 
       {
         "status": 200,
-        "sid": "964a2cb2afd34d2e9bc7c037a4c6d241"
+        "sid": "964a2cb2afd34d2e9bc7c037a4c6d241",
+        "user": {
+          "id": 42,
+          "name": "Chuck",
+          "surname": "Norris",
+          "type": "student"
+        }
       }
 
+   =========  =================================
+   Response fields
+   ============================================
+   sid        Session ID.
+   user       User metadata.
+   =========  =================================
+
+   =========  =================================
+   user fields
+   ============================================
+   id         User ID.
+   name       User name (or school name).
+   surname    User surname. Only for students.
+   type       User type: *student*, *school*,
+              *guest*, *admin*.
+   =========  =================================
 
    :statuscode 200: Authorization is passed.
 
@@ -92,3 +118,5 @@ with the user's authorization information.
 
    :statuscode 400: Authorization is invalid:
       client sent wrong auth data.
+
+    :statuscode 400: Not a JSON.

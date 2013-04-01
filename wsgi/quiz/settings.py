@@ -1,5 +1,6 @@
 import ConfigParser
 import os.path
+import hashlib
 
 
 class Settings(object):
@@ -22,6 +23,7 @@ class Settings(object):
             print('Using configuration ' + cfg_file)
         cfg = ConfigParser.SafeConfigParser()
         cfg.read(cfg_file)
+        self._parse_main(cfg)
         self._parse_session_and_cache(cfg)
         self._parse_db(cfg)
         self._parse_testing(cfg)
@@ -39,6 +41,14 @@ class Settings(object):
     def _fill_params(self, cfg, dest, section, prefix=''):
         for name, val in cfg.items(section, vars=self.defaults):
             dest[prefix + name] = os.path.expandvars(val)
+
+    def _parse_main(self, cfg):
+        self.main = {}
+        self._fill_params(cfg, self.main, 'main')
+        m = hashlib.md5()
+        m.update('admin:%s' % self.main['admin_password'])
+        self.main['admin_password'] = m.hexdigest()
+        self.main['guest_allowed_requests'] = int(self.main['guest_allowed_requests'])
 
     # Put session info to the self.session
     # and cache info to the self.cache

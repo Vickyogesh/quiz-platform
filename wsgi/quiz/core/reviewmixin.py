@@ -1,12 +1,12 @@
-from sqlalchemy import text
+from sqlalchemy import text, select, and_
 
 
 class ErrorReviewMixin(object):
     """This mixin provides Error Review feature. Used in QuizCore."""
     def __init__(self):
         self.__geterrors = text(""" SELECT * FROM questions q INNER JOIN
-            (SELECT question_id id FROM answers WHERE user_id=:user_id
-             AND is_correct=0 LIMIT 100) e USING(id) ORDER BY RAND() LIMIT 40;
+            (SELECT question_id id FROM errors WHERE user_id=:user_id
+             LIMIT 100) e USING(id) ORDER BY RAND() LIMIT 40;
         """)
         self.__geterrors = self.__geterrors.compile(self.engine)
 
@@ -35,5 +35,23 @@ class ErrorReviewMixin(object):
             questions.append(d)
         return {'questions': questions}
 
-    def saveErrorReview(self, user, id_list, answers):
-        self.saveQuestions(user, id_list, answers)
+    def saveErrorReview(self, user, questions, answers):
+        questions, answers = self._aux_prepareLists(questions, answers)
+
+        # select and check answers
+        q = self.questions
+        s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
+        res = self.engine.execute(s)
+
+        ans = [row[q.c.id] for row, answer in zip(res, answers)
+               if row[q.c.answer] == answer]
+        # ans = []
+        # for row, answer in zip(res, answers):
+        #     if row[q.c.answer] == answer:
+        #         ans.append(row[q.c.id])
+        if ans:
+            with self.engine.begin() as conn:
+                t = self.errors
+                d = t.delete().where(and_(t.c.user_id == user,
+                                     t.c.question_id.in_(ans)))
+                conn.execute(d)

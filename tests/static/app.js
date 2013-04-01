@@ -18,6 +18,7 @@ function url(url)
   // NOTE: uncomment if you want cross domain requests
   // var server = "http://127.0.0.1"
   // var server = "https://quizplatformtest-editricetoni.rhcloud.com"
+  // var server = "http://quizplatform-editricetoni.rhcloud.com"
   // path = server + url;
   // if (window.qsid)
   //   path += get_arg_prefix(path) + "sid=" + window.qsid;
@@ -163,7 +164,7 @@ function onAuth()
 
     var auth = {
       nonce: nonce,
-      username: login,
+      login: login,
       appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
       digest: hex_md5(nonce + ':' + digest)
     };
@@ -175,6 +176,10 @@ function onAuth()
         aux_showError("Authorization is not passed.", data.status);
       }
       else {
+        var name = data.user.name;
+        if (data.user.surname)
+          name += ' ' + data.user.surname;
+        $("#features #uname").text(data.user.type + ': ' + name)
         window.qsid = data.sid;
         aux_showFeatures();
       }
@@ -402,7 +407,10 @@ function onStudentStat()
   aux_clearUserStat();
 
   $.getJSON(url("/v1/student/"+user_id), data, function(data) {
-    aux_fillUserStat(data);
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillUserStat(data);
   })
   .error(function(data) {
     aux_showError(data.responseText, data.status);
@@ -601,6 +609,181 @@ function aux_fillTopicErrors(data)
 }
 //----------------------------------------------------------------------------
 
+function onAddSchool()
+{
+  $("#admintab #admin_add").modal('show');
+  $("#admintab #admin_add input").val('');
+}
+//----------------------------------------------------------------------------
+
+function onDoAddSchool()
+{
+  var name = $("#admintab #admin_add #name").val();
+  var login = $("#admintab #admin_add #login").val();
+  var passwd = $("#admintab #admin_add #passwd").val();
+
+  var data = {
+    name: name,
+    login: login,
+    passwd: hex_md5(login + ':' + passwd)
+  };
+
+  $("#admintab #admin_add").modal('hide');
+
+  aux_postJSON(url("/admin/newschool"), data, function (data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_showInfo($("#admintab"), "Done!");
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function onDelSchool(p, school_id)
+{
+  $.ajax({
+    url: url("/admin/school/" + school_id),
+    type: "DELETE",
+    success: function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      $(p).toggleClass("btn-danger");
+    }
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function aux_fillSchools(data)
+{
+  var html = "";
+  var lst = data.schools;
+  var body = $("#admintab table tbody");
+  $("#admintab table tbody tr").remove();
+
+  for (var i = 0; i < lst.length; i++)
+  {
+    var html = "<tr>";
+    html += "<td>" + lst[i].id + ".</td>";
+    html += "<td>" + lst[i].name + "</td>";
+    html += "<td>" + lst[i].login + "</td>";
+    html += "<td><a class='btn btn-danger' onclick='onDelSchool(this, " + lst[i].id + ")'>"
+      + "Delete</a></td>";
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+function onSchoolList()
+{
+  $.getJSON(url("/admin/schools"), function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillSchools(data);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+
+function onAddStudent()
+{
+  $("#schooltab #school_add").modal('show');
+  $("#schooltab #school_add input").val('');
+}
+//----------------------------------------------------------------------------
+
+function onDoAddStudent()
+{
+  var sid = $("#schooltab #school_id").val();
+  var name = $("#schooltab #school_add #name").val();
+  var surname = $("#schooltab #school_add #surname").val();
+  var login = $("#schooltab #school_add #login").val();
+  var passwd = $("#schooltab #school_add #passwd").val();
+
+  var data = {
+    name: name,
+    surname: surname,
+    login: login,
+    passwd: hex_md5(login + ':' + passwd)
+  };
+
+  $("#schooltab #school_add").modal('hide');
+
+  aux_postJSON(url("/school/" + sid + "/newstudent"), data, function (data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_showInfo($("#schooltab"), "Done!");
+  });
+
+}
+//----------------------------------------------------------------------------
+
+function onDelStudent(p, school_id, student_id)
+{
+  $.ajax({
+    url: url("/school/" + school_id + "/student/" + student_id),
+    type: "DELETE",
+    success: function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      $(p).toggleClass("btn-danger");
+    }
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function aux_fillStudents(data, school_id)
+{
+  var html = "";
+  var lst = data.students;
+  var body = $("#schooltab table tbody");
+  $("#schooltab table tbody tr").remove();
+
+  for (var i = 0; i < lst.length; i++)
+  {
+    var html = "<tr>";
+    html += "<td>" + lst[i].id + ".</td>";
+    html += "<td>" + lst[i].name + " " + lst[i].surname + "</td>";
+    html += "<td>" + lst[i].login + "</td>";
+    html += "<td><a class='btn btn-danger' "
+      + "onclick='onDelStudent(this, \"" + school_id + "\"," + lst[i].id + ")'>"
+      + "Delete</a></td>";
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+function onStudentlList()
+{
+  var sid = $("#schooltab #school_id").val();
+
+  $.getJSON(url("/school/" + sid + "/students"), function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+      aux_fillStudents(data, sid);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
 
 /*********************************************************
 ** Setup.
@@ -637,4 +820,12 @@ $(document).ready(function() {
   $("#examinfotab #bttGet").click(onExamInfo);
 
   $("#topicerrtab #bttGet").click(onTopicErrors);
+
+  $("#admintab #bttAdd").click(onAddSchool);
+  $("#admintab #admin_add .btn-success").click(onDoAddSchool);
+  $("#admintab #bttGet").click(onSchoolList);
+
+  $("#schooltab #bttAdd").click(onAddStudent);
+  $("#schooltab #school_add .btn-success").click(onDoAddStudent);
+  $("#schooltab #bttGet").click(onStudentlList);
 });

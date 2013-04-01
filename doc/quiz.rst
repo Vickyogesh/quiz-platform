@@ -1,4 +1,3 @@
-
 Quiz
 ----
 
@@ -16,6 +15,8 @@ Quiz is a list of 40 random questions for the specified topic.
 
 
 .. http:get:: /quiz/(topic_id)
+
+   **Access**: student, guest
 
    Get quiz for the specified topic and language (optional).
 
@@ -76,11 +77,14 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 200: Everything is ok.
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
    :statuscode 400: Invalid topic ID (temprorary removed - need to update quiz
     algo).
 
 
 .. http:post:: /quiz/(topic_id)
+
+   **Access**: student, guest
 
    Send quiz results for the specified topic. Client sends list of answered
    questions and answers. List of questions is not fixed to 40.
@@ -127,6 +131,7 @@ Quiz is a list of 40 random questions for the specified topic.
    :statuscode 200: Everything is ok.
 
    :statuscode 401: Unauthorized.
+   :statuscode 403: Forbidden.
 
    :statuscode 400: Not a JSON.
       Client sent malformed JSON string.
@@ -141,3 +146,6 @@ Quiz is a list of 40 random questions for the specified topic.
 
    :statuscode 400: Invalid value.
       List element is not a number.
+
+   :statuscode 400: Already answered.
+      Answers already sent to the server for the current quiz.
