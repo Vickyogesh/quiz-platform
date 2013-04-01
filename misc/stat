@@ -1,0 +1,31 @@
+# Simple awk script to generate requests statistics.
+# Run examples:
+#   gawk -F' ' -f stat app.log | d:\work\msys\1.0\bin\sort -k1,1 -k5nr
+#   gawk -F' ' -f stat app.log | sort -k1,1 -k5nr
+$1=="[pid:" {
+    if (index($18, ".")==0) {
+        match($18, "([^\\?]+)");
+        u=substr($18, RSTART, RLENGTH);
+        if (index(u, "/v1/quiz/") != 0) u = "/v1/quiz/";
+        else if (index(u, "/v1/exam/") != 0) u = "/v1/exam/";
+        else if (index(u, "/v1/student/me/topicerrors/") != 0) u = "/v1/student/me/topicerrors/";
+        x = $17 SUBSEP u
+        req[x] += $24;
+        cnt[x] += 1;
+        
+        if (min[x] == 0)
+            min[x] = $24;
+        if (max[x] < $24)
+            max[x] = $24;
+        if (min[x] > $24)
+            min[x] = $24;
+    }
+}
+END {
+    #printf "%-7s\t %-30s\t %-5s\t %-5s\t %-5s\t %-5s\n", "METHOD", "URL", "AVG", "MIN", "MAX", "COUNT";
+    for (w in req) {
+        split(w, A, SUBSEP);
+        avg = req[w] / cnt[w]
+        printf "%-7s\t %-30s\t %4.2f\t %d\t %d\t %d\n", A[1], A[2], avg, min[w], max[w], cnt[w];
+    }
+}
