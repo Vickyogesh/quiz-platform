@@ -158,6 +158,7 @@ class UserMixin(object):
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.__topicstat.execute(user_id=user)
+        now = None
         for row in rows:
             now = row[4]
             current = self._normErr(row[5])
