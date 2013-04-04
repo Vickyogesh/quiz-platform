@@ -347,6 +347,17 @@ function aux_clearUserStat()
 }
 //----------------------------------------------------------------------------
 
+function aux_errSpan(err) {
+    if (err == -1)
+      return "<span class='label label-important'>N/A</span>&nbsp;";
+    else if (err >= 20 )
+      return "<span class='badge badge-important'>" + err + "%</span>&nbsp;";
+    else if (err > 0)
+      return "<span class='badge badge-warning'>" + err + "%</span>&nbsp;";
+    else
+      return "<span class='badge badge-success'>" + err + "%</span>&nbsp;";
+}
+
 function aux_fillUserStat(data)
 {
   var html = "";
@@ -377,19 +388,13 @@ function aux_fillUserStat(data)
   for (var t in topics)
   {
     html = "<tr>";
-    html += "<td>" + topics[t].id + ".</td>";
+    html += "<td>" + (+t + 1) + ".</td>";
     html += "<td>" + topics[t].text + "</td>";
 
-    var err = topics[t].errors;
-
-    if (err == -1)
-      html += "<td>" + "<span class='label label-important'>Not enough exercises</span></td>";
-    else if (err >= 20 )
-      html += "<td>" + "<span class='badge badge-important'>" + err + "%</span></td>";
-    else if (err > 0)
-      html += "<td>" + "<span class='badge badge-warning'>" + err + "%</span></td>";
-    else
-      html += "<td>" + "<span class='badge badge-success'>" + err + "%</span></td>";
+    var a = topics[t].errors_now;
+    var b = topics[t].errors_week;
+    var c = topics[t].errors_month;
+    html += "<td><div class='row'>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</div></td>";
 
     body.append(html);
   }

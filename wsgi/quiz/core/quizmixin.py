@@ -114,26 +114,6 @@ class QuizMixin(object):
 
         return {'topic': topic_id, 'questions': questions}
 
-    # def saveQuestions(self, user_id, questions, answers):
-    #     questions, answers = self._aux_prepareLists(questions, answers)
-
-    #     # select and check answers
-    #     q = self.questions
-    #     s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
-    #     res = self.engine.execute(s)
-
-    #     ans = []
-    #     for row, answer in zip(res, answers):
-    #         ans.append({
-    #             'user_id': user_id,
-    #             'question_id': row[q.c.id],
-    #             'is_correct': row[q.c.answer] == answer
-    #         })
-
-    #     if ans:
-    #         with self.engine.begin() as conn:
-    #             conn.execute(self.quiz_answers.insert(), ans)
-
     def saveQuiz(self, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.
 

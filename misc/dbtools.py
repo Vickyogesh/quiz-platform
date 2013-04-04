@@ -177,9 +177,30 @@ class DbTool(object):
                 err_count SMALLINT NOT NULL DEFAULT 0
             );
 
-            CREATE TABLE errors(
+            CREATE TABLE topic_err_current(
                 user_id INTEGER UNSIGNED NOT NULL,
-                question_id INTEGER UNSIGNED NOT NULL
+                topic_id INTEGER UNSIGNED NOT NULL,
+                now_date DATE NOT NULL,
+                err_count SMALLINT NOT NULL DEFAULT 0,
+                count SMALLINT NOT NULL DEFAULT 0,
+                CONSTRAINT PRIMARY KEY (user_id, topic_id)
+            );
+
+            CREATE TABLE topic_err_snapshot(
+                user_id INTEGER UNSIGNED NOT NULL,
+                topic_id INTEGER UNSIGNED NOT NULL,
+                now_date DATE NOT NULL,
+                current FLOAT NOT NULL DEFAULT -1,
+                week FLOAT NOT NULL DEFAULT -1,
+                month FLOAT NOT NULL DEFAULT -1,
+                CONSTRAINT PRIMARY KEY (user_id, topic_id, now_date)
+            );
+
+            CREATE TABLE answers(
+                user_id INTEGER UNSIGNED NOT NULL,
+                question_id INTEGER UNSIGNED NOT NULL,
+                is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+                CONSTRAINT PRIMARY KEY (user_id, question_id)
             );
 
             CREATE TABLE quiz_answers(
@@ -216,6 +237,94 @@ class DbTool(object):
     def _createFuncs(self):
         print('Creating function...')
 
+        self.conn.execute("DROP TRIGGER IF EXISTS on_answer_add;")
+        self.conn.execute(text("""CREATE TRIGGER on_answer_add
+            AFTER INSERT ON answers FOR EACH ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                DECLARE err SMALLINT DEFAULT 0;
+
+                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
+
+                IF NEW.is_correct = 0 THEN
+                    SET err=1;
+                END IF;
+
+                INSERT INTO topic_err_current VALUES(NEW.user_id, topic, UTC_TIMESTAMP(), err, 1)
+                ON DUPLICATE KEY UPDATE
+                now_date=VALUES(now_date),
+                err_count=err_count+VALUES(err_count),
+                count=count+VALUES(count);
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_answer_upd;")
+        self.conn.execute(text("""CREATE TRIGGER on_answer_upd
+            AFTER UPDATE ON answers FOR EACH ROW BEGIN
+                DECLARE topic INTEGER UNSIGNED;
+                DECLARE err SMALLINT DEFAULT -1;
+
+                IF OLD.is_correct != NEW.is_correct THEN
+                    SELECT topic_id INTO topic FROM questions
+                    WHERE id=NEW.question_id;
+
+                    IF NEW.is_correct = 0 THEN
+                        SET err=1;
+                    END IF;
+
+                    UPDATE topic_err_current SET
+                    now_date=UTC_TIMESTAMP(), err_count=err_count+err
+                    WHERE user_id=NEW.user_id AND topic_id=topic;
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP PROCEDURE IF EXISTS update_topicerr_snapshot;")
+        self.conn.execute(text("""CREATE PROCEDURE update_topicerr_snapshot
+            (IN user INTEGER UNSIGNED, IN topic INTEGER UNSIGNED) BEGIN
+                DECLARE week FLOAT DEFAULT -1;
+                DECLARE month FLOAT DEFAULT -1;
+                DECLARE calc_err FLOAT DEFAULT -1;
+                DECLARE now DATE;
+                DECLARE row_exist INTEGER UNSIGNED;
+
+                SELECT now_date, err_count/count*100 INTO now, calc_err
+                FROM topic_err_current WHERE user_id=user AND topic_id=topic;
+
+                SELECT user_id INTO row_exist FROM topic_err_snapshot WHERE
+                user_id=user AND topic_id=topic AND now_date=now;
+
+                IF row_exist THEN
+                    UPDATE topic_err_snapshot SET current=calc_err
+                    WHERE user_id=user AND topic_id=topic AND now_date = now;
+                ELSE
+                    SELECT current INTO week FROM topic_err_snapshot
+                    WHERE user_id=user AND topic_id=topic
+                    AND now_date <= now - interval 7 day
+                    ORDER BY now_date DESC LIMIT 1;
+
+                    SELECT current INTO month FROM topic_err_snapshot
+                    WHERE user_id=user AND topic_id=topic
+                    AND now_date <= now - interval 1 month
+                    ORDER BY now_date DESC LIMIT 1;
+
+                    INSERT INTO topic_err_snapshot VALUES
+                    (user, topic, now, calc_err, week, month);
+                END IF;
+            END;
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_topicerr_add;")
+        self.conn.execute(text("""CREATE TRIGGER on_topicerr_add
+            AFTER INSERT ON topic_err_current FOR EACH ROW
+            CALL update_topicerr_snapshot(NEW.user_id, NEW.topic_id);
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS on_topicerr_upd;")
+        self.conn.execute(text("""CREATE TRIGGER on_topicerr_upd
+            AFTER UPDATE ON topic_err_current FOR EACH ROW
+            CALL update_topicerr_snapshot(NEW.user_id, NEW.topic_id);
+            """))
+
         ### Delete users
 
         self.conn.execute("DROP TRIGGER IF EXISTS on_del_school;")
@@ -227,7 +336,8 @@ class DbTool(object):
         self.conn.execute("DROP TRIGGER IF EXISTS on_del_user;")
         self.conn.execute(text("""CREATE TRIGGER on_del_user
             BEFORE DELETE ON users FOR EACH ROW BEGIN
-                DELETE FROM errors WHERE user_id=OLD.id;
+                DELETE FROM topic_err_snapshot WHERE user_id=OLD.id;
+                DELETE FROM answers WHERE user_id=OLD.id;
                 DELETE FROM quiz_answers WHERE user_id=OLD.id;
                 DELETE FROM exams WHERE user_id=OLD.id;
                 DELETE FROM topics_stat WHERE user_id=OLD.id;
@@ -276,61 +386,45 @@ class DbTool(object):
             END;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS update_err_quiz;")
+        self.conn.execute("DROP PROCEDURE IF EXISTS upd_answer;")
         self.conn.execute(text("""
-            CREATE TRIGGER update_err_quiz AFTER INSERT ON quiz_answers FOR EACH
-            ROW BEGIN
-                IF NEW.is_correct = 0 THEN
-                    INSERT IGNORE INTO errors VALUES(NEW.user_id, NEW.question_id);
-                END IF;
+            CREATE PROCEDURE upd_answer
+            (IN user INTEGER UNSIGNED, IN quest INTEGER UNSIGNED, IN correct BOOLEAN)
+            BEGIN
+                INSERT INTO answers VALUES(user, quest, correct)
+                ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct);
             END;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS update_err_examadd;")
+        self.conn.execute("DROP TRIGGER IF EXISTS quiz_add;")
         self.conn.execute(text("""
-            CREATE TRIGGER update_err_examadd AFTER INSERT ON exam_answers FOR EACH
+            CREATE TRIGGER quiz_add AFTER INSERT ON quiz_answers FOR EACH
+            ROW CALL upd_answer(NEW.user_id, NEW.question_id, NEW.is_correct);
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS quiz_upd;")
+        self.conn.execute(text("""
+            CREATE TRIGGER quiz_upd AFTER UPDATE ON quiz_answers FOR EACH
+            ROW CALL upd_answer(NEW.user_id, NEW.question_id, NEW.is_correct);
+            """))
+
+        self.conn.execute("DROP TRIGGER IF EXISTS exam_add;")
+        self.conn.execute(text("""
+            CREATE TRIGGER exam_add AFTER INSERT ON exam_answers FOR EACH
             ROW BEGIN
                 DECLARE user INT UNSIGNED;
                 SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
-                INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
+                CALL upd_answer(user, NEW.question_id, NEW.is_correct);
             END;
             """))
 
-        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_add;")
+        self.conn.execute("DROP TRIGGER IF EXISTS exam_upd;")
         self.conn.execute(text("""
-            CREATE TRIGGER update_topic_stat_add AFTER INSERT ON errors FOR EACH
-            ROW BEGIN
-                DECLARE topic INT UNSIGNED;
-                SELECT topic_id INTO topic FROM questions WHERE id=NEW.question_id;
-                INSERT INTO topics_stat VALUES(NEW.user_id, topic, 1)
-                ON DUPLICATE KEY UPDATE err_count = err_count + 1;
-            END;
-            """))
-
-        self.conn.execute("DROP TRIGGER IF EXISTS update_topic_stat_del;")
-        self.conn.execute(text("""
-            CREATE TRIGGER update_topic_stat_del AFTER DELETE ON errors FOR EACH
-            ROW BEGIN
-                DECLARE topic INT UNSIGNED;
-                SELECT topic_id INTO topic FROM questions WHERE id=OLD.question_id;
-                INSERT INTO topics_stat VALUES(OLD.user_id, topic, 0)
-                ON DUPLICATE KEY UPDATE err_count = err_count - 1;
-            END;
-            """))
-
-        self.conn.execute("DROP TRIGGER IF EXISTS update_err_exam;")
-        self.conn.execute(text("""
-            CREATE TRIGGER update_err_exam AFTER UPDATE ON exam_answers FOR EACH
+            CREATE TRIGGER exam_upd AFTER UPDATE ON exam_answers FOR EACH
             ROW BEGIN
                 DECLARE user INT UNSIGNED;
                 SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
-
-                IF NEW.is_correct = 1 THEN
-                    DELETE FROM errors WHERE user_id=user
-                    AND question_id=NEW.question_id;
-                ELSE
-                    INSERT IGNORE INTO errors VALUES(user, NEW.question_id);
-                END IF;
+                CALL upd_answer(user, NEW.question_id, NEW.is_correct);
             END;
             """))
 
@@ -433,8 +527,8 @@ class DbTool(object):
         print("Creating indices... topics_stat")
         self.conn.execute('ALTER TABLE topics_stat ADD UNIQUE ix_topicstat(user_id, topic_id);')
 
-        print("Creating indices... errors")
-        self.conn.execute('ALTER TABLE errors ADD UNIQUE ix_errors(user_id, question_id);')
+        # print("Creating indices... answers")
+        # self.conn.execute('ALTER TABLE answers ADD UNIQUE ix_answers(user_id, question_id);')
 
         print("Creating indices... quiz_answers")
         self.conn.execute('ALTER TABLE quiz_answers ADD UNIQUE ix_quiz_answers(user_id, question_id);')
@@ -451,7 +545,7 @@ class DbTool(object):
         self.conn.execute('OPTIMIZE TABLE topics;')
         self.conn.execute('OPTIMIZE TABLE questions;')
         self.conn.execute('OPTIMIZE TABLE topics_stat;')
-        self.conn.execute('OPTIMIZE TABLE errors;')
+        self.conn.execute('OPTIMIZE TABLE answers;')
         self.conn.execute('OPTIMIZE TABLE quiz_answers;')
         self.conn.execute('OPTIMIZE TABLE exam_answers;')
         self.conn.execute('OPTIMIZE TABLE users;')

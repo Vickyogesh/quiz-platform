@@ -32,11 +32,19 @@ class UserMixin(object):
         self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
         self.__getname = self.__getname.compile(self.engine)
 
-        self.__topicstat = text("""
-            SELECT t.id, t.max_id - t.min_id + 1, t.text, t.text_fr, t.text_de,
-            IFNULL(s.err_count,-1) FROM topics t LEFT JOIN
-            (SELECT * FROM topics_stat WHERE user_id=:user_id) s
-            ON t.id=s.topic_id;""")
+        self.__topicstat = text("""SELECT t.topic_id, t1.text, t1.text_de, t1.text_fr,
+                   t.now_date, h.current, h.week, h.month FROM
+                   topic_err_current t LEFT JOIN topic_err_snapshot h ON
+                   t.now_date=h.now_date AND t.topic_id=h.topic_id
+                   AND t.user_id=h.user_id
+                   LEFT JOIN topics t1 ON t.topic_id=t1.id WHERE
+                   t.user_id=:user_id;""")
+
+        # self.__topicstat = text("""
+        #     SELECT t.id, t.max_id - t.min_id + 1, t.text, t.text_fr, t.text_de,
+        #     IFNULL(s.err_count,-1) FROM topics t LEFT JOIN
+        #     (SELECT * FROM topics_stat WHERE user_id=:user_id) s
+        #     ON t.id=s.topic_id;""")
         self.__topicstat = self.__topicstat.compile(self.engine)
 
         self.__examstat = text("""SELECT id, err_count, end_time,
@@ -51,8 +59,8 @@ class UserMixin(object):
 
         self.__topicerr = text(
             """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
-            AND id IN (SELECT question_id FROM errors WHERE
-            user_id=:user_id)) t;""")
+            AND id IN (SELECT question_id FROM answers WHERE
+            user_id=:user_id AND is_correct=0)) t;""")
         self.__topicerr = self.__topicerr.compile(self.engine)
 
         self.__lastvisit = text("""UPDATE users SET last_visit=UTC_TIMESTAMP()
@@ -132,33 +140,38 @@ class UserMixin(object):
             raise QuizCoreError('Unknown user.')
         return info
 
+    def _normErr(self, err):
+        if 0 < err < 1:
+            return 1
+        elif 99 < err < 100:
+            return 99
+        return int(err)
+
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
-            lang = 4
+            lang = 2
         elif lang == 'fr':
             lang = 3
         else:
-            lang = 2
+            lang = 1
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.__topicstat.execute(user_id=user)
         for row in rows:
-            err = float(row[5]) / row[1] * 100
-
-            if err < 0:
-                err = -1
-            elif 0 < err < 1:
-                err = 1
-            elif 99 < err < 100:
-                err = 99
+            now = row[4]
+            current = self._normErr(row[5])
+            week = self._normErr(row[6])
+            month = self._normErr(row[7])
 
             stat.append({
                 'id': row[0],
                 'text': row[lang],
-                'errors': int(err)
+                'errors_now': current,
+                'errors_week': week,
+                'errors_month': month
             })
-        return stat
+        return now, stat
 
     def __getExamStat(self, user_id):
         rows = self.__examstat.execute(user_id=user_id)
@@ -176,10 +189,12 @@ class UserMixin(object):
 
     def getUserStat(self, user_id, lang):
         user = self._getStudentById(user_id)
+        now, topics = self._getTopicsStat(user_id, lang)
         return {
             'student': user,
             'exams': self.__getExamStat(user_id),
-            'topics': self._getTopicsStat(user_id, lang)
+            'last_date': str(now),
+            'topics': topics
         }
 
     def _createExamInfo(self, exam_db_row):

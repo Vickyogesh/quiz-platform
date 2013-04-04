@@ -37,8 +37,8 @@ class CoreReviewTest(unittest.TestCase):
     # Check: fill some answers and get wrong ones.
     def test_get(self):
         # Put 3 wrong answers.
-        self.engine.execute("""INSERT INTO errors values
-                            (1, 3), (1, 4), (1, 5)""")
+        self.engine.execute("""INSERT INTO answers values
+                            (1, 3, 0), (1, 4, 0), (1, 5, 0)""")
 
         # Error review must contain only questions with ids 3, 4, 5.
         review = self.core.getErrorReview(1, 'it')
@@ -75,12 +75,12 @@ class CoreReviewTest(unittest.TestCase):
     # Check: normal save
     def test_save(self):
         # set initial errors
-        self.engine.execute("""INSERT INTO errors values
-                            (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6)""")
+        self.engine.execute("""INSERT INTO answers values
+                            (1, 1, 0), (1, 2, 0), (1, 3, 0), (1, 4, 0), (1, 5, 0), (1, 6, 0)""")
 
         self.core.saveErrorReview(1, [1, 2, 3, 4, 5], [1, 1, 0, 0, 0])
 
-        res = self.engine.execute("SELECT question_id FROM errors")
+        res = self.engine.execute("SELECT question_id FROM answers where is_correct=0")
         data = [row[0] for row in res]
         data = list(sorted(data))
 

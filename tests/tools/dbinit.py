@@ -79,7 +79,7 @@ class Db(DbTool):
         self.conn.execute('TRUNCATE TABLE chapters;')
         self.conn.execute('TRUNCATE TABLE topics;')
         self.conn.execute('TRUNCATE TABLE questions;')
-        self.conn.execute('TRUNCATE TABLE errors;')
+        self.conn.execute('TRUNCATE TABLE answers;')
         self.conn.execute('TRUNCATE TABLE quiz_answers;')
         self.conn.execute('TRUNCATE TABLE exam_answers;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')

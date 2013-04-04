@@ -103,7 +103,7 @@ class CoreExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
         self.assertEqual(0, res[0])
 
-        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        res = self.engine.execute("SELECT count(*) from answers").fetchone()
         self.assertEqual(0, res[0])
 
         info = self.core.createExam(3, 'it')
@@ -117,7 +117,7 @@ class CoreExamTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
         self.assertEqual(40, res[0])
 
-        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        res = self.engine.execute("SELECT count(*) from answers").fetchone()
         self.assertEqual(40, res[0])
 
         ### Check exam metadata
@@ -162,7 +162,7 @@ class CoreExamTest(unittest.TestCase):
 
         ### Check errors questions
 
-        res = self.engine.execute("SELECT question_id from errors")
+        res = self.engine.execute("SELECT question_id from answers where is_correct=FALSE")
         err_questions = [row[0] for row in res]
         err_questions = list(sorted(err_questions))
         self.assertEqual(questions, err_questions)
@@ -236,7 +236,7 @@ class CoreExamTest(unittest.TestCase):
         self.assertTrue(delta <= 5)
 
         ### Check errors
-        res = self.engine.execute("SELECT question_id from errors")
+        res = self.engine.execute("SELECT question_id from answers where is_correct=FALSE")
         err_questions = [row[0] for row in res]
         err_questions = list(sorted(err_questions))
         self.assertEqual(questions[0:5], err_questions)
