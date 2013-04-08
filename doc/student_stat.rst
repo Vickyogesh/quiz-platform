@@ -144,8 +144,8 @@ Student statistics provides learning progress information of the student.
    =========================================================================
    last_date  Last activity date for this topic (UTC).
    last       Current percent of errors (relative to *last_date*).
-   week       Percent of errors in the last week (relative to *last_date*).
-   month      Percent of errors in the last month (relative to *last_date*).
+   week       Percent of errors week ago (relative to *last_date*).
+   month      Percent of errors month ago (relative to *last_date*).
 
               **-1** value means  that there is no
               data for the given period.
