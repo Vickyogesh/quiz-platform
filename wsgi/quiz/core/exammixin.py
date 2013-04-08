@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 from sqlalchemy import select, text, func, bindparam, and_
-from profilestats import profile
+#from profilestats import profile
 from .exceptions import QuizCoreError
 
 
