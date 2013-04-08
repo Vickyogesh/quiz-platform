@@ -68,3 +68,12 @@ topics_stat
 
 * guest_access - contains information about guest requests to provide/control
   limited access for the guest users.
+
+
+Frontend tips
+=============
+
+We may use the following tools:
+http://fabien-d.github.com/alertify.js/
+http://www.chartjs.org/
+https://github.com/mbuczko/simplemodal-jquery

@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 from sqlalchemy import select, text, func, bindparam, and_
-#from profilestats import profile
+from profilestats import profile
 from .exceptions import QuizCoreError
 
 
@@ -34,9 +34,6 @@ class ExamMixin(object):
         self.__upd = self.__upd.where(and_(t.c.exam_id == bindparam('exam_id'),
                                       t.c.question_id == bindparam('question_id')))
         self.__upd = self.__upd.compile(self.engine)
-
-        # self.__upd_examstat = text("call update_exam_stat(:exam_id, :passed);")
-        # self.__upd_examstat = self.__upd_examstat.compile(self.engine)
 
         self.__examquest = text("""SELECT q.*, e.is_correct FROM
             (SELECT * FROM exam_answers where exam_id=:exam_id) e LEFT JOIN
@@ -72,14 +69,13 @@ class ExamMixin(object):
             id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
         return id_list
 
+    #@profile
     def __initExam(self, user_id, questions):
         res = self.__create_exam.execute(user_id=user_id)
         exam_id = res.inserted_primary_key[0]
 
         vals = [{'exam_id': exam_id, 'question_id': q} for q in questions]
-
-        with self.engine.begin() as conn:
-            conn.execute(self.__set_questions, vals)
+        self.__set_questions.execute(vals)
         return exam_id
 
     # Return expiration date and exam end time (if set).

@@ -139,12 +139,14 @@ def topic_err_current(mgr):
 
 @add_me
 def delete_users(mgr):
+    # Delete all school's students.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_del_school;")
     mgr.conn.execute(text("""CREATE TRIGGER on_del_school
         BEFORE DELETE ON schools FOR EACH ROW
         DELETE FROM users WHERE school_id=OLD.id;
         """))
 
+    # Before delete a user we delete all user's data.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_del_user;")
     mgr.conn.execute(text("""CREATE TRIGGER on_del_user
         BEFORE DELETE ON users FOR EACH ROW BEGIN
@@ -160,6 +162,7 @@ def delete_users(mgr):
         END;
         """))
 
+    # Before delete exam we delete exam's answers.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_del_exam;")
     mgr.conn.execute(text("""CREATE TRIGGER on_del_exam
         BEFORE DELETE ON exams FOR EACH ROW
@@ -169,6 +172,7 @@ def delete_users(mgr):
 
 @add_me
 def guest(mgr):
+    # If school is added then we create school's guest user.
     mgr.conn.execute("DROP TRIGGER IF EXISTS add_guest;")
     mgr.conn.execute(text("""CREATE TRIGGER add_guest
         AFTER INSERT ON schools FOR EACH ROW
@@ -178,6 +182,7 @@ def guest(mgr):
              MD5(CONCAT(NEW.login, '-guest:guest')), 'guest', NEW.id);
         """))
 
+    # If guest is added then we update guest access info.
     mgr.conn.execute("DROP TRIGGER IF EXISTS guestaccess_add;")
     mgr.conn.execute(text("""CREATE TRIGGER guestaccess_add
         AFTER INSERT ON users FOR EACH ROW
@@ -189,6 +194,8 @@ def guest(mgr):
         END;
         """))
 
+    # If user activity timestamp is changed and if user is guest
+    # then we update number of requests.
     mgr.conn.execute("DROP TRIGGER IF EXISTS guestaccess_update;")
     mgr.conn.execute(text("""CREATE TRIGGER guestaccess_update
         AFTER UPDATE ON users FOR EACH ROW
@@ -227,14 +234,14 @@ def quiz_answers(mgr):
 
 @add_me
 def exam_answers(mgr):
-    mgr.conn.execute("DROP TRIGGER IF EXISTS exam_add;")
-    mgr.conn.execute(text("""CREATE TRIGGER exam_add
-        AFTER INSERT ON exam_answers FOR EACH ROW BEGIN
-            DECLARE user INT UNSIGNED;
-            SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
-            CALL upd_answer(user, NEW.question_id, NEW.is_correct);
-        END;
-        """))
+    # mgr.conn.execute("DROP TRIGGER IF EXISTS exam_add;")
+    # mgr.conn.execute(text("""CREATE TRIGGER exam_add
+    #     AFTER INSERT ON exam_answers FOR EACH ROW BEGIN
+    #         DECLARE user INT UNSIGNED;
+    #         SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
+    #         CALL upd_answer(user, NEW.question_id, NEW.is_correct);
+    #     END;
+    #     """))
 
     mgr.conn.execute("DROP TRIGGER IF EXISTS exam_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER exam_upd
