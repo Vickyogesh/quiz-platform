@@ -30,9 +30,13 @@ class ExamMixin(object):
         self.__set_questions = t.insert().values(exam_id=0, question_id=0)
         self.__set_questions = self.__set_questions.compile(self.engine)
 
-        self.__upd = t.update().values(is_correct=bindparam('is_correct'))
-        self.__upd = self.__upd.where(and_(t.c.exam_id == bindparam('exam_id'),
-                                      t.c.question_id == bindparam('question_id')))
+        # self.__upd = t.update().values(is_correct=bindparam('is_correct'))
+        # self.__upd = self.__upd.where(and_(t.c.exam_id == bindparam('exam_id'),
+        #                               t.c.question_id == bindparam('question_id')))
+
+        self.__upd = text("""INSERT INTO exam_answers
+            VALUES(:exam_id, :question_id, :is_correct)
+            ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct)""")
         self.__upd = self.__upd.compile(self.engine)
 
         self.__examquest = text("""SELECT q.*, e.is_correct FROM

@@ -245,7 +245,7 @@ def exam_answers(mgr):
 
     mgr.conn.execute("DROP TRIGGER IF EXISTS exam_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER exam_upd
-        AFTER UPDATE ON exam_answers FOR EACH ROW BEGIN
+        BEFORE UPDATE ON exam_answers FOR EACH ROW BEGIN
             DECLARE user INT UNSIGNED;
             SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
             CALL upd_answer(user, NEW.question_id, NEW.is_correct);

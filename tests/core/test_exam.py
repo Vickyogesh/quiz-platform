@@ -110,7 +110,7 @@ class CoreExamTest(unittest.TestCase):
 
         # After new exam generation there must be one entry in the
         # 'exams' table which describes exam and also 'exam_answers'
-        # and 'errors' must contain 40 exam questions.
+        # must contain 40 exam questions, but 'answers' will not be updated.
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(1, res[0])
 
@@ -118,7 +118,7 @@ class CoreExamTest(unittest.TestCase):
         self.assertEqual(40, res[0])
 
         res = self.engine.execute("SELECT count(*) from answers").fetchone()
-        self.assertEqual(40, res[0])
+        self.assertEqual(0, res[0])
 
         ### Check exam metadata
 
@@ -159,13 +159,6 @@ class CoreExamTest(unittest.TestCase):
 
         # every answer must be wrong by default
         self.assertEqual(answers, [0] * 40)
-
-        ### Check errors questions
-
-        res = self.engine.execute("SELECT question_id from answers where is_correct=FALSE")
-        err_questions = [row[0] for row in res]
-        err_questions = list(sorted(err_questions))
-        self.assertEqual(questions, err_questions)
 
     # Check exam saving with wrong data
     def test_saveWrong(self):
@@ -216,7 +209,7 @@ class CoreExamTest(unittest.TestCase):
         answers[:5] = [0] * 5
         self.core.saveExam(exam_id, questions, answers)
 
-        ### Check answers
+        ### Check exam answers
 
         res = self.engine.execute(
             "SELECT question_id,is_correct from exam_answers WHERE exam_id="
