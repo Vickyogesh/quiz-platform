@@ -32,19 +32,12 @@ class UserMixin(object):
         self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
         self.__getname = self.__getname.compile(self.engine)
 
-        self.__topicstat = text("""SELECT t.topic_id, t1.text, t1.text_de, t1.text_fr,
-                   t.now_date, h.current, h.week, h.month FROM
-                   topic_err_current t LEFT JOIN topic_err_snapshot h ON
-                   t.now_date=h.now_date AND t.topic_id=h.topic_id
-                   AND t.user_id=h.user_id
-                   LEFT JOIN topics t1 ON t.topic_id=t1.id WHERE
-                   t.user_id=:user_id;""")
+        self.__topicstat = text("""SELECT
+            t.id, e.now_date, e.err_count/e.count*100, e.week, e.month,
+            t.text, t.text_fr, t.text_de
+            FROM topics t LEFT JOIN topic_err_current e
+            ON t.id=e.topic_id and e.user_id=:user_id;""")
 
-        # self.__topicstat = text("""
-        #     SELECT t.id, t.max_id - t.min_id + 1, t.text, t.text_fr, t.text_de,
-        #     IFNULL(s.err_count,-1) FROM topics t LEFT JOIN
-        #     (SELECT * FROM topics_stat WHERE user_id=:user_id) s
-        #     ON t.id=s.topic_id;""")
         self.__topicstat = self.__topicstat.compile(self.engine)
 
         self.__examstat = text("""SELECT id, err_count, end_time,
@@ -149,30 +142,34 @@ class UserMixin(object):
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
-            lang = 2
+            lang = 7
         elif lang == 'fr':
-            lang = 3
+            lang = 6
         else:
-            lang = 1
+            lang = 5
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.__topicstat.execute(user_id=user)
-        now = None
         for row in rows:
-            now = row[4]
-            current = self._normErr(row[5])
-            week = self._normErr(row[6])
-            month = self._normErr(row[7])
+            tid = row[0]
+            now = row[1]
+            if now is None:
+                errors = -1
+            else:
+                errors = {
+                    'last_date': str(now),
+                    'last': self._normErr(row[2]),
+                    'week': self._normErr(row[3]),
+                    'month': self._normErr(row[4])
+                }
 
             stat.append({
-                'id': row[0],
+                'id': tid,
                 'text': row[lang],
-                'errors_now': current,
-                'errors_week': week,
-                'errors_month': month
+                'errors': errors
             })
-        return now, stat
+        return stat
 
     def __getExamStat(self, user_id):
         rows = self.__examstat.execute(user_id=user_id)
@@ -190,11 +187,10 @@ class UserMixin(object):
 
     def getUserStat(self, user_id, lang):
         user = self._getStudentById(user_id)
-        now, topics = self._getTopicsStat(user_id, lang)
+        topics = self._getTopicsStat(user_id, lang)
         return {
             'student': user,
             'exams': self.__getExamStat(user_id),
-            'last_date': str(now),
             'topics': topics
         }
 

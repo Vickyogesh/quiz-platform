@@ -10,7 +10,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'misc'))
 
 import argparse
 from sqlalchemy import text
-from dbtools import DbTool
+from dbtools import DbManager
+from dbtools.settings import TEST_SCHOOLS, TEST_USERS
+
 
 ###########################################################
 # Configuration
@@ -24,13 +26,13 @@ NUM_STUDENTS = 4
 NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
 
 
-class Db(DbTool):
+class Db(DbManager):
     def __init__(self):
         self.parseArgs()
-        DbTool.__init__(self,
-                        self.args.verbose,
-                        self.args.new,
-                        self.args.config)
+        DbManager.__init__(self,
+                           self.args.verbose,
+                           self.args.new,
+                           self.args.config)
         self.put_users = True
 
     def parseArgs(self):
@@ -250,14 +252,14 @@ class Db(DbTool):
             """
 
         lst = []
-        for x in DbTool.TEST_SCHOOLS:
+        for x in TEST_SCHOOLS:
             lst.append("""INSERT INTO schools VALUES
             (0, '{name}', '{login}',
             '{passwd}');""".format(**x))
         sql += '\n'.join(lst)
 
         lst = []
-        for x in DbTool.TEST_USERS:
+        for x in TEST_USERS:
             lst.append("""INSERT INTO users(name, surname, login, passwd,
             type, school_id) VALUES ('{name}', '{surname}', '{login}',
             '{passwd}', '{type}', {school_id});""".format(**x))

@@ -349,13 +349,17 @@ function aux_clearUserStat()
 
 function aux_errSpan(err) {
     if (err == -1)
-      return "<span class='label label-important'>N/A</span>&nbsp;";
-    else if (err >= 20 )
-      return "<span class='badge badge-important'>" + err + "%</span>&nbsp;";
-    else if (err > 0)
-      return "<span class='badge badge-warning'>" + err + "%</span>&nbsp;";
+      return " N/A ";
     else
-      return "<span class='badge badge-success'>" + err + "%</span>&nbsp;";
+      return " " + err + "% ";
+    // if (err == -1)
+    //   return "<div class='span1'><span class='label label-important'>N/A</span></div>";
+    // else if (err >= 20 )
+    //   return "<div class='span1'><span class='badge badge-important'>" + err + "%</span></div>";
+    // else if (err > 0)
+    //   return "<div class='span1'><span class='badge badge-warning'>" + err + "%</span></div>";
+    // else
+    //   return "<div class='span1'><span class='badge badge-success'>" + err + "%</span></div>";
 }
 
 function aux_fillUserStat(data)
@@ -387,15 +391,23 @@ function aux_fillUserStat(data)
   var topics = data.topics;
   for (var t in topics)
   {
+    var topic = topics[t]
     html = "<tr>";
     html += "<td>" + (+t + 1) + ".</td>";
-    html += "<td>" + topics[t].text + "</td>";
+    html += "<td>" + topic.text + "</td>";
 
-    var a = topics[t].errors_now;
-    var b = topics[t].errors_week;
-    var c = topics[t].errors_month;
-    html += "<td><div class='row'>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</div></td>";
+    if (topic.errors == -1) {
+      html += "<td>N/A</td><td>N/A</td>";
+    }
+    else {
+      var err = topic.errors;
+      html += "<td>" + err.last_date + "</td>";
+      var a = err.last;
+      var b = err.week;
+      var c = err.month;
+      html += "<td>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</td>";
 
+    }
     body.append(html);
   }
 }

@@ -8,11 +8,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import unittest
 from collections import namedtuple
 from datetime import datetime, timedelta
-from sqlalchemy import select, text
+from sqlalchemy import select
 from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 
-TopicErrLastRow = namedtuple('TopicErrLastRow', 'user topic date err count')
+TopicErrLastRow = namedtuple('TopicErrLastRow', 'user topic date err count, week month')
+TopicErrSnapshotRow = namedtuple('TopicErrSnapshotRow', 'user topic date err')
+R = TopicErrLastRow
+S = TopicErrSnapshotRow
 
 
 def now():
@@ -33,24 +36,35 @@ class CoreTopicHistoryTest(unittest.TestCase):
 
     # Check: add new answer.
     # answers -> topic_err_current -> topic_err_snapshot
+    # If you add answer then new row must be created in the
+    # topic_err_current (if it present then it must be updated).
+    # Also new row will be added to the topic_err_snapshot
+    # (or updated if date the same).
     def test_add(self):
-        R = TopicErrLastRow
-
         self.engine.execute("INSERT INTO answers VALUES(4, 1, 0)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=1, count=1), res[0])
+        self.assertEqual(R(user=4, topic=1, date=now(),
+                           err=1, count=1, week=-1, month=-1), res[0])
 
         self.engine.execute("INSERT INTO answers VALUES(4, 2, 1)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=1, count=2), res[0])
+        self.assertEqual(R(user=4, topic=1, date=now(),
+                           err=1, count=2, week=-1, month=-1), res[0])
 
         self.engine.execute("INSERT INTO answers VALUES(4, 203, 1)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(2, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=1, count=2), res[0])
-        self.assertEqual(R(user=4, topic=2, date=now(), err=0, count=1), res[1])
+        self.assertEqual(R(user=4, topic=1, date=now(), err=1,
+                           count=2, week=-1, month=-1), res[0])
+        self.assertEqual(R(user=4, topic=2, date=now(), err=0,
+                           count=1, week=-1, month=-1), res[1])
+
+        res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
+        self.assertEqual(2, len(res))
+        self.assertEqual(S(user=4, topic=1, date=now(), err=50), res[0])
+        self.assertEqual(S(user=4, topic=2, date=now(), err=0), res[1])
 
     # Check: update existent answer
     def test_update(self):
@@ -60,26 +74,35 @@ class CoreTopicHistoryTest(unittest.TestCase):
         self.engine.execute("UPDATE answers SET is_correct=1 WHERE question_id=1")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=0, count=2), res[0])
+        self.assertEqual(R(user=4, topic=1, date=now(), err=0,
+                           count=2, week=-1, month=-1), res[0])
+        res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
+        self.assertEqual(1, len(res))
+        self.assertEqual(S(user=4, topic=1, date=now(), err=0), res[0])
 
     def test_snapshot(self):
+        curr = self.core.meta.tables['topic_err_current']
         t = self.core.meta.tables['topic_err_snapshot']
         dt = now()
 
+        # add 60 snapshots (~2 month data)
         lst = []
-        for x in xrange(10):
+        for x in xrange(60):
             lst.append({
                 'user_id': 4,
                 'topic_id': 1,
                 'now_date': dt - timedelta(days=x),
-                'curr': 20 + x,
-                'week': 40 + x,
-                'month': 50 + x
+                'err_percent': 12 + x
             })
         self.engine.execute(t.insert(), lst)
-        res = self.engine.execute(t.select()).fetchall()
-        for r in res:
-            print r
+        # res = self.engine.execute(t.select()).fetchall()
+        # for r in res:
+        #     print r
+
+        tm = dt - timedelta(days=4)
+        self.engine.execute(curr.insert(), user_id=4, topic_id=1, now_date=tm,
+                            err_count=20, count=40)
+        #res = self.engine.execute("SELECT * FROM topic_err_current").fetchone()
 
 
 # Test: topic statistics calculation in various situations.

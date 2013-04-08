@@ -79,7 +79,12 @@ Student statistics provides learning progress information of the student.
           {
             "id": 1,
             "text": "Topic 1",
-            "errors": 20
+            "errors": {
+              "last_date": "2013-02-02",
+              "last": 12,
+              "week": 34.5,
+              "month": -1
+            }
           },
           {
             "id": 2,
@@ -119,19 +124,32 @@ Student statistics provides learning progress information of the student.
    =========  ==========================================
 
 
-   =========  ======================================
+   =========  =========================================
    topics fields
-   =================================================
+   ====================================================
    id         Topic ID.
    text       Topic text.
-   errors     Percent of errors for this topic based
+   errors     Information about errors for this topic.
+              Percent of errors for this topic based
               on quizzes, exams and error reviews
               results.
 
               **-1** value means
               that the student did not answer the
               questions in this topic.
-   =========  ======================================
+   =========  =========================================
+
+   =========  ==============================================================
+   errors fields
+   =========================================================================
+   last_date  Last activity date for this topic (UTC).
+   last       Current percent of errors (relative to *last_date*).
+   week       Percent of errors in the last week (relative to *last_date*).
+   month      Percent of errors in the last month (relative to *last_date*).
+
+              **-1** value means  that there is no
+              data for the given period.
+   =========  ==============================================================
 
    :param id: Student ID.
 
