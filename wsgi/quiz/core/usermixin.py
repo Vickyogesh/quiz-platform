@@ -154,7 +154,9 @@ class UserMixin(object):
         return info
 
     def _normErr(self, err):
-        if 0 < err < 1:
+        if err is None:
+            return -1
+        elif 0 < err < 1:
             return 1
         elif 99 < err < 100:
             return 99
