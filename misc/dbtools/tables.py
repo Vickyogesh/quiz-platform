@@ -90,11 +90,8 @@ def create(mgr):
         CREATE TABLE topic_err_current(
             user_id INTEGER UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
-            now_date DATE NOT NULL,
             err_count SMALLINT NOT NULL DEFAULT 0,
             count SMALLINT NOT NULL DEFAULT 0,
-            week FLOAT NOT NULL DEFAULT -1,
-            month FLOAT NOT NULL DEFAULT -1,
             CONSTRAINT PRIMARY KEY (user_id, topic_id)
         );
 

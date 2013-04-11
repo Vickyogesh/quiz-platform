@@ -37,11 +37,8 @@ def answers(mgr):
                 SET err=1;
             END IF;
 
-            INSERT INTO topic_err_current
-            (user_id, topic_id, now_date, err_count, count) VALUES
-            (NEW.user_id, topic, DATE(UTC_TIMESTAMP()), err, 1)
-            ON DUPLICATE KEY UPDATE now_date=VALUES(now_date),
-            err_count=err_count+VALUES(err_count),
+            INSERT INTO topic_err_current VALUES (NEW.user_id, topic, err, 1)
+            ON DUPLICATE KEY UPDATE err_count=err_count+VALUES(err_count),
             count=count+VALUES(count);
         END;
         """))
@@ -63,10 +60,8 @@ def answers(mgr):
                     SET err=1;
                 END IF;
 
-                INSERT INTO topic_err_current
-                (user_id, topic_id, now_date, err_count, count) VALUES
-                (NEW.user_id, topic, DATE(UTC_TIMESTAMP()), err, 1)
-                ON DUPLICATE KEY UPDATE now_date=VALUES(now_date),
+                INSERT INTO topic_err_current VALUES
+                (NEW.user_id, topic, err, 1) ON DUPLICATE KEY UPDATE
                 err_count=err_count+VALUES(err_count);
             END IF;
         END;
@@ -76,64 +71,24 @@ def answers(mgr):
 @add_me
 def topic_err_current(mgr):
     # If new entry is added to the topic_err_current table then
-    # before inserting calc week and month columns by getting
-    # errors percent for the last week and last month
-    # from the topic_err_snapshot table; and also insert (or update)
-    # snapshot of the current state to the topic_err_snapshot table.
+    # we also update snapshot of the current state.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_topic_err_current_add;")
     mgr.conn.execute(text("""CREATE TRIGGER on_topic_err_current_add
-        BEFORE INSERT ON topic_err_current FOR EACH ROW BEGIN
-            DECLARE week FLOAT DEFAULT -1;
-            DECLARE month FLOAT DEFAULT -1;
-
-            SELECT err_percent INTO week FROM topic_err_snapshot
-            WHERE user_id=NEW.user_id AND topic_id=NEW.topic_id
-            AND now_date >= NEW.now_date - interval 1 week
-            ORDER BY now_date LIMIT 1;
-
-            SELECT err_percent INTO month FROM topic_err_snapshot
-            WHERE user_id=NEW.user_id AND topic_id=NEW.topic_id
-            AND now_date >= NEW.now_date - interval 1 month
-            ORDER BY now_date LIMIT 1;
-
-            SET NEW.week = week;
-            SET NEW.month = month;
-
-            INSERT INTO topic_err_snapshot VALUES
-            (NEW.user_id, NEW.topic_id, NEW.now_date,
-             NEW.err_count/NEW.count*100)
-            ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
-        END;
+        AFTER INSERT ON topic_err_current FOR EACH ROW
+        INSERT INTO topic_err_snapshot VALUES
+        (NEW.user_id, NEW.topic_id, DATE(UTC_TIMESTAMP()),
+         NEW.err_count/NEW.count*100)
+        ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
         """))
 
-    # Before update if date is changed recalc week and month columns
-    # and update snapshot of the current state.
+    # After update we also update snapshot of the current state.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_topic_err_current_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_topic_err_current_upd
-        BEFORE UPDATE ON topic_err_current FOR EACH ROW BEGIN
-            DECLARE week FLOAT DEFAULT -1;
-            DECLARE month FLOAT DEFAULT -1;
-
-            IF NEW.now_date != OLD.now_date THEN
-                SELECT err_percent INTO week FROM topic_err_snapshot
-                WHERE user_id=NEW.user_id AND topic_id=NEW.topic_id
-                AND now_date >= NEW.now_date - interval 1 week
-                ORDER BY now_date LIMIT 1;
-
-                SELECT err_percent INTO month FROM topic_err_snapshot
-                WHERE user_id=NEW.user_id AND topic_id=NEW.topic_id
-                AND now_date >= NEW.now_date - interval 1 month
-                ORDER BY now_date LIMIT 1;
-
-                SET NEW.week = week;
-                SET NEW.month = month;
-            END IF;
-
-            INSERT INTO topic_err_snapshot VALUES
-            (NEW.user_id, NEW.topic_id, NEW.now_date,
-             NEW.err_count/NEW.count*100)
-            ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
-        END;
+        AFTER UPDATE ON topic_err_current FOR EACH ROW
+        INSERT INTO topic_err_snapshot VALUES
+        (NEW.user_id, NEW.topic_id, DATE(UTC_TIMESTAMP()),
+         NEW.err_count/NEW.count*100)
+        ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
         """))
 
 
@@ -150,12 +105,11 @@ def delete_users(mgr):
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_del_user;")
     mgr.conn.execute(text("""CREATE TRIGGER on_del_user
         BEFORE DELETE ON users FOR EACH ROW BEGIN
+            DELETE FROM topic_err_current WHERE user_id=OLD.id;
             DELETE FROM topic_err_snapshot WHERE user_id=OLD.id;
             DELETE FROM answers WHERE user_id=OLD.id;
             DELETE FROM quiz_answers WHERE user_id=OLD.id;
             DELETE FROM exams WHERE user_id=OLD.id;
-            DELETE FROM topic_err_current WHERE user_id=OLD.id;
-            DELETE FROM topic_err_snapshot WHERE user_id=OLD.id;
             IF OLD.type = 'guest' THEN
                 DELETE FROM guest_access WHERE id=OLD.id;
             END IF;
@@ -234,15 +188,6 @@ def quiz_answers(mgr):
 
 @add_me
 def exam_answers(mgr):
-    # mgr.conn.execute("DROP TRIGGER IF EXISTS exam_add;")
-    # mgr.conn.execute(text("""CREATE TRIGGER exam_add
-    #     AFTER INSERT ON exam_answers FOR EACH ROW BEGIN
-    #         DECLARE user INT UNSIGNED;
-    #         SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
-    #         CALL upd_answer(user, NEW.question_id, NEW.is_correct);
-    #     END;
-    #     """))
-
     mgr.conn.execute("DROP TRIGGER IF EXISTS exam_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER exam_upd
         BEFORE UPDATE ON exam_answers FOR EACH ROW BEGIN

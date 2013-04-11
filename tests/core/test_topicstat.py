@@ -12,7 +12,7 @@ from sqlalchemy import select
 from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 
-TopicErrLastRow = namedtuple('TopicErrLastRow', 'user topic date err count, week month')
+TopicErrLastRow = namedtuple('TopicErrLastRow', 'user topic err count')
 TopicErrSnapshotRow = namedtuple('TopicErrSnapshotRow', 'user topic date err')
 R = TopicErrLastRow
 S = TopicErrSnapshotRow
@@ -44,22 +44,18 @@ class CoreTopicHistoryTest(unittest.TestCase):
         self.engine.execute("INSERT INTO answers VALUES(4, 1, 0)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(),
-                           err=1, count=1, week=-1, month=-1), res[0])
+        self.assertEqual(R(user=4, topic=1, err=1, count=1), res[0])
 
         self.engine.execute("INSERT INTO answers VALUES(4, 2, 1)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(),
-                           err=1, count=2, week=-1, month=-1), res[0])
+        self.assertEqual(R(user=4, topic=1, err=1, count=2), res[0])
 
         self.engine.execute("INSERT INTO answers VALUES(4, 203, 1)")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(2, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=1,
-                           count=2, week=-1, month=-1), res[0])
-        self.assertEqual(R(user=4, topic=2, date=now(), err=0,
-                           count=1, week=-1, month=-1), res[1])
+        self.assertEqual(R(user=4, topic=1, err=1, count=2,), res[0])
+        self.assertEqual(R(user=4, topic=2, err=0, count=1,), res[1])
 
         res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
         self.assertEqual(2, len(res))
@@ -74,8 +70,7 @@ class CoreTopicHistoryTest(unittest.TestCase):
         self.engine.execute("UPDATE answers SET is_correct=1 WHERE question_id=1")
         res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
-        self.assertEqual(R(user=4, topic=1, date=now(), err=0,
-                           count=2, week=-1, month=-1), res[0])
+        self.assertEqual(R(user=4, topic=1, err=0, count=2), res[0])
         res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
         self.assertEqual(1, len(res))
         self.assertEqual(S(user=4, topic=1, date=now(), err=0), res[0])
@@ -99,8 +94,8 @@ class CoreTopicHistoryTest(unittest.TestCase):
         # for r in res:
         #     print r
 
-        tm = dt - timedelta(days=4)
-        self.engine.execute(curr.insert(), user_id=4, topic_id=1, now_date=tm,
+        #tm = dt - timedelta(days=4)
+        self.engine.execute(curr.insert(), user_id=4, topic_id=1,
                             err_count=20, count=40)
         #res = self.engine.execute("SELECT * FROM topic_err_current").fetchone()
 

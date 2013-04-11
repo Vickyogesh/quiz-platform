@@ -12,6 +12,7 @@ import argparse
 from sqlalchemy import text
 from dbtools import DbManager
 from dbtools.settings import TEST_SCHOOLS, TEST_USERS
+import dbfill
 
 
 ###########################################################
@@ -49,6 +50,8 @@ class Db(DbManager):
                             help='Generate quiz statistics.')
         parser.add_argument('-c', '--config', default=None,
                             help="Configuration file (default: ../test-data/config.ini).")
+        parser.add_argument('-p', action='store_true',
+                            help="Fill with big data for performance testing.")
         self.args = parser.parse_args()
 
     def createUsers(self):
@@ -274,5 +277,15 @@ class Db(DbManager):
         else:
             self.fillBigData()
         self.createTestFunc()
+
+    def fillForPerformance(self):
+        dbfill.do_fill(self)
+
+    def _do_run(self):
+        if self.args.p:
+            self.fillForPerformance()
+        else:
+            DbManager._do_run(self)
+
 
 Db().run()

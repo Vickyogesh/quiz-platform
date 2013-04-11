@@ -370,23 +370,9 @@ function aux_fillUserStat(data)
   $("#studentstattab .row #id").text(data.student.id);
   $("#studentstattab .row #name").text(data.student.name + ' ' + data.student.surname);
 
-  if (data.exams.length)
-  {
-    var exams = data.exams;
-    for (var i in exams)
-    {
-      var exam = exams[i];
-      var status = exam.status
-
-      if (status == "expired" || status > 4)
-        html += "<span class='label label-important'>&nbsp;";
-      else
-        html += "<span class='label label-success'>&nbsp;";
-      html += status + '&nbsp;</span>&nbsp;';
-    }
-
-    $("#studentstattab .row #exams").html(html);
-  }
+  var exams = data.exams;
+  html = aux_errSpan(exams.current) + aux_errSpan(exams.week) + aux_errSpan(exams.week3)
+  $("#studentstattab .row #exams").html(html);
 
   var topics = data.topics;
   for (var t in topics)
@@ -396,18 +382,12 @@ function aux_fillUserStat(data)
     html += "<td>" + (+t + 1) + ".</td>";
     html += "<td>" + topic.text + "</td>";
 
-    if (topic.errors == -1) {
-      html += "<td>N/A</td><td>N/A</td>";
-    }
-    else {
-      var err = topic.errors;
-      html += "<td>" + err.last_date + "</td>";
-      var a = err.last;
-      var b = err.week;
-      var c = err.month;
-      html += "<td>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</td>";
+    var err = topic.errors;
+    var a = err.current;
+    var b = err.week;
+    var c = err.week3;
+    html += "<td>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</td>";
 
-    }
     body.append(html);
   }
 }

@@ -32,17 +32,37 @@ class UserMixin(object):
         self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
         self.__getname = self.__getname.compile(self.engine)
 
-        self.__topicstat = text("""SELECT
-            t.id, e.now_date, e.err_count/e.count*100, e.week, e.month,
-            t.text, t.text_fr, t.text_de
-            FROM topics t LEFT JOIN topic_err_current e
-            ON t.id=e.topic_id and e.user_id=:user_id;""")
-
+        self.__topicstat = text("""SELECT t.id, t.text, t.text_fr, t.text_de,
+            IFNULL((SELECT err_count/count*100 FROM topic_err_current WHERE
+                   user_id=:user_id AND topic_id=t.id), -1) current,
+            IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
+                   user_id=:user_id AND topic_id = t.id AND
+                   now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+                   AND DATE(UTC_TIMESTAMP())
+                   GROUP BY topic_id), -1) week,
+            IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
+                   user_id=:user_id AND topic_id = t.id AND
+                   now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 21 DAY
+                   AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
+                   GROUP BY topic_id), -1) week3
+            from topics t""")
         self.__topicstat = self.__topicstat.compile(self.engine)
 
-        self.__examstat = text("""SELECT id, err_count, end_time,
-            UTC_TIMESTAMP() > start_time + interval 3 hour
-            FROM exams WHERE user_id=:user_id;""")
+        # self.__examstat = text("""SELECT id, err_count, end_time,
+        #     UTC_TIMESTAMP() > start_time + interval 3 hour
+        #     FROM exams WHERE user_id=:user_id;""")
+        self.__examstat = text("""SELECT
+            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+             FROM exams WHERE user_id=:user_id) current,
+            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+             FROM exams WHERE user_id=:user_id AND
+             start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+             AND DATE(UTC_TIMESTAMP())) week,
+            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+             FROM exams WHERE user_id=:user_id AND
+             start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+             AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
+            """)
         self.__examstat = self.__examstat.compile(self.engine)
 
         self.__examlist = text("""SELECT exams.*,
@@ -138,52 +158,49 @@ class UserMixin(object):
             return 1
         elif 99 < err < 100:
             return 99
-        return int(err)
+        return round(err)
 
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
-            lang = 7
+            lang = 3
         elif lang == 'fr':
-            lang = 6
+            lang = 2
         else:
-            lang = 5
+            lang = 1
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.__topicstat.execute(user_id=user)
         for row in rows:
-            tid = row[0]
-            now = row[1]
-            if now is None:
-                errors = -1
-            else:
-                errors = {
-                    'last_date': str(now),
-                    'last': self._normErr(row[2]),
-                    'week': self._normErr(row[3]),
-                    'month': self._normErr(row[4])
-                }
-
             stat.append({
-                'id': tid,
+                'id': row[0],
                 'text': row[lang],
-                'errors': errors
+                'errors': {
+                    'current': self._normErr(row[4]),
+                    'week': self._normErr(row[5]),
+                    'week3': self._normErr(row[6])
+                }
             })
         return stat
 
     def __getExamStat(self, user_id):
-        rows = self.__examstat.execute(user_id=user_id)
-        stat = []
-        for row in rows:
-            end = row[2]
-            expired = row[3]
-            if end:
-                stat.append({'id': row[0], 'status': row[1]})
-            elif expired:
-                stat.append({'id': row[0], 'status': 'expired'})
-            else:
-                stat.append({'id': row[0], 'status': 'in-progress'})
-        return stat
+        row = self.__examstat.execute(user_id=user_id).fetchone()
+        return {
+            'current': self._normErr(row[0]),
+            'week': self._normErr(row[1]),
+            'week3': self._normErr(row[2])
+        }
+        # stat = []
+        # for row in rows:
+        #     end = row[2]
+        #     expired = row[3]
+        #     if end:
+        #         stat.append({'id': row[0], 'status': row[1]})
+        #     elif expired:
+        #         stat.append({'id': row[0], 'status': 'expired'})
+        #     else:
+        #         stat.append({'id': row[0], 'status': 'in-progress'})
+        # return stat
 
     def getUserStat(self, user_id, lang):
         user = self._getStudentById(user_id)

@@ -60,18 +60,21 @@ class DbManager(object):
     def after(self):
         pass
 
+    def _do_run(self):
+        self.before()
+        tables.recreate(self)
+        func.create(self)
+        default_data.fill(self)
+        self.fillData()
+        questions.update_stat(self)
+        tables.optimize(self)
+        self.after()
+
     def run(self):
         t = self.conn.begin()
         msg = ''
         try:
-            self.before()
-            tables.recreate(self)
-            func.create(self)
-            default_data.fill(self)
-            self.fillData()
-            questions.update_stat(self)
-            tables.optimize(self)
-            self.after()
+            self._do_run()
         except Exception as e:
             print(e)
             print('Rollback changes...')

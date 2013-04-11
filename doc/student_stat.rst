@@ -57,39 +57,29 @@ Student statistics provides learning progress information of the student.
           "name": "Chuck",
           "surname": "Norris"
         },
-        "exams": [
-          {
-            "id": 1,
-            "status": 5
-          },
-          {
-            "id": 2,
-            "status": "expired"
-          },
-          {
-            "id": 3,
-            "status": 0
-          },
-          {
-            "id": 4,
-            "status": "in-progress"
-          }
-        ],
+        "exams": {
+            "current": 10,
+            "week": 80,
+            "week3": 35
+        },
         "topics": [
           {
             "id": 1,
             "text": "Topic 1",
             "errors": {
-              "last_date": "2013-02-02",
-              "last": 12,
+              "current": 12,
               "week": 34.5,
-              "month": -1
+              "week3": -1
             }
           },
           {
             "id": 2,
             "text": "Topic 2",
-            "errors": -1
+            "errors": {
+              "current": -1,
+              "week": -1,
+              "week3": -1
+            }
           }
         ]
       }
@@ -99,8 +89,8 @@ Student statistics provides learning progress information of the student.
    Response fields
    ======================================================
    student    Information about the student.
-   exams      List of statistics for each exam.
-   topics     List of statistics for each topic.
+   exams      Exam statistics.
+   topics     Statistics for each topic.
    =========  ===========================================
 
    =========  ===========================================
@@ -111,17 +101,14 @@ Student statistics provides learning progress information of the student.
    surname    Student surname.
    =========  ===========================================
 
-   =========  ==========================================
+   =========  ============================================
    exams fields
-   =====================================================
-   id         Exam ID.
-   status     Exam status. It may contain on the
-              following value:
-
-              * *number* - number of errors
-              * *'expired'* - exam is expired 
-              * *'in-progress'* - exam is not passed yet
-   =========  ==========================================
+   =======================================================
+   current    Current percent of failed exams.
+   week       Last week percent of failed exams (average).
+   week3      Average percent of failed exams in the range
+              [3 weeks ago - week ago].
+   =========  ============================================
 
 
    =========  =========================================
@@ -133,23 +120,19 @@ Student statistics provides learning progress information of the student.
               Percent of errors for this topic based
               on quizzes, exams and error reviews
               results.
-
-              **-1** value means
-              that the student did not answer the
-              questions in this topic.
    =========  =========================================
 
-   =========  ==============================================================
+   =========  ==========================================
    errors fields
-   =========================================================================
-   last_date  Last activity date for this topic (UTC).
-   last       Current percent of errors (relative to *last_date*).
-   week       Percent of errors week ago (relative to *last_date*).
-   month      Percent of errors month ago (relative to *last_date*).
+   =====================================================
+   current    Current percent of errors.
+   week       Last week percent of errors (average).
+   week3      Average percent of errors in the range
+              [3 weeks ago - week ago].
 
               **-1** value means  that there is no
               data for the given period.
-   =========  ==============================================================
+   =========  ==========================================
 
    :param id: Student ID.
 

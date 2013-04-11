@@ -70,6 +70,21 @@ topics_stat
   limited access for the guest users.
 
 
+Statistics algo
+---------------
+
+Student part
+^^^^^^^^^^^^
+
+We save daily snapshots of the topic erorrs and answers.
+History rime range for each topic is one month.
+Backend calculates the following statistics for each topic:
+
+  * curernt err_count/ans_count;
+  * avg(err_count/ans_count) for current - 7 days ago (1 week);
+  * avg(err_count/ans_count) for 7 days ago - 21 days ago (7*3 = ~3 weeks);
+
+
 Frontend tips
 =============
 
