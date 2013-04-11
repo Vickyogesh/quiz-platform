@@ -38,7 +38,7 @@ class UserMixin(object):
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                    user_id=:user_id AND topic_id = t.id AND
                    now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-                   AND DATE(UTC_TIMESTAMP())
+                   AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
                    GROUP BY topic_id), -1) week,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                    user_id=:user_id AND topic_id = t.id AND
@@ -57,7 +57,7 @@ class UserMixin(object):
             (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
              FROM exams WHERE user_id=:user_id AND
              start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-             AND DATE(UTC_TIMESTAMP())) week,
+             AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
             (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
              FROM exams WHERE user_id=:user_id AND
              start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
