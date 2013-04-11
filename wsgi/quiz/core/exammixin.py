@@ -41,7 +41,7 @@ class ExamMixin(object):
         self.__upd = self.__upd.compile(self.engine)
 
         self.__examquest = text("""SELECT q.*, e.is_correct FROM
-            (SELECT * FROM exam_answers where exam_id=:exam_id) e LEFT JOIN
+            (SELECT * FROM exam_answers where exam_id=:exam_id order by add_id) e LEFT JOIN
             questions q ON e.question_id=q.id;""")
         self.__examquest = self.__examquest.compile(self.engine)
 
