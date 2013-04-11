@@ -31,8 +31,10 @@ class CoreExamTest(unittest.TestCase):
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
     def test_questionIds(self):
-        ids = self.core._ExamMixin__generate_idList()
-        ids = list(sorted(ids))
+        norm, high = self.core._ExamMixin__generate_idList()
+        self.assertEqual(25, len(norm))
+        self.assertEqual(15, len(high))
+        ids = list(sorted(norm+high))
 
         # Get ranges:
         # | priority | min_id  |  max_id

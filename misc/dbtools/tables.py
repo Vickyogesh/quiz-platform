@@ -5,6 +5,7 @@ def recreate(mgr):
     print('Recreating tables...')
     remove(mgr)
     create(mgr)
+    print('Recreating tables... done')
 
 
 def optimize(mgr):
@@ -117,9 +118,11 @@ def create(mgr):
         );
 
         CREATE TABLE exam_answers(
+            add_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             exam_id INTEGER UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
-            is_correct BOOLEAN NOT NULL DEFAULT FALSE
+            is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+            CONSTRAINT PRIMARY KEY (add_id)
         );
 
         CREATE TABLE exams(

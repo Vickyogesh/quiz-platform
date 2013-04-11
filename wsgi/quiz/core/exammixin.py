@@ -35,6 +35,7 @@ class ExamMixin(object):
         #                               t.c.question_id == bindparam('question_id')))
 
         self.__upd = text("""INSERT INTO exam_answers
+            (exam_id, question_id, is_correct)
             VALUES(:exam_id, :question_id, :is_correct)
             ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct)""")
         self.__upd = self.__upd.compile(self.engine)
@@ -66,12 +67,25 @@ class ExamMixin(object):
     # [1 - 100] and for row 2 we need select two (random) questions
     # in the range [101 - 200].
     def __generate_idList(self):
-        id_list = []
+        # id_list = []
+        # res = self.__stmt_ch_info.execute()
+        # for row in res:
+        #     # priority = row[0], min_id = row[1], max_id = row[2]
+        #     id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
+        # return id_list
+        id_norm = []
+        id_high = []
+        ids = None
         res = self.__stmt_ch_info.execute()
         for row in res:
             # priority = row[0], min_id = row[1], max_id = row[2]
-            id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
-        return id_list
+            ids = random.sample(xrange(row[1], row[2] + 1), row[0])
+            if len(ids) > 1:
+                id_norm.append(ids[0])
+                id_high.extend(ids[1:])
+            else:
+                id_norm.extend(ids)
+        return id_norm, id_high
 
     #@profile
     def __initExam(self, user_id, questions):
@@ -89,7 +103,7 @@ class ExamMixin(object):
             raise QuizCoreError('Invalid exam ID.')
         return row[0], row[1]
 
-    def __getQuestions(self, questions, lang):
+    def __getQuestions(self, questions, lang, dest):
         q = self.questions
 
         if lang == 'de':
@@ -99,11 +113,10 @@ class ExamMixin(object):
         else:
             txt_lang = q.c.text
 
-        s = select([q], q.c.id.in_(questions)).order_by(func.rand())
+        s = select([q], q.c.id.in_(questions))
         res = self.engine.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
-        exam = []
         for row in res:
             d = {
                 'id': row[q.c.id],
@@ -113,14 +126,15 @@ class ExamMixin(object):
                 'image_bis': row[q.c.image_part]
             }
             self._aux_question_delOptionalField(d)
-            exam.append(d)
-
-        return exam
+            dest.append(d)
 
     def createExam(self, user_id, lang):
-        id_list = self.__generate_idList()
-        exam_id = self.__initExam(user_id, id_list)
-        questions = self.__getQuestions(id_list, lang)
+        norm, high = self.__generate_idList()
+        exam_id = self.__initExam(user_id, norm + high)
+
+        questions = []
+        self.__getQuestions(norm, lang, questions)
+        self.__getQuestions(high, lang, questions)
 
         # YYYY-MM-DDTHH:MM:SS
         expires, _ = self.__getExpirationDate(exam_id)
@@ -144,7 +158,6 @@ class ExamMixin(object):
 
         res = self.__examids.execute(exam_id=exam_id)
         exam_questons = [row[0] for row in res]
-
         questions, answers = self._aux_prepareLists(questions, answers)
 
         q = self.questions
