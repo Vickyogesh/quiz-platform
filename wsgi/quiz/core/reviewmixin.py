@@ -1,14 +1,13 @@
-from sqlalchemy import text, select, and_
+from sqlalchemy import select
 
 
 class ErrorReviewMixin(object):
     """This mixin provides Error Review feature. Used in QuizCore."""
     def __init__(self):
-        self.__geterrors = text(""" SELECT * FROM questions q INNER JOIN
+        self.__geterrors = self.sql(""" SELECT * FROM questions q INNER JOIN
             (SELECT question_id id FROM answers WHERE user_id=:user_id
              AND is_correct=0 LIMIT 100) e USING(id) ORDER BY RAND() LIMIT 40;
         """)
-        self.__geterrors = self.__geterrors.compile(self.engine)
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
 
     def getErrorReview(self, user, lang):

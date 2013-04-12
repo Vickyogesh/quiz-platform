@@ -1,6 +1,6 @@
 import random
 from datetime import datetime
-from sqlalchemy import select, text, func, bindparam, and_
+from sqlalchemy import select, func
 #from profilestats import profile
 from .exceptions import QuizCoreError
 
@@ -9,49 +9,40 @@ class ExamMixin(object):
     """Mixin for working with exams. Used in QuizCore."""
     def __init__(self):
         # Get chapters info: priority and chapter's questions' id range.
-        query = text('SELECT priority, min_id, max_id FROM chapters')
-        self.__stmt_ch_info = query.compile(self.engine)
+        sql = self.sql("SELECT priority, min_id, max_id FROM chapters")
+        self.__stmt_ch_info = sql
 
-        t = self.exams
-        self.__create_exam = t.insert().values(start_time=func.utc_timestamp(),
-                                               user_id=0)
-        self.__create_exam = self.__create_exam.compile(self.engine)
+        self.__create_exam = self.sql(self.exams.insert().values(
+                                      start_time=func.utc_timestamp(),
+                                      user_id=0))
 
-        self.__expires = text("""SELECT start_time + interval 3 hour, end_time
-                              from exams where id=:exam_id""")
-        self.__expires = self.__expires.compile(self.engine)
-
-        self.__getexam = text("""SELECT exams.*,
-            UTC_TIMESTAMP() > start_time + interval 3 hour
+        self.__expires = self.sql("""SELECT
+            start_time + INTERVAL 3 HOUR, end_time
             FROM exams WHERE id=:exam_id""")
-        self.__getexam = self.__getexam.compile(self.engine)
 
-        t = self.exam_answers
-        self.__set_questions = t.insert().values(exam_id=0, question_id=0)
-        self.__set_questions = self.__set_questions.compile(self.engine)
+        self.__getexam = self.sql("""SELECT exams.*,
+            UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR
+            FROM exams WHERE id=:exam_id""")
 
-        # self.__upd = t.update().values(is_correct=bindparam('is_correct'))
-        # self.__upd = self.__upd.where(and_(t.c.exam_id == bindparam('exam_id'),
-        #                               t.c.question_id == bindparam('question_id')))
+        self.__set_questions = self.sql(self.exam_answers.insert().values(
+                                        exam_id=0,
+                                        question_id=0))
 
-        self.__upd = text("""INSERT INTO exam_answers
+        self.__upd = self.sql("""INSERT INTO exam_answers
             (exam_id, question_id, is_correct)
             VALUES(:exam_id, :question_id, :is_correct)
             ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct)""")
-        self.__upd = self.__upd.compile(self.engine)
 
-        self.__examquest = text("""SELECT q.*, e.is_correct FROM
-            (SELECT * FROM exam_answers where exam_id=:exam_id order by add_id) e LEFT JOIN
-            questions q ON e.question_id=q.id;""")
-        self.__examquest = self.__examquest.compile(self.engine)
+        self.__examquest = self.sql("""SELECT q.*, e.is_correct FROM
+            (SELECT * FROM exam_answers where exam_id=:exam_id ORDER BY add_id) e
+            LEFT JOIN questions q ON e.question_id=q.id;""")
 
-        self.__examids = text("SELECT question_id FROM exam_answers WHERE exam_id=:exam_id")
-        self.__examids = self.__examids.compile(self.engine)
+        self.__examids = self.sql("""SELECT
+            question_id FROM exam_answers WHERE exam_id=:exam_id""")
 
-        self.__updexaminfo = text("""
-            UPDATE exams SET end_time=UTC_TIMESTAMP(), err_count=:errors
+        self.__updexaminfo = self.sql("""UPDATE
+            exams SET end_time=UTC_TIMESTAMP(), err_count=:errors
             WHERE id=:exam_id""")
-        self.__updexaminfo = self.__updexaminfo.compile(self.engine)
 
     # Create list of exam questions.
     # At first, we get info about chapters: chapter priority,

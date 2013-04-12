@@ -5,11 +5,9 @@ from .exceptions import QuizCoreError
 class SchoolMixin(object):
     """This mixin provides school features. Used in QuizCore."""
     def __init__(self):
-        self.__create = self.users.insert()
-        self.__create = self.__create.values(name=None, surname=None,
-                                             login=None, passwd=None,
-                                             school_id=0)
-        self.__create = self.__create.compile(self.engine)
+        self.__create = self.sql(self.users.insert().values(
+                                 name=None, surname=None, login=None,
+                                 passwd=None, school_id=0))
 
     def _checkSchoolId(self, school_id):
         try:

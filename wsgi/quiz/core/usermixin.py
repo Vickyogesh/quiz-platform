@@ -9,49 +9,43 @@ class UserMixin(object):
         apps = self.apps
         users = self.users
 
-        self.__appid = text("SELECT id FROM applications WHERE appkey=:appkey")
-        self.__appid = self.__appid.compile(self.engine)
+        self.__appid = self.sql("""SELECT id FROM applications
+                                WHERE appkey=:appkey""")
 
-        self.__school = text("SELECT * FROM schools WHERE login=:login")
-        self.__school = self.__school.compile(self.engine)
+        self.__school = self.sql("SELECT * FROM schools WHERE login=:login")
 
-        self.__user_by_login = text("SELECT * FROM users WHERE login=:login")
-        self.__user_by_login = self.__user_by_login.compile(self.engine)
+        self.__user_by_login = self.sql("SELECT * FROM users WHERE login=:login")
 
-        self.__user_by_id = text("SELECT * FROM users WHERE id=:id")
-        self.__user_by_id = self.__user_by_id.compile(self.engine)
+        self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id")
 
-        query = select(
-            [users.c.id, users.c.name, users.c.surname, users.c.passwd, users.c.type, apps.c.id],
+        self.__stmt = self.sql(select(
+            [users.c.id, users.c.name, users.c.surname,
+             users.c.passwd, users.c.type, apps.c.id],
             and_(users.c.login == bindparam('login'),
                  apps.c.appkey == bindparam('appkey')),
-            use_labels=True
-        )
-        self.__stmt = query.compile(self.engine)
+            use_labels=True))
 
-        self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
-        self.__getname = self.__getname.compile(self.engine)
+        self.__getname = self.sql(select(
+            [users.c.name, users.c.surname, users.c.type],
+            users.c.id == bindparam('id')))
 
-        self.__topicstat = text("""SELECT t.id, t.text, t.text_fr, t.text_de,
+        self.__topicstat = self.sql("""SELECT
+            t.id, t.text, t.text_fr, t.text_de,
             IFNULL((SELECT err_count/count*100 FROM topic_err_current WHERE
-                   user_id=:user_id AND topic_id=t.id), -1) current,
+                user_id=:user_id AND topic_id=t.id), -1) current,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-                   user_id=:user_id AND topic_id = t.id AND
-                   now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-                   AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
-                   GROUP BY topic_id), -1) week,
+               user_id=:user_id AND topic_id = t.id AND
+               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+               AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
+               GROUP BY topic_id), -1) week,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-                   user_id=:user_id AND topic_id = t.id AND
-                   now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 21 DAY
-                   AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
-                   GROUP BY topic_id), -1) week3
+               user_id=:user_id AND topic_id = t.id AND
+               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 21 DAY
+               AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
+               GROUP BY topic_id), -1) week3
             from topics t""")
-        self.__topicstat = self.__topicstat.compile(self.engine)
 
-        # self.__examstat = text("""SELECT id, err_count, end_time,
-        #     UTC_TIMESTAMP() > start_time + interval 3 hour
-        #     FROM exams WHERE user_id=:user_id;""")
-        self.__examstat = text("""SELECT
+        self.__examstat = self.sql("""SELECT
             (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
              FROM exams WHERE user_id=:user_id) current,
             (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
@@ -63,22 +57,18 @@ class UserMixin(object):
              start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
              AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
             """)
-        self.__examstat = self.__examstat.compile(self.engine)
 
-        self.__examlist = text("""SELECT exams.*,
-            UTC_TIMESTAMP() > start_time + interval 3 hour
+        self.__examlist = self.sql("""SELECT
+            exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR
             FROM exams WHERE user_id=:user_id;""")
-        self.__examlist = self.__examlist.compile(self.engine)
 
-        self.__topicerr = text(
-            """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
+        self.__topicerr = self.sql("""SELECT
+            * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
             AND id IN (SELECT question_id FROM answers WHERE
             user_id=:user_id AND is_correct=0)) t;""")
-        self.__topicerr = self.__topicerr.compile(self.engine)
 
-        self.__lastvisit = text("""UPDATE users SET last_visit=UTC_TIMESTAMP()
-                                WHERE id=:user_id""")
-        self.__lastvisit = self.__lastvisit.compile(self.engine)
+        self.__lastvisit = self.sql("""UPDATE
+            users SET last_visit=UTC_TIMESTAMP() WHERE id=:user_id""")
 
     def updateUserLastVisit(self, user_id):
         self.engine.execute(self.__lastvisit, user_id=user_id)

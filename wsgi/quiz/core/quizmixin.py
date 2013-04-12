@@ -1,4 +1,4 @@
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from .exceptions import QuizCoreError
 
@@ -14,13 +14,11 @@ class QuizMixin(object):
     def __init__(self):
         # See getQuiz() comments for more info.
 
-        self.__getquiz = text(
+        self.__getquiz = self.sql(
             """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
             AND id NOT IN (SELECT question_id FROM quiz_answers WHERE
             user_id=:user_id) LIMIT 100) t
             ORDER BY RAND() LIMIT 40;""")
-
-        self.__getquiz = self.__getquiz.compile(self.engine)
 
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
 
