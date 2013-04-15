@@ -63,6 +63,13 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id)
         );
 
+        CREATE TABLE guest_access_snapshot(
+            guest_id INTEGER UNSIGNED NOT NULL,
+            now_date DATE NOT NULL,
+            num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+            CONSTRAINT PRIMARY KEY (guest_id, now_date)
+        );
+
         CREATE TABLE chapters(
             id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
             priority TINYINT UNSIGNED NOT NULL,

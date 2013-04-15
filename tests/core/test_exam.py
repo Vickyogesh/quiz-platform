@@ -441,6 +441,21 @@ class CoreExamStatTest(unittest.TestCase):
         self.assertEqual(datetime.utcnow().date(), row['now_date'])
         self.assertAlmostEqual(0.23, row['progress_coef'], 2)
 
+        # One more change
+        sql = "UPDATE users SET progress_coef=0.25 WHERE id=4"
+        self.engine.execute(sql)
+
+        # Since we cleanup user_progress_snapshot in setUp()
+        # then we'll have only one row
+        sql = "SELECT * FROM user_progress_snapshot WHERE user_id=4"
+        res = self.engine.execute(sql).fetchall()
+        self.assertEqual(1, len(res))
+        row = res[0]
+
+        self.assertEqual(4, row['user_id'])
+        self.assertEqual(datetime.utcnow().date(), row['now_date'])
+        self.assertAlmostEqual(0.25, row['progress_coef'], 2)
+
 
 def suite():
     suite = unittest.TestSuite()

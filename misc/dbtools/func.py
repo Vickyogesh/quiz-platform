@@ -238,3 +238,27 @@ def exams(mgr):
             UPDATE users SET progress_coef=coef WHERE id=NEW.user_id;
         END;
         """))
+
+
+@add_me
+def guest_access(mgr):
+    # After adding guest info we also add snapshot entry.
+    mgr.conn.execute("DROP TRIGGER IF EXISTS on_guest_access_after_add;")
+    mgr.conn.execute(text("""CREATE TRIGGER on_guest_access_after_add
+        AFTER INSERT ON guest_access FOR EACH ROW
+        INSERT IGNORE INTO guest_access_snapshot VALUES
+        (NEW.id, DATE(UTC_TIMESTAMP()), 0);
+        """))
+
+    # If guest's num_requests is changed then we count snapshot value.
+    # NOTE: on_users_after_upd updates num_requests in the guest_access table.
+    mgr.conn.execute("DROP TRIGGER IF EXISTS on_guest_access_after_upd;")
+    mgr.conn.execute(text("""CREATE TRIGGER on_guest_access_after_upd
+        AFTER UPDATE ON guest_access FOR EACH ROW BEGIN
+            IF NEW.num_requests != OLD.num_requests THEN
+                INSERT INTO guest_access_snapshot VALUES
+                (NEW.id, DATE(UTC_TIMESTAMP()), 1)
+                ON DUPLICATE KEY UPDATE num_requests = num_requests + 1;
+            END IF;
+        END;
+        """))
