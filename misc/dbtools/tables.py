@@ -45,7 +45,15 @@ def create(mgr):
             type ENUM('student', 'guest') NOT NULL,
             school_id INTEGER UNSIGNED NOT NULL,
             last_visit TIMESTAMP NOT NULL DEFAULT 0,
+            progress_coef FLOAT NOT NULL DEFAULT -1,
             CONSTRAINT PRIMARY KEY (id, school_id)
+        );
+
+        CREATE TABLE user_progress_snapshot(
+            user_id INTEGER UNSIGNED NOT NULL,
+            now_date DATE NOT NULL,
+            progress_coef FLOAT NOT NULL DEFAULT -1,
+            CONSTRAINT PRIMARY KEY (user_id, now_date)
         );
 
         CREATE TABLE guest_access(

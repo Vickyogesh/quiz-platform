@@ -45,14 +45,15 @@ class UserMixin(object):
                GROUP BY topic_id), -1) week3
             from topics t""")
 
+        # NOTE: we skip 'in-progress' exams.
         self.__examstat = self.sql("""SELECT
-            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
              FROM exams WHERE user_id=:user_id) current,
-            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
              FROM exams WHERE user_id=:user_id AND
              start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
              AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
-            (SELECT SUM(IF(err_count > 4 OR end_time IS NULL, 1, 0))/COUNT(*)*100 e
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
              FROM exams WHERE user_id=:user_id AND
              start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
              AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;

@@ -16,6 +16,7 @@ def url(path):
 
 def cleanupdb_onSetup(engine, drop_users=False):
     with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
         conn.execute("TRUNCATE TABLE topic_err_current;")
         conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE quiz_answers;")
@@ -32,6 +33,7 @@ def cleanupdb_onSetup(engine, drop_users=False):
 
 def cleanupdb_onTearDown(engine):
     with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
         conn.execute("TRUNCATE TABLE topic_err_current;")
         conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE quiz_answers;")

@@ -75,6 +75,7 @@ class CoreTopicHistoryTest(unittest.TestCase):
         self.assertEqual(1, len(res))
         self.assertEqual(S(user=4, topic=1, date=now(), err=0), res[0])
 
+    # TODO: implement me
     def test_snapshot(self):
         curr = self.core.meta.tables['topic_err_current']
         t = self.core.meta.tables['topic_err_snapshot']
