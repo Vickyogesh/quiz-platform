@@ -12,7 +12,7 @@ import argparse
 from sqlalchemy import text
 from dbtools import DbManager
 from dbtools.settings import TEST_SCHOOLS, TEST_USERS
-import dbfill
+import fill
 
 
 ###########################################################
@@ -279,7 +279,7 @@ class Db(DbManager):
         self.createTestFunc()
 
     def fillForPerformance(self):
-        dbfill.do_fill(self)
+        fill.do_fill(self)
 
     def _do_run(self):
         if self.args.p:
