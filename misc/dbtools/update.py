@@ -146,6 +146,20 @@ def get_current_student_rating(users_str):
     return {'best': best, 'worst': worst}
 
 
+def get_users_info(ulist):
+    if not ulist:
+        return []
+    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
+        users WHERE id IN (%s) ORDER by progress_coef""" % ulist)
+    data = [{
+        'id': row[0],
+        'name': row[1],
+        'surname': row[2],
+        'coef': row[3]
+    } for row in res if row[3] != -1]
+    return data
+
+
 def get_week_student_rating(users_str):
     """Return list of best and worst students."""
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
@@ -154,16 +168,7 @@ def get_week_student_rating(users_str):
         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 7 day
         AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c DESC limit 3;
     """ % users_str)
-    best = ','.join([str(row[0]) for row in res])
-
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
-        users WHERE id IN (%s) ORDER by progress_coef""" % best)
-    best = [{
-        'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+    best = get_users_info(','.join([str(row[0]) for row in res]))
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
@@ -171,16 +176,7 @@ def get_week_student_rating(users_str):
         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 7 day
         AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c limit 3;
     """ % users_str)
-    worst = ','.join([str(row[0]) for row in res])
-
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
-        users WHERE id IN (%s) ORDER by progress_coef""" % worst)
-    worst = [{
-        'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+    worst = get_users_info(','.join([str(row[0]) for row in res]))
 
     return {'best': best, 'worst': worst}
 
@@ -194,16 +190,7 @@ def get_week3_student_rating(users_str):
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c DESC limit 3;
     """ % users_str)
-    best = ','.join([str(row[0]) for row in res])
-
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
-        users WHERE id IN (%s) ORDER by progress_coef""" % best)
-    best = [{
-        'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+    best = get_users_info(','.join([str(row[0]) for row in res]))
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
@@ -212,16 +199,7 @@ def get_week3_student_rating(users_str):
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c limit 3;
     """ % users_str)
-    worst = ','.join([str(row[0]) for row in res])
-
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
-        users WHERE id IN (%s) ORDER by progress_coef""" % worst)
-    worst = [{
-        'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+    worst = get_users_info(','.join([str(row[0]) for row in res]))
 
     return {'best': best, 'worst': worst}
 
