@@ -111,7 +111,7 @@ def get_guest_stat(school):
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
          now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 7 day
-         AND DATE(UTC_TIMESTAMP())), -1) week,
+         AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY), -1) week,
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
          now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
