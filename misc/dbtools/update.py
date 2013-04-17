@@ -221,12 +221,17 @@ def get_exams_stat(users_str):
     return (res[0], res[1], res[2])
 
 
+###########################################################
+# Cleanup functions
+###########################################################
+
 def do_clean(school_list):
     start = time.time()
     logging.debug('Cleanup started.')
 
     clean_schools_data()
-    clean_users_data()
+    for school in school_list:
+        clean_users_data(school)
 
     end = time.time() - start
     logging.debug('Cleanup finished in %.3fs', end)
@@ -242,10 +247,22 @@ def clean_schools_data():
 
 # NONE: this will take long time.
 # For 5000 users if takes ~4 min.
-def clean_users_data():
+def clean_users_data(school):
     """Remove old history (older than 30 days)."""
+    students = get_active_students(school)
+    if not students:
+        return
+    students = ','.join(str(user) for user in students)
+
     engine.execute("""DELETE FROM user_progress_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
+                   AND user_id IN (%s)""" % students)
 
     engine.execute("""DELETE FROM topic_err_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
+                   AND user_id IN (%s)""" % students)
+
+    engine.execute("""DELETE FROM exams
+                   WHERE user_id IN (%s) AND end_time IS NULL
+                   AND start_time < UTC_TIMESTAMP() - INTERVAL 3 HOUR
+                   """ % students)
