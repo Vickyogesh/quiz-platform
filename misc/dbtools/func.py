@@ -38,8 +38,12 @@ def answers(mgr):
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_answer_after_add;")
     mgr.conn.execute(text("""CREATE TRIGGER on_answer_after_add
         AFTER INSERT ON answers FOR EACH ROW BEGIN
+            DECLARE school INTEGER UNSIGNED DEFAULT NULL;
             DECLARE topic INTEGER UNSIGNED;
             DECLARE err SMALLINT DEFAULT 0;
+
+            SELECT school_id INTO school FROM users WHERE
+            id=NEW.user_id AND type='student';
 
             SELECT topic_id INTO topic FROM questions
             WHERE id=NEW.question_id;
@@ -51,6 +55,14 @@ def answers(mgr):
             INSERT INTO topic_err_current VALUES (NEW.user_id, topic, err, 1)
             ON DUPLICATE KEY UPDATE err_count=err_count+VALUES(err_count),
             count=count+VALUES(count);
+
+            IF school IS NOT NULL THEN
+                INSERT INTO school_topic_err
+                (school_id, topic_id, err_count, count)
+                VALUES (school, topic, err, 1) ON DUPLICATE KEY UPDATE
+                err_count=err_count+VALUES(err_count),
+                count=count+VALUES(count);
+            END IF;
         END;
         """))
 
@@ -60,10 +72,14 @@ def answers(mgr):
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_answer_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_answer_after_upd
         AFTER UPDATE ON answers FOR EACH ROW BEGIN
+            DECLARE school INTEGER UNSIGNED DEFAULT NULL;
             DECLARE topic INTEGER UNSIGNED;
             DECLARE err SMALLINT DEFAULT -1;
 
             IF OLD.is_correct != NEW.is_correct THEN
+                SELECT school_id INTO school FROM users WHERE
+                id=NEW.user_id AND type='student';
+
                 SELECT topic_id INTO topic FROM questions
                 WHERE id=NEW.question_id;
 
@@ -74,6 +90,13 @@ def answers(mgr):
                 INSERT INTO topic_err_current VALUES
                 (NEW.user_id, topic, err, 1) ON DUPLICATE KEY UPDATE
                 err_count=err_count+VALUES(err_count);
+
+                IF school IS NOT NULL THEN
+                    INSERT INTO school_topic_err_current
+                    (school_id, topic_id, err_count, count)
+                    VALUES (school, topic, err, 1) ON DUPLICATE KEY UPDATE
+                    err_count=err_count+VALUES(err_count);
+                END IF;
             END IF;
         END;
         """))
@@ -136,6 +159,8 @@ def users(mgr):
                 UPDATE guest_access SET num_requests = num_requests + 1
                 WHERE id=NEW.id;
             END IF;
+            UPDATE school_stat_cache SET last_activity=UTC_TIMESTAMP()
+            WHERE school_id=NEW.school_id;
         END;
         """))
 
@@ -158,21 +183,60 @@ def users(mgr):
 
 @add_me
 def schools(mgr):
-    # Delete all school's students.
+    # Delete all school's students and school stat.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_school_before_del;")
     mgr.conn.execute(text("""CREATE TRIGGER on_school_before_del
-        BEFORE DELETE ON schools FOR EACH ROW
-        DELETE FROM users WHERE school_id=OLD.id;
+        BEFORE DELETE ON schools FOR EACH ROW BEGIN
+            DELETE FROM users WHERE school_id=OLD.id;
+            DELETE FROM school_topic_err WHERE school_id=OLD.id;
+            DELETE FROM school_topic_err_snapshot WHERE school_id=OLD.id;
+            DELETE FROM school_stat_cache WHERE school_id=OLD.id;
+        END;
         """))
 
-    # If school is added then we create school's guest user.
+    # If school is added then we create school's guest user
+    # and also add entry to the school_stat_cache.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_school_after_add;")
     mgr.conn.execute(text("""CREATE TRIGGER on_school_after_add
-        AFTER INSERT ON schools FOR EACH ROW
-        INSERT IGNORE INTO users
+        AFTER INSERT ON schools FOR EACH ROW BEGIN
+            INSERT IGNORE INTO users
             (name, surname, login, passwd, type, school_id) VALUES
             (NEW.name, '', CONCAT(NEW.login, '-guest'),
              MD5(CONCAT(NEW.login, '-guest:guest')), 'guest', NEW.id);
+            INSERT IGNORE INTO school_stat_cache(school_id) VALUES(NEW.id);
+        END;
+        """))
+
+    # Stored procedure for update daily snapshot of the school
+    # topics statistics. This procedure will be run daily by the update
+    # script. See misc/dbupdate.py.
+    mgr.conn.execute("DROP PROCEDURE IF EXISTS update_school_snapshot;")
+    mgr.conn.execute(text("""CREATE PROCEDURE update_school_snapshot
+        (IN school INT UNSIGNED)
+        BEGIN
+            DECLARE topic INT UNSIGNED;
+            DECLARE err FLOAT DEFAULT -1;
+
+            DECLARE done INT DEFAULT FALSE;
+            DECLARE cur CURSOR FOR SELECT topic_id, err_count/count*100
+                FROM school_topic_err WHERE school_id=school;
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+            OPEN cur;
+            START TRANSACTION;
+            rloop: LOOP
+                FETCH cur INTO topic, err;
+                IF done THEN
+                    LEAVE rloop;
+                END IF;
+
+                INSERT INTO school_topic_err_snapshot VALUES
+                (school, topic, DATE(UTC_TIMESTAMP()), err)
+                ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
+            END LOOP;
+            COMMIT;
+            CLOSE cur;
+        END;
         """))
 
 

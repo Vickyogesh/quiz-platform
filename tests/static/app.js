@@ -366,6 +366,7 @@ function aux_fillUserStat(data)
 {
   var html = "";
   var body = $("#studentstattab tbody");
+  body.find("tr").remove();
 
   $("#studentstattab .row #id").text(data.student.id);
   $("#studentstattab .row #name").text(data.student.name + ' ' + data.student.surname);
@@ -767,6 +768,9 @@ function aux_fillStudents(data, school_id)
 
 function onStudentlList()
 {
+  $("#schooltab #stat").addClass("hide");
+  $("#schooltab #students").removeClass("hide");
+
   var sid = $("#schooltab #school_id").val();
 
   $.getJSON(url("/school/" + sid + "/students"), function(data) {
@@ -774,6 +778,110 @@ function onStudentlList()
       aux_showJSONError(data);
     else
       aux_fillStudents(data, sid);
+  })
+  .error(function(data) {
+    aux_showError(data.responseText, data.status);
+  });
+}
+//----------------------------------------------------------------------------
+
+function aux_getRatingDiv(data)
+{
+  function toLi(info) {
+    if (info == undefined)
+      return"<li>N/A</li>";
+    else
+      return "<li>" + info.name + ' ' + info.surname + "</li>";
+  }
+
+  if (data == undefined)
+    return "<ul><li>N/A</li><li>N/A</li><li>N/A</li></ul>";
+
+  var html = "<ul>";
+  html += toLi(data[0]);
+  html += toLi(data[1]);
+  html += toLi(data[2]);
+  html += "</ul>";
+  return html;
+}
+//----------------------------------------------------------------------------
+
+
+function aux_fillSchoolStat(data)
+{
+  var html = "";
+  var body = $("#schooltab #stat #info");
+
+  var students = data.students;
+
+  html += "<div class='row'>";
+  html += "<div class='span2'><b>Current</b></div>";
+  html += "<div class='span2'><b>best</b>";
+  html += aux_getRatingDiv(students.current.best);
+  html += "</div>";
+  html += "<div class='span2'><b>worst</b>";
+  html += aux_getRatingDiv(students.current.worst);
+  html += "</div>";
+  html += "</div>";
+
+  html += "<div class='row'>";
+  html += "<div class='span2'><b>Week</b></div>";
+  html += "<div class='span2'><b>best</b>";
+  html += aux_getRatingDiv(students.week.best);
+  html += "</div>";
+  html += "<div class='span2'><b>worst</b>";
+  html += aux_getRatingDiv(students.week.worst);
+  html += "</div>";
+  html += "</div>";
+
+  html += "<div class='row'>";
+  html += "<div class='span2'><b>Week3</b></div>";
+  html += "<div class='span2'><b>best</b>";
+  html += aux_getRatingDiv(students.week3.best);
+  html += "</div>";
+  html += "<div class='span2'><b>worst</b>";
+  html += aux_getRatingDiv(students.week3.worst);
+  html += "</div>";
+  html += "</div>";
+
+  body.html(html);
+
+  $("#schooltab #stat .row #guest_visits").text(data.guest_visits);
+  $("#schooltab #stat .row #exams").text(data.exams);
+
+  body = $("#schooltab #stat #topics tbody");
+  body.find("tr").remove();
+  var topics = data.topics;
+  for (var t in topics)
+  {
+    var topic = topics[t]
+    html = "<tr>";
+    html += "<td>" + (+t + 1) + ".</td>";
+    html += "<td>" + topic.text + "</td>";
+
+    var err = topic.errors;
+    var a = err.current;
+    var b = err.week;
+    var c = err.week3;
+    html += "<td>" + aux_errSpan(a) + aux_errSpan(b) + aux_errSpan(c) + "</td>";
+
+    body.append(html);
+  }
+}
+//----------------------------------------------------------------------------
+
+function onSchoolStat()
+{
+  var sid = $("#schooltab #school_id").val();
+
+  $("#schooltab #stat").removeClass("hide");
+  $("#schooltab #students").addClass("hide");
+
+  $.getJSON(url("/school/" + sid), function(data) {
+    if (data.status != 200)
+      aux_showJSONError(data);
+    else
+       aux_fillSchoolStat(data);
   })
   .error(function(data) {
     aux_showError(data.responseText, data.status);
@@ -825,4 +933,5 @@ $(document).ready(function() {
   $("#schooltab #bttAdd").click(onAddStudent);
   $("#schooltab #school_add .btn-success").click(onDoAddStudent);
   $("#schooltab #bttGet").click(onStudentlList);
+  $("#schooltab #bttGetStat").click(onSchoolStat);
 });

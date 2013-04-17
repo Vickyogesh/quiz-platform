@@ -27,6 +27,7 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id)
         );
 
+
         CREATE TABLE schools(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             name VARCHAR(100) NOT NULL,
@@ -35,6 +36,44 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id),
             CONSTRAINT UNIQUE (login)
         );
+        CREATE TABLE school_topic_err(
+            school_id INTEGER UNSIGNED NOT NULL,
+            topic_id INTEGER UNSIGNED NOT NULL,
+            err_count SMALLINT NOT NULL DEFAULT 0,
+            count SMALLINT NOT NULL DEFAULT 0,
+            err_week FLOAT NOT NULL DEFAULT -1,
+            err_week3 FLOAT NOT NULL DEFAULT -1,
+            CONSTRAINT PRIMARY KEY (school_id, topic_id)
+        );
+        CREATE TABLE school_topic_err_snapshot(
+            school_id INTEGER UNSIGNED NOT NULL,
+            topic_id INTEGER UNSIGNED NOT NULL,
+            now_date DATE NOT NULL,
+            err_percent FLOAT NOT NULL DEFAULT -1,
+            CONSTRAINT PRIMARY KEY (school_id, topic_id, now_date)
+        );
+        CREATE TABLE school_stat_cache(
+            school_id INTEGER UNSIGNED NOT NULL,
+            last_activity DATETIME NOT NULL DEFAULT 0,
+            last_update DATETIME NOT NULL DEFAULT 0,
+            stat_cache TEXT NOT NULL,
+            CONSTRAINT PRIMARY KEY (school_id)
+        );
+
+
+        CREATE TABLE guest_access(
+            id INTEGER UNSIGNED NOT NULL,
+            num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+            period_end DATETIME NOT NULL,
+            CONSTRAINT PRIMARY KEY (id)
+        );
+        CREATE TABLE guest_access_snapshot(
+            guest_id INTEGER UNSIGNED NOT NULL,
+            now_date DATE NOT NULL,
+            num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+            CONSTRAINT PRIMARY KEY (guest_id, now_date)
+        );
+
 
         CREATE TABLE users(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -48,7 +87,6 @@ def create(mgr):
             progress_coef FLOAT NOT NULL DEFAULT -1,
             CONSTRAINT PRIMARY KEY (id, school_id)
         );
-
         CREATE TABLE user_progress_snapshot(
             user_id INTEGER UNSIGNED NOT NULL,
             now_date DATE NOT NULL,
@@ -56,19 +94,6 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (user_id, now_date)
         );
 
-        CREATE TABLE guest_access(
-            id INTEGER UNSIGNED NOT NULL,
-            num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-            period_end DATETIME NOT NULL,
-            CONSTRAINT PRIMARY KEY (id)
-        );
-
-        CREATE TABLE guest_access_snapshot(
-            guest_id INTEGER UNSIGNED NOT NULL,
-            now_date DATE NOT NULL,
-            num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (guest_id, now_date)
-        );
 
         CREATE TABLE chapters(
             id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -78,7 +103,6 @@ def create(mgr):
             max_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
             CONSTRAINT PRIMARY KEY (id)
         );
-
         CREATE TABLE topics(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             text VARCHAR(200) NOT NULL,
@@ -89,7 +113,6 @@ def create(mgr):
             max_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
             CONSTRAINT PRIMARY KEY (id)
         );
-
         CREATE TABLE questions(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             text VARCHAR(500) NOT NULL,
@@ -103,6 +126,7 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id)
         );
 
+
         CREATE TABLE topic_err_current(
             user_id INTEGER UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
@@ -110,7 +134,6 @@ def create(mgr):
             count SMALLINT NOT NULL DEFAULT 0,
             CONSTRAINT PRIMARY KEY (user_id, topic_id)
         );
-
         CREATE TABLE topic_err_snapshot(
             user_id INTEGER UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
@@ -119,19 +142,18 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (user_id, topic_id, now_date)
         );
 
+
         CREATE TABLE answers(
             user_id INTEGER UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
             is_correct BOOLEAN NOT NULL DEFAULT FALSE,
             CONSTRAINT PRIMARY KEY (user_id, question_id)
         );
-
         CREATE TABLE quiz_answers(
             user_id INTEGER UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
             is_correct BOOLEAN NOT NULL DEFAULT FALSE
         );
-
         CREATE TABLE exam_answers(
             add_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             exam_id INTEGER UNSIGNED NOT NULL,
@@ -139,6 +161,7 @@ def create(mgr):
             is_correct BOOLEAN NOT NULL DEFAULT FALSE,
             CONSTRAINT PRIMARY KEY (add_id)
         );
+
 
         CREATE TABLE exams(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
