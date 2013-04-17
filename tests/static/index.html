@@ -187,7 +187,7 @@
             <thead>
               <tr><th colspan="3">Topics statistics</th></tr>
               <tr>
-                <th>#</th><th width="90%">Topic</th><th>Errors</th>
+                <th>#</th><th width="60%">Topic</th><th>Errors (last,week,month)</th>
               </tr>
             </thead>
             <tbody>
@@ -380,20 +380,46 @@
             <input type="text" class="input-small" id="school_id" value="me">
             <a class="btn btn-info" id="bttAdd">Add student</a>
             <a class="btn btn-info" id="bttGet">Get student list</a>
+            <a class="btn btn-info" id="bttGetStat">Get statistics</a>
             <span class="label pull-right hide" id="infoLabel">Done</span>
           </form>
 
           <p></p>
-          <table class="table table-hover">  <!-- SCHOOL TABLE -->
-            <thead>
-              <tr><th colspan="3">Students</th></tr>
-              <tr>
-                <th>#</th><th>Name</th><th>Login</th><th></th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+          <div id="stat">
+            <div class="row"><div class="span2">Guest visits:</div>
+              <div class="span3" id="guest_visits">N/A</div>
+            </div>
+
+            <div class="row"><div class="span2">Exams:</div>
+              <div class="span3" id="exams">N/A</div>
+            </div>
+
+            <div id="info"></div>
+
+            <table class="table table-hover" id="topics">  <!-- TOPICS STAT TABLE -->
+              <thead>
+                <tr><th colspan="3">Topics statistics</th></tr>
+                <tr>
+                  <th>#</th><th width="60%">Topic</th><th>Errors (last,week,month)</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="students" class="hide">
+            <table class="table table-hover">  <!-- SCHOOL TABLE -->
+              <thead>
+                <tr><th colspan="3">Students</th></tr>
+                <tr>
+                  <th>#</th><th>Name</th><th>Login</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div> <!-- /tab-pane schooltab -->
 
       </div> <!-- /tab-content -->

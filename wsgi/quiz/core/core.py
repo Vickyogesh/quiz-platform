@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
 from .exceptions import QuizCoreError
@@ -60,10 +60,16 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
-        self.errors = self.meta.tables['errors']
+        self.answers = self.meta.tables['answers']
         self.quiz_answers = self.meta.tables['quiz_answers']
         self.exam_answers = self.meta.tables['exam_answers']
         self.exams = self.meta.tables['exams']
+
+    def sql(self, stmt):
+        """Build SQL expression."""
+        if isinstance(stmt, str) or isinstance(stmt, unicode):
+            stmt = text(' '.join(stmt.split()))
+        return stmt.compile(self.engine)
 
     # Remove None question fileds from the dict d.
     def _aux_question_delOptionalField(self, d):

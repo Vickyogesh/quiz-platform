@@ -1,16 +1,13 @@
 from datetime import datetime
-from sqlalchemy import text
 
 
 class GuestMixin(object):
     """Mixin for processing guest access. Used in QuizCore."""
     def __init__(self):
-        self.__getinfo = text("SELECT * FROM guest_access WHERE id=:id")
-        self.__getinfo = self.__getinfo.compile(self.engine)
+        self.__getinfo = self.sql("SELECT * FROM guest_access WHERE id=:id")
 
-        self.__fresh = text("""UPDATE guest_access SET num_requests=1,
+        self.__fresh = self.sql("""UPDATE guest_access SET num_requests=1,
             period_end=UTC_TIMESTAMP() + interval 1 hour WHERE id=:id""")
-        self.__fresh = self.__fresh.compile(self.engine)
 
     def processGuestAccess(self, user_id):
         """Process guest access.

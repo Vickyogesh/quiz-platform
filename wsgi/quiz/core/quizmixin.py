@@ -1,4 +1,4 @@
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from .exceptions import QuizCoreError
 
@@ -14,13 +14,11 @@ class QuizMixin(object):
     def __init__(self):
         # See getQuiz() comments for more info.
 
-        self.__getquiz = text(
+        self.__getquiz = self.sql(
             """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
             AND id NOT IN (SELECT question_id FROM quiz_answers WHERE
             user_id=:user_id) LIMIT 100) t
             ORDER BY RAND() LIMIT 40;""")
-
-        self.__getquiz = self.__getquiz.compile(self.engine)
 
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
 
@@ -113,26 +111,6 @@ class QuizMixin(object):
             questions = self._getQuizQuestions(user_id, topic_id, lang)
 
         return {'topic': topic_id, 'questions': questions}
-
-    # def saveQuestions(self, user_id, questions, answers):
-    #     questions, answers = self._aux_prepareLists(questions, answers)
-
-    #     # select and check answers
-    #     q = self.questions
-    #     s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
-    #     res = self.engine.execute(s)
-
-    #     ans = []
-    #     for row, answer in zip(res, answers):
-    #         ans.append({
-    #             'user_id': user_id,
-    #             'question_id': row[q.c.id],
-    #             'is_correct': row[q.c.answer] == answer
-    #         })
-
-    #     if ans:
-    #         with self.engine.begin() as conn:
-    #             conn.execute(self.quiz_answers.insert(), ans)
 
     def saveQuiz(self, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.

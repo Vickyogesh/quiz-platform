@@ -16,11 +16,15 @@ def url(path):
 
 def cleanupdb_onSetup(engine, drop_users=False):
     with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
+        conn.execute("TRUNCATE TABLE topic_err_current;")
+        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE quiz_answers;")
         conn.execute("TRUNCATE TABLE exam_answers;")
         conn.execute("TRUNCATE TABLE exams;")
-        conn.execute("TRUNCATE TABLE errors;")
-        conn.execute("TRUNCATE TABLE topics_stat;")
+        conn.execute("TRUNCATE TABLE answers;")
+        conn.execute("TRUNCATE TABLE topic_err_current;")
+        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         if drop_users:
             conn.execute("TRUNCATE TABLE schools;")
             conn.execute("TRUNCATE TABLE users;")
@@ -29,11 +33,15 @@ def cleanupdb_onSetup(engine, drop_users=False):
 
 def cleanupdb_onTearDown(engine):
     with engine.begin() as conn:
+        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
+        conn.execute("TRUNCATE TABLE topic_err_current;")
+        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE quiz_answers;")
         conn.execute("TRUNCATE TABLE exam_answers;")
         conn.execute("TRUNCATE TABLE exams;")
-        conn.execute("TRUNCATE TABLE errors;")
-        conn.execute("TRUNCATE TABLE topics_stat;")
+        conn.execute("TRUNCATE TABLE answers;")
+        conn.execute("TRUNCATE TABLE topic_err_current;")
+        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE guest_access;")
         conn.execute("call aux_create_test_users();")
     engine.dispose()

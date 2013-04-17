@@ -9,55 +9,67 @@ class UserMixin(object):
         apps = self.apps
         users = self.users
 
-        self.__appid = text("SELECT id FROM applications WHERE appkey=:appkey")
-        self.__appid = self.__appid.compile(self.engine)
+        self.__appid = self.sql("""SELECT id FROM applications
+                                WHERE appkey=:appkey""")
 
-        self.__school = text("SELECT * FROM schools WHERE login=:login")
-        self.__school = self.__school.compile(self.engine)
+        self.__school = self.sql("SELECT * FROM schools WHERE login=:login")
 
-        self.__user_by_login = text("SELECT * FROM users WHERE login=:login")
-        self.__user_by_login = self.__user_by_login.compile(self.engine)
+        self.__user_by_login = self.sql("SELECT * FROM users WHERE login=:login")
 
-        self.__user_by_id = text("SELECT * FROM users WHERE id=:id")
-        self.__user_by_id = self.__user_by_id.compile(self.engine)
+        self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id")
 
-        query = select(
-            [users.c.id, users.c.name, users.c.surname, users.c.passwd, users.c.type, apps.c.id],
+        self.__stmt = self.sql(select(
+            [users.c.id, users.c.name, users.c.surname,
+             users.c.passwd, users.c.type, apps.c.id],
             and_(users.c.login == bindparam('login'),
                  apps.c.appkey == bindparam('appkey')),
-            use_labels=True
-        )
-        self.__stmt = query.compile(self.engine)
+            use_labels=True))
 
-        self.__getname = select([users.c.name, users.c.surname, users.c.type], users.c.id == bindparam('id'))
-        self.__getname = self.__getname.compile(self.engine)
+        self.__getname = self.sql(select(
+            [users.c.name, users.c.surname, users.c.type],
+            users.c.id == bindparam('id')))
 
-        self.__topicstat = text("""
-            SELECT t.id, t.max_id - t.min_id + 1, t.text, t.text_fr, t.text_de,
-            IFNULL(s.err_count,-1) FROM topics t LEFT JOIN
-            (SELECT * FROM topics_stat WHERE user_id=:user_id) s
-            ON t.id=s.topic_id;""")
-        self.__topicstat = self.__topicstat.compile(self.engine)
+        self.__topicstat = self.sql("""SELECT
+            t.id, t.text, t.text_fr, t.text_de,
+            IFNULL((SELECT err_count/count*100 FROM topic_err_current WHERE
+                user_id=:user_id AND topic_id=t.id), -1) current,
+            IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
+               user_id=:user_id AND topic_id = t.id AND
+               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+               AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
+               GROUP BY topic_id), -1) week,
+            IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
+               user_id=:user_id AND topic_id = t.id AND
+               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 21 DAY
+               AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
+               GROUP BY topic_id), -1) week3
+            from topics t""")
 
-        self.__examstat = text("""SELECT id, err_count, end_time,
-            UTC_TIMESTAMP() > start_time + interval 3 hour
+        # NOTE: we skip 'in-progress' exams.
+        self.__examstat = self.sql("""SELECT
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+             FROM exams WHERE user_id=:user_id) current,
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+             FROM exams WHERE user_id=:user_id AND
+             start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+             AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
+            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+             FROM exams WHERE user_id=:user_id AND
+             start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+             AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
+            """)
+
+        self.__examlist = self.sql("""SELECT
+            exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR
             FROM exams WHERE user_id=:user_id;""")
-        self.__examstat = self.__examstat.compile(self.engine)
 
-        self.__examlist = text("""SELECT exams.*,
-            UTC_TIMESTAMP() > start_time + interval 3 hour
-            FROM exams WHERE user_id=:user_id;""")
-        self.__examlist = self.__examlist.compile(self.engine)
+        self.__topicerr = self.sql("""SELECT
+            * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
+            AND id IN (SELECT question_id FROM answers WHERE
+            user_id=:user_id AND is_correct=0)) t;""")
 
-        self.__topicerr = text(
-            """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
-            AND id IN (SELECT question_id FROM errors WHERE
-            user_id=:user_id)) t;""")
-        self.__topicerr = self.__topicerr.compile(self.engine)
-
-        self.__lastvisit = text("""UPDATE users SET last_visit=UTC_TIMESTAMP()
-                                WHERE id=:user_id""")
-        self.__lastvisit = self.__lastvisit.compile(self.engine)
+        self.__lastvisit = self.sql("""UPDATE
+            users SET last_visit=UTC_TIMESTAMP() WHERE id=:user_id""")
 
     def updateUserLastVisit(self, user_id):
         self.engine.execute(self.__lastvisit, user_id=user_id)
@@ -132,54 +144,64 @@ class UserMixin(object):
             raise QuizCoreError('Unknown user.')
         return info
 
+    def _normErr(self, err):
+        if err is None:
+            return -1
+        elif 0 < err < 1:
+            return 1
+        elif 99 < err < 100:
+            return 99
+        return round(err)
+
     def _getTopicsStat(self, user, lang):
         if lang == 'de':
-            lang = 4
-        elif lang == 'fr':
             lang = 3
-        else:
+        elif lang == 'fr':
             lang = 2
+        else:
+            lang = 1
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
         rows = self.__topicstat.execute(user_id=user)
         for row in rows:
-            err = float(row[5]) / row[1] * 100
-
-            if err < 0:
-                err = -1
-            elif 0 < err < 1:
-                err = 1
-            elif 99 < err < 100:
-                err = 99
-
             stat.append({
                 'id': row[0],
                 'text': row[lang],
-                'errors': int(err)
+                'errors': {
+                    'current': self._normErr(row[4]),
+                    'week': self._normErr(row[5]),
+                    'week3': self._normErr(row[6])
+                }
             })
         return stat
 
     def __getExamStat(self, user_id):
-        rows = self.__examstat.execute(user_id=user_id)
-        stat = []
-        for row in rows:
-            end = row[2]
-            expired = row[3]
-            if end:
-                stat.append({'id': row[0], 'status': row[1]})
-            elif expired:
-                stat.append({'id': row[0], 'status': 'expired'})
-            else:
-                stat.append({'id': row[0], 'status': 'in-progress'})
-        return stat
+        row = self.__examstat.execute(user_id=user_id).fetchone()
+        return {
+            'current': self._normErr(row[0]),
+            'week': self._normErr(row[1]),
+            'week3': self._normErr(row[2])
+        }
+        # stat = []
+        # for row in rows:
+        #     end = row[2]
+        #     expired = row[3]
+        #     if end:
+        #         stat.append({'id': row[0], 'status': row[1]})
+        #     elif expired:
+        #         stat.append({'id': row[0], 'status': 'expired'})
+        #     else:
+        #         stat.append({'id': row[0], 'status': 'in-progress'})
+        # return stat
 
     def getUserStat(self, user_id, lang):
         user = self._getStudentById(user_id)
+        topics = self._getTopicsStat(user_id, lang)
         return {
             'student': user,
             'exams': self.__getExamStat(user_id),
-            'topics': self._getTopicsStat(user_id, lang)
+            'topics': topics
         }
 
     def _createExamInfo(self, exam_db_row):

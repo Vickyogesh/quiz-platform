@@ -9,6 +9,7 @@ import unittest
 import json
 from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
+from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
 
 
 # Test: error review http requests: /errorreview;
@@ -28,10 +29,11 @@ class HttpReviewTest(unittest.TestCase):
         self.assertEqual(200, r.json()['status'])
 
         self.engine = create_engine(db_uri, echo=False)
-        self.engine.execute("INSERT IGNORE INTO errors VALUES (1, 1),(1,2)")
+        cleanupdb_onSetup(self.engine)
+        self.engine.execute("INSERT IGNORE INTO answers VALUES (4,1,0),(4,2,0)")
 
     def tearDown(self):
-        self.engine.dispose()
+        cleanupdb_onTearDown(self.engine)
 
     # Check: get review
     def test_get(self):
@@ -40,11 +42,13 @@ class HttpReviewTest(unittest.TestCase):
 
         data = r.json()
         self.assertGreaterEqual(2, len(data['questions']))
-
-        question = data['questions'][0]
+        questions = sorted(data['questions'])
+        question = questions[0]
         self.assertIn('id', question)
         self.assertIn('text', question)
         self.assertIn('answer', question)
+        self.assertEqual(1, questions[0]['id'])
+        self.assertEqual(2, questions[1]['id'])
 
     # Check: get review with lang
     # TODO: how to check the language?

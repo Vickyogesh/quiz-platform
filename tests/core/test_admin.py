@@ -135,15 +135,17 @@ class CoreAdminTest(unittest.TestCase):
         self.core.saveQuiz(1, 1, [10, 12, 13], [1, 1, 0])
 
         # Now we must have rows in the following tables:
-        # exams, exam_answers, topics_stat, errors, quiz_answers;
+        # exams, exam_answers, topics_stat, answers, quiz_answers;
         # and also in schools, users, guest_access.
         res = self.engine.execute("SELECT count(*) from exams").fetchone()
         self.assertEqual(1, res[0])
         res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
         self.assertEqual(40, res[0])
-        res = self.engine.execute("SELECT count(*) from topics_stat").fetchone()
+        res = self.engine.execute("SELECT count(*) from topic_err_current").fetchone()
         self.assertLessEqual(1, res[0])
-        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        res = self.engine.execute("SELECT count(*) from topic_err_snapshot").fetchone()
+        self.assertLessEqual(1, res[0])
+        res = self.engine.execute("SELECT count(*) from answers").fetchone()
         self.assertLessEqual(1, res[0])
         res = self.engine.execute("SELECT count(*) from quiz_answers").fetchone()
         self.assertLessEqual(1, res[0])
@@ -162,9 +164,11 @@ class CoreAdminTest(unittest.TestCase):
         self.assertEqual(0, res[0])
         res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
         self.assertEqual(0, res[0])
-        res = self.engine.execute("SELECT count(*) from topics_stat").fetchone()
+        res = self.engine.execute("SELECT count(*) from topic_err_current").fetchone()
         self.assertEqual(0, res[0])
-        res = self.engine.execute("SELECT count(*) from errors").fetchone()
+        res = self.engine.execute("SELECT count(*) from topic_err_snapshot").fetchone()
+        self.assertEqual(0, res[0])
+        res = self.engine.execute("SELECT count(*) from answers").fetchone()
         self.assertEqual(0, res[0])
         res = self.engine.execute("SELECT count(*) from quiz_answers").fetchone()
         self.assertEqual(0, res[0])
