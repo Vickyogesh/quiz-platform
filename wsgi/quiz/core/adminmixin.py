@@ -5,12 +5,9 @@ from .exceptions import QuizCoreError
 class AdminMixin(object):
     """This mixin provides administration features. Used in QuizCore."""
     def __init__(self):
-        self.__create = self.schools.insert()
-        self.__create = self.__create.values(name=None, login=None, passwd=None)
-        self.__create = self.__create.compile(self.engine)
-
-        self.__list = self.schools.select()
-        self.__list = self.__list.compile(self.engine)
+        self.__create = self.sql(self.schools.insert().values(
+                                 name=None, login=None, passwd=None))
+        self.__list = self.sql(self.schools.select())
 
     def createSchool(self, name, login, passwd):
         # Check if params are strings and they are not empty

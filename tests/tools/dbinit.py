@@ -10,7 +10,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'misc'))
 
 import argparse
 from sqlalchemy import text
-from dbtools import DbTool
+from dbtools import DbManager
+from dbtools.settings import TEST_SCHOOLS, TEST_USERS
+import fill
+
 
 ###########################################################
 # Configuration
@@ -24,13 +27,13 @@ NUM_STUDENTS = 4
 NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
 
 
-class Db(DbTool):
+class Db(DbManager):
     def __init__(self):
         self.parseArgs()
-        DbTool.__init__(self,
-                        self.args.verbose,
-                        self.args.new,
-                        self.args.config)
+        DbManager.__init__(self,
+                           self.args.verbose,
+                           self.args.new,
+                           self.args.config)
         self.put_users = True
 
     def parseArgs(self):
@@ -47,6 +50,8 @@ class Db(DbTool):
                             help='Generate quiz statistics.')
         parser.add_argument('-c', '--config', default=None,
                             help="Configuration file (default: ../test-data/config.ini).")
+        parser.add_argument('-p', action='store_true',
+                            help="Fill with big data for performance testing.")
         self.args = parser.parse_args()
 
     def createUsers(self):
@@ -79,7 +84,7 @@ class Db(DbTool):
         self.conn.execute('TRUNCATE TABLE chapters;')
         self.conn.execute('TRUNCATE TABLE topics;')
         self.conn.execute('TRUNCATE TABLE questions;')
-        self.conn.execute('TRUNCATE TABLE errors;')
+        self.conn.execute('TRUNCATE TABLE answers;')
         self.conn.execute('TRUNCATE TABLE quiz_answers;')
         self.conn.execute('TRUNCATE TABLE exam_answers;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_chapters;')
@@ -250,14 +255,14 @@ class Db(DbTool):
             """
 
         lst = []
-        for x in DbTool.TEST_SCHOOLS:
+        for x in TEST_SCHOOLS:
             lst.append("""INSERT INTO schools VALUES
             (0, '{name}', '{login}',
             '{passwd}');""".format(**x))
         sql += '\n'.join(lst)
 
         lst = []
-        for x in DbTool.TEST_USERS:
+        for x in TEST_USERS:
             lst.append("""INSERT INTO users(name, surname, login, passwd,
             type, school_id) VALUES ('{name}', '{surname}', '{login}',
             '{passwd}', '{type}', {school_id});""".format(**x))
@@ -272,5 +277,15 @@ class Db(DbTool):
         else:
             self.fillBigData()
         self.createTestFunc()
+
+    def fillForPerformance(self):
+        fill.do_fill(self)
+
+    def _do_run(self):
+        if self.args.p:
+            self.fillForPerformance()
+        else:
+            DbManager._do_run(self)
+
 
 Db().run()

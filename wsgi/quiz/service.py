@@ -258,7 +258,6 @@ def delete_student(id, student):
     return JSONResponse(res)
 
 
-# TODO: implement me
 @app.get('/school/<uid:id>', access=['school', 'admin'])
 def school_stat(id):
     school_id = app.getUserId(id)
@@ -270,5 +269,6 @@ def school_stat(id):
     elif id == 'me':
         raise Forbidden('Forbidden.')
 
-    res = {}
+    lang = app.getLang()
+    res = app.core.getSchoolStat(school_id, lang)
     return JSONResponse(res)

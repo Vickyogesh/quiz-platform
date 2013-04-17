@@ -7,7 +7,7 @@ import os.path
 
 import argparse
 import csv
-from dbtools import DbTool
+from dbtools import DbManager
 
 
 # Input files
@@ -16,13 +16,13 @@ TOPICS_FILE = "dbdata/topics.csv"
 QUESTIONS_FILE = "dbdata/questions.csv"
 
 
-class Db(DbTool):
+class Db(DbManager):
     def __init__(self):
         self.parseArgs()
-        DbTool.__init__(self,
-                        self.args.verbose,
-                        self.args.new,
-                        self.args.config)
+        DbManager.__init__(self,
+                           self.args.verbose,
+                           self.args.new,
+                           self.args.config)
         self.put_users = self.args.test_users
 
     def parseArgs(self):

@@ -243,7 +243,7 @@ class QuizApp(object):
             if utype == 'guest':
                 if not self.core.processGuestAccess(uid):
                     raise Forbidden('Forbidden.')
-            if utype != 'admin':
+            if utype == 'student' or utype == 'guest':
                 self.core.updateUserLastVisit(uid)
 
         return handler(**args)
