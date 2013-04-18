@@ -177,7 +177,10 @@ class UserMixin(object):
         return stat
 
     def __getExamStat(self, user_id):
-        row = self.__examstat.execute(user_id=user_id).fetchone()
+        try:
+            row = self.__examstat.execute(user_id=user_id).fetchone()
+        except Exception:
+            row = (-1, -1, -1)
         return {
             'current': self._normErr(row[0]),
             'week': self._normErr(row[1]),
