@@ -1,11 +1,13 @@
 Quiz Web Service repo layout
 ============================
 
-misc/ - Contains tools, initial db data and documentation
-tests/ - Web service tests
-wsg/ - Quiz web service itself
-test-data/ - Local configurations and other files. Used only for local testing.
-             This folder is not included to the repo.
+doc/        - API documentation (you need sphinx to build HTML).
+misc/       - Tools, initial db data and internals documentation.
+tests/      - Quiz Web service tests & test tools.
+wsg/        - Quiz Web Service itself.
+test-data/  - Local configurations and other files.
+              This folder is not included to the repo and
+              used only for testing on local host.
 
 
 OpenShift hooks (scripts)
@@ -33,108 +35,34 @@ Quiz Web Service runs in a python-2.7 DIY cartridge.
 This section provides steps to setup such DIY cartridge.
 
 
-1) Create an app
+* Create an app:
   rhc app create -a quizplatform -t diy-0.1
 
 
-2) Add MySql cartridge
+* Add cartridges:
   rhc cartridge add mysql-5.1 -a quizplatform
+  rhc cartridge add cron-1.4 -a quizplatform
 
 
-3) Edit basic OpenShift hooks
+* Setup OpenShift hooks & cron tasks:
+  .openshift/action_hooks/build
+  .openshift/action_hooks/pre_build
+  .openshift/action_hooks/stop
+  .openshift/action_hooks/start
 
---- .openshift/action_hooks/stop ---
-#!/bin/bash
-if [  -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
-kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
-fi
-
-
---- .openshift/action_hooks/build ---
-$OPENSHIFT_DATA_DIR/bin/pip install --use-mirrors -r $OPENSHIFT_REPO_DIR/requirements.txt
-
-# Generate documantation (if needed)
-if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-$OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
-fi
+  .openshift/cron/daily/del_old_session
+  .openshift/cron/monthly/dbclean
+  .openshift/cron/daily/dbupdate
 
 
---- .openshift/action_hooks/pre_build ---
-#!/bin/bash
-
-# create quiz data directory
-if [ ! -d $OPENSHIFT_DATA_DIR/quiz ]; then
-mkdir $OPENSHIFT_DATA_DIR/quiz
-fi
-
-# copy app config
-if [ ! -f $OPENSHIFT_DATA_DIR/quiz/config.ini ]; then
-cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz
-fi
-
-# copy uwsgi config
-if [ ! -f $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini ]; then
-cp $OPENSHIFT_REPO_DIR/misc/uwsgi.ini $OPENSHIFT_DATA_DIR/quiz
-fi
-
-if [ ! -d $OPENSHIFT_DATA_DIR/bin ]; then
-
-# install python 2.7.3
-cd $OPENSHIFT_TMP_DIR
-wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2
-tar jxf Python-2.7.3.tar.bz2
-cd Python-2.7.3
-./configure --prefix=$OPENSHIFT_DATA_DIR
-make install
-
-export PATH=$OPENSHIFT_DATA_DIR/bin:$PATH
-
-# install setuptools
-cd $OPENSHIFT_TMP_DIR
-wget http://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
-tar zxf setuptools-0.6c11.tar.gz
-cd setuptools-0.6c11
-python setup.py install
-
-# install pip
-cd $OPENSHIFT_TMP_DIR
-wget http://pypi.python.org/packages/source/p/pip/pip-1.1.tar.gz
-tar zxf pip-1.1.tar.gz
-cd pip-1.1
-python setup.py install
-
-# install uWSGI
-# Commented because we have uwsgi entry in the requirements.txt
-# cd $OPENSHIFT_TMP_DIR
-# pip install uwsgi
-
-# cleanup
-cd $OPENSHIFT_TMP_DIR
-rm -rf Python-2.7.3.tar.bz2
-rm -rf setuptools-0.6c11.tar.gz
-rm -rf pip-1.1.tar.gz
-
-fi
-
-# Install sphinx to generate documantation (if needed)
-if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-$OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
-fi
+* Edit configs if you need:
+  * $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini - server config
+  * $OPENSHIFT_DATA_DIR/quiz/config.ini - app config
 
 
---- .openshift/action_hooks/start ---
-$OPENSHIFT_DATA_DIR/bin/uwsgi --ini $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini
-
-
---- .openshift/cron/daily/del_old_session ---
-#!/bin/bash
-# Remove session files which are older than one day.
-find $OPENSHIFT_DATA_DIR/quiz/sessions -mtime +1 -type f -exec rm {} \;
-
-
-4) Setup quiz database with dbsetup tool
-cd $OPENSHIFT_REPO_DIR
-$OPENSHIFT_DATA_DIR/bin/python misc/dbinit.py -n -c misc/config.ini
+* Setup quiz database with dbsetup tool
+  cd $OPENSHIFT_REPO_DIR
+  $OPENSHIFT_DATA_DIR/bin/python misc/dbinit.py -n -c misc/config.ini
 
 
 Develop flow
