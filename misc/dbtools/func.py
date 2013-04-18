@@ -92,7 +92,7 @@ def answers(mgr):
                 err_count=err_count+VALUES(err_count);
 
                 IF school IS NOT NULL THEN
-                    INSERT INTO school_topic_err_current
+                    INSERT INTO school_topic_err
                     (school_id, topic_id, err_count, count)
                     VALUES (school, topic, err, 1) ON DUPLICATE KEY UPDATE
                     err_count=err_count+VALUES(err_count);
