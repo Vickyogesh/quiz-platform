@@ -3,3 +3,6 @@
 # build hook has been run but before the application has been started back
 # up again.  This script gets executed directly, so it could be python, php,
 # ruby, etc.
+
+env | sed 's/[\%]/\\&/g;s/\([^=]*\)=\(.*\)/s%${\1}%\2%/' > $OPENSHIFT_TMP_DIR/sed.script
+cat $OPENSHIFT_REPO_DIR/misc/nginx.conf | sed -f $OPENSHIFT_TMP_DIR/sed.script > $OPENSHIFT_DATA_DIR/nginx/conf/nginx.conf
