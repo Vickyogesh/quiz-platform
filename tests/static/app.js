@@ -628,7 +628,7 @@ function onDoAddSchool()
 
   $("#admintab #admin_add").modal('hide');
 
-  aux_postJSON(url("/admin/newschool"), data, function (data) {
+  aux_postJSON(url("/v1/admin/newschool"), data, function (data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else
@@ -643,7 +643,7 @@ function onDoAddSchool()
 function onDelSchool(p, school_id)
 {
   $.ajax({
-    url: url("/admin/school/" + school_id),
+    url: url("/v1/admin/school/" + school_id),
     type: "DELETE",
     success: function(data) {
     if (data.status != 200)
@@ -680,7 +680,7 @@ function aux_fillSchools(data)
 
 function onSchoolList()
 {
-  $.getJSON(url("/admin/schools"), function(data) {
+  $.getJSON(url("/v1/admin/schools"), function(data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else
@@ -717,7 +717,7 @@ function onDoAddStudent()
 
   $("#schooltab #school_add").modal('hide');
 
-  aux_postJSON(url("/school/" + sid + "/newstudent"), data, function (data) {
+  aux_postJSON(url("/v1/school/" + sid + "/newstudent"), data, function (data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else
@@ -730,7 +730,7 @@ function onDoAddStudent()
 function onDelStudent(p, school_id, student_id)
 {
   $.ajax({
-    url: url("/school/" + school_id + "/student/" + student_id),
+    url: url("/v1/school/" + school_id + "/student/" + student_id),
     type: "DELETE",
     success: function(data) {
     if (data.status != 200)
@@ -773,7 +773,7 @@ function onStudentlList()
 
   var sid = $("#schooltab #school_id").val();
 
-  $.getJSON(url("/school/" + sid + "/students"), function(data) {
+  $.getJSON(url("/v1/school/" + sid + "/students"), function(data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else
@@ -877,7 +877,7 @@ function onSchoolStat()
   $("#schooltab #stat").removeClass("hide");
   $("#schooltab #students").addClass("hide");
 
-  $.getJSON(url("/school/" + sid), function(data) {
+  $.getJSON(url("/v1/school/" + sid), function(data) {
     if (data.status != 200)
       aux_showJSONError(data);
     else
