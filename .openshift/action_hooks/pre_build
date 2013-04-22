@@ -57,6 +57,31 @@ rm -rf pip-1.1.tar.gz
 
 fi
 
+# Build nginx
+if [ ! -d $OPENSHIFT_DATA_DIR/nginx ]; then
+cd $OPENSHIFT_TMP_DIR
+
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.32.tar.bz2
+tar jxf pcre-8.32.tar.bz2
+
+wget http://zlib.net/zlib-1.2.7.tar.bz2
+tar jxf zlib-1.2.7.tar.bz2
+
+wget http://nginx.org/download/nginx-1.2.8.tar.gz
+tar zxf nginx-1.2.8.tar.gz
+cd nginx-1.2.8
+./configure --with-zlib=../zlib-1.2.7 --with-pcre=../pcre-8.32  --prefix=$OPENSHIFT_DATA_DIR/nginx
+make install
+
+cd $OPENSHIFT_TMP_DIR
+rm -rf pcre-8.32.tar.bz2
+rm -rf zlib-1.2.7.tar.bz2
+rm -rf nginx-1.2.8.tar.gz
+rm -Rf pcre-8.32
+rm -Rf zlib-1.2.7
+rm -Rf nginx-1.2.8
+fi
+
 # Install sphinx to generate documantation (if needed)
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
 $OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
