@@ -6,5 +6,5 @@ kill -QUIT `cat $OPENSHIFT_DATA_DIR/pid/nginx.pid`
 fi
 
 if [  -f $OPENSHIFT_DATA_DIR/pid/uwsgi.pid ]; then
-kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
+kill -INT `cat $OPENSHIFT_DATA_DIR/pid/uwsgi.pid`
 fi
