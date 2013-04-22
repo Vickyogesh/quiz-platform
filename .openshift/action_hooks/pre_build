@@ -82,6 +82,11 @@ rm -Rf zlib-1.2.7
 rm -Rf nginx-1.2.8
 fi
 
+# Create pid dir
+if [ -d $OPENSHIFT_DATA_DIR/pid ]; then
+mkdir $OPENSHIFT_DATA_DIR/pid
+fi
+
 # Install sphinx to generate documantation (if needed)
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
 $OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
