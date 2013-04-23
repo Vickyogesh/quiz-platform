@@ -56,8 +56,9 @@ This section provides steps to setup such DIY cartridge.
 
 
 * Edit configs if you need:
-  * $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini - server config
-  * $OPENSHIFT_DATA_DIR/quiz/config.ini - app config
+  * $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini - backend server config
+  * $OPENSHIFT_DATA_DIR/quiz/config.ini - backend config
+  * $OPENSHIFT_DATA_DIR/quiz/nginx.conf - nginx config
 
 
 * Setup quiz database with dbsetup tool

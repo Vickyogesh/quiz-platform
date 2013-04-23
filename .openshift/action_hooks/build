@@ -3,9 +3,16 @@
 # available.  Otherwise it will execute while your application is stopped
 # before the deploy step.  This script gets executed directly, so it
 # could be python, php, ruby, etc.
+
+# Install requirements.
 $OPENSHIFT_DATA_DIR/bin/pip install --use-mirrors -r $OPENSHIFT_REPO_DIR/requirements.txt
 
-# Generate documantation (if needed)
+# Install sphinx to generate documantation (if needed).
+if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
+$OPENSHIFT_DATA_DIR/bin/pip install sphinx sphinxcontrib-httpdomain
+fi
+
+# Generate documantation (if needed).
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
 $OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
 fi
