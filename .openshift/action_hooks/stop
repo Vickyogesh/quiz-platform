@@ -1,6 +1,10 @@
 #!/bin/bash
 # The logic to stop your application should be put in this script.
 
-if [  -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
-kill -INT `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
+if [  -f $OPENSHIFT_DATA_DIR/pid/nginx.pid ]; then
+kill -QUIT `cat $OPENSHIFT_DATA_DIR/pid/nginx.pid`
+fi
+
+if [  -f $OPENSHIFT_DATA_DIR/pid/uwsgi.pid ]; then
+kill -INT `cat $OPENSHIFT_DATA_DIR/pid/uwsgi.pid`
 fi
