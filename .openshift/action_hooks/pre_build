@@ -10,7 +10,7 @@ mkdir $OPENSHIFT_DATA_DIR/quiz
 fi
 
 # Create directory for pid and socket files.
-if [ -d $OPENSHIFT_DATA_DIR/pid ]; then
+if [ ! -d $OPENSHIFT_DATA_DIR/pid ]; then
 mkdir $OPENSHIFT_DATA_DIR/pid
 fi
 
