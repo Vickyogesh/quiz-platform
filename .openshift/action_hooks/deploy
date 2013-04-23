@@ -4,19 +4,19 @@
 # up again.  This script gets executed directly, so it could be python, php,
 # ruby, etc.
 
-if [ $OPENSHIFT_REPO_DIR/misc/config.ini -nt $OPENSHIFT_DATA_DIR/quiz/config.ini ]; then
+if [ ! -f $OPENSHIFT_DATA_DIR/quiz/config.ini ]; then
 echo "Updating config.ini..."
-cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz/config.ini
+cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz
 fi
 
-if [ $OPENSHIFT_REPO_DIR/misc/uwsgi.ini -nt $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini ]; then
+if [ ! -f $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini ]; then
 echo "Updating uwsgi.ini..."
-cp -f $OPENSHIFT_REPO_DIR/misc/uwsgi.ini $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini
+cp $OPENSHIFT_REPO_DIR/misc/uwsgi.ini $OPENSHIFT_DATA_DIR/quiz
 fi
 
-if [ $OPENSHIFT_REPO_DIR/misc/nginx.conf -nt $OPENSHIFT_DATA_DIR/quiz/nginx.conf ]; then
+if [ ! -f $OPENSHIFT_DATA_DIR/quiz/nginx.conf ]; then
 echo "Updating nginx.conf..."
-cp -f $OPENSHIFT_REPO_DIR/misc/nginx.conf $OPENSHIFT_DATA_DIR/quiz/nginx.conf
+cp $OPENSHIFT_REPO_DIR/misc/nginx.conf $OPENSHIFT_DATA_DIR/quiz
 fi
 
 echo "Pre-processing nginx config..."
