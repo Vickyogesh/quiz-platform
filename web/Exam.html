@@ -1,0 +1,449 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/switch/jquery.iphone-switch.js"></script>
+<script type="text/javascript" src="js/timer/jquery.plugin.js"></script>
+<script type="text/javascript" src="js/timer/jquery.timer.js"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+<script>
+	
+	var curIndex;
+	var quizData;
+	var id_list = [];
+  	var answer_list = [];
+  	var nTime = 1800;
+  	var bTerminated = false;
+
+	$(document).ready(function() {
+		var i, htmlVal;
+	
+		window.qsid = getCookie("qsid");
+		window.name = getCookie("name");
+		
+		$("#testarea").hide();
+		
+		WaitMsg.show();
+			
+		var lang = "it";
+		var uri = url("/v1/exam");
+		var data = {}
+			
+		if (lang != "it")
+			data.lang = lang;
+			
+		$.getJSON(uri, data, function(data) {
+			if (data.status != 200) {
+				WaitMsg.hide();
+				aux_showJSONError(data);
+			}
+			else {
+				WaitMsg.hide();
+				
+				$("#testarea").show();
+				curIndex = 0;
+				
+				quizData = data;				
+				
+				// stting up examid area
+				$("#examidarea").html(quizData.exam.id);
+				$("#namearea").html(window.name);
+				
+				setTestEnv();
+			}
+		});		
+		
+		$("#nextbut").click(function(){
+			if (curIndex < quizData.questions.length - 1) {
+				curIndex++;
+				setTestEnv();
+			}
+		});
+		
+		$("#prevbut").click(function(){
+			if (curIndex > 0) {
+				curIndex--;
+				setTestEnv();
+			}
+		});
+		
+		$("#firstrow div").click(function(){
+			var nItemIndex, nClickedIndex;
+			
+			nItemIndex = Math.floor(curIndex / 10) + 1;
+			nClickedIndex = parseInt($(this).attr("id").substring(5));
+			
+			if (nItemIndex != nClickedIndex) {
+				curIndex = (nClickedIndex - 1) * 10;
+				setTestEnv();
+			}
+		});
+		
+		$("#secondrow div").click(function(){
+			var nItemIndex, nClickedIndex;
+			
+			nItemIndex = curIndex % 10 + 1;
+			nClickedIndex = parseInt($(this).attr("id").substring(5));
+			
+			if (nItemIndex != nClickedIndex) {
+				curIndex += nClickedIndex - nItemIndex;
+				setTestEnv();
+			}
+		});
+		
+		$("#thirdrow div").click(function(){
+			var nClickedIndex;
+			nClickedIndex = parseInt($(this).attr("id").substring(5)) - 1;			
+			
+			if (curIndex != nClickedIndex) {
+				curIndex = nClickedIndex;
+				setTestEnv();
+			}
+		});
+		
+		$("#tbutton").click(function(){
+			var nIndex = alreadyAnswered(curIndex);
+			
+			$(this).attr('src', 'img/exam_true.png');
+			$("#fbutton").attr('src', 'img/exam_false.png');
+			if (nIndex < 0) {
+				id_list.push(curIndex+1);
+				answer_list.push(1);				
+			}
+			else {
+				answer_list[nIndex] = 1;
+			}
+			
+			$(this).attr('src', 'img/exam_true_selected.png');
+			var id = "#titem" + (curIndex+1);
+				$(id).css('background-color', '#ccc');
+		});		
+		$("#fbutton").click(function(){
+			var nIndex = alreadyAnswered(curIndex);
+			
+			$(this).attr('src', 'img/exam_false.png');
+			$("#tbutton").attr('src', 'img/exam_true.png');
+			if (nIndex < 0) {
+				id_list.push(curIndex+1);
+				answer_list.push(0);				
+			}
+			else {
+				answer_list[nIndex] = 0;
+			}
+			
+			$(this).attr('src', 'img/exam_false_selected.png');				
+			var id = "#titem" + (curIndex+1);
+			$(id).css('background-color', '#ccc');
+		});
+		
+		$('#timerarea').timer({
+			delay: 1000,
+			repeat: nTime,
+			autostart: true,
+			callback: function( index ) {
+				nTime--;
+								
+				var nMin = Math.floor(nTime / 60);
+				var nSec = nTime % 60;
+				var strMin = '' + nMin;
+				var strSec = '' + nSec;
+				if (strMin < 10) strMin = '0' + nMin;
+				if (strSec < 10) strSec = '0' + nSec;
+				
+				var html = strMin + " : " + strSec;
+				$(this).html(html);
+				
+				if (nTime == 0) {
+					terminateExam();
+				}
+			}
+		});
+	
+		$('#endbut').click(function(){
+			terminateExam();			
+		});		
+/*		
+		$('#backbut').click(function(){
+			window.location = "menu.html";
+		});
+*/		
+		$('#btnlogout').click(function(){
+			window.qsid = null;
+			window.location = "index.html";
+		});
+	});
+	
+	function terminateExam() {
+//		bTerminated = true;
+			
+		var i, nError = 0;
+		
+		for (i = 0; i < quizData.questions.length; i++) {				
+//			if (answer_list[i] != null) {
+				if (parseInt(quizData.questions[i].answer) != answer_list[i]) {
+					nError++;
+				}
+//			}
+		}
+		
+		var id_list_real = [];
+		var answer_list_real = [];
+		for (i = 0; i < quizData.questions.length; i++) {
+			id_list_real.push(quizData.questions[i].id);
+			
+			var nIndex = alreadyAnswered(i);
+			if (nIndex > 0) {
+				answer_list_real.push(answer_list[nIndex]);
+			}
+			else {
+				if (quizData.questions[i].answer == true)
+					answer_list_real.push(0);
+				else 
+					answer_list_real.push(1);
+			}
+		}		
+		
+		$('#timerarea').timer('stop');
+		
+		var data = {
+			questions: id_list_real,
+			answers: answer_list_real
+		}
+		
+		WaitMsg.show();
+
+		aux_postJSON(url("/v1/exam/" + quizData.exam.id), data, function (data) {
+			if (data.status != 200) {
+				WaitMsg.hide();
+				aux_showJSONError(data);
+			}
+			else {
+				WaitMsg.hide();
+				
+				alert('Number of errors: ' + nError);
+		
+				window.qsid = null;
+				setCookie("fromexam", 1, 30)
+				window.location = "Statistics.html";
+			}
+		});		
+	}
+
+	function alreadyAnswered(nIndex) {
+		var i;
+		for (i = 0; i < id_list.length; i++) {
+			if (nIndex == id_list[i] - 1)
+				break;
+		}
+		
+		if (i < id_list.length)
+			return i;
+		else 
+			return -1;
+	}
+	
+	function setTestEnv() {	
+		
+		var i, j = 0;
+		var id;
+		
+		if (bTerminated == false) {
+			
+			//
+			// setting up first row
+			//
+			for (i = 1; i <= 4; i++) {
+				id = "#firstrow #fitem" + i;
+				$(id).removeClass('redColor');
+			}			
+			var nItemIndex;
+			nItemIndex = Math.floor(curIndex / 10) + 1;
+			id = "#firstrow #fitem" + nItemIndex;
+			$(id).addClass('redColor');
+
+			//
+			// setting up second row
+			//
+			for (i = 1; i <= 10; i++) {
+				id = "#secondrow #sitem" + i;
+				$(id).removeClass('redColor');
+			}			
+			nItemIndex = curIndex % 10 + 1;
+			id = "#secondrow #sitem" + nItemIndex;
+			$(id).addClass('redColor');
+			
+			//
+			// setting up third row
+			//
+			for (i = 1; i <= 40; i++) {
+				id = "#thirdrow #titem" + i;
+				$(id).removeClass('redColor');
+			}
+			nItemIndex = curIndex + 1;
+			id = "#thirdrow #titem" + nItemIndex;
+			$(id).addClass('redColor');
+			
+			//
+			// stting up image area
+			//
+			var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + quizData.questions[curIndex].image + ".jpg";
+			$("#imgarea").css("background-image","url('" + image + "')");
+			
+			//
+			// setting up true false
+			//
+			$("#tbutton").attr('src', 'img/exam_true.png');
+			$("#fbutton").attr('src', 'img/exam_false.png');
+			for (i = 0; i < id_list.length; i++) {
+				if (curIndex == id_list[i] - 1)
+					break;
+			}			
+			if (i < id_list.length) {
+				if (answer_list[i] == 1) 
+					$("#tbutton").attr('src', 'img/exam_true_selected.png');
+				else 
+					$("#fbutton").attr('src', 'img/exam_false_selected.png');
+			}
+			
+			//
+			// setting up quiznum area
+			//
+			$("#quiznum").html(nItemIndex);
+			
+			//
+			// setting up text area
+			//
+			$("#quizarea").html(quizData.questions[curIndex].text);
+		}
+	}
+</script>
+	
+</head>
+
+<body>
+	<div id="work_area">
+		<div id="testarea" style="width:732px; height:550px; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
+			
+			<div id="logoutarea" style="position:absolute; top:20px; left:600px;">
+				<a id="btnlogout" href="#">Log out</a>				
+			</div>
+			
+			<div id="firstrow" style="position:absolute; top:65px; left:58px; width:622px; height:38px; cursor:pointer">
+				<div id="fitem1">
+					<p class="firstrowtext">Da 1 a 10</p>
+				</div>
+				<div id="fitem2">
+					<p class="firstrowtext">Da 11 a 20</p>
+				</div>
+				<div id="fitem3">
+					<p class="firstrowtext">Da 21 a 30</p>
+				</div>
+				<div id="fitem4">
+					<p class="firstrowtext">Da 31 a 40</p>
+				</div>
+			</div>
+			
+			<div id="secondrow" style="position:absolute; top:106px; left:58px; width:622px; height:38px; cursor:pointer">
+				<div id="sitem1">1</div>
+				<div id="sitem2">2</div>
+				<div id="sitem3">3</div>
+				<div id="sitem4">4</div>
+				<div id="sitem5">5</div>
+				<div id="sitem6">6</div>
+				<div id="sitem7">7</div>
+				<div id="sitem8">8</div>
+				<div id="sitem9">9</div>
+				<div id="sitem10">10</div>				
+			</div>
+						
+			<div id="thirdrow" style="position:absolute; top:151px; left:51px; height:23px; cursor:pointer">
+				<div id="titem1">1</div>
+				<div id="titem2">2</div>
+				<div id="titem3">3</div>
+				<div id="titem4">4</div>
+				<div id="titem5">5</div>
+				<div id="titem6">6</div>
+				<div id="titem7">7</div>
+				<div id="titem8">8</div>
+				<div id="titem9">9</div>
+				<div id="titem10">10</div>
+				<div id="titem11">11</div>
+				<div id="titem12">12</div>
+				<div id="titem13">13</div>
+				<div id="titem14">14</div>
+				<div id="titem15">15</div>
+				<div id="titem16">16</div>
+				<div id="titem17">17</div>
+				<div id="titem18">18</div>
+				<div id="titem19">19</div>
+				<div id="titem20">20</div>
+				<div id="titem21">21</div>
+				<div id="titem22">22</div>
+				<div id="titem23">23</div>				
+				<div id="titem24">24</div>				
+				<div id="titem25">25</div>				
+				<div id="titem26">26</div>				
+				<div id="titem27">27</div>				
+				<div id="titem28">28</div>				
+				<div id="titem29">29</div>				
+				<div id="titem30">30</div>				
+				<div id="titem31">31</div>				
+				<div id="titem32">32</div>				
+				<div id="titem33">33</div>			
+				<div id="titem34">34</div>				
+				<div id="titem35">35</div>				
+				<div id="titem36">36</div>				
+				<div id="titem37">37</div>				
+				<div id="titem38">38</div>				
+				<div id="titem39">39</div>				
+				<div id="titem40" style="border-right:2px solid #90a699;">40</div>				
+			</div>
+			
+			<div id="imgarea" style="position:absolute; left:23px; top:176px; width:227px; height:287px;background-position: center; background-repeat: no-repeat; background-size: contain;">
+			</div>
+			
+			<div id="quiznum" style="position:absolute; left:677px; top:180px; width:30px; height:30px; line-height:30px; font-size:17px">
+				1
+			</div>
+			
+			<div id="quizarea" style="position:absolute; left:269px; top:220px; width:410px; height:90px; text-align:left; font-size:15px; padding:10px; border:2px solid #555;">
+				1
+			</div>
+			
+			<img id="tbutton" src="img/exam_true.png" style="position:absolute; left:403px; top:395px; width:52px; cursor:pointer" />
+			<img id="fbutton" src="img/exam_false.png" style="position:absolute; left:493px; top:395px; width:52px; cursor:pointer" />
+				
+			<div id="timerarea" style="position:absolute; left:24px; top:484px; width:125px; height:57px; line-height:57px; font-size:25px; ">
+			</div>
+			
+			<div id="examidarea" style="position:absolute; left:173px; top:479px; width:106px; height:20px; line-height:20px; font-size:17px; color:#555; text-align:left">
+			</div>
+			
+			<div id="namearea" style="position:absolute; left:158px; top:511px; width:271px; height:28px; line-height:28px; font-size:17px; color:#555; ">
+			</div>
+			
+			<div id="endbut" style="position:absolute; left:480px; top:502px; width:64px; height:37px; cursor:pointer">
+			</div>
+			
+			<div id="prevbut" style="position:absolute; left:591px; top:502px; width:40px; height:37px; cursor:pointer">
+			</div>
+			
+			<div id="nextbut" style="position:absolute; left:665px; top:502px; width:40px; height:37px; cursor:pointer">
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
