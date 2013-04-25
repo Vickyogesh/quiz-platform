@@ -21,6 +21,25 @@ hosts = {
 }
 
 
+def get_remote_command(server, cmd):
+    info = hosts[server]
+    return 'ssh -t {0}@{1} {2}'.format(info['uid'], info['domain'], cmd)
+
+
+def check_remote_logs(server):
+    print('Checking logs snapshot...')
+    info = hosts[server]
+    base = '/var/lib/openshift/{0}'.format(info['uid'], info['domain'])
+    fmt = 'bash {0}/app-root/runtime/repo/misc/lrotate.sh -checkarch'
+
+    cmd = get_remote_command(args.server, fmt.format(base))
+    res = subprocess.call(cmd.split(' '))
+
+    if res != 0:
+        sys.exit(res)
+    print('Checking logs snapshot... done')
+
+
 # Construct path to the remote log file.
 def get_log_remote_path(server, log='app.log'):
     info = hosts[server]
@@ -47,11 +66,14 @@ def convert_to_unixstyle(path):
 
 # Download remote log to the local log file
 # and return local log file path.
-def download_log(server, log='app.log'):
+def download_log(server, log='app.log', notemp=False):
     info = hosts[server]
     print("Downloading %s => %s" % (info['domain'], log))
     remote = get_log_remote_path(server, log)
-    local_file = get_temp_path(log)
+    if notemp:
+        local_file = log
+    else:
+        local_file = get_temp_path(log)
     res = subprocess.call(['scp', remote, convert_to_unixstyle(local_file)])
 
     if res != 0:
@@ -146,39 +168,63 @@ def print_stat(data, table_width=100):
     print('\n', table.draw())
 
 
+def do_analyze(args):
+    if args.log:
+        log_file = args.log
+        args.noclean = True
+    else:
+        log_file = download_log(args.server)
+
+    analyze_perfornace(log_file, args.w)
+
+    if not args.noclean:
+        os.remove(log_file)
+    else:
+        print('\nLog file: %s' % log_file)
+
+
+def do_getlogs(args):
+    check_remote_logs(args.server)
+    download_log(args.server, 'logs-snapshot.tar.bz2', True)
+
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    description='Quiz Service log analyzer (default uWSGI logs).',
+    description='Quiz Service log tool.',
     epilog="""Examples:
     Analyse requests log from production server:
-        logstat.py
+        logstat.py analyze
 
     Analyse requests log from test server and don't remove log file:
-        logstat.py -n -s test
+        logstat.py -s test analyze -n
 
     Analyse specified log:
-        logstat.py -l log.txt
+        logstat.py analyze -l log.txt
+
+    Download logs snapshot from the peduction server:
+        logstat.py getlogs
+
+    Download logs snapshot from the test server:
+        logstat.py -s test getlogs
     """)
+
 parser.add_argument('-s', '--server', choices=hosts.keys(),
                     default='production',
                     help='Source server (default: %(default)s).')
-parser.add_argument('-n', '--noclean', action='store_true',
-                    help='Do not delete log.')
-parser.add_argument('-l', '--log',
-                    help='Specify log file.')
-parser.add_argument('-w', type=int, default=100,
-                    help='Max table width (default: %(default)s).')
+sp = parser.add_subparsers(title='Actions', help='Avaliable actions.')
+
+# Logs analyzer arguments
+p = sp.add_parser('analyze', help='Analyze logs (default uWSGI logs).')
+p.add_argument('-n', '--noclean', action='store_true',
+               help='Do not delete log.')
+p.add_argument('-l', '--log',
+               help='Specify log file to analyze.')
+p.add_argument('-w', type=int, default=100,
+               help='Max table width (default: %(default)s).')
+p.set_defaults(func=do_analyze)
+
+# Logs downloader arguments
+p = sp.add_parser('getlogs', help='Download logs snapshot.')
+p.set_defaults(func=do_getlogs)
+
 args = parser.parse_args()
-
-if args.log:
-    log_file = args.log
-    args.noclean = True
-else:
-    log_file = download_log(args.server)
-
-analyze_perfornace(log_file, args.w)
-
-if not args.noclean:
-    os.remove(log_file)
-else:
-    print('\nLog file: %s' % log_file)
+args.func(args)
