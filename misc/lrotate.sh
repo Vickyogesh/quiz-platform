@@ -15,6 +15,10 @@ then
     kill -USR1 `cat $OPENSHIFT_DATA_DIR/pid/nginx.pid`
 fi
 
+# Archive all logs
 sleep 1
+tar -cvjf logs.tar.bz2 *.log*
 
-tar --remove-files -cvjf logs.tar.bz2 *.log.*
+# Remove old logs
+sleep 1
+rm *.log.*
