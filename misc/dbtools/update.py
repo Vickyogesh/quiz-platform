@@ -1,7 +1,6 @@
 """
 This module contains function for updating quiz db.
 """
-import logging
 import time
 import traceback
 from sqlalchemy import text
@@ -11,13 +10,15 @@ except ImportError:
     import json
 
 engine = None
+logger = None
 
 
-def process(dbengine, clean):
+def process(dbengine, log, clean):
     """Update statistics for all active schools."""
     global engine
+    global logger
     engine = dbengine
-
+    logger = log
     try:
         school_list = get_schools_for_update()
         if clean:
@@ -26,17 +27,17 @@ def process(dbengine, clean):
             do_update(school_list)
     except:
         msg = traceback.format_exc()
-        logging.critical(msg)
+        logger.critical(msg)
 
 
 def do_update(school_list):
-    logging.debug('Number of schools to update: %d', len(school_list))
+    logger.debug('Number of schools to update: %d', len(school_list))
     for school in school_list:
         start = time.time()
-        logging.debug('Update school %d', school)
+        logger.debug('Update school %d', school)
         update_school(school)
         end = time.time() - start
-        logging.debug('Update school %d finished in %.3fs', school, end)
+        logger.debug('Update school %d finished in %.3fs', school, end)
         time.sleep(1)
 
 
@@ -227,14 +228,14 @@ def get_exams_stat(users_str):
 
 def do_clean(school_list):
     start = time.time()
-    logging.debug('Cleanup started.')
+    logger.debug('Cleanup started.')
 
     clean_schools_data()
     for school in school_list:
         clean_users_data(school)
 
     end = time.time() - start
-    logging.debug('Cleanup finished in %.3fs', end)
+    logger.debug('Cleanup finished in %.3fs', end)
 
 
 def clean_schools_data():
