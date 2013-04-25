@@ -4,6 +4,7 @@ Tools to update quiz db.
 from __future__ import print_function
 import argparse
 import logging
+from logging.handlers import RotatingFileHandler
 import time
 import os.path
 import sys
@@ -46,17 +47,24 @@ parser.add_argument('-c', '--config', default=None,
 parser.add_argument('--clean', action='store_true', help="Cleanup db.")
 args = parser.parse_args()
 
-logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                    datefmt='%d.%m.%Y %H:%M:%S',
-                    filename=args.log,
-                    level=args.verbose and logging.DEBUG or logging.INFO)
+# Logging setup
+logger = logging.getLogger('dbupdate')
+logger.setLevel(args.verbose and logging.DEBUG or logging.INFO)
+
+fmt = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s',
+                        '%d.%m.%Y %H:%M:%S')
+
+# Max log size is 5Mb
+handler = RotatingFileHandler(args.log, maxBytes=5242880, backupCount=1)
+handler.setFormatter(fmt)
+logger.addHandler(handler)
 
 engine = get_engine(args.config)
 
-logging.info('Update started')
+logger.info('Update started')
 start = time.time()
-update.process(engine, args.clean)
+update.process(engine, logger, args.clean)
 end = time.time() - start
-logging.info('Update finished in %.3fs', end)
+logger.info('Update finished in %.3fs', end)
 
 engine.dispose()
