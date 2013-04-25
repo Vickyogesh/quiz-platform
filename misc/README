@@ -1,10 +1,17 @@
 Directory layout
 ================
 
-dbdata/ - initial data for the database (see dbsetup.py).
-config.ini - Quiz WebService configuration (ready to use as production).
-uwsgi.ini - uWSGI server configuration.
-dbinit.py - Quiz WebService databse init tool.
+dbdata/     - initial data for the database (see dbsetup.py).
+dbtools/    - python module which provides features for
+              dbinit.py and dbupdate.py
+config.ini  - Quiz WebService configuration (ready to use as production).
+dbinit.py   - Quiz WebService databse init tool.
+dbupdate.py - Quiz WebService databse statistics update tool.
+img.zip     - Images for the questions.
+lrotate.sh  - Script for rotating nginx logs and creating logs snapshots.
+nginx.conf  - uWSGI server configuration.
+uwsgi.ini   - uWSGI server configuration.
+
 
 
 Brief algo
@@ -92,3 +99,22 @@ We may use the following tools:
 http://fabien-d.github.com/alertify.js/
 http://www.chartjs.org/
 https://github.com/mbuczko/simplemodal-jquery
+
+
+Develop workflow tips
+=====================
+
+How to use git flow to work with production and testing repos
+
+1) clone release openshift repo
+2) git flow init
+3) git remote add test [testing openshift repo]
+4) git fetch test
+5) (you have to be inside develop branch) git branch -u test/master
+6) git pull
+
+now you have two tracked branches:
+    master - production repo
+    develop - testing repo
+
+NOTE: set push.default=upstream to push from develop branch

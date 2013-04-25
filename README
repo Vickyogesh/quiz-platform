@@ -3,11 +3,12 @@ Quiz Web Service repo layout
 
 doc/        - API documentation (you need sphinx to build HTML).
 misc/       - Tools, initial db data and internals documentation.
-tests/      - Quiz Web service tests & test tools.
-wsg/        - Quiz Web Service itself.
 test-data/  - Local configurations and other files.
               This folder is not included to the repo and
               used only for testing on local host.
+tests/      - Quiz Web service backend tests & test tools.
+web/        - Quiz Web Service frontend.
+wsg/        - Quiz Web Service backend.
 
 
 OpenShift hooks (scripts)
@@ -38,48 +39,27 @@ This section provides steps to setup such DIY cartridge.
 * Create an app:
   rhc app create -a quizplatform -t diy-0.1
 
-
 * Add cartridges:
   rhc cartridge add mysql-5.1 -a quizplatform
   rhc cartridge add cron-1.4 -a quizplatform
 
-
-* Setup OpenShift hooks & cron tasks:
+* Setup OpenShift hooks:
   .openshift/action_hooks/build
   .openshift/action_hooks/pre_build
   .openshift/action_hooks/stop
   .openshift/action_hooks/start
 
+* Setup OpenShift cron tasks:
   .openshift/cron/daily/del_old_session
   .openshift/cron/monthly/dbclean
   .openshift/cron/daily/dbupdate
-
+  .openshift/cron/weekly/rotatelogs
 
 * Edit configs if you need:
   * $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini - backend server config
   * $OPENSHIFT_DATA_DIR/quiz/config.ini - backend config
   * $OPENSHIFT_DATA_DIR/quiz/nginx.conf - nginx config
 
-
 * Setup quiz database with dbsetup tool
   cd $OPENSHIFT_REPO_DIR
   $OPENSHIFT_DATA_DIR/bin/python misc/dbinit.py -n -c misc/config.ini
-
-
-Develop flow
-============
-
-How to use git flow to work with production and testing repos
-
-1) clone release openshift repo
-2) git flow init
-3) git remote add test [testing openshift repo]
-4) git fetch test
-5) (you have to be inside develop branch) git branch -u test/master
-6) git pull
-
-now you have two tracked branches:
-    master - production repo
-    develop - testing repo
-
-NOTE: set push.default=upstream to push from develop branch
