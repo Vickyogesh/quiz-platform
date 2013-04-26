@@ -43,9 +43,10 @@ def do_update(school_list):
 
 def get_schools_for_update():
     """Return list of schools for which update is needed."""
-    res = engine.execute("""SELECT school_id FROM school_stat_cache WHERE
-                         last_activity > last_update""")
-    return [row[0] for row in res]
+    # res = engine.execute("""SELECT school_id FROM school_stat_cache WHERE
+    #                      last_activity > last_update""")
+    # return [row[0] for row in res]
+    return [1, 2, 3, 4]
 
 
 def update_school(school):
@@ -147,18 +148,24 @@ def get_current_student_rating(users_str):
     return {'best': best, 'worst': worst}
 
 
-def get_users_info(ulist):
-    if not ulist:
+def get_users_info(res):
+    data = {}
+    users = []
+    for row in res:
+        data[row[0]] = row[1]
+        users.append(str(row[0]))
+    if not data:
         return []
+    users = ','.join(users)
     res = engine.execute("""SELECT id, name, surname, progress_coef FROM
-        users WHERE id IN (%s) ORDER by progress_coef""" % ulist)
-    data = [{
+        users WHERE id IN (%s) ORDER by progress_coef""" % users)
+    d = [{
         'id': row[0],
         'name': row[1],
         'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
-    return data
+        'coef': data[row[0]]
+    } for row in res if data[row[0]] != -1]
+    return d
 
 
 def get_week_student_rating(users_str):
@@ -169,7 +176,7 @@ def get_week_student_rating(users_str):
         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 7 day
         AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c DESC limit 3;
     """ % users_str)
-    best = get_users_info(','.join([str(row[0]) for row in res]))
+    best = get_users_info(res)
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
@@ -177,7 +184,7 @@ def get_week_student_rating(users_str):
         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 7 day
         AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c limit 3;
     """ % users_str)
-    worst = get_users_info(','.join([str(row[0]) for row in res]))
+    worst = get_users_info(res)
 
     return {'best': best, 'worst': worst}
 
@@ -191,7 +198,7 @@ def get_week3_student_rating(users_str):
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c DESC limit 3;
     """ % users_str)
-    best = get_users_info(','.join([str(row[0]) for row in res]))
+    best = get_users_info(res)
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
@@ -200,7 +207,7 @@ def get_week3_student_rating(users_str):
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c limit 3;
     """ % users_str)
-    worst = get_users_info(','.join([str(row[0]) for row in res]))
+    worst = get_users_info(res)
 
     return {'best': best, 'worst': worst}
 

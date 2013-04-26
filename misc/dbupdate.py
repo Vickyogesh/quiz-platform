@@ -4,6 +4,7 @@ Tools to update quiz db.
 from __future__ import print_function
 import argparse
 import logging
+from logging import StreamHandler
 from logging.handlers import RotatingFileHandler
 import time
 import os.path
@@ -54,8 +55,11 @@ logger.setLevel(args.verbose and logging.DEBUG or logging.INFO)
 fmt = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s',
                         '%d.%m.%Y %H:%M:%S')
 
-# Max log size is 5Mb
-handler = RotatingFileHandler(args.log, maxBytes=5242880, backupCount=1)
+if args.log:
+    # Max log size is 5Mb
+    handler = RotatingFileHandler(args.log, maxBytes=5242880, backupCount=1)
+else:
+    handler = StreamHandler()
 handler.setFormatter(fmt)
 logger.addHandler(handler)
 

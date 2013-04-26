@@ -4,6 +4,7 @@ def do_fill(mgr):
     create_guestvisits(mgr)
     create_exams(mgr)
     create_user_progress(mgr)
+    create_school_topic_err_snapshot(mgr)
     create_topics_snapshots(mgr)
 
 
@@ -204,12 +205,72 @@ def create_user_progress(mgr):
     print("Create user progress ...done")
 
 
+def create_school_topic_err_snapshot(mgr):
+    print("Create schools topic_err snapshots ...")
+    mgr.conn.execute("DROP PROCEDURE IF EXISTS tst")
+    mgr.conn.execute("""CREATE PROCEDURE tst()
+        BEGIN
+            DECLARE numtopics INT DEFAULT 45;
+            DECLARE numdays INT DEFAULT 35;
+            DECLARE topic INT DEFAULT 1;
+            DECLARE school INT DEFAULT 1;
+            DECLARE day INT DEFAULT 1;
+            DECLARE err FLOAT DEFAULT 0;
+            DECLARE dt DATE DEFAULT NULL;
+            DECLARE d DATE DEFAULT NULL;
+
+            DECLARE done INT DEFAULT FALSE;
+            DECLARE cur CURSOR FOR SELECT id FROM schools;
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+            PREPARE stmt FROM 'INSERT INTO school_topic_err_snapshot VALUES(?, ?, ?, ?)';
+
+            SET dt = DATE(UTC_TIMESTAMP());
+            OPEN cur;
+
+            TRUNCATE TABLE school_topic_err_snapshot;
+
+            START TRANSACTION;
+            rloop: LOOP
+                FETCH cur INTO school;
+                IF done THEN
+                    LEAVE rloop;
+                END IF;
+
+                WHILE (topic <= numtopics) DO
+                    SET d = dt;
+                    WHILE (day <= numdays) DO
+                        SET err = err + 0.5;
+                        SET @a = school;
+                        SET @b = topic;
+                        SET @c = d;
+                        SET @d = err;
+                        EXECUTE stmt USING @a, @b, @c, @d;
+                        SET day = day + 1;
+                        SET d = d - interval 1 day;
+                    END WHILE;
+                    SET day = 1;
+                    SET err = 0;
+                    SET topic = topic + 1;
+                END WHILE;
+                SET topic = 1;
+            END LOOP;
+            COMMIT;
+
+            DEALLOCATE PREPARE stmt;
+            CLOSE cur;
+        END;""")
+    mgr.conn.execute("call tst()")
+    mgr.conn.execute("DROP PROCEDURE IF EXISTS tst")
+    print("Create uest visits ...done")
+
+
 def create_topics_snapshots(mgr):
     print("Create topics snapshots ...")
     mgr.conn.execute("DROP PROCEDURE IF EXISTS tst")
     mgr.conn.execute("""CREATE PROCEDURE tst()
         BEGIN
-            DECLARE numtopics INT DEFAULT 60;
+            DECLARE numtopics INT DEFAULT 45;
             DECLARE numdays INT DEFAULT 35;
             DECLARE user INT DEFAULT 1;
             DECLARE topic INT DEFAULT 1;
