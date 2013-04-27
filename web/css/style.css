@@ -1,5 +1,11 @@
+@font-face
+{
+	font-family: customMyriadFont;
+	src: url('../font/MyriadPro-Regular.ttf');
+} 
+
 body {
-    font-family: "Myriad Pro";
+    font-family: customMyriadFont;
     font-size:12px;
     margin:10px;    
     text-align:center;
@@ -17,7 +23,7 @@ body {
 	margin:	10px auto;
 }
         
-form {
+#subscribeForm {
     margin:0 auto;
     position:relative;
     text-align:left;
@@ -37,14 +43,14 @@ form {
 /*    background-size: contain; */
 }
         
-fieldset {
+#subscribeForm fieldset {
     overflow:hidden;
     border:0;
     height:30px;    
     margin:3px 0;
 }
         
-fieldset label {
+#subscribeForm fieldset label {
     display:block;
     float:left;
     font-weight:100;
@@ -54,7 +60,7 @@ fieldset label {
     text-decoration:underline;
 }
     
-fieldset input {
+#subscribeForm fieldset input {
     float:left;
     border:1px solid #ccc;    
     height: 20px;
@@ -91,8 +97,9 @@ a.cssSubmitButton {
     border-radius: 15px;
     -moz-border-radius: 15px;
     -webkit-border-radius: 15px;
-    -moz-box-shadow: 0 1px 3px #999;
+/*    -moz-box-shadow: 0 1px 3px #999;
     -webkit-box-shadow: 0 1px 3px #999;
+*/    
     position: relative;
     cursor: pointer;
     outline:none;
@@ -415,4 +422,65 @@ a.cssSubmitButton:hover {
 	top:50%; 
 	margin-top:-50%; 
 	border-radius:10px; 
+}
+
+
+/* add student form */
+
+#addstudentarea h2 {
+	font-size:25px;
+	text-align:center;
+}
+
+#addstudentarea form {
+	padding: 0 20px 20px 20px;
+}
+
+#addstudentarea form p { position: relative; margin: 10px 0;}
+#addstudentarea form p label { position: absolute; top: 0; left: 0;}
+#addstudentarea form p br {display: none;}
+
+#addstudentarea fieldset {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
+
+#addstudentarea form fieldset p input,
+#addstudentarea form fieldset p textarea {
+	display: block;
+	padding: 4px;
+	width: 450px;
+	margin: 0;
+}
+
+#addstudentarea form fieldset p label {
+	width: 380px;
+	display: block;
+	margin: 5px 5px 5px 6px;
+	padding: 0;
+}
+
+#addstudentarea form fieldset p textarea {
+	padding: 2px;
+	width: 404px;
+}
+
+#addstudentarea form fieldset p textarea,
+#addstudentarea form fieldset p input {
+	border: solid 1px #ccc;
+}
+#addstudentarea form fieldset p label {
+	color: #777;
+}
+
+/* school statistics */
+#guestVisit div {
+	width:30px; 
+	height:25px; 
+	line-height:25px; 
+	float:right; 
+	text-align:center; 
+	font-size:14px; 
+	color:white
 }

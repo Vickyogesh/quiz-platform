@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script src="js/graph/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/graph/g.raphael.js" type="text/javascript"></script>
+<script src="js/graph/g.line.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/graph/g.pie.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="js/organictabs.jquery.js"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+<script>
+	var i, sHtml;
+	var statData;	
+	var bFromExam;
+	var parentQuizObj;
+	
+	$(document).ready(function() {
+
+		window.qsid = sessionStorage.getItem('quizqsid');
+		window.name = sessionStorage.getItem('quizname');		
+
+		bFromExam = sessionStorage.getItem('quizfromexam');
+		
+		$("#statarea").hide();
+		
+		WaitMsg.show();
+									
+		$.getJSON(url("/v1/school/me"), 
+			function(data) {
+				if (data.status != 200) {
+					WaitMsg.hide();
+					aux_showJSONError(data);
+				}
+				else {					
+					statData = data;
+			
+					WaitMsg.hide();
+					$("#statarea").show();
+					
+					var stArray;
+					// filling best and wors students : week
+					stArray = data.students.current.best;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#week #bestStList").append(sHtml);
+					}
+					
+					stArray = data.students.current.worst;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#week #worstStList").append(sHtml);
+					}
+					
+					// filling best and worst students : month
+					stArray = data.students.week.best;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#month #bestStList").append(sHtml);
+					}
+					
+					stArray = data.students.week.worst;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#month #worstStList").append(sHtml);
+					}
+					
+					// filling best and worst students : all
+					stArray = data.students.week3.best;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '"">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#all #bestStList").append(sHtml);
+					}
+					
+					stArray = data.students.week3.worst;					
+					for (i = 0; i < stArray.length; i++) {
+						sHtml = '<li><a id="' + stArray[i].id + '" href="Statistics.html?id=' + stArray[i].id + '"">';
+						sHtml += stArray[i].name + ' ' + stArray[i].surname;
+						sHtml += '</a></li>';
+						$("#all #worstStList").append(sHtml);
+					}
+					
+					// filling guest visits
+					$("#week #guestVisit div").html(data.guest_visits[0]);
+					$("#month #guestVisit div").html(data.guest_visits[1]);
+					$("#all #guestVisit div").html(data.guest_visits[2]);
+					
+					// filling exam graph
+					var p = Raphael('wpgraph');
+					if (data.exams[0] != null && data.exams[0]) {
+						p.piechart(10, 10, 10, [100 - data.exams[0], data.exams[0]], {strokewidth:0, colors:['#c20808','#219429']});
+					}
+					p = Raphael('mpgraph');
+					if (data.exams[1] != null && data.exams[1]) {
+						p.piechart(10, 10, 10, [100 - data.exams[1], data.exams[1]], {strokewidth:0, colors:['#c20808','#219429']});
+					}
+					p = Raphael('apgraph');
+					if (data.exams[2] != null && data.exams[2]) {
+						p.piechart(10, 10, 10, [100 - data.exams[2], data.exams[2]], {strokewidth:0, colors:['#c20808','#219429']});
+					}					
+
+					// filling topic statistics : week
+					for (i = 0; i < data.topics.length; i++) {
+						sHtml = '<li><a id="' + (i+1) + '">';
+						sHtml += '<div id="wtgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
+						sHtml += data.topics[i].text;
+						sHtml += '</a></li>';
+						$("#week #topic ul").append(sHtml);
+						
+						var id = 'wtgraph' + (i+1);
+						var r = Raphael(id);
+						var nError = data.topics[i].errors.current;
+						if (nError != null && nError > 0)
+							r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
+					}
+							
+					// filling topic statistics : month
+					for (i = 0; i < data.topics.length; i++) {
+						sHtml = '<li><a id="' + (i+1) + '">';
+						sHtml += '<div id="mtgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
+						sHtml += data.topics[i].text;
+						sHtml += '</a></li>';
+						$("#month #topic ul").append(sHtml);
+						
+						var id = 'mtgraph' + (i+1);
+						var r = Raphael(id);
+						var nError = data.topics[i].errors.week;
+						if (nError != null && nError > 0)
+							r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
+					}
+					
+					// filling topic statistics : month
+					for (i = 0; i < data.topics.length; i++) {
+						sHtml = '<li><a id="' + (i+1) + '">';
+						sHtml += '<div id="atgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
+						sHtml += data.topics[i].text;
+						sHtml += '</a></li>';
+						$("#all #topic ul").append(sHtml);
+						
+						var id = 'atgraph' + (i+1);
+						var r = Raphael(id);
+						var nError = data.topics[i].errors.week3;
+						if (nError != null && nError > 0)
+							r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
+					}
+							
+							//
+							// topic click events
+							//
+/*							$('#topic ul li a').click(function(){
+								parentQuizObj = $(this).parent().parent().parent().parent();
+								// showing topic errors								
+								$('#statarea').css('width', '520px');
+								
+								var sHtml;
+								
+								$("#topicerrorlist").empty();
+								
+								sHtml = '<li>';
+								sHtml += '<a id="back" style="cursor:pointer">';
+								sHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<-&nbsp;Back</a>';
+								sHtml += '</li>';
+								$("#topicerrorlist").append(sHtml);
+
+								sHtml = '<li>';
+								sHtml += '<a id="' + $(this).attr('id') + '" style="cursor:pointer">';
+								sHtml += 'Question List Topic ' + $(this).attr('id') + '</a>';
+								sHtml += '<ul>'
+								sHtml += '</ul>';
+								sHtml += '</li>';
+								
+								$("#topicerrorlist").append(sHtml);
+								
+								// filling lists
+								WaitMsg.show();
+					
+								data = {};
+								data.lang = "it";
+								
+								$.getJSON(url("/v1/student/me/topicerrors/" + $(this).attr('id')), data, function(data) {
+									if (data.status != 200) {
+										WaitMsg.hide();
+										aux_showJSONError(data);
+									}
+									else {
+										WaitMsg.hide();
+										parentQuizObj.hide();
+										
+										$('#topicerrorlist').show();
+										$('html, body').animate({ scrollTop: 0 }, 0);
+										
+										var id;
+										for (i = 0; i < data.questions.length; i++) {
+											id = data.questions[i].id + '_' + i;
+											
+											sHtml = '<li><a id="' + id + '">';
+								
+											var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + data.questions[i].image + ".jpg";
+											sHtml += '<div class="img" style="width:30px; height:30px; float:left; margin-right:5px; background-image:';
+											sHtml += "url('" + image + "');" + 'background-size:contain; background-position:center; background-repeat: no-repeat;">';
+											sHtml += '</div>';
+											
+											var result;
+											sHtml += '<div class="result" style="width:30px; height:30px; float:right; margin-left:5px; font-size:20px; text-align:center">';
+											if (data.questions[i].answer == 1)
+												result = 'V';
+											else
+												result = 'F';
+												
+											sHtml += result;
+											sHtml += '</div>';
+											
+											sHtml += 'Question ' + data.questions[i].id + '<br>';
+											sHtml += data.questions[i].text;
+											sHtml += '</a></li>';
+											
+											$("#topicerrorlist ul").append(sHtml);
+										}
+										
+										// resizing images of the items
+										var nHeight;
+										for (i = 0; i < data.questions.length; i++) {
+											id = data.questions[i].id + '_' + i;
+											nHeight = $('#' + id).height() + 5;
+											$('#' + id + ' .img').css('height', nHeight + 'px');
+											$('#' + id + ' .result').css('height', nHeight + 'px');
+											$('#' + id + ' .result').css('line-height', nHeight + 'px');
+										}
+									}
+								})
+								.error(function(data) {
+									aux_showError(data.responseText, data.status);
+								});
+								
+								$('#topicerrorlist #back').click(function(){
+									$('#topicerrorlist').hide();
+									$('#statarea').css('width', '520px');
+//									$('#menu').show();
+									parentQuizObj.show();
+								});
+							});
+							if (bFromExam == 1)
+								showExamList(7);
+
+							
+						}
+					})
+					.error(function(data) {
+						WaitMsg.hide();
+						aux_showError(data.responseText, data.status);
+					});		
+*/					
+					$("#statarea").organicTabs();								
+					$("#month").hide();
+					$("#all").hide();							
+				}
+			})
+			.error(function(data) {
+				WaitMsg.hide();
+				aux_showError(data.responseText, data.status);
+			});
+			
+		
+		$('#backbut').click(function(){
+			window.location = "School.html";
+		});
+		
+		$('.nav li a').click(function(){
+			$('#topicerrorlist').hide();			
+			$('#examlist').hide();
+		});	
+		
+		$('#bestStListBut a, #worstStListBut a').click(function(){
+			var checkElement = $(this).next();
+			
+			if(checkElement.is(':visible')) {
+				checkElement.slideUp('normal');
+			}
+			if(!checkElement.is(':visible')) {
+				checkElement.slideDown('normal');
+			}
+		});
+	});
+	
+</script>
+	
+</head>
+
+<body>
+	<div id="work_area">
+		<div id="statarea">
+
+			<div style="width:321px; margin:auto">
+	        	<ul class="nav" style="padding:0px">
+	                <li class="nav-one"><a href="#week" class="current">Last week</a></li>
+	                <li class="nav-two"><a href="#month">Last month</a></li>
+	                <li class="nav-three"><a href="#all">All</a></li>
+	            </ul>
+            </div>
+            
+        	<div class="list-wrap" style="padding-left:5px; padding-right:5px">
+        		<ul id="week" class="parentitem">
+        			<li id="bestStListBut">
+						<a href='#'>Best students</a>
+						<ul id="bestStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="worstStListBut">
+						<a href='#'>Worst students</a>
+						<ul id="worstStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="guestVisit">
+						<div>10</div>
+						<a href='#'>Guest Visits</a>
+					</li>
+        			<li id="exam">
+        				<div id="wpgraph" style="width:20px; height:20px; float:right; margin-top:4px; margin-right:5px"></div>
+						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
+					</li>
+					<li id="topic">
+						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
+						<ul>
+						</ul>
+					</li>
+				</ul>
+				
+				<ul id="month" class="parentitem">
+					<li id="bestStListBut">
+						<a href='#'>Best students</a>
+						<ul id="bestStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="worstStListBut">
+						<a href='#'>Worst students</a>
+						<ul id="worstStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="guestVisit">
+						<div>10</div>
+						<a href='#'>Guest Visits</a>
+					</li>
+        			<li id="exam">
+        				<div id="mpgraph" style="width:20px; height:20px; float:right; margin-top:4px; margin-right:5px"></div>
+						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
+					</li>
+					<li id="topic">
+						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
+						<ul>
+						</ul>
+					</li>
+				</ul>
+				
+				<ul id="all" class="parentitem">
+					<li id="bestStListBut">
+						<a href='#'>Best students</a>
+						<ul id="bestStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="worstStListBut">
+						<a href='#'>Worst students</a>
+						<ul id="worstStList" style="font-size:12px">
+						</ul>
+					</li>
+					<li id="guestVisit">
+						<div>10</div>
+						<a href='#'>Guest Visits</a>
+					</li>
+        			<li id="exam">
+        				<div id="apgraph" style="width:20px; height:20px; float:right; margin-top:4px; margin-right:5px"></div>
+						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
+					</li>
+					<li id="topic">
+						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
+						<ul>
+						</ul>
+					</li>
+				</ul>
+				
+				<!-- exam list -->
+				<ul id="examlist" style="display:none" class="parentitem">
+				</ul>
+				
+				<!-- topic error list -->
+				<ul id="topicerrorlist" style="display:none" class="parentitem">
+				</ul>
+        	</div> <!-- END List Wrap -->
+        	
+        	<div style="width:100%; height:70px">
+				<a class="button" id="backbut" style="margin:15px; padding:10px; font-size:22px; float:left; margin-left:150px">
+					Back to school
+				</a>
+			</div>
+         
+         </div> <!-- END Organic Tabs (Example One) -->
+	</div>
+</body>
+
+</html>

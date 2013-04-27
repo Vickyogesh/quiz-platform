@@ -28,10 +28,10 @@
 	$(document).ready(function() {
 		var i, htmlVal;
 	
-		window.qsid = getCookie("qsid");
+		window.qsid = sessionStorage.getItem('quizqsid');
 				
 		$("#reviewarea").hide();
-		$("#reviewarea #topic h1").html("Error Review");
+		$("#reviewarea #topic h1").html("Ripasso Errori");
 		
 		curIndex = 0;
 		fillupReview();
@@ -101,11 +101,12 @@
 		$('#backbut').click(function(){
 			window.location = "menu.html";
 		});
-		
+/*		
 		$('#btnlogout').click(function(){
 			window.qsid = null;
 			window.location = "index.html";
 		});
+*/		
 		
 		$('#reviewarea').mousewheel(function(event, delta, deltaX, deltaY) {
 			if (deltaY > 0) {
@@ -379,13 +380,15 @@
 			</div>
 			
 			<div id="switch" style="width:200px; height:60px; float:left">
-				<h2 style="float:left; margin-top:20px; color:white">Solutions</h2>
+				<h2 style="float:left; margin-top:20px; color:white">Soluzioni</h2>
 				<div id="iswitch" style="float:left; margin-left:10px; margin-top:20px"></div>
 			</div>
-			
+
+<!--			
 			<div id="logoutarea" style="position:absolute; top:20px; left:870px;">
 				<a id="btnlogout" href="#" style="color:#fff">Log out</a>				
 			</div>
+-->			
 			
 			<div id="imagearea">
 			</div>
@@ -452,10 +455,10 @@
 			
 			<div style="width:100%; float:left; height:80px; margin-top:20px; background-color:#142f66">
 				<a class="button" id="backbut" style="margin:15px; padding:10px; font-size:22px; float:left; margin-left:100px">
-					Back to main menu
+					Torna al Menu
 				</a>
 				<a class="button" id="endbut" style="margin:15px; padding:10px; font-size:22px; float:right; margin-right:100px">
-					Terminate
+					Correggi
 				</a>
 			</div>
 		</div>
