@@ -1,7 +1,7 @@
 Develop workflow tips
 =====================
 
-This file contains tip for development.
+This file contains tips for development.
 
 How to use git flow to work with production and testing repos
 -------------------------------------------------------------
