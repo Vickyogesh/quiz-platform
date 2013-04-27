@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/md5-min.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script src="js/jquery.infieldlabel.min.js" type="text/javascript"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+
+<script>
+	$(document).ready(function() {		
+		window.qsid = sessionStorage.getItem('quizqsid');
+		
+		$("#statarea").hide();
+		
+		WaitMsg.show();
+		
+		$("#addstudentarea label").inFieldLabels();
+		
+		$.getJSON(url("/v1/school/me/students"), function(data) {
+			if (data.status != 200) {
+				WaitMsg.hide();
+				aux_showJSONError(data);
+			}
+			else {
+				WaitMsg.hide();
+				$("#statarea").show();
+				
+				var i, sHtml;
+				var lst = data.students;
+				for (var i = 0; i < lst.length; i++) {
+					sHtml = '<li><a id="' + lst[i].id + '" href="Statistics.html?id=' + lst[i].id + '">';
+					sHtml += lst[i].name + " " + lst[i].surname;
+					sHtml += '</a></li>';
+					
+					$("#schoolmain #stListBut ul").append(sHtml);
+				}
+			}
+		})
+		.error(function(data) {
+			WaitMsg.hide();
+			aux_showError(data.responseText, data.status);
+		});
+		
+		$('#stListBut a').click(function(){
+			var checkElement = $(this).next();
+			
+			if(checkElement.is(':visible')) {
+				checkElement.slideUp('normal');
+			}
+			if(!checkElement.is(':visible')) {
+				checkElement.slideDown('normal');
+			}
+		});
+		
+		$('#addStBut').click(function(){
+			$(".list-wrap").hide();
+			$("#addstudentarea").show();
+		});
+		
+		$('#addConfirm').click(function(){
+			var name = $("#addstudentarea #name").val();
+			var surname = $("#addstudentarea #surname").val();
+			var login = $("#addstudentarea #login").val();
+			var passwd = $("#addstudentarea #passwd").val();
+
+			var data = {
+				name: name,
+				surname: surname,
+				login: login,
+				passwd: hex_md5(login + ':' + passwd)
+			};
+			
+			WaitMsg.show();
+			
+			aux_postJSON(url("/v1/school/me/newstudent"), data, function (data) {
+				if (data.status != 200) {
+					WaitMsg.hide();
+					aux_showJSONError(data);
+				}
+				else {
+					WaitMsg.hide();
+					alert('Added successfully!');
+				}
+			});
+		});
+		
+		$('#statis').click(function(){
+			window.location = "Statistics_school.html";
+		});
+	});
+</script>
+	
+</head>
+
+<body>
+	<div id="work_area">
+		<div id="statarea">
+            
+        	<div class="list-wrap" style="padding-left:5px; padding-right:5px">
+        		<ul id="schoolmain" class="parentitem" style="font-size:16px">
+        			<li id="statis">
+						<a href='#'>Statistics</a>
+					</li>
+					<li id="addStBut">
+						<a href='#'>Add Student</a>
+					</li>
+					<li id="stListBut">
+						<a href='#'>Student List</a>
+						<ul id="stList" style="font-size:12px">
+						</ul>
+					</li>					
+				</ul>
+        	</div> <!-- END List Wrap -->
+
+			<div id="addstudentarea" style="display:none">
+	        	<h2>Add Student</h2>
+				<form action="">
+					<fieldset>
+						<p>
+							<label for="name">Name</label><br />
+							<input type="text" name="name" value="" id="name">
+						</p>
+						<p>
+							<label for="surname">Surname</label><br />
+							<input type="text" name="surname" value="" id="surname">
+						</p>
+						<p>
+							<label for="passwd">Password</label><br />
+							<input type="password" name="passwd" value="" id="passwd">
+						</p>
+						<p>
+							<label for="login">Login</label><br />
+							<input type="text" name="login" value="" id="login">
+						</p>
+					</fieldset>
+					<p style="text-align:center">
+						<input id="addConfirm" type="button" value="Continue &rarr;">
+					</p>
+				</form>	
+			</div>
+         
+         </div> <!-- END Organic Tabs (Example One) -->
+	</div>
+</body>
+
+</html>

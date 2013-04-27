@@ -29,9 +29,9 @@
 
 	$(document).ready(function() {
 		var i, htmlVal;
-	
-		window.qsid = getCookie("qsid");
-		window.name = getCookie("name");
+
+		window.qsid = sessionStorage.getItem('quizqsid');	
+		window.name = sessionStorage.getItem('quizname');
 		
 		$("#testarea").hide();
 		
@@ -235,7 +235,7 @@
 				alert('Number of errors: ' + nError);
 		
 				window.qsid = null;
-				setCookie("fromexam", 1, 30)
+				sessionStorage.setItem('fromexam', 1);
 				window.location = "Statistics.html";
 			}
 		});		
@@ -337,8 +337,9 @@
 		<div id="testarea" style="width:732px; height:550px; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
 			
 			<div id="logoutarea" style="position:absolute; top:20px; left:600px;">
-				<a id="btnlogout" href="#">Log out</a>				
+				<a id="btnlogout" href="#">Esci</a>				
 			</div>
+
 			
 			<div id="firstrow" style="position:absolute; top:65px; left:58px; width:622px; height:38px; cursor:pointer">
 				<div id="fitem1">

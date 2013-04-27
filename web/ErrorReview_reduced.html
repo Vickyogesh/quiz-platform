@@ -28,7 +28,7 @@
 	$(document).ready(function() {
 		var i, htmlVal;
 	
-		window.qsid = getCookie("qsid");
+		window.qsid = sessionStorage.getItem('quizqsid');
 				
 		$("#reviewarea").hide();
 		$("#reviewarea #topic h1").html("Error Review");
@@ -101,11 +101,13 @@
 		$('#backbut').click(function(){
 			window.location = "menu.html";
 		});
-		
+
+/*		
 		$('#btnlogout').click(function(){
 			window.qsid = null;
 			window.location = "index.html";
 		});
+*/		
 		
 		$('#reviewarea').mousewheel(function(event, delta, deltaX, deltaY) {
 			if (deltaY > 0) {
@@ -382,10 +384,12 @@
 				<h2 style="margin:5px 0px 0px 0px; color:white">Solutions</h2>
 				<div id="iswitch" style="float:left; margin-left:30px;"></div>
 			</div>
-			
+
+<!--			
 			<div id="logoutarea" style="position:absolute; top:20px; left:670px;">
 				<a id="btnlogout" href="#" style="color:#fff">Log out</a>				
 			</div>
+-->			
 			
 			<div id="imagearea">
 			</div>
@@ -452,10 +456,10 @@
 			
 			<div style="width:100%; float:left; margin-top:20px; background-color:#142f66; height:70px">
 				<a class="button" id="backbut" style="margin:12px; padding:7px; font-size:17px; float:left; margin-left:77px">
-					Back to main menu
+					Torna al Menu
 				</a>
 				<a class="button" id="endbut" style="margin:12px; padding:7px; font-size:17px; float:right; margin-right:77px">
-					Terminate
+					Correggi
 				</a>
 			</div>
 		</div>

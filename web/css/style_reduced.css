@@ -1,5 +1,11 @@
+@font-face
+{
+	font-family: customMyriadFont;
+	src: url('../font/MyriadPro-Regular.TTF');
+} 
+
 body {
-    font-family: arial;
+    font-family: customMyriadFont;
     font-size:12px;
     margin:10px;    
     text-align:center;
