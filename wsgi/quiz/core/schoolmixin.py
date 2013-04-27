@@ -25,7 +25,7 @@ class SchoolMixin(object):
                GROUP BY topic_id), -1) week,
         IFNULL((SELECT avg(err_percent) FROM school_topic_err_snapshot WHERE
                school_id=:school_id AND topic_id = t.id AND
-               now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+               now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
                AND DATE(UTC_TIMESTAMP()) - interval 8 day
                GROUP BY topic_id), -1) week3
         from topics t;""")

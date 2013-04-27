@@ -115,7 +115,7 @@ def get_guest_stat(school):
          AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY), -1) week,
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
-         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+         now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
          AND DATE(UTC_TIMESTAMP()) - interval 8 day), -1) week3;
         """), guest_id=guest_id).fetchone()
 
@@ -193,7 +193,7 @@ def get_week3_student_rating(users_str):
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
         user_id IN (%s) AND
-        now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+        now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c DESC limit 3;
     """ % users_str)
@@ -202,7 +202,7 @@ def get_week3_student_rating(users_str):
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE
         user_id IN (%s) AND
-        now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+        now_date BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
         AND DATE(UTC_TIMESTAMP()) - interval 8 day
         GROUP BY user_id ORDER by c limit 3;
     """ % users_str)
@@ -222,7 +222,7 @@ def get_exams_stat(users_str):
          AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
         (SELECT ROUND(SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE user_id IN (%(u)s) AND
-         start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 21 day
+         start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
          AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
         """ % {'u': users_str}).fetchone()
     return (res[0], res[1], res[2])
