@@ -1,8 +1,7 @@
-This file contains information about the project structure
+This file provides information about the project structure
 and server side dir layout and scripts.
- are described in the .
 
-misc/doc provides info about the backend internals
+misc/README and misc/doc provides info about the backend internals
 (backend logic, DB logic/structure, etc).
 
 tests/README provides info about testing tools.
