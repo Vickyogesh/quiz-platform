@@ -9,6 +9,9 @@ Tables are created by misc/dbtools/tables.py.
 Triggers and stored procedures are created by misc/dbtools/func.py.
 Refer to them for more info.
 
+There is db.svg which provides additional info
+about db structure in a grapgics way.
+
 * answers:
   Contains quiz and exam answers.
   This table is used by *error review* feature.
@@ -109,13 +112,14 @@ Refer to them for more info.
 Statistics algo
 ---------------
 
-Student part
-^^^^^^^^^^^^
+Statistics ranges:
 
-We save daily snapshots of the topic erorrs and answers.
-History rime range for each topic is one month.
-Backend calculates the following statistics for each topic:
+* current - Current state.
 
-  * curernt err_count/ans_count;
-  * avg(err_count/ans_count) for current - 7 days ago (1 week);
-  * avg(err_count/ans_count) for 7 days ago - 21 days ago (7*3 = ~3 weeks);
+* week    - Average value of the state in the range
+            [current - 1 day; current - 7 days].
+
+* week3   - Average value of the state in the range
+            [current - 8 day; current - 29 days].
+
+Overall there is 30 days statistics.
