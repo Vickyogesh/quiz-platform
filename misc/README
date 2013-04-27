@@ -1,9 +1,10 @@
 Directory layout
 ================
 
-dbdata/     - initial data for the database (see dbsetup.py).
-dbtools/    - python module which provides features for
-              dbinit.py and dbupdate.py
+dbdata/     - Initial data for the database (see dbsetup.py).
+dbtools/    - Python module which provides features for
+              dbinit.py and dbupdate.py.
+doc/        - Internals documentation.
 config.ini  - Quiz WebService configuration (ready to use as production).
 dbinit.py   - Quiz WebService databse init tool.
 dbupdate.py - Quiz WebService databse statistics update tool.
@@ -11,110 +12,3 @@ img.zip     - Images for the questions.
 lrotate.sh  - Script for rotating nginx logs and creating logs snapshots.
 nginx.conf  - uWSGI server configuration.
 uwsgi.ini   - uWSGI server configuration.
-
-
-
-Brief algo
-==========
-
-0) quiz by topic, exam and errors are almost 3 different worlds
-
-1) quiz and exam puts questions to error DB
-
-2) quiz has a memory of the questions made in the "quiz by topic" mode.
-In the quiz, every time a question is sent,
-it's temporarily removed from the DB for that student
-so that there are no questions duplicates you do exercises and exercises
-
-3) errors of the exam are sent to error DB.
-
-4) statistics use the error DB and stored somewhere the number
-of exercises performed.
-
-5) error review removes questions from error DB
-
-6) exam removes questions from error BD
-
-7) statistics of topics now, last week and last month
-
-
-Database structure
-==================
-
-applications
-chapters
-topics
-questions
-topics_stat
-
-* users - Registered users (students, schools and schools' guests).
-  Attached triggers:
-    - on insert if user is guest then add row to the guest_access table
-    - on update if user is guest then update num_requests
-      in the guest_access table.
-
-* errors - contains questions with wrong answers (from quizzes and exams).
-  Attached triggers:
-    - on insert add row for the question's topic into topics_stat with err_count=1
-      or set err_count = err_count+1 if row is already present
-    - on delete add row for the question's topic into topics_stat with err_count=0
-      or set err_count = err_count-1 if row is already present
-
-* quiz_answers - contains questions already provided in the quizzes
-  Attached triggers:
-    - on insert wrong answer it will put question into errors table.
-
-* exam_answers - contains exam questions and user answers
-  Attached triggers:
-    - on insert question it will put question into errors table.
-    - on update answer it will put question into errors table if
-      answer if wrong or remove question from the errors table if
-      answer if correct.
-
-* exams - contains list of generated exams
-
-* guest_access - contains information about guest requests to provide/control
-  limited access for the guest users.
-
-
-Statistics algo
----------------
-
-Student part
-^^^^^^^^^^^^
-
-We save daily snapshots of the topic erorrs and answers.
-History rime range for each topic is one month.
-Backend calculates the following statistics for each topic:
-
-  * curernt err_count/ans_count;
-  * avg(err_count/ans_count) for current - 7 days ago (1 week);
-  * avg(err_count/ans_count) for 7 days ago - 21 days ago (7*3 = ~3 weeks);
-
-
-Frontend tips
-=============
-
-We may use the following tools:
-http://fabien-d.github.com/alertify.js/
-http://www.chartjs.org/
-https://github.com/mbuczko/simplemodal-jquery
-
-
-Develop workflow tips
-=====================
-
-How to use git flow to work with production and testing repos
-
-1) clone release openshift repo
-2) git flow init
-3) git remote add test [testing openshift repo]
-4) git fetch test
-5) (you have to be inside develop branch) git branch -u test/master
-6) git pull
-
-now you have two tracked branches:
-    master - production repo
-    develop - testing repo
-
-NOTE: set push.default=upstream to push from develop branch
