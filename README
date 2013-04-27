@@ -1,3 +1,12 @@
+This file provides information about the project structure
+and server side dir layout and scripts.
+
+misc/README and misc/doc provides info about the backend internals
+(backend logic, DB logic/structure, etc).
+
+tests/README provides info about testing tools.
+
+
 Quiz Web Service repo layout
 ============================
 
@@ -11,15 +20,40 @@ web/        - Quiz Web Service frontend.
 wsg/        - Quiz Web Service backend.
 
 
+OpenShift-specific information
+==============================
+
+This section provides information about OpenShift scripts, dirs
+and basic explanation the scripts works to serve Quiz Web Service backend.
+
 OpenShift hooks (scripts)
 -------------------------
 
-.openshift/action_hooks/build       - Run every git push as part of the build process.
-.openshift/action_hooks/deploy      - Run every git push after build but before the app is restarted.
-.openshift/action_hooks/post_deploy - Run every git push after the app is restarted.
-.openshift/action_hooks/pre_build   - Run every git push before the build.
-.openshift/action_hooks/start       - Run to start the app.
-.openshift/action_hooks/stop        - Run to stop the app.
+Details of the scripts in .openshift/action_hooks dir:
+
+build       - Run every git push as part of the build process.
+              Install packages from the requirements.txt
+              (uwsgi, werkzeug, etc); install sphinx documentation system 
+              if $OPENSHIFT_DATA_DIR/quiz/apidoc exists.
+
+deploy      - Run every git push after build but before the app is restarted.
+              Update configs in the $OPENSHIFT_DATA_DIR/quiz dir if needed,
+              Create nginx config from the template.
+              Build API docs if $OPENSHIFT_DATA_DIR/quiz/apidoc exists.
+
+post_deploy - Run every git push after the app is restarted. Not used.
+
+pre_build   - Run every git push before the build.
+              Download and install the following packages into
+              $OPENSHIFT_DATA_DIR/bin dir: python 2.7.3, pip and nginx.
+              $OPENSHIFT_DATA_DIR/quiz and $OPENSHIFT_DATA_DIR/pid dirs
+              will be created. Also misc/img.zip will be extracted into
+              $OPENSHIFT_DATA_DIR/quiz/img if the dir is not exist.
+
+start       - Run to start the app. Start uwsg and nginx servers.
+
+stop        - Run to stop the app. Stop uwsg and nginx servers.
+
 
 Note: Every time you push, everything in your remote repo dir gets recreated
       please store long term items (like an sqlite database) in the OpenShift
@@ -28,13 +62,51 @@ Note: Every time you push, everything in your remote repo dir gets recreated
       directory (../data) or using a path constructed as
       $OPENSHIFT_HOMEDIR/app-root/data.
 
+OpenShift cron scripts
+----------------------
+
+The following scripts are used to run by cron
+(paths are relative to .openshift/cron):
+
+minutely/dbupdate     - Update schools statistics (each 5 min).
+daily/del_old_session - Delete old session files.
+weekly/rotatelogs     - Rotate logs and make week logs snapshots.
+monthly/dbclean       - Remove old history data from the DB.
+
+OpenShift directories
+---------------------
+
+Quiz Web Service creates/uses the following dirs:
+
+* $OPENSHIFT_DATA_DIR/bin:
+  - binaries and & libs for the backend (python, pip, etc).
+
+* $OPENSHIFT_DATA_DIR/nginx:
+  - nginx instalation.
+
+* $OPENSHIFT_DATA_DIR/pid:
+  - nginx and uwsgi pid & socket files.
+
+* $OPENSHIFT_DATA_DIR/quiz:
+  - backend configuration (config.ini)
+  - nginx configuration template (nginx.conf; it will be used to create
+    real nginx config at deployment stage - see deploy hook.)
+  - backend server config (uwsgi.ini)
+
+* $OPENSHIFT_DATA_DIR/quiz/apidoc:
+  - backend web API documentation (HTML).
+
+* $OPENSHIFT_DATA_DIR/quiz/img:
+  - questions' images.
+
+* $OPENSHIFT_DATA_DIR/quiz/sessions:
+  - session data.
 
 OpenShift Application setup
-===========================
+---------------------------
 
 Quiz Web Service runs in a python-2.7 DIY cartridge.
 This section provides steps to setup such DIY cartridge.
-
 
 * Create an app:
   rhc app create -a quizplatform -t diy-0.1
@@ -43,17 +115,7 @@ This section provides steps to setup such DIY cartridge.
   rhc cartridge add mysql-5.1 -a quizplatform
   rhc cartridge add cron-1.4 -a quizplatform
 
-* Setup OpenShift hooks:
-  .openshift/action_hooks/build
-  .openshift/action_hooks/pre_build
-  .openshift/action_hooks/stop
-  .openshift/action_hooks/start
-
-* Setup OpenShift cron tasks:
-  .openshift/cron/daily/del_old_session
-  .openshift/cron/monthly/dbclean
-  .openshift/cron/daily/dbupdate
-  .openshift/cron/weekly/rotatelogs
+* Setup OpenShift hooks & cron tasks:
 
 * Edit configs if you need:
   * $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini - backend server config
@@ -63,3 +125,7 @@ This section provides steps to setup such DIY cartridge.
 * Setup quiz database with dbsetup tool
   cd $OPENSHIFT_REPO_DIR
   $OPENSHIFT_DATA_DIR/bin/python misc/dbinit.py -n -c misc/config.ini
+
+Note: if you want to build API docs at deployment then create
+      $OPENSHIFT_DATA_DIR/quiz/apidoc dir, and on next deployment
+      the docs will be built.

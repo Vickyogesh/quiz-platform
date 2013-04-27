@@ -1,0 +1,125 @@
+Database structure
+==================
+
+Tables
+------
+
+This section briefly describes each table in the quiz db.
+Tables are created by misc/dbtools/tables.py.
+Triggers and stored procedures are created by misc/dbtools/func.py.
+Refer to them for more info.
+
+There is db.svg which provides additional info
+about db structure in a grapgics way.
+
+* answers:
+  Contains quiz and exam answers.
+  This table is used by *error review* feature.
+
+  *AFTER INSERT* and *AFTER UPDATE* triggers updates
+  topic_err_current and school_topic_err with current number of
+  errors and answers per topic.
+
+* applications:
+  Contains application keys for varios types of clent applications.
+  Currently info from this table is used while authorization only.
+  Application key may be used later to collect statistics.
+
+* chapters:
+  Contains list of chapters. Used in exam initialization
+  and also provides chapters' titles.
+
+* exam_answers:
+  Stores exam answers.
+  *BEFORE UPDATE* trigger updates answers table.
+
+* exams:
+  Contains list of students' exams.
+  *BEFORE DELETE* trigger deletes all linked answers from the exam_answers.
+  *AFTER UPDATE* trigger updates user's progres_coef in the users table.
+
+* guest_access:
+  Used to limit guest requests.
+  *AFTER INSERT* and *AFTER UPDATE* triggers updates guest_access_snapshot.
+
+* guest_access_snapshot:
+  Contains daily snapshots of the guest_access.
+  Populated by guest_access triggers.
+
+* questions:
+  Contains questions for the quizzes and exams.
+
+* quiz_answers:
+  Stores quiz answers.
+  Questions from this table will be excluded from future quizzes.
+  *AFTER INSERT* and *AFTER UPDATE* triggers updates answers table.
+
+* school_stat_cache:
+  Contains part of the school's statistics: guest visits statistics,
+  exams statistics and students rating statistics. See misc/dbtools/update.py
+  for more info.
+
+* school_topic_err:
+  Contains total number of errors and answers per topic for school.
+  Used to provide part of the topics statistics for the school.
+
+* school_topic_err_snapshot:
+  Contains daily snapshots of the school_topic_err state.
+  Updated by stored procedure update_school_snapshot() by the
+  misc/dbtools/update.py script.
+  Used to create school's topics errors statistics.
+  Stored procedure update_school_snapshot() is created by schools()
+  in the misc/dbtools/func.py.
+  school_topic_err and school_topic_err_snapshot are used in the
+  wsgi/quiz/core/schoolmixin.py.
+
+* schools:
+  Contains list of registered schools.
+  *BEFORE DELETE* trigger deletes linked users from the users table
+  and also all linked data from the school_topic_err, school_topic_err_snapshot
+  and school_stat_cache tables.
+  *AFTER INSERT* trigger inserts guest user to the users table.
+
+* topic_err_current:
+  Contains number of topic erorrs and answers per student.
+  Updated after quiz, exam and error review by the answers's table triggers.
+  *AFTER INSERT* and *AFTER UPDATE* triggers updates topic_err_snapshot table.
+  Used to provide student's topics statistics.
+
+* topic_err_snapshot:
+  Contains snapshot of the topic_err_current state.
+  Used to provide student's topics statistics.
+
+* topics:
+  Contains list of questions' topics.
+  Provides max and min question's IDs for the topic and also topic's title.
+
+* user_progress_snapshot:
+  Stores daily snapshots of the user's learning progress.
+  Used to provide students rating for the school statistics.
+  Updated by users's table triggers.
+
+* users:
+  Conains list of registered students/guests.
+  Also last visit time stamp and learning progress is provided.
+  Last visit time is used by the misc/dbtools/update.py script to detect
+  active users and learning progress used to provide ratings.
+  *AFTER INSERT* and *AFTER UPDATE* triggers updates school activity timestamt,
+  guest_access and user_progress_snapshot tables.
+  *BEFORE DELETE* trigger deletes all user related data from the quiz db.
+
+
+Statistics algo
+---------------
+
+Statistics ranges:
+
+* current - Current state.
+
+* week    - Average value of the state in the range
+            [current - 1 day; current - 7 days].
+
+* week3   - Average value of the state in the range
+            [current - 8 day; current - 29 days].
+
+Overall there is 30 days statistics.
