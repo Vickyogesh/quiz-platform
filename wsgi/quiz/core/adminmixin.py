@@ -20,7 +20,7 @@ class AdminMixin(object):
         try:
             with self.engine.begin() as conn:
                 # NOTE: guest will be created by the trigger.
-                # See _createFuncs() in the misc/dbtools.py
+                # See misc/dbtools/func.py.
                 res = conn.execute(self.__create, name=name, login=login,
                                    passwd=passwd)
                 school_id = res.inserted_primary_key[0]

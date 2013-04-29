@@ -116,7 +116,7 @@ class QuizApp(object):
     Provides the following features:
 
         * JSON responses.
-        * Convert exceptions and HTTP errors into JSON.
+        * Convert exceptions and HTTP errors to JSON.
         * Session management and CORS requests (See QuizApp.wrap()).
         * Authorization.
         * Requests access privileges.
@@ -128,15 +128,15 @@ class QuizApp(object):
         self.urls = Map(converters={'uid': IdConverter})
         self.endpoints = {}
 
-        # Default handlers to server authorization.
+        # Default handlers for authorization.
         self.addRule('/authorize', self.onNewAuth, methods=['GET'])
         self.addRule('/authorize', self.onDoAuth, methods=['POST'])
 
     # Read application settings.
     # There may be two sources:
     #   1. $OPENSHIFT_DATA_DIR/quiz/congig.ini
-    #   2. [src]/test-data/congig.ini
-    # At first (1) will be loaded, if this file doesn't exsist
+    #   2. [src]/test-data/config.ini
+    # At first (1) will be loaded, if this file is not exsist
     # then (2) will be loaded. (2) is used for development only
     # and (1) must be used for production.
     def __getSettings(self):
