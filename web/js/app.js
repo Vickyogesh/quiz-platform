@@ -16,12 +16,11 @@ function url(url)
   var path = url;
 
   // NOTE: uncomment if you want cross domain requests
-  // var server = "http://127.0.0.1"
-  // var server = "https://quizplatformtest-editricetoni.rhcloud.com"
-  // var server = "http://quizplatform-editricetoni.rhcloud.com"
-  // path = server + url;
-  // if (window.qsid)
-  //    path += get_arg_prefix(path) + "sid=" + window.qsid;
+  //var server = "http://127.0.0.1"
+  var server = "http://quizplatform-editricetoni.rhcloud.com"
+  path = server + url;
+  if (window.qsid)
+     path += get_arg_prefix(path) + "sid=" + window.qsid;
 
   return path;
 }

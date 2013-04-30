@@ -62,7 +62,7 @@ function onAuth(butObj)
 		if (data.user.type == 'student')
 			window.location = "menu.html";
 		else if (data.user.type == 'school')
-			window.location = "School.html";
+			window.location = "school.html";
       }
     });
   }); // GET
