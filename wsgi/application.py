@@ -11,10 +11,12 @@ if __name__ == '__main__':
 
     here = os.path.dirname(__file__)
     static_path = os.path.join(here, '..', 'tests', 'static')
+    app_path = os.path.join(here, '..', 'web')
     config_file = os.path.join(here, '..', 'test-data', 'config.ini')
 
     application = DispatcherMiddleware(application, {'/v1': application})
     application = SharedDataMiddleware(application, {'/test': static_path})
+    application = SharedDataMiddleware(application, {'/app': app_path})
 
     run_simple('127.0.0.1', 80, application, use_debugger=True,
                use_reloader=True,

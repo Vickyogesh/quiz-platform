@@ -390,7 +390,11 @@
 		});
 		
 		$('#backbut').click(function(){
-			window.location = "menu.html";
+			var type = sessionStorage.getItem("quizutype");
+			if (type == 'school')
+				window.location = "School.html";
+			else
+				window.location = "menu.html";
 		});
 		
 /*		
