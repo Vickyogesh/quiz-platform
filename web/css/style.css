@@ -436,7 +436,7 @@ a.cssSubmitButton:hover {
 	padding: 0 20px 20px 20px;
 }
 
-#addstudentarea form p { position: relative; margin: 10px 0;}
+#addstudentarea form p { position: relative; margin: 10px 10px;}
 #addstudentarea form p label { position: absolute; top: 0; left: 0;}
 #addstudentarea form p br {display: none;}
 
@@ -483,4 +483,11 @@ a.cssSubmitButton:hover {
 	text-align:center; 
 	font-size:14px; 
 	color:white
+}
+
+.parsley-error {
+    background-color: rgb(242, 222, 222) !important;
+}
+.parsley-error-list {
+    display: none !important;
 }
