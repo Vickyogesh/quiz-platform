@@ -38,14 +38,26 @@ function doQuit()
 
 function aux_postJSON(url, data, success)
 {
-  $.ajax({
-    url: url,
-    type: "POST",
-    contentType: "application/json; charset=UTF-8",
-    data: JSON.stringify(data),
-    dataType: "json",
-    success: success
-  });
+  if (success === undefined) {
+    $.ajax({
+      url: url,
+      type: "POST",
+      contentType: "application/json; charset=UTF-8",
+      dataType: "json",
+      success: data
+    });
+  }
+  else {
+    $.ajax({
+      url: url,
+      type: "POST",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(data),
+      dataType: "json",
+      success: success
+    });
+  }
+
 }
 //----------------------------------------------------------------------------
 

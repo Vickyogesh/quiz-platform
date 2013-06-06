@@ -491,3 +491,31 @@ a.cssSubmitButton:hover {
 .parsley-error-list {
     display: none !important;
 }
+
+#stList #ctrl {
+    position: absolute;
+    display: none;
+    bottom: 0px;
+    right: 0px;
+    background: #aaa;
+}
+
+#stList li:hover #data a {
+  background: #aaa;
+  border-left: 5px #000 solid;
+  padding-left: 15px;
+}
+
+#stList #ctrl a {
+    background: #aaa;
+    border-left: 0;
+}
+
+#stList #ctrl a:hover {
+    cursor:pointer;
+    text-decoration: underline;
+}
+
+#stList li:hover #ctrl {
+    display: inline;
+}
