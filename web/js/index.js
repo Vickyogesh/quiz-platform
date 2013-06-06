@@ -57,8 +57,9 @@ function onAuth(butObj)
         window.name = name;
 //        aux_showFeatures();
 		sessionStorage.setItem('quizqsid', window.qsid);
-		sessionStorage.setItem('quizname', window.name);
-		
+    sessionStorage.setItem('quizname', window.name);
+    sessionStorage.setItem('quizutype', data.user.type);
+
 		if (data.user.type == 'student')
 			window.location = "menu.html";
 		else if (data.user.type == 'school')
