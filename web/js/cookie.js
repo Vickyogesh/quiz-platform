@@ -13,3 +13,7 @@ function setCookie(name, value, days){ //set cookie value
 	var expstring=expireDate.setDate(expireDate.getDate()+parseInt(days));
 	document.cookie = name+"="+value+"; expires="+expireDate.toGMTString()+"; path=/";
 }
+
+function deleteCookie(name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};

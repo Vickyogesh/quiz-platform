@@ -137,6 +137,15 @@
 		$('#statis').click(function(){
 			window.location = "Statistics_school.html";
 		});
+
+		$("#bttExit").click(function() {
+			deleteCookie('QUIZSID');
+			sessionStorage.removeItem("quizqsid");
+			sessionStorage.removeItem("quizname");
+			window.qsid = null;
+			window.name = null;
+			window.location = "index.html";
+		})
 	});
 </script>
 	
@@ -162,7 +171,7 @@
 				</ul>
         		<div class="areafooter">
         			<div class="content">
-        				<a href="#">ESCI</a>
+        				<a href="#" id="bttExit">ESCI</a>
         			</div>
         		</div>
         	</div> <!-- END List Wrap -->
