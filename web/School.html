@@ -45,7 +45,7 @@
 					sHtml += '<a id="' + lst[i].id + '" href="Statistics.html?id=' + lst[i].id + '">';
 					sHtml += lst[i].name + " " + lst[i].surname;
 					sHtml += '</a></div>';
-					sHtml += '<div id="ctrl"><a href="#">del</a></div></li>';
+					sHtml += '<div id="ctrl"><a href="#">DEL</a></div></li>';
 					
 					$("#schoolmain #stListBut ul").append(sHtml);
 				}
@@ -145,9 +145,9 @@
 <body>
 	<div id="work_area">
 		<div id="statarea">
-            
-        	<div class="list-wrap" style="padding-left:5px; padding-right:5px">
-        		<ul id="schoolmain" class="parentitem" style="font-size:16px">
+        	<div class="list-wrap">
+	            <div class="areaheader"><div class="content">School</div></div>
+        		<ul id="schoolmain" class="parentitem">
         			<li id="statis">
 						<a href='#'>Statistiche</a>
 					</li>
@@ -160,34 +160,38 @@
 						</ul>
 					</li>					
 				</ul>
+        		<div class="areafooter">
+        			<div class="content">
+        				<a href="#">ESCI</a>
+        			</div>
+        		</div>
         	</div> <!-- END List Wrap -->
 
 			<div id="addstudentarea" style="display:none">
-	        	<h2>Aggiungi Studente</h2>
+				<div class="areaheader"><div class="content">Aggiungi Studente</div></div>
 				<form action="" id="studentform" data-validate="parsley">
 					<fieldset>
 						<p>
-							<label for="name">Nome</label><br />
-							<input type="text" name="name" value="" id="name" data-required="true">
+							<input type="text" name="name" value="" placeholder="Nome" id="name" data-required="true">
 						</p>
 						<p>
-							<label for="surname">Cognome</label><br />
-							<input type="text" name="surname" value="" id="surname" data-required="true">
+							<input type="text" name="surname" value="" placeholder="Cognome" id="surname" data-required="true">
 						</p>
 						<p>
-							<label for="passwd">Parola d'ordine</label><br />
-							<input type="password" name="passwd" value="" id="passwd" data-required="true">
+							<input type="password" name="passwd" value="" placeholder="Parola d'ordine" id="passwd" data-required="true">
 						</p>
 						<p>
-							<label for="login">Login</label><br />
-							<input type="text" name="login" value="" id="login" data-required="true">
+							<input type="text" name="login" value="" placeholder="Login" id="login" data-required="true">
 						</p>
 					</fieldset>
-					<p style="text-align:right">
-						<input id="bttBack" type="button" value="&larr; Torna al Menu">
-						<input id="addConfirm" type="button" value="Aggiungere">
-					</p>
 				</form>	
+	    		<div class="areafooter">
+	    			<div class="content">
+	    				<a href="#" id="addConfirm">Aggiungere</a>
+	    				<span style="display:inline-block; width:80px;"></span>
+	    				<a href="#" id="bttBack">ESCI</a>
+	    			</div>
+	    		</div>
 			</div>
          
          </div> <!-- END Organic Tabs (Example One) -->
