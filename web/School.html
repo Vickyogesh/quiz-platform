@@ -140,12 +140,7 @@
 		});
 
 		$("#bttExit").click(function() {
-			deleteCookie('QUIZSID');
-			sessionStorage.removeItem("quizqsid");
-			sessionStorage.removeItem("quizname");
-			window.qsid = null;
-			window.name = null;
-			window.location = "index.html";
+			doLogout();
 		})
 	});
 </script>
