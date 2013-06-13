@@ -237,7 +237,8 @@
                             else
                                 result = 'F';
 							
-                            var image = "img/" + data.questions[i].image + ".jpg";
+                            var root = location.protocol + '//' + location.host;
+                            var image = root + "/img/" + data.questions[i].image + ".jpg";
                             var img = '<div class="qimg" style="background-image: url(';
                             img += "'" + image + "')" + '"></div>';
 
@@ -404,8 +405,9 @@
                                 result = 'V';
                             else
                                 result = 'F';
-
-                            var image = "img/" + data.questions[i].image + ".jpg";
+                            
+                            var root = location.protocol + '//' + location.host;
+                            var image = root + "/img/" + data.questions[i].image + ".jpg";
                             var img = '<div class="qimg" style="background-image: url(';
                             img += "'" + image + "')" + '"></div>';
 
