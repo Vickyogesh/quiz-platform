@@ -92,6 +92,10 @@
 		});
 		
 		$('#bttAddStudent').click(function(){
+			$("#school_addstudent #name").val("");
+			$("#school_addstudent #surname").val("");
+			$("#school_addstudent #login").val("");
+			$("#school_addstudent #passwd").val("");
 			$("#school_menu").hide();
 			$("#school_addstudent").show();
 		});
@@ -102,10 +106,10 @@
 		});
 
 		$('#addConfirm').click(function(){
-			var name = $("#addstudentarea #name").val();
-			var surname = $("#addstudentarea #surname").val();
-			var login = $("#addstudentarea #login").val();
-			var passwd = $("#addstudentarea #passwd").val();
+			var name = $("#school_addstudent #name").val();
+			var surname = $("#school_addstudent #surname").val();
+			var login = $("#school_addstudent #login").val();
+			var passwd = $("#school_addstudent #passwd").val();
 
 			var data = {
 				name: name,
@@ -125,10 +129,10 @@
 					aux_showJSONError(data);
 				}
 				else {
-					$("#addstudentarea #name").val("");
-					$("#addstudentarea #surname").val("");
-					$("#addstudentarea #login").val("");
-					$("#addstudentarea #passwd").val("");
+					$("#school_addstudent #name").val("");
+					$("#school_addstudent #surname").val("");
+					$("#school_addstudent #login").val("");
+					$("#school_addstudent #passwd").val("");
 					WaitMsg.hide();
 					alert('Added successfully!');
 				}
