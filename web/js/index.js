@@ -45,8 +45,7 @@ function onAuth(butObj)
     aux_postJSON(url("/v1/authorize"), auth, function (data) {
       if (data.status != 200) {
         doQuit();
-//        aux_showError("Authorization is not passed.", data.status);
-		alert("Authorization is not passed." + data.status);
+  		  alert("Authorization is not passed." + data.status);
       }
       else {      	
       	var name = data.user.name;
@@ -56,14 +55,16 @@ function onAuth(butObj)
         window.qsid = data.sid;
         window.name = name;
 //        aux_showFeatures();
-		sessionStorage.setItem('quizqsid', window.qsid);
-    sessionStorage.setItem('quizname', window.name);
-    sessionStorage.setItem('quizutype', data.user.type);
+    		sessionStorage.setItem('quizqsid', window.qsid);
+        sessionStorage.setItem('quizname', window.name);
+        sessionStorage.setItem('quizutype', data.user.type);
 
-		if (data.user.type == 'student')
-			window.location = "menu.html";
-		else if (data.user.type == 'school')
-			window.location = "School.html";
+    		if (data.user.type == 'student')
+    			window.location = "student.html";
+    		else if (data.user.type == 'school')
+    			window.location = "School.html";
+        else if (data.user.type == 'admin')
+          window.location = "admin.html";
       }
     });
   }); // GET

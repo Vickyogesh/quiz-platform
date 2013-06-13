@@ -17,3 +17,21 @@ function setCookie(name, value, days){ //set cookie value
 function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
+
+function deleteCookie(name, path, domain) {
+   if (getCookie(name)) {
+           document.cookie = name + "=" +
+           ((path) ? "; path=" + path : "") +
+           ((domain) ? "; domain=" + domain : "") +
+           "; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
+   }
+}
+
+function doLogout() {
+  window.qsid = null;
+  window.name = null;
+  deleteCookie('QUIZSID', '/');
+  sessionStorage.removeItem("quizqsid");
+  sessionStorage.removeItem("quizname");
+  window.location = "index.html";
+}

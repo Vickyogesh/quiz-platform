@@ -5,7 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Quiz Platform</title>
 
-<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/new_style.css" />
+
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
@@ -14,7 +15,7 @@
 <script src="js/graph/g.line.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/graph/g.pie.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" src="js/organictabs.jquery.js"></script>
-<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/moment.min.js"></script>
 
 <!--Please wait-->
 <link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
@@ -30,10 +31,103 @@
 	var urlstat;
 	
 	$(document).ready(function() {
+        // Create exam graph in the period [start; end]
+        // start & end may be null to use whole data.
+        function drawExamGraph(id, data, start, end) {
+            var examX = [];
+            var examY = [];
+            var examY1 = [];
+            var nCount = 0;
+
+            if (start !== undefined && end !== undefined) {
+                start = start.hour(0).minute(0).second(0);
+                end = end.hour(0).minute(0).second(0);
+            }
+
+            for (i = 0; i < data.length; i++) {
+                if (data[i].status != "passed" && data[i].status != "failed")
+                    continue;
+
+                var exam_date = moment(data[i].end + ":00 Z").hour(0).minute(0).second(0);
+            
+                if (start !== undefined && end !== undefined) {
+                    if (exam_date.isBefore(start) || exam_date.isAfter(end))
+                        continue;
+                }
+
+                examX.push(nCount);
+                examY.push(40 - data[i].errors);
+                examY1.push(36);
+                nCount++;
+            }                           
+
+            if (nCount > 0) {
+                var r = Raphael(id);
+                var echart = r.linechart(7, 0,
+                    $('#' + id).width() - 10,
+                    $('#' + id).height() - 10, 
+                    examX, 
+                    [examY, examY1], {
+                        axis: "0 0 1 1",
+                        axisxstep: examX.length - 1,
+                        colors: ['#2479cc', '#CCC'],
+                        dash: ["", "-"]
+                });
+
+                for( var i = 0, l = echart.axis.length; i < l; i++ ) {
+                  // change the axis and tick-marks
+                  echart.axis[i].attr("stroke", "#0459ac");
+                               
+                  // change the axis labels
+                  var axisItems = echart.axis[i].text.items
+                  for( var ii = 0, ll = axisItems.length; ii < ll; ii++ ) {
+                     axisItems[ii].attr("fill", "#0459ac");
+                  }
+                }
+
+                // Update x-axis texts
+                var xText = echart.axis[0].text.items;  
+                for(i in xText){
+                    var nVal = parseInt(xText[i].attr('text')) + 1;
+                    xText[i].attr({'text': nVal + ''});
+                }
+            }
+        }
+
+        // Fill topics for the time periods.
+        function fill_topics(topics, type, chart_type) {
+            function get_err(topic, type) {
+                if (type == "week")
+                    return topic.errors.current;
+                else if (type == "month")
+                    return topic.errors.week;
+                else if (type == "all")
+                    return topic.errors.week3;
+            }
+
+            // Create list of topics
+            var html = "";
+            for (i = 0; i < topics.length; i++) {
+                html += '<li><div class="row" style="cursor:pointer">';
+                html += '<div class="item"><a id="' + (i+1) + '">'
+                     + topics[i].text + '</a></div>';
+                html += '<div class="item"><div id="' + chart_type + (i + 1)
+                     + '" class="chart" style="margin:auto"></div></div>';
+                html += '</div></li>';
+            }
+            $("#" + type + " #topic ul").append(html);
+
+            // Assign errors chart for each topic.
+            for (i = 0; i < topics.length; i++) {
+                var id = chart_type + (i+1);
+                var nError = get_err(topics[i], type);
+                if (nError != null && nError > 0)
+                    createErrorsChart(id, nError);
+            }
+        }
 
 		window.qsid = sessionStorage.getItem('quizqsid');
 		window.name = sessionStorage.getItem('quizname');		
-		
 		var urltext = document.location.href;
 		var idtext;
 		if (urltext.indexOf('?') > -1) {
@@ -43,350 +137,170 @@
 		
 		bFromExam = sessionStorage.getItem('quizfromexam');
 		
-		$("#statarea").hide();
-		
 		WaitMsg.show();
+		$("#work_area").hide();
 						
 		if (studentId > 0)
 			urlstat = url("/v1/student/" + studentId + "/exam");
 		else
 			urlstat = url("/v1/student/me/exam");
 			
-		$.getJSON(urlstat, 
-			function(data) {
+		$.getJSON(urlstat, function(data) {
+			if (data.status != 200) {
+				WaitMsg.hide();
+				aux_showJSONError(data);
+				return;
+			}
+			examData = data;
+			data = {};
+			data.lang = "it";					
+			
+			if (studentId > 0)
+				urlstat = url("/v1/student/" + studentId);
+			else
+				urlstat = url("/v1/student/me");
+				
+			$.getJSON(urlstat, data, function(data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
 					aux_showJSONError(data);
+					return;
 				}
-				else {					
-					examData = data;
+				WaitMsg.hide();
+				$("#work_area").show();
+				
+				$("#student_stat .header .item").html(
+				    data.student.name + ' ' + data.student.surname);
+		
+				drawExamGraph("wexamgraph", examData.exams);
+				drawExamGraph("mexamgraph", examData.exams,
+				              moment().subtract('days', 8),
+				              moment().subtract('days', 1));
+				drawExamGraph("examgraph", examData.exams,
+				              moment().subtract('days', 29),
+				              moment().subtract('days', 8));
+
+                fill_topics(data.topics, "week", "wtgraph");
+                fill_topics(data.topics, "month", "mtgraph");
+                fill_topics(data.topics, "all", "atgraph");
+
+				//
+				// topic click events
+				//
+				$('#topic ul li a').click(function(){
+					parentQuizObj = $(this).parent().parent().parent().parent();
+					// showing topic errors								
+					$('#work_area').css('width', '520px');
+					
+					var html = "";
+					
+					$("#topicerrorlist").empty();
+					
+                    html = '<li class="examid">';
+                    html += '<a class="lustre-button" id="back" style="cursor:pointer; font-size:14px">';
+                    html += '&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>';
+                    html += '</li>';
+					$("#topicerrorlist").append(html);
+
+					html = '<li>';
+					html += '<a class="lustre-button" id="' + $(this).attr('id') + '" style="cursor:pointer">';
+					html += 'Question List Topic ' + $(this).attr('id') + '</a>';
+					html += '<ul></ul></li>';					
+					$("#topicerrorlist").append(html);
+					
+					WaitMsg.show();		
 					data = {};
 					data.lang = "it";					
-					
 					if (studentId > 0)
-						urlstat = url("/v1/student/" + studentId);
+						urlstat = url("/v1/student/" + studentId + "/topicerrors/" + $(this).attr('id'));
 					else
-						urlstat = url("/v1/student/me");
+						urlstat = url("/v1/student/me/topicerrors/" + $(this).attr('id'));
 						
 					$.getJSON(urlstat, data, function(data) {
 						if (data.status != 200) {
 							WaitMsg.hide();
 							aux_showJSONError(data);
+                            return;
 						}
-						else {
-							WaitMsg.hide();							
-							$("#statarea").show();
-							
-							$("#name").html(data.student.name + ' ' + data.student.surname);					
-					
-							var examX = [];
-							var examY = [];
-							var examY1 = [];
-							var examY2 = [];
-							var nCount = 0;
-							
-							//
-							// graph for week test
-							//
-							for (i = 0; i < examData.exams.length; i++) {
-								
-								if (examData.exams[i].status == "passed" || examData.exams[i].status == "failed") {							
-									
-									// parsing date time and convert to local
-									var endDate = Date.parse(examData.exams[i].end + ' UTC');
-
-									if (endDate.addDays(7) < Date.today())
-										continue;
-
-									examX.push(nCount);
-									examY.push(40 - examData.exams[i].errors);
-									examY1.push(36);
-									if (nCount == 0)
-										examY2.push(0);
-									else
-										examY2.push(1);
-									nCount++;
-								}
-							}							
-							examY2[nCount-1] = 40;
-							
-							if (nCount == 0)
-								examY2.push(0);
-							else
-								examY2.push(1);							
-							
-							if (nCount > 0) {
-								var r = Raphael("wexamgraph");
-								var echart = r.linechart(7, 0, $('#wexamgraph').width()-10, $('#wexamgraph').height()-10, 
-														examX, 
-														[examY2, examY, examY1], 
-														{axis:"0 0 1 1", axisxstep:examX.length - 1, colors:['#fff', '#0000ff', '#13ff7e']});
-													
-								var xText = echart.axis[0].text.items;  
-								for(i in xText){ // Iterate through the array of dom elems, the current dom elem will be i
-									var nVal = parseInt(xText[i].attr('text')) + 1;
-									xText[i].attr({'text': nVal + ''}); // Set the text of the current elem with the result
-								}
-							}
-							
-							//
-							// graph for month test
-							//
-							examX = []; examY = []; examY1 = []; examY2 = []; nCount = 0;
-							for (i = 0; i < examData.exams.length; i++) {
-								
-								if (examData.exams[i].status == "passed" || examData.exams[i].status == "failed") {							
-									
-									// parsing date time and convert to local
-									var endDate = Date.parse(examData.exams[i].end + ' UTC');
-
-									if (endDate.addDays(30) < Date.today())
-										continue;
-
-									examX.push(nCount);
-									examY.push(40 - examData.exams[i].errors);
-									examY1.push(36);
-									if (nCount == 0)
-										examY2.push(0);
-									else
-										examY2.push(1);
-									nCount++;
-								}
-							}
-							examY2[nCount-1] = 40;
-							
-							if (nCount > 0) {
-								var r = Raphael("mexamgraph");
-								var echart = r.linechart(7, 0, $('#mexamgraph').width()-10, $('#mexamgraph').height()-10, 
-														examX, 
-														[examY2, examY, examY1], 
-														{axis:"0 0 1 1", axisxstep:examX.length - 1, colors:['#fff', '#0000ff', '#13ff7e']});
-													
-								var xText = echart.axis[0].text.items;  
-								for(i in xText){ // Iterate through the array of dom elems, the current dom elem will be i
-									var nVal = parseInt(xText[i].attr('text')) + 1;
-									xText[i].attr({'text': nVal + ''}); // Set the text of the current elem with the result
-								}
-							}
-							
-							//
-							// graph for all test
-							//
-							examX = []; examY = []; examY1 = []; examY2 = []; nCount = 0;
-							for (i = 0; i < examData.exams.length; i++) {
-								
-								if (examData.exams[i].status == "passed" || examData.exams[i].status == "failed") {							
-									examX.push(nCount);
-									examY.push(40 - examData.exams[i].errors);
-									examY1.push(36);
-									if (nCount == 0)
-										examY2.push(0);
-									else
-										examY2.push(1);
-									nCount++;
-								}
-							}
-							examY2[nCount-1] = 40;
-							
-							if (nCount > 0) {
-								var r = Raphael("aexamgraph");
-								var echart = r.linechart(7, 0, $('#aexamgraph').width()-10, $('#aexamgraph').height()-10, 
-														examX, 
-														[examY2, examY, examY1], 
-														{axis:"0 0 1 1", axisxstep:examX.length - 1, colors:['#fff', '#0000ff', '#13ff7e']});
-													
-								var xText = echart.axis[0].text.items;  
-								for(i in xText){ // Iterate through the array of dom elems, the current dom elem will be i
-									var nVal = parseInt(xText[i].attr('text')) + 1;
-									xText[i].attr({'text': nVal + ''}); // Set the text of the current elem with the result
-								}
-							}
+						WaitMsg.hide();
+						parentQuizObj.hide();
 						
-							// filling topic statistics : week
-							for (i = 0; i < data.topics.length; i++) {
-								sHtml = '<li><a id="' + (i+1) + '">';
-								sHtml += '<div id="wtgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
-								sHtml += data.topics[i].text;
-								sHtml += '</a></li>';
-								$("#week #topic ul").append(sHtml);
-								
-								var id = 'wtgraph' + (i+1);
-								var r = Raphael(id);
-								var nError = data.topics[i].errors.current;
-								if (nError != null && nError > 0)
-									r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
-							}
+						$('#topicerrorlist').show();
+						$('html, body').animate({ scrollTop: 0 }, 0);
+						
+						var id;
+                        var html = "";
+						for (i = 0; i < data.questions.length; i++) {
+							id = data.questions[i].id + '_' + i;
+                            if (data.questions[i].answer == 1)
+                                result = 'V';
+                            else
+                                result = 'F';
 							
-							// filling topic statistics : month
-							for (i = 0; i < data.topics.length; i++) {
-								sHtml = '<li><a id="' + (i+1) + '">';
-								sHtml += '<div id="mtgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
-								sHtml += data.topics[i].text;
-								sHtml += '</a></li>';
-								$("#month #topic ul").append(sHtml);
-								
-								var id = 'mtgraph' + (i+1);
-								var r = Raphael(id);
-								var nError = data.topics[i].errors.week;
-								if (nError != null && nError > 0)
-									r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
-							}
-							
-							// filling topic statistics : month
-							for (i = 0; i < data.topics.length; i++) {
-								sHtml = '<li><a id="' + (i+1) + '">';
-								sHtml += '<div id="atgraph' + (i+1) + '" style="width:20px; height:20px; float:right; margin-top:-2px"></div>';
-								sHtml += data.topics[i].text;
-								sHtml += '</a></li>';
-								$("#all #topic ul").append(sHtml);
-								
-								var id = 'atgraph' + (i+1);
-								var r = Raphael(id);
-								var nError = data.topics[i].errors.week3;
-								if (nError != null && nError > 0)
-									r.piechart(10, 10, 10, [100 - nError, nError], {strokewidth:0, colors:['#c20808','#219429']});
-							}
-							
-							//
-							// topic click events
-							//
-							$('#topic ul li a').click(function(){
-								parentQuizObj = $(this).parent().parent().parent().parent();
-								// showing topic errors								
-								$('#statarea').css('width', '520px');
-								
-								var sHtml;
-								
-								$("#topicerrorlist").empty();
-								
-								sHtml = '<li>';
-								sHtml += '<a id="back" style="cursor:pointer">';
-								sHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<-&nbsp;Back</a>';
-								sHtml += '</li>';
-								$("#topicerrorlist").append(sHtml);
+                            var image = "img/" + data.questions[i].image + ".jpg";
+                            var img = '<div class="qimg" style="background-image: url(';
+                            img += "'" + image + "')" + '"></div>';
 
-								sHtml = '<li>';
-								sHtml += '<a id="' + $(this).attr('id') + '" style="cursor:pointer">';
-								sHtml += 'Question List Topic ' + $(this).attr('id') + '</a>';
-								sHtml += '<ul>'
-								sHtml += '</ul>';
-								sHtml += '</li>';
-								
-								$("#topicerrorlist").append(sHtml);
-								
-								// filling lists
-								WaitMsg.show();
-					
-								data = {};
-								data.lang = "it";
-								
-								if (studentId > 0)
-									urlstat = url("/v1/student/" + studentId + "/topicerrors/" + $(this).attr('id'));
-								else
-									urlstat = url("/v1/student/me/topicerrors/" + $(this).attr('id'));
-									
-								$.getJSON(urlstat, data, function(data) {
-									if (data.status != 200) {
-										WaitMsg.hide();
-										aux_showJSONError(data);
-									}
-									else {
-										WaitMsg.hide();
-										parentQuizObj.hide();
-										
-										$('#topicerrorlist').show();
-										$('html, body').animate({ scrollTop: 0 }, 0);
-										
-										var id;
-										for (i = 0; i < data.questions.length; i++) {
-											id = data.questions[i].id + '_' + i;
-											
-											sHtml = '<li><a id="' + id + '">';
-								
-											var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + data.questions[i].image + ".jpg";
-											sHtml += '<div class="img" style="width:30px; height:30px; float:left; margin-right:5px; background-image:';
-											sHtml += "url('" + image + "');" + 'background-size:contain; background-position:center; background-repeat: no-repeat;">';
-											sHtml += '</div>';
-											
-											var result;
-											sHtml += '<div class="result" style="width:30px; height:30px; float:right; margin-left:5px; font-size:20px; text-align:center">';
-											if (data.questions[i].answer == 1)
-												result = 'V';
-											else
-												result = 'F';
-												
-											sHtml += result;
-											sHtml += '</div>';
-											
-											sHtml += 'Question ' + data.questions[i].id + '<br>';
-											sHtml += data.questions[i].text;
-											sHtml += '</a></li>';
-											
-											$("#topicerrorlist ul").append(sHtml);
-										}
-										
-										// resizing images of the items
-										var nHeight;
-										for (i = 0; i < data.questions.length; i++) {
-											id = data.questions[i].id + '_' + i;
-											nHeight = $('#' + id).height() + 5;
-											$('#' + id + ' .img').css('height', nHeight + 'px');
-											$('#' + id + ' .result').css('height', nHeight + 'px');
-											$('#' + id + ' .result').css('line-height', nHeight + 'px');
-										}
-									}
-								})
-								.error(function(data) {
-									aux_showError(data.responseText, data.status);
-								});
-								
-								$('#topicerrorlist #back').click(function(){
-									$('#topicerrorlist').hide();
-									$('#statarea').css('width', '520px');
-//									$('#menu').show();
-									parentQuizObj.show();
-								});
-																
-							});
-							
-							if (bFromExam == 1)
-								showExamList(7);
-								
-							$("#statarea").organicTabs();
-							$("#month").hide();
-							$("#all").hide();							
+                            html += '<li><div class="row">';
+                            html += '<div class="item" style="width:40px; padding:0">' + img + '</div>';
+                            html += '<div class="item" style="width:80%;text-align:left;padding:0"><a>';
+                            html += '<span style="font-size: 14px; font-weight:bold">Questione ' + data.questions[i].id + '</span><br>';
+                            html += data.questions[i].text + '</a></div>';
+                            html += '<div class="item">';
+                            html += '<a><span style="font-size: 14px; font-weight:bold">' + result + '</span></a>';
+                            html += '</div>';
+                            html += '</div></li>';
 						}
+                        $("#topicerrorlist ul").append(html);
 					})
 					.error(function(data) {
-						WaitMsg.hide();
 						aux_showError(data.responseText, data.status);
-					});				
-				}
+					});
+					
+					$('#topicerrorlist #back').click(function(){
+						$('#topicerrorlist').hide();
+						$('#work_area').css('width', '520px');
+						parentQuizObj.show();
+					});
+													
+				});
+				
+				if (bFromExam == 1)
+					showExamList(7);
+					
+				$("#student_stat").organicTabs();
+				$("#month").hide();
+				$("#all").hide();							
 			})
 			.error(function(data) {
 				WaitMsg.hide();
 				aux_showError(data.responseText, data.status);
-			});
+			});				
+				
+		})
+		.error(function(data) {
+			WaitMsg.hide();
+			aux_showError(data.responseText, data.status);
+		});
 			
 		$("#wexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
-			parentQuizObj.hide();
-			
-			showExamList(7);		
+			parentQuizObj.hide();			
+			showExamList();		
 		});
 		
 		$("#mexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
-			parentQuizObj.hide();
-			
-			showExamList(30);		
+			parentQuizObj.hide();			
+			showExamList(moment().subtract('days', 8),
+                         moment().subtract('days', 1));
 		});
 		
 		$("#aexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
 			parentQuizObj.hide();
-			
-			showExamList(-1);		
+            showExamList(moment().subtract('days', 29),
+                         moment().subtract('days', 8));
 		});
 		
 		$('#backbut').click(function(){
@@ -394,58 +308,59 @@
 			if (type == 'school')
 				window.location = "School.html";
 			else
-				window.location = "menu.html";
+				window.location = "student.html";
 		});
 		
-/*		
-		$('#btnlogout').click(function(){
-			window.qsid = null;
-			window.location = "index.html";
-		});
-*/		
-
 		$('.nav li a').click(function(){
 			$('#topicerrorlist').hide();			
 			$('#examlist').hide();
 		});
 	});
 	
-	function showExamList(period) {
-		
-		$('#statarea').css('width', '520px');
+	function showExamList(start, end) {
+        var html = "";
+		$('#work_area').css('width', '520px');
 		$("#examlist").empty();
 		
 		if ($.trim($("#examlist").html()) == '') {
-			sHtml = '<li class="examid">';
-			sHtml += '<a id="back" style="cursor:pointer">';
-			sHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<-&nbsp;Back</a>';
-			sHtml += '</li>';
-			$("#examlist").append(sHtml);
+			html = '<li class="examid">';
+			html += '<a class="lustre-button" id="back" style="cursor:pointer; font-size:14px">';
+			html += '&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>';
+			html += '</li>';
+			$("#examlist").append(html);
 			
+            if (start !== undefined && end !== undefined) {
+                start = start.hour(0).minute(0).second(0);
+                end = end.hour(0).minute(0).second(0);
+            }
+
+            html = "";
 			var correctNum;
-			for (i = 0; i < examData.exams.length; i++) {
-				if (examData.exams[i].status == "passed" || examData.exams[i].status == "failed") {
+            var exams = examData.exams;
+			for (i = 0; i < exams.length; i++) {
+				if (exams[i].status != "passed" && exams[i].status != "failed")
+                    continue;
 					
-					// parsing date time and convert to local
-					var endDate = Date.parse(examData.exams[i].end + ' UTC');
-					
-					if (period > 0) {
-						if (endDate.addDays(period) < Date.today())
-							continue;
-					}
-					
-					correctNum = 40 - examData.exams[i].errors;
-					
-					sHtml = '<li class="examid">';
-					sHtml += '<a id="' + examData.exams[i].id + '" style="cursor:pointer">';
-					sHtml += 'Exam ' + examData.exams[i].id + '&nbsp;(' + correctNum + '/40)' + '&nbsp;&nbsp;&nbsp;&nbsp;' + endDate.toString() + '</a>';
-					sHtml += '<ul>';
-					sHtml += '</ul>';
-					sHtml += '</li>'
-					
-					$("#examlist").append(sHtml);
-				}
+                var exam_date = moment(exams[i].end + ":00 Z");
+                if (start !== undefined && end !== undefined) {
+                    var e = exam_date.hour(0).minute(0).second(0);
+                    if (e.isBefore(start) || e.isAfter(end))
+                        continue;
+                }
+				
+				correctNum = 40 - exams[i].errors;
+				
+				html += '<li class="examid">';
+				html += '<a class="lustre-button" id="' + exams[i].id
+                     +  '" style="cursor:pointer">';
+				html += 'Esame ' + exams[i].id + '&nbsp;('
+                     +  correctNum + '/40)' + '&nbsp;&nbsp;&nbsp;&nbsp;'
+                     +  exam_date.toDate().toLocaleFormat() + '</a>';
+				html += '<ul>';
+				html += '</ul>';
+				html += '</li>'
 			}
+            $("#examlist").append(html);
 		}
 		
 		$('#examlist').show();
@@ -455,7 +370,7 @@
 			
 			if ($(this).attr('id') == 'back') {
 				$('#examlist').hide();
-				$('#statarea').css('width', '520px');
+				$('#work_area').css('width', '520px');
 				parentQuizObj.show();
 				return;
 			}
@@ -476,48 +391,35 @@
 						WaitMsg.hide();
 						
 						var id;
+                        var html = "";
 						for (i = 0; i < data.questions.length; i++) {
 							id = data.questions[i].id + '_' + i;
 							
-							sHtml = '<li><a id="' + id + '">';
-							
-							var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + data.questions[i].image + ".jpg";
-							sHtml += '<div class="img" style="width:30px; height:30px; float:left; margin-right:5px; background-image:';
-							sHtml += "url('" + image + "');" + 'background-size:contain; background-position:center; background-repeat: no-repeat;">';
-							sHtml += '</div>';
-							
-							var result, bkcolor;
-							if (data.questions[i].is_correct == 1)
-								bkcolor = '#468847';
-							else
-								bkcolor = '#b94a48';
+                            var result, bkcolor;
+                            if (data.questions[i].is_correct == 1)
+                                bkcolor = '#468847';
+                            else
+                                bkcolor = '#b94a48';
+                            if (data.questions[i].answer == 1)
+                                result = 'V';
+                            else
+                                result = 'F';
 
-							sHtml += '<div class="quizresult">';
-							sHtml += '<div style="text-align:center; background-color:' + bkcolor +';">';
-							
-							if (data.questions[i].answer == 1)
-								result = 'V';
-							else
-								result = 'F';
+                            var image = "img/" + data.questions[i].image + ".jpg";
+                            var img = '<div class="qimg" style="background-image: url(';
+                            img += "'" + image + "')" + '"></div>';
 
-							sHtml += result;
-							sHtml += '</div></div>';
-							
-							sHtml += 'Question ' + data.questions[i].id + '<br>';
-							sHtml += data.questions[i].text;
-							sHtml += '</a></li>';
-							
-							checkElement.append(sHtml);
+                            html += '<li><div class="row">';
+                            html += '<div class="item" style="width:40px; padding:0">' + img + '</div>';
+                            html += '<div class="item" style="width:80%;text-align:left;padding:0"><a>';
+                            html += '<span style="font-size: 14px; font-weight:bold">Questione ' + data.questions[i].id + '</span><br>';
+                            html += data.questions[i].text + '</a></div>';
+                            html += '<div class="item">';
+                            html += '<div style="font-size: 14px; font-weight:bold; padding:5px; background:' + bkcolor + '"">' + result + '</div>';
+                            html += '</div>';
+                            html += '</div></li>';
 						}
-						
-						// resizing images of the items
-						var nHeight;
-						for (i = 0; i < data.questions.length; i++) {
-							id = data.questions[i].id + '_' + i;
-							nHeight = $('#' + id).height() + 5;
-							$('#' + id + ' .img').css('height', nHeight + 'px');
-							$('#' + id + ' .quizresult').css('height', nHeight + 'px');
-						}
+                        checkElement.append(html);
 					}
 				});					
 			}
@@ -538,79 +440,55 @@
 
 <body>
 	<div id="work_area">
-		<div id="statarea">
-<!--			
-        	<div id="logoutarea" style="text-align:right;">
-				<a id="btnlogout" href="#" >Log out</a>				
-			</div>
--->			
-			
-			<h1 id="name">Name Surname</h1>
+		<div id="student_stat" class="content-box">
+            <div class="header"><div class="item">__</div></div>
 
-			<div style="width:321px; margin:auto">
-	        	<ul class="nav" style="padding:0px">
-	                <li class="nav-one"><a href="#week" class="current">Last week</a></li>
-	                <li class="nav-two"><a href="#month">Last month</a></li>
-	                <li class="nav-three"><a href="#all">All</a></li>
+            <div class="blueline" style="margin-bottom:10px;">
+	        	<ul class="nav">
+	                <li class="nav-one"><a href="#week" class="lustre-button current">LAST WEEK</a></li>
+	                <li class="nav-two"><a href="#month" class="lustre-button">LAST MONTH</a></li>
+	                <li class="nav-three"><a href="#all" class="lustre-button">ALL</a></li>
 	            </ul>
+	        </div>  <!-- /Navigation -->
+
+	        <ul id="week" class="collapsable-list">
+	        	<li id="exam" style="background: #fff">
+		            <div id="wexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+	        	</li>
+				<li id="topic">
+					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
+					<ul></ul>
+				</li>
+	        </ul>
+	        <ul id="month" class="collapsable-list">
+	        	<li id="exam" style="background: #fff">
+		            <div id="mexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+	        	</li>
+				<li id="topic">
+					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
+					<ul></ul>
+				</li>
+	        </ul>
+	        <ul id="all" class="collapsable-list">
+	        	<li id="exam" style="background: #fff">
+		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+	        	</li>
+				<li id="topic">
+					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
+					<ul></ul>
+				</li>
+	        </ul>
+
+			<ul id="examlist" style="display:none" class="collapsable-list"></ul>
+			<ul id="topicerrorlist" style="display:none" class="collapsable-list"></ul>
+
+            <div class="footer">
+                <div class="item">
+                    <a href="#" id="backbut" class="lustre-button">TORNA AL MENU</a>
+                </div>
             </div>
-            
-        	<div class="list-wrap" style="padding-left:5px; padding-right:5px">
-        		<ul id="week" class="parentitem">
-        			<li id="exam" style="height:150px">
-						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
-						<div id="wexamgraph" style="width:250px; height:110px; float:right; background-color:#fff; margin-right:120px; cursor:pointer">
-						</div>
-					</li>
-					<li id="topic">
-						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
-						<ul>
-						</ul>
-					</li>
-				</ul>
-				
-				<ul id="month" class="parentitem">
-        			<li id="exam" style="height:150px">
-						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
-						<div id="mexamgraph" style="width:250px; height:110px; float:right; background-color:#fff; margin-right:120px; cursor:pointer">
-						</div>
-					</li>
-					<li id="topic">
-						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
-						<ul>
-						</ul>
-					</li>
-				</ul>
-				
-				<ul id="all" class="parentitem">
-        			<li id="exam" style="height:150px">
-						<span style="padding:7px; display:block; color:#fff">Exam Statistics</span>
-						<div id="aexamgraph" style="width:250px; height:110px; float:right; background-color:#fff; margin-right:120px; cursor:pointer">
-						</div>
-					</li>
-					<li id="topic">
-						<span style="padding:7px; display:block; color:#fff">Topic Statistics</span>
-						<ul>
-						</ul>
-					</li>
-				</ul>
-				
-				<!-- exam list -->
-				<ul id="examlist" style="display:none" class="parentitem">
-				</ul>
-				
-				<!-- topic error list -->
-				<ul id="topicerrorlist" style="display:none" class="parentitem">
-				</ul>
-        	</div> <!-- END List Wrap -->
-        	
-        	<div style="width:100%; height:70px">
-				<a class="button" id="backbut" style="margin:15px; padding:10px; font-size:22px; float:left; margin-left:150px">
-					Torna al Menu
-				</a>
-			</div>
-         
-         </div> <!-- END Organic Tabs (Example One) -->
+		</div>
+
 	</div>
 </body>
 
