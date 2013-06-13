@@ -2,6 +2,18 @@
 ** AUX tools.
 *********************************************************/
 
+
+function createErrorsChart(id, val) {
+  p = Raphael(id);
+  p.piechart(10, 10, 8, [100 - val, val], {
+    stroke:'#fff',
+    strokewidth:2,
+    colors:['#2479cc','#fff']
+  });
+  return p;
+}
+//----------------------------------------------------------------------------
+
 function get_arg_prefix(url)
 {
     if (url.indexOf('?') == -1)
@@ -38,14 +50,26 @@ function doQuit()
 
 function aux_postJSON(url, data, success)
 {
-  $.ajax({
-    url: url,
-    type: "POST",
-    contentType: "application/json; charset=UTF-8",
-    data: JSON.stringify(data),
-    dataType: "json",
-    success: success
-  });
+  if (success === undefined) {
+    $.ajax({
+      url: url,
+      type: "POST",
+      contentType: "application/json; charset=UTF-8",
+      dataType: "json",
+      success: data
+    });
+  }
+  else {
+    $.ajax({
+      url: url,
+      type: "POST",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(data),
+      dataType: "json",
+      success: success
+    });
+  }
+
 }
 //----------------------------------------------------------------------------
 

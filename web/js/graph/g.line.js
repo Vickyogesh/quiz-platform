@@ -155,12 +155,13 @@
 
         for (i = 0, ii = valuesy.length; i < ii; i++) {
             if (!opts.nostroke) {
+                var dash = Raphael.is(opts.dash, "array") ? opts.dash[i] : opts.dash || "";
                 lines.push(line = paper.path().attr({
                     stroke: colors[i],
                     "stroke-width": opts.width || 2,
                     "stroke-linejoin": "round",
                     "stroke-linecap": "round",
-                    "stroke-dasharray": opts.dash || ""
+                    "stroke-dasharray": dash
                 }));
             }
 

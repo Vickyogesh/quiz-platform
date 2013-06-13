@@ -316,56 +316,81 @@ a.cssSubmitButton:hover {
 
 /* Specific to statarea */
 
-#statarea * { 
-/*	margin: 0; */
-/*	padding: 0; */
-	text-align: left;
-}
-
-#statarea a { text-decoration: none; }
-
-#statarea h1 {
-	margin: 0 0 20px 0; 
-	text-align:center;
-}
-
 #statarea { 
-	background: #eee; 
-	padding: 10px; 
+	background: #fff;
+  border-radius: 10px;
+	padding: 0; 
 	margin: auto; 
-	-moz-box-shadow: 0 0 5px #666; 
+  box-shadow: 0 0 5px #666; 
+  -moz-box-shadow: 0 0 5px #666; 
 	-webkit-box-shadow: 0 0 5px #666; 
 	width:520px;
 }
 
-#statarea .nav { overflow: hidden; margin: 0 0 10px 0; list-style: none; }
+#statarea .list-wrap { text-align: left; }
+#statarea a { text-decoration: none; }
+
+.separator {
+  display: table;
+  text-align: center;
+  width: 100%;
+  background: #2479cc;
+  background: -moz-linear-gradient(top, #2479cc, #0459ac);
+  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
+  background: -o-linear-gradient(top, #2479cc, #0459ac);
+  background: linear-gradient(top, #2479cc, #0459ac);
+}
+.separator .content {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+
+#statarea .separator {
+  margin-bottom: 10px;
+}
+
+#statarea .nav {
+  display: inline-block;
+  overflow: hidden;
+  list-style: none;
+}
+
 #statarea .nav li {
-	width: 97px; 
-	float: left; 
-	margin: 0 5px 0 5px; 
+  float: left;
+  margin-right: 60px; 
 }
+
 #statarea .nav li.last { margin-right: 0; }
+
 #statarea .nav li a {
-	display: block; 
-	padding: 5px; 
-	background: #959290; 
-	color: white; 
-	font-size: 15px; 
-	text-align: center; 
-	border: 0; 
+  color: white;
+  text-transform: uppercase;
 }
-#statarea .nav li a:hover { background-color: #111; }
-#statarea .nav li a.current {
-	background-color: #0575f4;
+
+#statarea .nav li a.current, #statarea .nav li a:hover {
+  text-shadow: 0 0 0.3em #fff;
 }
-#statarea .nav li a:hover {
-	background-color: #0575f4; 
-	color: white;
+
+
+.areaheader {
+  display: table;
+  width: 100%;
+  height: 50px;
+  font-size:20px;
+  color: #102f68;
+  text-align: center;
+}
+
+.areaheader .content {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
 }
 
 .list-wrap ul { list-style: none; }
-/*.list-wrap ul li a { display: block; border-bottom: 1px solid #666; padding: 4px; color: #666; }*/
-.list-wrap ul li a:hover { background: #fe4902; color: white; }
+.list-wrap ul li a:hover { color: white; }
 .list-wrap ul li:last-child a { border: none; }
 
 .list-wrap ul.parentitem, ul.parentitem ul {
@@ -379,30 +404,58 @@ a.cssSubmitButton:hover {
   text-decoration: none;	
 }
 
-.list-wrap .parentitem li {
-  margin-top: 1px; 
-  background: #777;
+.list-wrap .parentitem > li {
+  background: #2479cc;
+  background: -moz-linear-gradient(top, #2479cc, #0459ac);
+  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
+  background: -o-linear-gradient(top, #2479cc, #0459ac);
+  background: linear-gradient(top, #2479cc, #0459ac);
 }
 
-.list-wrap .parentitem li a {  
-  color: #fff;	
+.list-wrap .parentitem > li > a {
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.list-wrap .parentitem li a {
   padding: 0.5em;
 }
 
-.list-wrap .parentitem li a:hover {
-  background: #000;
+.list-wrap .parentitem > li > a:hover {
+  text-shadow: 0 0 0.3em #fff;
+}
+
+.list-wrap .parentitem li ul {
+  background: #fff;
+}
+
+.list-wrap .parentitem li ul > li {
+  background: #fff;
+  border-right: 20px solid #fff;
+  border-left: 20px solid #fff;
+  border-top: 1px solid #e8ecef;
+}
+
+.list-wrap .parentitem li ul > li:hover {
+  border-right: none;
+  border-left: none;
+  padding-left: 20px;
+  padding-right: 20px;
+  background: #2479cc;
+  background: -moz-linear-gradient(top, #2479cc, #0459ac);
+  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
+  background: -o-linear-gradient(top, #2479cc, #0459ac);
+  background: linear-gradient(top, #2479cc, #0459ac);
+}
+
+.list-wrap .parentitem li ul > li:hover a {
+  color: #fff;
 }
 
 .list-wrap .parentitem li ul li a {
-  background: #ccc;
-  color: #000;
+  color: #102f68;
   padding-left: 20px;
-}
-
-.list-wrap .parentitem li ul li a:hover,ul#menu li ul .current a {
-  background: #aaa;
-  border-left: 5px #000 solid;
-  padding-left: 15px;
 }
 
 .list-wrap .quizresult {
@@ -424,12 +477,36 @@ a.cssSubmitButton:hover {
 	border-radius:10px; 
 }
 
+.areafooter {
+  text-align: center;
+  display: table;
+  width: 100%;
+  height: 60px;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-top: 1px;
+  background: #2579cf;
+  background: -moz-linear-gradient(top, #2579cf, #0358ab);
+  background: -webkit-linear-gradient(top, #2579cf, #0358ab);
+  background: -o-linear-gradient(top, #2579cf, #0358ab);
+  background: linear-gradient(top, #2579cf, #0358ab);
+}
+
+.areafooter .content {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.areafooter a {
+  color: #fff;
+}
+
+#statarea .areafooter a:hover {text-decoration: underline;}
 
 /* add student form */
 
-#addstudentarea h2 {
-	font-size:25px;
-	text-align:center;
+#addstudentarea .areaheader span {
+  border-bottom: 1px solid #e8ecef;
 }
 
 #addstudentarea form {
@@ -437,8 +514,6 @@ a.cssSubmitButton:hover {
 }
 
 #addstudentarea form p { position: relative; margin: 10px 10px;}
-#addstudentarea form p label { position: absolute; top: 0; left: 0;}
-#addstudentarea form p br {display: none;}
 
 #addstudentarea fieldset {
 	margin: 0px;
@@ -490,4 +565,24 @@ a.cssSubmitButton:hover {
 }
 .parsley-error-list {
     display: none !important;
+}
+
+#stList #ctrl {
+    position: absolute;
+    display: none;
+    bottom: 0px;
+    right: 0px;
+}
+
+#stList #ctrl a {
+    border-left: 0;
+}
+
+#stList #ctrl a:hover {
+    cursor:pointer;
+    text-decoration: underline;
+}
+
+#stList li:hover #ctrl {
+    display: inline;
 }

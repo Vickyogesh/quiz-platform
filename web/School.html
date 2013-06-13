@@ -5,6 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Quiz Platform</title>
 
+<link rel="stylesheet" type="text/css" href="css/new_style.css" />
+
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/md5-min.js"></script>
@@ -16,44 +18,68 @@
 <link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
 <script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
 <!--Please wait-->
-<link rel="stylesheet" type="text/css" href="css/style.css" />
 
 
 <script>
 	$(document).ready(function() {		
+		function delStudent(item) {
+			var id = item.find('#data a').attr("id");
+			var name = item.find('#data a').text();
+			var rc = confirm("Sei sicuro di voler rimuovere questo studente?\n"+name);
+			if (!rc)
+				return;
+
+			aux_postJSON(url("/v1/school/me/student/" + id + "?action=delete"), function (data) {
+				if (data.status != 200) {
+					WaitMsg.hide();
+					aux_showJSONError(data);
+				}
+				else
+					item.remove();
+			});
+
+		}
+
 		window.qsid = sessionStorage.getItem('quizqsid');
 		
-		$("#statarea").hide();
-		
 		WaitMsg.show();
-		
-		$("#addstudentarea label").inFieldLabels();
+		$("#school_menu").hide();
+		$("#school_addstudent").hide();
 		
 		$.getJSON(url("/v1/school/me/students"), function(data) {
 			if (data.status != 200) {
 				WaitMsg.hide();
 				aux_showJSONError(data);
+				return;
 			}
-			else {
-				WaitMsg.hide();
-				$("#statarea").show();
-				
-				var i, sHtml;
-				var lst = data.students;
-				for (var i = 0; i < lst.length; i++) {
-					sHtml = '<li><a id="' + lst[i].id + '" href="Statistics.html?id=' + lst[i].id + '">';
-					sHtml += lst[i].name + " " + lst[i].surname;
-					sHtml += '</a></li>';
-					
-					$("#schoolmain #stListBut ul").append(sHtml);
-				}
+			
+			$("#school_menu .header .item").html(window.name);
+			var html = "";
+			var lst = data.students;
+			for (var i = 0; i < lst.length; i++) {
+				html += '<li style="position: relative"><div id="data">'
+				html += '<a id="' + lst[i].id + '" href="Statistics.html?id='
+					 + lst[i].id + '">';
+				html += lst[i].name + " " + lst[i].surname;
+				html += '</a></div>';
+				html += '<div id="ctrl"><a href="#">DEL</a></div></li>';
 			}
+
+			$("#school_menu #students").append(html);
+			$('#ctrl a').click(function() {
+				var item = $(this).parent().parent();
+				delStudent(item);
+			});
+
+			$("#school_menu").show();
+			WaitMsg.hide();
 		})
 		.error(function(data) {
 			WaitMsg.hide();
 			aux_showError(data.responseText, data.status);
 		});
 		
+		// slide feature
 		$('#stListBut a').click(function(){
 			var checkElement = $(this).next();
 			
@@ -65,18 +91,15 @@
 			}
 		});
 		
-		$('#addStBut').click(function(){
-			$(".list-wrap").hide();
-			$("#addstudentarea").show();
+		$('#bttAddStudent').click(function(){
+			$("#school_menu").hide();
+			$("#school_addstudent").show();
 		});
 		
 		$('#bttBack').click(function(){
-			window.location = 'School.html';
+			$("#school_addstudent").hide();
+			$("#school_menu").show();
 		});
-
-		function validateAccData(data) {
-
-		}
 
 		$('#addConfirm').click(function(){
 			var name = $("#addstudentarea #name").val();
@@ -102,6 +125,10 @@
 					aux_showJSONError(data);
 				}
 				else {
+					$("#addstudentarea #name").val("");
+					$("#addstudentarea #surname").val("");
+					$("#addstudentarea #login").val("");
+					$("#addstudentarea #passwd").val("");
 					WaitMsg.hide();
 					alert('Added successfully!');
 				}
@@ -111,60 +138,60 @@
 		$('#statis').click(function(){
 			window.location = "Statistics_school.html";
 		});
+
+		$("#bttExit").click(function() {
+			doLogout();
+		})
 	});
 </script>
-	
 </head>
 
 <body>
 	<div id="work_area">
-		<div id="statarea">
-            
-        	<div class="list-wrap" style="padding-left:5px; padding-right:5px">
-        		<ul id="schoolmain" class="parentitem" style="font-size:16px">
-        			<li id="statis">
-						<a href='#'>Statistics</a>
-					</li>
-					<li id="addStBut">
-						<a href='#'>Aggiungi Studente</a>
-					</li>
-					<li id="stListBut">
-						<a href='#'>Student List</a>
-						<ul id="stList" style="font-size:12px">
-						</ul>
-					</li>					
-				</ul>
-        	</div> <!-- END List Wrap -->
-
-			<div id="addstudentarea" style="display:none">
-	        	<h2>Aggiungi Studente</h2>
-				<form action="" id="studentform" data-validate="parsley">
-					<fieldset>
-						<p>
-							<label for="name">Nome</label><br />
-							<input type="text" name="name" value="" id="name" data-required="true">
-						</p>
-						<p>
-							<label for="surname">Cognome</label><br />
-							<input type="text" name="surname" value="" id="surname" data-required="true">
-						</p>
-						<p>
-							<label for="passwd">Parola d'ordine</label><br />
-							<input type="password" name="passwd" value="" id="passwd" data-required="true">
-						</p>
-						<p>
-							<label for="login">Login</label><br />
-							<input type="text" name="login" value="" id="login" data-required="true">
-						</p>
-					</fieldset>
-					<p style="text-align:right">
-						<input id="bttBack" type="button" value="&larr; Torna al Menu">
-						<input id="addConfirm" type="button" value="Aggiungere">
-					</p>
-				</form>	
-			</div>
-         
-         </div> <!-- END Organic Tabs (Example One) -->
+        <div id="school_menu" class="content-box">
+            <div class="header"><div class="item"></div></div>
+        	<ul class="collapsable-list">
+    			<li id="statis">
+					<a href='#' class="lustre-button">STATISTICHE</a>
+				</li>
+				<li id="bttAddStudent">
+					<a href='#' class="lustre-button">AGGIUNGI STUDENTE</a>
+				</li>
+				<li id="stListBut">
+					<a href='#' class="lustre-button">ELENCO STUDENTI</a>
+					<ul id="students">
+					</ul>
+				</li>
+        	</ul>
+            <div class="footer">
+                <div class="item">
+                    <a href="#" id="bttExit" class="lustre-button">ESCI</a>
+                </div>
+            </div>
+        </div>  <!-- /school_menu -->
+        
+        <div id="school_addstudent" class="content-box" style="display:none">
+        	<div class="header"><div class="item">Aggiungi Studente</div></div>
+        	<div class="hline"></div>
+			<form action="" id="studentform" data-validate="parsley">
+				<fieldset>
+					<p><input type="text" name="name" value="" placeholder="Nome" id="name" data-required="true"></p>
+					<p><input type="text" name="surname" value="" placeholder="Cognome" id="surname" data-required="true"></p>
+					<p><input type="password" name="passwd" value="" placeholder="Parola d'ordine" id="passwd" data-required="true"></p>
+					<p><input type="text" name="login" value="" placeholder="Login" id="login" data-required="true"></p>
+				</fieldset>
+			</form>	
+    		<div class="footer">
+    			<div class="item"></div>
+    			<div class="item">
+    				<a href="#" id="addConfirm" class="lustre-button">Aggiungere</a>
+    			</div>
+    			<div class="item">
+    				<a href="#" id="bttBack" class="lustre-button">ESCI</a>
+    			</div>
+    			<div class="item"></div>
+    		</div>
+        </div>   <!-- /school_addstudent -->
 	</div>
 </body>
 
