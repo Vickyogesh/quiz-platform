@@ -61,7 +61,7 @@ function onAuth(butObj)
     sessionStorage.setItem('quizutype', data.user.type);
 
 		if (data.user.type == 'student')
-			window.location = "menu.html";
+			window.location = "student.html";
 		else if (data.user.type == 'school')
 			window.location = "School.html";
       }

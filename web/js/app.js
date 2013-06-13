@@ -2,6 +2,18 @@
 ** AUX tools.
 *********************************************************/
 
+
+function createErrorsChart(id, val) {
+  p = Raphael(id);
+  p.piechart(10, 10, 8, [100 - val, val], {
+    stroke:'#fff',
+    strokewidth:2,
+    colors:['#2479cc','#fff']
+  });
+  return p;
+}
+//----------------------------------------------------------------------------
+
 function get_arg_prefix(url)
 {
     if (url.indexOf('?') == -1)

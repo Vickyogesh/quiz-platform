@@ -18,7 +18,9 @@
 <script>
 	$(document).ready(function() {
 		window.qsid = sessionStorage.getItem('quizqsid');
-		
+		window.name = sessionStorage.getItem('quizname');
+		$("#statarea .areaheader .content").html(window.name);
+
 		var nwidth = $(window).width();
 		
 		$("#quiz").click(function(){
@@ -49,22 +51,20 @@
 
 <body>
 	<div id="work_area">
-		<div style="width:732px; height:450px; margin:auto">
-			<div style="width:100%; height: 80%; background-color:#ddd; position:relative">
-				
-				<div id="logoutarea" style="position:absolute; top:20px; left:670px;">
-					<a id="btnlogout" href="#" style="color:#0000ff">Esci</a>				
-				</div>
-				
-				<div id="main_menu" style="width:660px; height:220px; margin:auto; padding-top:80px">
-					<img id="quiz" class="img_btn" src="img/QUIZ-ARG.png"></img>
-					<img id="exam" class="img_btn" src="img/PROVA-ESAME.png"></img>
-					<img id="review" class="img_btn" src="img/RIPASSSO-ERRORI.png"></img>
-				</div>
+		<div id="statarea" style="width:732px; margin:auto">
+			<div class="areaheader"><div class="content"></div></div>
+			<div id="main_menu" style="height:100%; width:100%">
+				<img id="quiz" class="img_btn" src="img/QUIZ-ARG.png"></img>
+				<img id="exam" class="img_btn" src="img/PROVA-ESAME.png"></img>
+				<img id="review" class="img_btn" src="img/RIPASSSO-ERRORI.png"></img>
 			</div>
-			<div style="width:100%; height: 20%; background-color:#142f66">
-				<a class="button" id="student_stat_but" style="width:200px; height:30px; font-size:20px; line-height:30px; margin-top:20px">Statistiche</a>
-			</div>
+    		<div class="areafooter">
+    			<div class="content">
+    				<a href="#" id="bttStat">STATISTICHE</a>
+    				<span style="display:inline-block; width:80px;"></span>
+    				<a href="#" id="bttBack">ESCI</a>
+    			</div>
+    		</div>
 		</div>
 	</div>
 </body>
