@@ -44,7 +44,7 @@ def do_update(school_list):
 def get_schools_for_update():
     """Return list of schools for which update is needed."""
     res = engine.execute("""SELECT school_id FROM school_stat_cache WHERE
-                         last_activity > last_update""")
+                         last_activity > last_update OR last_update = 0""")
     return [row[0] for row in res]
 
 

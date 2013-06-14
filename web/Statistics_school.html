@@ -31,6 +31,8 @@
 		// Fill best/worst students for the time periods.
 		function fill_students(type, data) {
 			function _create_list(info) {
+                if (info === undefined)
+                    return;
 				var html = "";
 				for (i = 0; i < info.length; i++) {
 					html += '<li><a id="' + info[i].id
