@@ -108,11 +108,15 @@
             // Create list of topics
             var html = "";
             for (i = 0; i < topics.length; i++) {
-                html += '<li><div class="row" style="cursor:pointer">';
-                html += '<div class="item"><a id="' + (i+1) + '">'
-                     + topics[i].text + '</a></div>';
-                html += '<div class="item"><div id="' + chart_type + (i + 1)
+                html += '<li style="cursor:pointer" id="' + (i+1) + '"><div class="row">';
+
+                html += '<div class="item" style="width:20px"><div id="' + chart_type + (i + 1)
                      + '" class="chart" style="margin:auto"></div></div>';
+
+                html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0">'
+                     + topics[i].text + '</a></div>';
+
+                html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
                 html += '</div></li>';
             }
             $("#" + type + " #topic ul").append(html);
@@ -121,8 +125,9 @@
             for (i = 0; i < topics.length; i++) {
                 var id = chart_type + (i+1);
                 var nError = get_err(topics[i], type);
-                if (nError != null && nError > 0)
-                    createErrorsChart(id, nError);
+                if (nError != null && nError > 0) {
+                    var p = createErrorsChart(id, nError);
+                }
             }
         }
 
@@ -184,11 +189,29 @@
                 fill_topics(data.topics, "month", "mtgraph");
                 fill_topics(data.topics, "all", "atgraph");
 
+                // way to change piechart colors on hover
+                // Update app.js createErrorsChart()
+                // to enable i0/i1 id.
+                // $("#topic ul > li").hover(function(obj) {
+                //     var p = $(this).find("svg #i0");
+                //     p.attr("stroke", "#2479cc");
+                //     if (p.attr("fill") == "#2479cc")
+                //         p.attr("fill", "#ffffff");
+                //     else if (p.attr("fill") == "#ffffff")
+                //         p.attr("fill", "#2479cc");
+
+                //     p = $(this).find("svg #i1");
+                //     p.attr("stroke", "#2479cc");
+                //     if (p.attr("fill") == "#2479cc")
+                //         p.attr("fill", "#ffffff");
+                //     else if (p.attr("fill") == "#ffffff")
+                //         p.attr("fill", "#2479cc");
+                // });
 				//
 				// topic click events
 				//
-				$('#topic ul li a').click(function(){
-					parentQuizObj = $(this).parent().parent().parent().parent();
+				$('#topic ul li').click(function(){
+					parentQuizObj = $(this).parent().parent().parent();
 					// showing topic errors								
 					$('#work_area').css('width', '520px');
 					
