@@ -62,7 +62,7 @@
 					 + lst[i].id + '">';
 				html += lst[i].name + " " + lst[i].surname;
 				html += '</a></div>';
-				html += '<div id="ctrl"><a href="#">DEL</a></div></li>';
+				html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
 			}
 
 			$("#school_menu #students").append(html);
@@ -169,7 +169,10 @@
         	</ul>
             <div class="footer">
                 <div class="item">
-                    <a href="#" id="bttExit" class="lustre-button">ESCI</a>
+                    <a href="#" id="bttExit" class="lustre-button">
+                    	<span class="btt_inline">ESCI</span>
+                    	<img src="img/esc.png" class="btt_inline"/>
+                    </a>
                 </div>
             </div>
         </div>  <!-- /school_menu -->
@@ -188,10 +191,16 @@
     		<div class="footer">
     			<div class="item"></div>
     			<div class="item">
-    				<a href="#" id="addConfirm" class="lustre-button">Aggiungere</a>
+    				<a href="#" id="addConfirm" class="lustre-button">
+                    	<img src="img/continue.png" class="btt_inline"/>
+    					<span class="btt_inline">Aggiungere</span>
+                    </a>
     			</div>
     			<div class="item">
-    				<a href="#" id="bttBack" class="lustre-button">ESCI</a>
+    				<a href="#" id="bttBack" class="lustre-button">
+    					<span class="btt_inline">ESCI</span>
+                    	<img src="img/esc.png" class="btt_inline"/>
+                    </a>
     			</div>
     			<div class="item"></div>
     		</div>

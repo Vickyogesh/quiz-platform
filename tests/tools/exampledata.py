@@ -8,9 +8,9 @@ from sqlalchemy import MetaData
 
 users = [
     {
-        'login': 'norris@mail.com',
-        'name': 'Chuck',
-        'sname': 'Norris'
+        'login': 'studente',
+        'name': 'Test',
+        'sname': 'Studente'
     },
     {
         'login': 'vandamme@mail.com',
@@ -43,7 +43,6 @@ def fill(mgr):
         mgr.conn.execute('OPTIMIZE TABLE %s;' % tbl)
 
 
-
 def create_users(mgr):
     global users
     global sid
@@ -55,7 +54,7 @@ def create_users(mgr):
     for u in users:
         u['sid'] = sid
 
-    sql = text("INSERT INTO users VALUES(0, :name, :sname, :login,  MD5(CONCAT(:login, ':', '123')), 'student', :sid, UTC_TIMESTAMP(), -1)")
+    sql = text("INSERT INTO users VALUES(0, :name, :sname, :login,  MD5(CONCAT(:login, ':', 'studente')), 'student', :sid, UTC_TIMESTAMP(), -1)")
     for user in users:
         engine.execute(sql, user)
 
@@ -125,6 +124,7 @@ def create_exams(mgr):
             answers = [random.randint(0, 1) for row in info['questions']]
             core.saveQuiz(id, topic, q, answers)
     core = None
+
 
 def create_user_progress(mgr):
     print("Create user progress ...")
