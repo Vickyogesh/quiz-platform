@@ -4,6 +4,7 @@ import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 import random
 from quiz.core.core import QuizCore
+from sqlalchemy import MetaData
 
 users = [
     {
@@ -33,6 +34,14 @@ def fill(mgr):
     create_school_topic_err_snapshot(mgr)
     create_topics_snapshots(mgr)
     create_exams(mgr)
+
+    mgr.meta = MetaData()
+    mgr.meta.reflect(bind=mgr.engine)
+
+    for tbl in mgr.meta.tables:
+        print("Table optimizations... %s" % tbl)
+        mgr.conn.execute('OPTIMIZE TABLE %s;' % tbl)
+
 
 
 def create_users(mgr):
@@ -115,7 +124,7 @@ def create_exams(mgr):
             q = [x['id'] for x in info['questions']]
             answers = [random.randint(0, 1) for row in info['questions']]
             core.saveQuiz(id, topic, q, answers)
-
+    core = None
 
 def create_user_progress(mgr):
     print("Create user progress ...")
