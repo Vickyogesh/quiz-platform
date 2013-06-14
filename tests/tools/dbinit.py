@@ -13,6 +13,7 @@ from sqlalchemy import text
 from dbtools import DbManager
 from dbtools.settings import TEST_SCHOOLS, TEST_USERS
 import fill
+import exampledata
 
 
 ###########################################################
@@ -44,14 +45,16 @@ class Db(DbManager):
                             help='Verbose output.')
         parser.add_argument('-n', '--new', action='store_true',
                             help='Create quiz database.')
+        parser.add_argument('-c', '--config', default=None,
+                            help="Configuration file (default: ../test-data/config.ini).")
         parser.add_argument('-s', '--small', action='store_true',
                             help='Create small testing data.')
         parser.add_argument('--qs', action='store_true',
                             help='Generate quiz statistics.')
-        parser.add_argument('-c', '--config', default=None,
-                            help="Configuration file (default: ../test-data/config.ini).")
         parser.add_argument('-p', action='store_true',
                             help="Fill with big data for performance testing.")
+        parser.add_argument('-e', action='store_true',
+                            help="Fill with example school data.")
         self.args = parser.parse_args()
 
     def createUsers(self):
@@ -281,9 +284,14 @@ class Db(DbManager):
     def fillForPerformance(self):
         fill.do_fill(self)
 
+    def fillExample(self):
+        exampledata.fill(self)
+
     def _do_run(self):
         if self.args.p:
             self.fillForPerformance()
+        elif self.args.e:
+            self.fillExample()
         else:
             DbManager._do_run(self)
 
