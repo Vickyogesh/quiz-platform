@@ -316,81 +316,56 @@ a.cssSubmitButton:hover {
 
 /* Specific to statarea */
 
+#statarea * { 
+/*	margin: 0; */
+/*	padding: 0; */
+	text-align: left;
+}
+
+#statarea a { text-decoration: none; }
+
+#statarea h1 {
+	margin: 0 0 20px 0; 
+	text-align:center;
+}
+
 #statarea { 
-	background: #fff;
-  border-radius: 10px;
-	padding: 0; 
+	background: #eee; 
+	padding: 10px; 
 	margin: auto; 
-  box-shadow: 0 0 5px #666; 
-  -moz-box-shadow: 0 0 5px #666; 
+	-moz-box-shadow: 0 0 5px #666; 
 	-webkit-box-shadow: 0 0 5px #666; 
 	width:520px;
 }
 
-#statarea .list-wrap { text-align: left; }
-#statarea a { text-decoration: none; }
-
-.separator {
-  display: table;
-  text-align: center;
-  width: 100%;
-  background: #2479cc;
-  background: -moz-linear-gradient(top, #2479cc, #0459ac);
-  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
-  background: -o-linear-gradient(top, #2479cc, #0459ac);
-  background: linear-gradient(top, #2479cc, #0459ac);
-}
-.separator .content {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-}
-
-
-#statarea .separator {
-  margin-bottom: 10px;
-}
-
-#statarea .nav {
-  display: inline-block;
-  overflow: hidden;
-  list-style: none;
-}
-
+#statarea .nav { overflow: hidden; margin: 0 0 10px 0; list-style: none; }
 #statarea .nav li {
-  float: left;
-  margin-right: 60px; 
+	width: 97px; 
+	float: left; 
+	margin: 0 5px 0 5px; 
 }
-
 #statarea .nav li.last { margin-right: 0; }
-
 #statarea .nav li a {
-  color: white;
-  text-transform: uppercase;
+	display: block; 
+	padding: 5px; 
+	background: #959290; 
+	color: white; 
+	font-size: 15px; 
+	text-align: center; 
+	border: 0; 
 }
-
-#statarea .nav li a.current, #statarea .nav li a:hover {
-  text-shadow: 0 0 0.3em #fff;
+#statarea .nav li a:hover { background-color: #111; }
+#statarea .nav li a.current {
+	background-color: #0575f4;
 }
-
-
-.areaheader {
-  display: table;
-  width: 100%;
-  height: 50px;
-  font-size:20px;
-  color: #102f68;
-  text-align: center;
-}
-
-.areaheader .content {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+#statarea .nav li a:hover {
+	background-color: #0575f4; 
+	color: white;
 }
 
 .list-wrap ul { list-style: none; }
-.list-wrap ul li a:hover { color: white; }
+/*.list-wrap ul li a { display: block; border-bottom: 1px solid #666; padding: 4px; color: #666; }*/
+.list-wrap ul li a:hover { background: #fe4902; color: white; }
 .list-wrap ul li:last-child a { border: none; }
 
 .list-wrap ul.parentitem, ul.parentitem ul {
@@ -404,58 +379,30 @@ a.cssSubmitButton:hover {
   text-decoration: none;	
 }
 
-.list-wrap .parentitem > li {
-  background: #2479cc;
-  background: -moz-linear-gradient(top, #2479cc, #0459ac);
-  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
-  background: -o-linear-gradient(top, #2479cc, #0459ac);
-  background: linear-gradient(top, #2479cc, #0459ac);
+.list-wrap .parentitem li {
+  margin-top: 1px; 
+  background: #777;
 }
 
-.list-wrap .parentitem > li > a {
-  color: #fff;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.list-wrap .parentitem li a {
+.list-wrap .parentitem li a {  
+  color: #fff;	
   padding: 0.5em;
 }
 
-.list-wrap .parentitem > li > a:hover {
-  text-shadow: 0 0 0.3em #fff;
-}
-
-.list-wrap .parentitem li ul {
-  background: #fff;
-}
-
-.list-wrap .parentitem li ul > li {
-  background: #fff;
-  border-right: 20px solid #fff;
-  border-left: 20px solid #fff;
-  border-top: 1px solid #e8ecef;
-}
-
-.list-wrap .parentitem li ul > li:hover {
-  border-right: none;
-  border-left: none;
-  padding-left: 20px;
-  padding-right: 20px;
-  background: #2479cc;
-  background: -moz-linear-gradient(top, #2479cc, #0459ac);
-  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
-  background: -o-linear-gradient(top, #2479cc, #0459ac);
-  background: linear-gradient(top, #2479cc, #0459ac);
-}
-
-.list-wrap .parentitem li ul > li:hover a {
-  color: #fff;
+.list-wrap .parentitem li a:hover {
+  background: #000;
 }
 
 .list-wrap .parentitem li ul li a {
-  color: #102f68;
+  background: #ccc;
+  color: #000;
   padding-left: 20px;
+}
+
+.list-wrap .parentitem li ul li a:hover,ul#menu li ul .current a {
+  background: #aaa;
+  border-left: 5px #000 solid;
+  padding-left: 15px;
 }
 
 .list-wrap .quizresult {
@@ -477,43 +424,21 @@ a.cssSubmitButton:hover {
 	border-radius:10px; 
 }
 
-.areafooter {
-  text-align: center;
-  display: table;
-  width: 100%;
-  height: 60px;
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
-  margin-top: 1px;
-  background: #2579cf;
-  background: -moz-linear-gradient(top, #2579cf, #0358ab);
-  background: -webkit-linear-gradient(top, #2579cf, #0358ab);
-  background: -o-linear-gradient(top, #2579cf, #0358ab);
-  background: linear-gradient(top, #2579cf, #0358ab);
-}
-
-.areafooter .content {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-}
-.areafooter a {
-  color: #fff;
-}
-
-#statarea .areafooter a:hover {text-decoration: underline;}
 
 /* add student form */
 
-#addstudentarea .areaheader span {
-  border-bottom: 1px solid #e8ecef;
+#addstudentarea h2 {
+	font-size:25px;
+	text-align:center;
 }
 
 #addstudentarea form {
 	padding: 0 20px 20px 20px;
 }
 
-#addstudentarea form p { position: relative; margin: 10px 10px;}
+#addstudentarea form p { position: relative; margin: 10px 0;}
+#addstudentarea form p label { position: absolute; top: 0; left: 0;}
+#addstudentarea form p br {display: none;}
 
 #addstudentarea fieldset {
 	margin: 0px;
@@ -560,29 +485,103 @@ a.cssSubmitButton:hover {
 	color:white
 }
 
-.parsley-error {
-    background-color: rgb(242, 222, 222) !important;
+
+/** exam review */
+.row {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
 }
-.parsley-error-list {
-    display: none !important;
+.row > .item {
+  padding: 0.5em;
+  display: table-cell;
+  vertical-align: middle;
 }
 
-#stList #ctrl {
-    position: absolute;
-    display: none;
-    bottom: 0px;
-    right: 0px;
+#examreview {
+  width: 732px;
+  height: 550px;
+  margin: auto;
+  background: #f1d5e0;
+}
+#examreview > #answers {
+  height: 350px;
+  background: #f1d5e0;
+  overflow-y: auto;
+  border: 1px solid #ccc;
 }
 
-#stList #ctrl a {
-    border-left: 0;
+#answers > ul {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  list-style: none;
+}
+#answers > ul > li {
+  text-align: left;
+}
+#answers .row > .item {
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+#answers .row > .item.qimg {
+  width: 40px;
+}
+#answers .row > .item.quest {
+  width: 80%;
+}
+#answers .row > .item.quest.ans{
+  background: #fff;
+}
+#answers .row .item.vf {
+  width: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: #ccc;
+  background: #fff;
+}
+#answers .row .item.vf.x {
+  color: #102f68;
+}
+#answers .row > .item .qimg {
+  background-size:contain;
+  background-position:center;
+  background-repeat: no-repeat;
+  height: 40px;
+  width: 40px;
 }
 
-#stList #ctrl a:hover {
-    cursor:pointer;
-    text-decoration: underline;
+#examreview .examinfo {
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+}
+#examreview .examinfo span {
+  padding-left: 4px;
+  display: block;
+}
+#examreview .examinfo span.label {
+  color: #102f68;
+}
+#examreview .examinfo span.val {
+  width: 200px;
+  color: #ccc;
+  background: #fff;
+  border: 1px solid #000;
 }
 
-#stList li:hover #ctrl {
-    display: inline;
+#examreview .btt {
+  display: inline-block;
+  width: 150px;
+  padding: 0.5em;
+  cursor: pointer;
+  border: 1px solid #7c7c7c;
+  border-radius: 4px;
+  color: #102f68;
+  background: #aaa;
+  font-size: 12px;
+}
+
+#examreview .btt:hover {
+  background: #ccc;
 }
