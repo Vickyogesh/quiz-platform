@@ -11,10 +11,12 @@ if __name__ == '__main__':
 
     here = os.path.dirname(__file__)
     static_path = os.path.join(here, '..', 'tests', 'static')
+    img_path = os.path.join(here, '..', 'test-data', 'img')
     app_path = os.path.join(here, '..', 'web')
     config_file = os.path.join(here, '..', 'test-data', 'config.ini')
 
     application = DispatcherMiddleware(application, {'/v1': application})
+    application = SharedDataMiddleware(application, {'/img': img_path})
     application = SharedDataMiddleware(application, {'/test': static_path})
     application = SharedDataMiddleware(application, {'/app': app_path})
 

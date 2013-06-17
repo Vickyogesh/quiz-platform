@@ -360,11 +360,18 @@
 			id = "#thirdrow #titem" + nItemIndex;
 			$(id).addClass('redColor');
 			
+			console.log(curIndex, quizData.questions[curIndex].image);
+
 			//
 			// stting up image area
 			//
-			var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + quizData.questions[curIndex].image + ".jpg";
-			$("#imgarea").css("background-image","url('" + image + "')");
+			if (quizData.questions[curIndex].image != "")
+			{
+				var image = "/img/" + quizData.questions[curIndex].image + ".jpg";
+				$("#imgarea").css("background-image","url('" + image + "')");
+			}
+			else
+				$("#imgarea").css("background-image","none");
 			
 			//
 			// setting up true false

@@ -311,7 +311,6 @@
 				for (i = 0; i < data.questions.length; i++) {
 					quizData.push(data.questions[i]);
 				}
-				
 				setQuizEnv();
 			}
 		});
@@ -364,6 +363,8 @@
 				$("#quiz01").append(quizhtml1);
 			}			
 			
+			$("#imagearea").css("background-image","none");
+
 			for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
 				var id;
 							
@@ -380,13 +381,15 @@
 					id = "#quiz0" + (j+1) + " .maintext p";
 				else 
 					id = "#quiz0" + (j+1) + " .text";
-					
+				
 				var text = quizData[i].text;
 				$(id).html(text);
 				
-				var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + quizData[i].image + ".jpg";
-				$("#imagearea").css("background-image","url('" + image + "')");
-				
+				if (i == curIndex && quizData[i].image != "") {
+					var image = "/img/" + quizData[i].image + ".jpg";
+					$("#imagearea").css("background-image","url('" + image + "')");
+				}
+
 				id = "#quiz0" + (j+1) + " .answer";
 				$(id).removeClass('trueAnswer');
 				$(id).removeClass('falseAnswer');
