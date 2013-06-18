@@ -101,12 +101,6 @@
 		$('#backbut').click(function(){
 			window.location = "student.html";
 		});
-/*		
-		$('#btnlogout').click(function(){
-			window.qsid = null;
-			window.location = "index.html";
-		});
-*/		
 		
 		$('#reviewarea').mousewheel(function(event, delta, deltaX, deltaY) {
 			if (deltaY > 0) {
@@ -246,7 +240,8 @@
 				$("#quiz01").append(quizhtml1);
 			}			
 
-			$("#imagearea").css("background-image","none");
+			$("#imagearea img").attr("src","");
+			$("#imagearea span").html("");
 
 			for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
 				var id;
@@ -270,7 +265,8 @@
 				
 				if (i == curIndex && quizData[i].image != "") {
 					var image = "/img/" + quizData[i].image + ".jpg";
-					$("#imagearea").css("background-image","url('" + image + "')");
+					$("#imagearea img").attr("src", image);
+					$("#imagearea span").html("fig. " + quizData[i].image);
 				}
 
 				id = "#quiz0" + (j+1) + " .answer";
@@ -395,6 +391,7 @@
 -->			
 			
 			<div id="imagearea">
+				<div><img></img><span></span></div>
 			</div>
 			<div id="quizarea" style="width:750px; float:left">
 				<div id="quizlistarea" style="width:710px; float:left">
