@@ -61,37 +61,43 @@
                 nCount++;
             }                           
 
-            if (nCount > 0) {
-                var r = Raphael(id);
-                var echart = r.linechart(7, 0,
-                    $('#' + id).width() - 10,
-                    $('#' + id).height() - 10, 
-                    examX, 
-                    [examY, examY1], {
-                        axis: "0 0 1 1",
-                        axisxstep: examX.length - 1,
-                        colors: ['#2479cc', '#CCC'],
-                        dash: ["", "-"]
-                });
+            for (var i = nCount; i < 4; i++) {
+                examX.push(i);
+                examY1.push(36);
+            };
 
-                for( var i = 0, l = echart.axis.length; i < l; i++ ) {
-                  // change the axis and tick-marks
-                  echart.axis[i].attr("stroke", "#0459ac");
-                               
-                  // change the axis labels
-                  var axisItems = echart.axis[i].text.items
-                  for( var ii = 0, ll = axisItems.length; ii < ll; ii++ ) {
-                     axisItems[ii].attr("fill", "#0459ac");
-                  }
-                }
+            var r = Raphael(id);
+            var echart = r.linechart(10, 8,
+                $('#' + id).width() - 12,
+                $('#' + id).height() - 12, 
+                examX, 
+                [examY, examY1, [0, 40]], {
+                    axis: "0 0 1 1",
+                    axisxstep: examX.length - 1,
+                    colors: ['#2479cc', '#CCC'],
+                    dash: ["", "-"]
+            });
 
-                // Update x-axis texts
-                var xText = echart.axis[0].text.items;  
-                for(i in xText){
-                    var nVal = parseInt(xText[i].attr('text')) + 1;
-                    xText[i].attr({'text': nVal + ''});
-                }
+            for( var i = 0, l = echart.axis.length; i < l; i++ ) {
+              // change the axis and tick-marks
+              echart.axis[i].attr("stroke", "#0459ac");
+                           
+              // change the axis labels
+              var axisItems = echart.axis[i].text.items
+              for( var ii = 0, ll = axisItems.length; ii < ll; ii++ ) {
+                 axisItems[ii].attr("fill", "#0459ac");
+              }
             }
+
+            // Update x-axis texts
+            var xText = echart.axis[0].text.items;  
+            for(i in xText){
+                var nVal = parseInt(xText[i].attr('text')) + 1;
+                xText[i].attr({'text': nVal + ''});
+            }
+            var lab = r.label($('#' + id).width() / 2, 8, "Statistiche esami");
+            lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
+            
         }
 
         // Fill topics for the time periods.
@@ -478,7 +484,7 @@
 
 	        <ul id="week" class="collapsable-list">
 	        	<li id="exam" style="background: #fff">
-		            <div id="wexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+		            <div id="wexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
 					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
@@ -487,7 +493,7 @@
 	        </ul>
 	        <ul id="month" class="collapsable-list">
 	        	<li id="exam" style="background: #fff">
-		            <div id="mexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+		            <div id="mexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
 					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
@@ -496,7 +502,7 @@
 	        </ul>
 	        <ul id="all" class="collapsable-list">
 	        	<li id="exam" style="background: #fff">
-		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; cursor:pointer"></div>
+		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
 					<a href='#' class="lustre-button">TOPIC STATISTICS</a>
