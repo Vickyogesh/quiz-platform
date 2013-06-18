@@ -82,15 +82,19 @@
 			}
 		}
 
+        function setGuestVisits(sel, value) {
+            if (value < 0)
+                value = 0;
+            $(sel).html(value);
+        }
+
+
 		window.qsid = sessionStorage.getItem('quizqsid');
 		window.name = sessionStorage.getItem('quizname');		
+        bFromExam = sessionStorage.getItem('quizfromexam');
 
 		$("#school_stat .header .item").html(window.name);
-		
-		bFromExam = sessionStorage.getItem('quizfromexam');
-
 		$("#work_area").hide();
-		
 		WaitMsg.show();
 									
 		$.getJSON(url("/v1/school/me"), function(data) {
@@ -104,10 +108,9 @@
 			fill_students("month", data.students.week);
 			fill_students("all", data.students.week3);
 
-			// filling guest visits
-			$("#week #guestVisit .txt-val").html(data.guest_visits[0]);
-			$("#month #guestVisit .txt-val").html(data.guest_visits[1]);
-			$("#all #guestVisit .txt-val").html(data.guest_visits[2]);
+            setGuestVisits("#week #guestVisit .txt-val", data.guest_visits[0]);
+            setGuestVisits("#month #guestVisit .txt-val", data.guest_visits[1]);
+            setGuestVisits("#all #guestVisit .txt-val", data.guest_visits[2]);
 			
 			// filling exam graph
 			var ids = ['wpgraph', 'mpgraph', 'apgraph'];

@@ -5,15 +5,33 @@
 
 function createErrorsChart(id, val) {
   var p = Raphael(id);
-  p = p.piechart(10, 10, 8, [100 - val, val], {
-    stroke:'#fff',
-    strokewidth:2,
-    colors:['#2479cc','#fff']
+  var values;
+  var colors;
+
+  if (val == 100) {
+    values = [100];
+    colors = ['#fff'];
+  }
+  else if (val == 0) {
+    values = [100];
+    colors = ['#2479cc'];
+  }
+  else {
+    values = [100 - val, val];
+    colors = ['#2479cc', '#fff'];
+  }
+
+  p = p.piechart(10, 10, 8, values, {
+    stroke: '#fff',
+    strokewidth: 2,
+    colors: colors
   });
 
-  // $(p.series.items[0].node).attr("id", "i0");
-  // $(p.series.items[1].node).attr("id", "i1");
-  p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+  if (val == 100)
+    p.series.items[0].attr({opacity : 100, fill: "#ccc"});
+  else if (val != 100)
+    p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+
   return p;
 }
 //----------------------------------------------------------------------------
