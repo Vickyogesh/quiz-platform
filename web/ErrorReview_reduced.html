@@ -247,8 +247,7 @@
 				$("#quiz01").append(quizhtml1);
 			}			
 			
-			$("#imagearea img").attr("src","");
-			$("#imagearea span").html("");
+			$("#imagearea > div").hide();
 
 			for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
 				var id;
@@ -274,6 +273,7 @@
 					var image = "/img/" + quizData[i].image + ".jpg";
 					$("#imagearea img").attr("src", image);
 					$("#imagearea span").html("fig. " + quizData[i].image);
+					$("#imagearea > div").show();
 				}
 				
 				id = "#quiz0" + (j+1) + " .answer";

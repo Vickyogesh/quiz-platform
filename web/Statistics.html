@@ -31,6 +31,7 @@
 	var urlstat;
 	
 	$(document).ready(function() {
+
         // Create exam graph in the period [start; end]
         // start & end may be null to use whole data.
         function drawExamGraph(id, data, start, end) {
@@ -69,7 +70,7 @@
             var r = Raphael(id);
             var echart = r.linechart(10, 8,
                 $('#' + id).width() - 12,
-                $('#' + id).height() - 12, 
+                $('#' + id).height() - 16, 
                 examX, 
                 [examY, examY1, [0, 40]], {
                     axis: "0 0 1 1",
@@ -195,27 +196,7 @@
                 fill_topics(data.topics, "month", "mtgraph");
                 fill_topics(data.topics, "all", "atgraph");
 
-                // way to change piechart colors on hover
-                // Update app.js createErrorsChart()
-                // to enable i0/i1 id.
-                // $("#topic ul > li").hover(function(obj) {
-                //     var p = $(this).find("svg #i0");
-                //     p.attr("stroke", "#2479cc");
-                //     if (p.attr("fill") == "#2479cc")
-                //         p.attr("fill", "#ffffff");
-                //     else if (p.attr("fill") == "#ffffff")
-                //         p.attr("fill", "#2479cc");
-
-                //     p = $(this).find("svg #i1");
-                //     p.attr("stroke", "#2479cc");
-                //     if (p.attr("fill") == "#2479cc")
-                //         p.attr("fill", "#ffffff");
-                //     else if (p.attr("fill") == "#ffffff")
-                //         p.attr("fill", "#2479cc");
-                // });
-				//
 				// topic click events
-				//
 				$('#topic ul li').click(function(){
 					parentQuizObj = $(this).parent().parent().parent();
 					// showing topic errors								
@@ -483,7 +464,7 @@
 	        </div>  <!-- /Navigation -->
 
 	        <ul id="week" class="collapsable-list">
-	        	<li id="exam" style="background: #fff">
+	        	<li id="exam">
 		            <div id="wexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
@@ -492,7 +473,7 @@
 				</li>
 	        </ul>
 	        <ul id="month" class="collapsable-list">
-	        	<li id="exam" style="background: #fff">
+	        	<li id="exam">
 		            <div id="mexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
@@ -501,7 +482,7 @@
 				</li>
 	        </ul>
 	        <ul id="all" class="collapsable-list">
-	        	<li id="exam" style="background: #fff">
+	        	<li id="exam">
 		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
