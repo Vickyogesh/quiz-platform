@@ -170,22 +170,25 @@ def get_topic_error(user, id):
 
 @app.get('/admin/schools', access=['admin'])
 def school_list():
-    res = app.core.getSchoolList()
+    res = app.account.getSchools()
+    #res = app.core.getSchoolList()
     return JSONResponse(res)
 
 
 @app.post('/admin/newschool', access=['admin'])
 def add_school():
-    data = app.request.json
+    # data = app.request.json
 
-    try:
-        name = data['name']
-        login = data['login']
-        passwd = data['passwd']
-    except KeyError:
-        raise BadRequest('Missing parameter.')
+    # try:
+    #     name = data['name']
+    #     login = data['login']
+    #     passwd = data['passwd']
+    # except KeyError:
+    #     raise BadRequest('Missing parameter.')
 
-    res = app.core.createSchool(name, login, passwd)
+    # res = app.account.addSchool(name, login, passwd)
+    #res = app.core.createSchool(name, login, passwd)
+    res = app.account.addSchool(raw=app.request.data)
     return JSONResponse(res)
 
 
@@ -199,48 +202,54 @@ def delete_school(id):
         elif len(app.request.data):
             raise BadRequest('Invalid request.')
 
-    res = app.core.deleteSchool(id)
+    res = app.account.removeSchool(id)
+    #res = app.core.deleteSchool(id)
     return JSONResponse(res)
 
 
 @app.get('/school/<uid:id>/students', access=['school', 'admin'])
 def student_list(id):
     school_id = app.getUserId(id)
-
-    if not app.isAdmin():
-        uid = app.session['user_id']
-        if uid != school_id:
-            raise Forbidden('Forbidden.')
-    elif id == 'me':
-        raise Forbidden('Forbidden.')
-
-    res = app.core.getStudentList(school_id)
+    res = app.account.getSchoolStudents(school_id)
     return JSONResponse(res)
 
+    # if not app.isAdmin():
+    #     uid = app.session['user_id']
+    #     if uid != school_id:
+    #         raise Forbidden('Forbidden.')
+    # elif id == 'me':
+    #     raise Forbidden('Forbidden.')
 
-@app.post('/school/<uid:id>/newstudent', access=['school'])
+    # res = app.core.getStudentList(school_id)
+    # return JSONResponse(res)
+
+
+@app.post('/school/<uid:id>/newstudent', access=['school', 'admin'])
 def add_student(id):
     school_id = app.getUserId(id)
-    data = app.request.json
+    # data = app.request.json
 
-    uid = app.session['user_id']
-    if uid != school_id:
-        raise Forbidden('Forbidden.')
+    # uid = app.session['user_id']
+    # if uid != school_id:
+    #     raise Forbidden('Forbidden.')
 
-    try:
-        name = data['name']
-        surname = data['surname']
-        login = data['login']
-        passwd = data['passwd']
-    except KeyError:
-        raise BadRequest('Missing parameter.')
+    # try:
+    #     name = data['name']
+    #     surname = data['surname']
+    #     login = data['login']
+    #     passwd = data['passwd']
+    # except KeyError:
+    #     raise BadRequest('Missing parameter.')
 
-    res = app.core.createStudent(name, surname, login, passwd, school_id)
+    # res = app.account.addStudent(name, surname, login, passwd, school_id)
+    res = app.account.addStudent(school_id, raw=app.request.data)
     return JSONResponse(res)
+    # res = app.core.createStudent(name, surname, login, passwd, school_id)
+    # return JSONResponse(res)
 
 
-@app.post('/school/<uid:id>/student/<int:student>', access=['school'])
-@app.delete('/school/<uid:id>/student/<int:student>', access=['school'])
+@app.post('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
+@app.delete('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
 def delete_student(id, student):
     if app.request.method == 'POST':
         action = app.request.args.get('action', None)
@@ -249,16 +258,18 @@ def delete_student(id, student):
         elif len(app.request.data):
             raise BadRequest('Invalid request.')
 
-    school_id = app.getUserId(id)
-    uid = app.session['user_id']
-    if uid != school_id:
-        raise Forbidden('Forbidden.')
-
-    res = app.core.deleteStudent(school_id, student)
+    id = app.getUserId(id)
+    res = app.account.removeStudent(student)
     return JSONResponse(res)
+    # uid = app.session['user_id']
+    # if uid != school_id:
+    #     raise Forbidden('Forbidden.')
+
+    # res = app.core.deleteStudent(school_id, student)
+    # return JSONResponse(res)
 
 
-@app.get('/school/<uid:id>', access=['school', 'admin'])
+@app.get('/school/<uid:id>')
 def school_stat(id):
     school_id = app.getUserId(id)
 

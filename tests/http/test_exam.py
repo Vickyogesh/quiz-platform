@@ -10,6 +10,7 @@ import json
 from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
 from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
+from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: Exam http requests: /exam, /exam/<id>;
@@ -30,9 +31,11 @@ class HttpExamTest(unittest.TestCase):
 
         self.engine = create_engine(db_uri, echo=False)
         cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self, drop_users=True)
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
+        cleanupdb_onTearDownAccDb(self)
 
     # Check: get exam
     def test_get(self):

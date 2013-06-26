@@ -21,6 +21,7 @@ from .middleware import QuizMiddleware
 from .settings import Settings
 from .core.core import QuizCore
 from .core.exceptions import QuizCoreError
+from .accounts import AccountApi
 
 
 def _check_digest(nonce, digest, passwd):
@@ -32,20 +33,23 @@ def _check_digest(nonce, digest, passwd):
 
 class QuizWWWAuthenticate(object):
     """"Provides simple WWW-Authenticate header for the Quiz service."""
-    def __init__(self):
+    def __init__(self, nonce):
         self.random = random.random()
         self.time = time.time()
+        self.nonce = nonce
 
     def to_header(self):
         """Convert the stored values into a WWW-Authenticate header."""
-        m = hashlib.md5()
-        m.update('{0}:{1}'.format(self.random, self.time))
-        return 'QuizAuth nonce="%s"' % m.hexdigest()
+        return 'QuizAuth nonce="%s"' % self.nonce
+        # m = hashlib.md5()
+        # m.update('{0}:{1}'.format(self.random, self.time))
+        # return 'QuizAuth nonce="%s"' % m.hexdigest()
 
     def to_dict(self):
-        m = hashlib.md5()
-        m.update('{0}:{1}'.format(self.random, self.time))
-        return {'nonce': m.hexdigest()}
+        return {'nonce': self.nonce}
+        # m = hashlib.md5()
+        # m.update('{0}:{1}'.format(self.random, self.time))
+        # return {'nonce': m.hexdigest()}
 
 
 class IdConverter(BaseConverter):
@@ -123,14 +127,21 @@ class QuizApp(object):
         * 'guest' access control.
     """
     def __init__(self):
+        self.session = None
         self.settings = self.__getSettings()
         self.core = QuizCore(self.settings)
         self.urls = Map(converters={'uid': IdConverter})
         self.endpoints = {}
-
+        self.__setup_accounts_api()
         # Default handlers for authorization.
         self.addRule('/authorize', self.onNewAuth, methods=['GET'])
         self.addRule('/authorize', self.onDoAuth, methods=['POST'])
+
+    def __setup_accounts_api(self):
+        def session_func():
+            return self.session
+        acc_url = self.settings.main['accounts_url']
+        self.account = AccountApi(acc_url, session_func)
 
     # Read application settings.
     # There may be two sources:
@@ -227,7 +238,7 @@ class QuizApp(object):
         try:
             user_type = self.session['user_type']
         except Exception:
-            raise Unauthorized('Unauthorized.')
+            raise Forbidden('Forbidden.')
         can = '*' in access or user_type in access
         return can
 
@@ -358,7 +369,9 @@ class QuizApp(object):
 
         :seealso: :class:`QuizWWWAuthenticate`.
         """
-        return JSONResponse(QuizWWWAuthenticate().to_dict(), status=401)
+        data = self.account.get_auth()
+        return JSONResponse(QuizWWWAuthenticate(data['nonce']).to_dict(),
+                            status=401)
 
     def onDoAuth(self):
         """Handle authorization."""
@@ -371,22 +384,36 @@ class QuizApp(object):
         except KeyError:
             raise BadRequest('Invalid parameters.')
 
+        user = self.account.send_auth(login, digest, nonce)
+
         try:
             appid = self.core.getAppId(appkey)
-            user = self.core.getUserInfo(login, with_passwd=True)
+            #user = self.core.getUserInfo(login, with_passwd=True)
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        if not _check_digest(nonce, digest, user['passwd']):
-            raise BadRequest('Authorization is invalid.')
-
-        self.session['app_id'] = appid
+        self.session['user'] = user
         self.session['user_id'] = user['id']
-        self.session['user_name'] = user['name']
-        self.session['user_login'] = user['login']
         self.session['user_type'] = user['type']
+        self.session['app_id'] = appid
         self.session.save()
-        del user['login']
+
+        # try:
+        #     appid = self.core.getAppId(appkey)
+        #     user = self.core.getUserInfo(login, with_passwd=True)
+        # except QuizCoreError:
+        #     raise BadRequest('Authorization is invalid.')
+
+        # if not _check_digest(nonce, digest, user['passwd']):
+        #     raise BadRequest('Authorization is invalid.')
+
+        # self.session['app_id'] = appid
+        # self.session['user_id'] = user['id']
+        # self.session['user_name'] = user['name']
+        # self.session['user_login'] = user['login']
+        # self.session['user_type'] = user['type']
+        # self.session.save()
+        # del user['login']
 
         # NOTE: we you want to use 'beaker.session.secret' then use:
         # sid = self.session.__dict__['_headers']['cookie_out']

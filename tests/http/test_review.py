@@ -10,6 +10,7 @@ import json
 from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
 from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
+from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: error review http requests: /errorreview;
@@ -30,10 +31,12 @@ class HttpReviewTest(unittest.TestCase):
 
         self.engine = create_engine(db_uri, echo=False)
         cleanupdb_onSetup(self.engine)
-        self.engine.execute("INSERT IGNORE INTO answers VALUES (4,1,0),(4,2,0)")
+        cleanupdb_onSetupAccDb(self)
+        self.engine.execute("INSERT IGNORE INTO answers VALUES (3,1,0),(3,2,0)")
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
+        cleanupdb_onTearDownAccDb(self)
 
     # Check: get review
     def test_get(self):

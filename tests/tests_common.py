@@ -1,6 +1,7 @@
 # common test parameters
+import hashlib
 import unittest
-
+from sqlalchemy import create_engine, MetaData
 
 app_id = '32bfe1c505d4a2a042bafd53993f10ece3ccddca'
 user = 'testuser'
@@ -8,6 +9,8 @@ password = 'testpasswd'
 db_uri = 'mysql://quiz:quiz@192.168.56.101/quiz?charset=utf8'
 test_server = 'http://127.0.0.1/v1'
 #test_server = 'http://quizplatformtest-editricetoni.rhcloud.com/v1'
+
+acc_db_uri = 'mysql://quiz:quiz@192.168.56.101/accounts'
 
 
 def url(path):
@@ -47,8 +50,63 @@ def cleanupdb_onTearDown(engine):
     engine.dispose()
 
 
+def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
+    tst.acc_engine = create_engine(acc_db_uri, echo=False)
+    tst.acc_meta = MetaData()
+    tst.acc_meta.reflect(tst.acc_engine)
+    tst.acc_schools = tst.acc_meta.tables['acc_schools']
+    tst.acc_users = tst.acc_meta.tables['acc_users']
+    if drop_users:
+        tst.acc_engine.execute("DELETE FROM acc_users")
+        tst.acc_engine.execute("DELETE FROM acc_schools")
+        tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
+        tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
+    if add_users:
+        tst.acc_engine.execute(tst.acc_schools.insert().values(
+            name='Chuck Norris School',
+            login='chuck@norris.com',
+            passwd=_pwd('chuck@norris.com', 'boo')))
+        tst.acc_engine.execute(tst.acc_schools.insert().values(
+            name='school2',
+            login='school2',
+            passwd=_pwd('school2', 'boo')))
+        tst.acc_engine.execute(tst.acc_users.insert().values(
+            name='Test',
+            surname='User',
+            login='testuser',
+            passwd=_pwd('testuser', 'testpasswd'),
+            school_id=1))
+
+
+def cleanupdb_onTearDownAccDb(tst):
+    tst.acc_engine.execute("DELETE FROM acc_users")
+    tst.acc_engine.execute("DELETE FROM acc_schools")
+    tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
+    tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
+    tst.acc_engine.execute(tst.acc_schools.insert().values(
+        name='Chuck Norris School',
+        login='chuck@norris.com',
+        passwd=_pwd('chuck@norris.com', 'boo')))
+    tst.acc_engine.execute(tst.acc_schools.insert().values(
+        name='school2',
+        login='school2',
+        passwd=_pwd('school2', 'boo')))
+    tst.acc_engine.execute(tst.acc_users.insert().values(
+        name='Test',
+        surname='User',
+        login='testuser',
+        passwd=_pwd('testuser', 'testpasswd'),
+        school_id=1))
+    tst.acc_engine.dispose()
+
+
+def _pwd(username, passwd):
+    m = hashlib.md5()
+    m.update('%s:%s' % (username, passwd))
+    return m.hexdigest()
+
+
 def _createDigest(nonce, username, passwd):
-    import hashlib
     m = hashlib.md5()
     m.update('%s:%s' % (username, passwd))
     ha1 = m.hexdigest()
@@ -71,7 +129,7 @@ def createAuthData(nonce, appkey=None, login=None, passwd=None):
 # type: admin. school, guest, student
 def createAuthFor(type, nonce=123):
     auth = {
-        'admin': {'login': 'admin', 'passwd': 'ari09Xsw_'},
+        'admin': {'login': 'admin', 'passwd': 's=myA{xOYQ.(Vbgx26'},
         'school': {'login': 'chuck@norris.com', 'passwd': 'boo'},
         'guest': {'login': 'chuck@norris.com-guest', 'passwd': 'guest'},
         'student': {'login': 'testuser', 'passwd': 'testpasswd'}
@@ -98,6 +156,9 @@ class HttpStatusTest(unittest.TestCase):
         data = response.json()
         if 'status' not in data or 'description' not in data:
             raise self.failureException('Malformed server error response.')
+
+        if data['status'] == 403:
+            return
 
         if data['status'] == 401:
             if data['description'] != 'Unauthorized.':
