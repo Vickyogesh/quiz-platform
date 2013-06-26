@@ -247,6 +247,7 @@ a.cssSubmitButton:hover {
 }
 
 #quizarea #imagearea, #reviewarea #imagearea {
+    display: table;
 	width:116px; 
 	height: 193px; 
 	float:left; 
@@ -256,6 +257,16 @@ a.cssSubmitButton:hover {
     background-color: white;
     background-size: contain;
     border-radius: 5px 5px 5px 5px; 
+}
+#quizarea #imagearea > div, #reviewarea #imagearea > div{
+    display: table-cell;
+    vertical-align: middle;
+}
+#quizarea #imagearea img, #reviewarea #imagearea img {
+    width: 116px;
+}
+#quizarea #imagearea, #reviewarea #imagearea {
+    color: #102f68;
 }
 
 .trueAnswer {
@@ -411,3 +422,5 @@ a.cssSubmitButton:hover {
 	margin-top:-50%; 
 	border-radius:10px; 
 }
+
+

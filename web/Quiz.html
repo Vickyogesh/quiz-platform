@@ -311,7 +311,6 @@
 				for (i = 0; i < data.questions.length; i++) {
 					quizData.push(data.questions[i]);
 				}
-				
 				setQuizEnv();
 			}
 		});
@@ -329,6 +328,7 @@
 		}
 	}
 	
+	var img_preload = new Image();
 	function setQuizEnv() {	
 		
 		var quizhtml1, quizhtml2;
@@ -364,6 +364,9 @@
 				$("#quiz01").append(quizhtml1);
 			}			
 			
+			$("#imagearea > div").hide();
+			$("#imagearea img").attr("src", "");
+
 			for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
 				var id;
 							
@@ -380,13 +383,23 @@
 					id = "#quiz0" + (j+1) + " .maintext p";
 				else 
 					id = "#quiz0" + (j+1) + " .text";
-					
+				
 				var text = quizData[i].text;
 				$(id).html(text);
 				
-				var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + quizData[i].image + ".jpg";
-				$("#imagearea").css("background-image","url('" + image + "')");
-				
+				if (i == curIndex && quizData[i].image != "") {
+					var image = "/img/" + quizData[i].image + ".jpg";
+					$("#imagearea img").attr("src", image);
+					$("#imagearea span").html("fig. " + quizData[i].image);
+					$("#imagearea > div").show();
+
+					// preload next image
+					if (i + 1 < quizData.length && quizData[i + 1].image != "") {
+						image = "/img/" + quizData[i + 1].image + ".jpg";
+						img_preload.src = image;
+					}
+				}
+
 				id = "#quiz0" + (j+1) + " .answer";
 				$(id).removeClass('trueAnswer');
 				$(id).removeClass('falseAnswer');
@@ -527,6 +540,7 @@
 -->			
 			
 			<div id="imagearea">
+				<div><img></img><span></span></div>
 			</div>
 			<div id="quizarea" style="width:750px; float:left">
 				<div id="quizlistarea" style="width:710px; float:left">

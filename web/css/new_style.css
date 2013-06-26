@@ -32,7 +32,8 @@ body {
   box-shadow: 0 0 5px #666; 
   -moz-box-shadow: 0 0 5px #666; 
   -webkit-box-shadow: 0 0 5px #666; 
-  width:520px;
+  width: 520px;
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 
 .content-box > .header {
@@ -59,6 +60,8 @@ body {
   background: -webkit-linear-gradient(top, #2579cf, #0358ab);
   background: -o-linear-gradient(top, #2579cf, #0358ab);
   background: linear-gradient(top, #2579cf, #0358ab);
+  -pie-background: linear-gradient(top, #2579cf, #0358ab);
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 
 .content-box a.lustre-button {
@@ -66,10 +69,10 @@ body {
   text-decoration: none;
 }
 .content-box a.lustre-button.current {
-  text-shadow: 0 0 0.3em #fff;
+  text-shadow: 0px 0px 0.3em #FFFFFF;
 }
 .content-box a.lustre-button:hover {
-  text-shadow: 0 0 0.3em #fff;
+  text-shadow: 0px 0px 0.3em #FFFFFF;
 }
 
 .row {
@@ -97,6 +100,8 @@ body {
   background: -webkit-linear-gradient(top, #2479cc, #0459ac);
   background: -o-linear-gradient(top, #2479cc, #0459ac);
   background: linear-gradient(top, #2479cc, #0459ac);
+  -pie-background: linear-gradient(top, #2579cf, #0358ab);
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 
 .btt_inline {
@@ -104,6 +109,8 @@ body {
   vertical-align:middle;
   margin-left: 2px;
 }
+
+a img {border: none; }
 
 /** Navigation row. */
 ul.nav {
@@ -130,6 +137,8 @@ ul.nav li {
   background: -webkit-linear-gradient(top, #2479cc, #0459ac);
   background: -o-linear-gradient(top, #2479cc, #0459ac);
   background: linear-gradient(top, #2479cc, #0459ac);
+  -pie-background: linear-gradient(top, #2579cf, #0358ab);
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 .collapsable-list > li > a {
   display: block;
@@ -179,6 +188,8 @@ ul.nav li {
   background: -webkit-linear-gradient(top, #2479cc, #0459ac);
   background: -o-linear-gradient(top, #2479cc, #0459ac);
   background: linear-gradient(top, #2479cc, #0459ac);
+  -pie-background: linear-gradient(top, #2579cf, #0358ab);
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 .collapsable-list > li > ul > li:hover a {
   color: #fff;
@@ -197,8 +208,9 @@ ul.nav li {
   width:200px;
   cursor: pointer;
   border: 1px solid #fff;
-  border-radius: 10px 10px 10px 10px;
+  border-radius: 10px;
   box-shadow: 1px 3px 5px #888888;
+  behavior: url(css/PIE.htc); /* IE fix. */
 }
 .ibtn:hover {
   border: 1px solid #ccc;
@@ -281,4 +293,52 @@ ul.nav li {
   background-repeat: no-repeat;
   height: 40px;
   width: 40px;
+}
+
+
+.topicarrow {
+  position: relative;
+  width: 20px;
+  height: 16px;
+}
+.topicarrow:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 4px;
+  width: 5px;
+  height: 8px;
+  background: #ccc;
+  -webkit-transform: skew(45deg);
+  -moz-transform: skew(45deg);
+  -o-transform: skew(45deg);
+  transform: skew(45deg);
+}
+.topicarrow:after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  width: 5px;
+  height: 8px;
+  background: #ccc;
+  -webkit-transform: skew(-45deg);
+  -moz-transform: skew(-45deg);
+  -o-transform: skew(-45deg);
+  transform: skew(-45deg);
+
+}
+.collapsable-list > li > ul > li:hover .topicarrow:before {
+  background: #fff;
+}
+.collapsable-list > li > ul > li:hover .topicarrow:after {
+  background: #fff;
+}
+
+
+/* statistics.html */
+
+.collapsable-list > li#exam {
+  background: #fff;
+  behavior: none; /* IE fix. */
 }

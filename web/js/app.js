@@ -4,12 +4,34 @@
 
 
 function createErrorsChart(id, val) {
-  p = Raphael(id);
-  p.piechart(10, 10, 8, [100 - val, val], {
-    stroke:'#fff',
-    strokewidth:2,
-    colors:['#2479cc','#fff']
+  var p = Raphael(id);
+  var values;
+  var colors;
+
+  if (val == 100) {
+    values = [100];
+    colors = ['#fff'];
+  }
+  else if (val == 0) {
+    values = [100];
+    colors = ['#2479cc'];
+  }
+  else {
+    values = [100 - val, val];
+    colors = ['#2479cc', '#fff'];
+  }
+
+  p = p.piechart(10, 10, 8, values, {
+    stroke: '#fff',
+    strokewidth: 2,
+    colors: colors
   });
+
+  if (val == 100)
+    p.series.items[0].attr({opacity : 100, fill: "#ccc"});
+  else if (val != 100)
+    p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+
   return p;
 }
 //----------------------------------------------------------------------------

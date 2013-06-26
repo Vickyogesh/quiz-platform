@@ -9,6 +9,7 @@
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/sprintf.min.js"></script>
 <script type="text/javascript" src="js/switch/jquery.iphone-switch.js"></script>
 <script type="text/javascript" src="js/timer/jquery.plugin.js"></script>
 <script type="text/javascript" src="js/timer/jquery.timer.js"></script>
@@ -28,12 +29,14 @@
   	var bTerminated = false;
 
 	$(document).ready(function() {
+		//return;
 		var i, htmlVal;
 
 		window.qsid = sessionStorage.getItem('quizqsid');	
 		window.name = sessionStorage.getItem('quizname');
 		
 		$("#testarea").hide();
+		$("#examreview").hide();
 		
 		WaitMsg.show();
 			
@@ -60,7 +63,8 @@
 				// stting up examid area
 				$("#examidarea").html(quizData.exam.id);
 				$("#namearea").html(window.name);
-				
+				$("#examreview #examno .val").html(quizData.exam.id);
+				$("#examreview #studentname .val").html(window.name);
 				setTestEnv();
 			}
 		});		
@@ -171,20 +175,81 @@
 			}
 		});
 	
-		$('#endbut').click(function(){
-			terminateExam();			
-		});		
-/*		
-		$('#backbut').click(function(){
-			window.location = "student.html";
+		$('#endbut').click(function() {
+			$("#testarea").hide();
+			fillAnswers();
+			$("#examreview").show();
+
 		});
-*/		
+
+		$("#bttBackExam").click(function() {
+			if (nTime != 0) {
+				$("#examreview").hide();
+				$("#testarea").show();
+			}
+		});
+
+		$("#bttEndExam").click(function() {
+			terminateExam();
+		});
+
 		$('#btnlogout').click(function(){
 			window.qsid = null;
 			window.location = "index.html";
 		});
 	});
 	
+	// TODO: not wery good - we always recreate list of questions;
+	// here we may create the list once (when exam is received)
+	// and then just change 'X' column.
+	function fillAnswers() {
+		$("#examreview #answers > ul > li").empty();
+
+		var row = ' \
+		<li> \
+			<div class="row"> \
+				<div class="item qimg" style="color:#102f68">%s</div> \
+				<div class="item quest"><span style="color:#102f68; font-size:14px; font-weight:bold">Testo della domanda</span></div> \
+				<div class="item vf">V</div> \
+				<div class="item vf">F</div> \
+			</div> \
+			<div class="row"> \
+				<div class="item qimg"><div class="qimg" style="margin-left:auto;background-image:url(\'/img/%s.jpg\')"></div></div> \
+				<div class="item quest ans">%s</div> \
+				<div class="item vf x">%s</div> \
+				<div class="item vf x">%s</div> \
+			</div> \
+		</li>';
+
+		// Prepare answers list
+		ans = [];
+		for (var i = 0; i < id_list.length; i++)
+			ans.push([id_list[i], answer_list[i]]);
+		ans.sort(function(a, b) { return a[0] - b[0]});
+
+		var html = "";
+		var idx = 0;
+		for (var i = 0; i < quizData.questions.length; i++) {
+			var v_x = "";
+			var f_x = "";
+			var info = ans[idx];
+
+			if (info !== undefined && info[0] == i + 1)
+			{
+				if (info[1] == 1) {
+					v_x = "X";
+					f_x = "";
+				} else {
+					v_x = "";
+					f_x = "X";
+				}
+				idx++;
+			}
+			html += sprintf(row, i + 1, quizData.questions[i].image, quizData.questions[i].text, v_x, f_x);
+		}
+		$("#examreview #answers > ul").html(html);
+	}
+
 	function terminateExam() {
 //		bTerminated = true;
 			
@@ -298,8 +363,13 @@
 			//
 			// stting up image area
 			//
-			var image = "https://quizplatform-editricetoni.rhcloud.com/img/" + quizData.questions[curIndex].image + ".jpg";
-			$("#imgarea").css("background-image","url('" + image + "')");
+			if (quizData.questions[curIndex].image != "")
+			{
+				var image = "/img/" + quizData.questions[curIndex].image + ".jpg";
+				$("#imgarea").css("background-image","url('" + image + "')");
+			}
+			else
+				$("#imgarea").css("background-image","none");
 			
 			//
 			// setting up true false
@@ -334,7 +404,7 @@
 
 <body>
 	<div id="work_area">
-		<div id="testarea" style="width:732px; height:550px; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
+		<div id="testarea" style="width:732px; height:550px; margin:auto; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
 			
 			<div id="logoutarea" style="position:absolute; top:20px; left:600px;">
 				<a id="btnlogout" href="#">Esci</a>				
@@ -444,6 +514,35 @@
 			<div id="nextbut" style="position:absolute; left:665px; top:502px; width:40px; height:37px; cursor:pointer">
 			</div>
 		</div>
+
+		<div id="examreview" style="display:none">
+			<div id="answers" class="list-wrap"><ul></ul></div>
+			<div class="row" style="margin-top:20px">
+				<div class="item"><a id="bttBackExam" class="btt">Ritorna alle domande</a></div>
+				<div class="item"><a id="bttEndExam" class="btt">Chiudi esame</a></div>
+			</div>
+			<div class="row" style="margin-top: 20px">
+				<div class="item"></div>
+				<div class="item">
+					<div id="examno" class="examinfo">
+						<span class="label">Scheda Esame N.</span>
+						<span class="val">12</span>
+					</div>
+				</div>
+				<div class="item"></div>
+			</div>
+			<div class="row">
+				<div class="item"></div>
+				<div class="item">
+					<div id="studentname" class="examinfo">
+						<span class="label">Cognome e nome</span>
+						<span class="val">--</span>
+					</div>
+				</div>
+				<div class="item"></div>
+			</div>
+		</div>  <!-- /examreview -->
+
 	</div>
 </body>
 
