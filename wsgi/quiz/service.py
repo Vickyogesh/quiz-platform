@@ -231,6 +231,8 @@ def delete_student(id, student):
 
 
 def _get_ids(data):
+    if 'best' not in data or 'worst' not in data:
+        return []
     return [x['id'] for x in data['best']] + [x['id'] for x in data['worst']]
 
 
