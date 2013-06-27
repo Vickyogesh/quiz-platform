@@ -262,15 +262,17 @@ def school_stat(id):
         + _get_ids(students['week']) \
         + _get_ids(students['week3'])
     lst = set(lst)
-    data = app.account.getSchoolStudents(school_id, lst)
-    lst = {}
-    for info in data['students']:
-        lst[info['id']] = info
-    _update_names(lst, students['current']['best'])
-    _update_names(lst, students['current']['worst'])
-    _update_names(lst, students['week']['best'])
-    _update_names(lst, students['week']['worst'])
-    _update_names(lst, students['week3']['best'])
-    _update_names(lst, students['week3']['worst'])
+
+    if lst:
+        data = app.account.getSchoolStudents(school_id, lst)
+        lst = {}
+        for info in data['students']:
+            lst[info['id']] = info
+        _update_names(lst, students['current']['best'])
+        _update_names(lst, students['current']['worst'])
+        _update_names(lst, students['week']['best'])
+        _update_names(lst, students['week']['worst'])
+        _update_names(lst, students['week3']['best'])
+        _update_names(lst, students['week3']['worst'])
 
     return JSONResponse(res)
