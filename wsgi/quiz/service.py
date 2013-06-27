@@ -59,7 +59,7 @@ def get_student_stat(user='me'):
     elif utype != 'school' and uid != stat['student']['id']:
         raise Forbidden('Forbidden.')
 
-    data = app.account.getStudent(user_id)
+    data = app.account.getStudent(user_id)['account']
     info = stat['student']
     info['name'] = data['name']
     info['surname'] = data['surname']
