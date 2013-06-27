@@ -1,7 +1,7 @@
 # common test parameters
 import hashlib
 import unittest
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 
 app_id = '32bfe1c505d4a2a042bafd53993f10ece3ccddca'
 user = 'testuser'
@@ -29,7 +29,6 @@ def cleanupdb_onSetup(engine, drop_users=False):
         conn.execute("TRUNCATE TABLE topic_err_current;")
         conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         if drop_users:
-            conn.execute("TRUNCATE TABLE schools;")
             conn.execute("TRUNCATE TABLE users;")
             conn.execute("TRUNCATE TABLE guest_access;")
 
@@ -46,7 +45,13 @@ def cleanupdb_onTearDown(engine):
         conn.execute("TRUNCATE TABLE topic_err_current;")
         conn.execute("TRUNCATE TABLE topic_err_snapshot;")
         conn.execute("TRUNCATE TABLE guest_access;")
-        conn.execute("call aux_create_test_users();")
+        conn.execute("TRUNCATE TABLE users;")
+        #conn.execute("DELETE FROM users WHERE school_id=1")
+        conn.execute("INSERT INTO users VALUES(1, 'guest', 1, UTC_TIMESTAMP(), -1)")
+        conn.execute("INSERT INTO users VALUES(2, 'guest', 2, UTC_TIMESTAMP(), -1)")
+        conn.execute("INSERT INTO users VALUES(3, 'student', 1, UTC_TIMESTAMP(), -1)")
+        conn.execute("INSERT INTO users VALUES(4, 'student', 1, UTC_TIMESTAMP(), -1)")
+
     engine.dispose()
 
 
@@ -75,6 +80,12 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
             surname='User',
             login='testuser',
             passwd=_pwd('testuser', 'testpasswd'),
+            school_id=1))
+        tst.acc_engine.execute(tst.acc_users.insert().values(
+            name='Test',
+            surname='User2',
+            login='testuser2',
+            passwd=_pwd('testuser2', 'testpasswd'),
             school_id=1))
 
 

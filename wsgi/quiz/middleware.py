@@ -1,6 +1,7 @@
 from werkzeug.urls import url_decode
 
 
+# NOTE: currently not used.
 # TODO: maybe analyse:
 #  HTTP_ACCESS_CONTROL_REQUEST_HEADERS content-type
 #  HTTP_ACCESS_CONTROL_REQUEST_METHOD GET

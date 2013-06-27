@@ -265,8 +265,8 @@ class CoreExamTest(unittest.TestCase):
 
         # Check student
         self.assertEqual(4, student['id'])
-        self.assertEqual('Test', student['name'])
-        self.assertEqual('User', student['surname'])
+        self.assertEqual('student', student['type'])
+        self.assertEqual(1, student['school_id'])
 
         # Check questions
         q1 = list(sorted([q['id'] for q in exam_questions]))
@@ -426,7 +426,7 @@ class CoreExamStatTest(unittest.TestCase):
 
     # Check: exam snapshot update.
     def test_snapshot(self):
-        # update current coef and cjeck snapshot
+        # update current coef and check snapshot
         sql = "UPDATE users SET progress_coef=0.23 WHERE id=4"
         self.engine.execute(sql)
 

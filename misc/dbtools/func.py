@@ -159,8 +159,9 @@ def users(mgr):
                 UPDATE guest_access SET num_requests = num_requests + 1
                 WHERE id=NEW.id;
             END IF;
-            UPDATE school_stat_cache SET last_activity=UTC_TIMESTAMP()
-            WHERE school_id=NEW.school_id;
+            INSERT INTO school_stat_cache (school_id, last_activity, stat_cache)
+            VALUES (NEW.school_id, UTC_TIMESTAMP(), "")
+            ON DUPLICATE KEY UPDATE last_activity=VALUES(last_activity);
         END;
         """))
 
@@ -183,30 +184,6 @@ def users(mgr):
 
 @add_me
 def schools(mgr):
-    # Delete all school's students and school stat.
-    mgr.conn.execute("DROP TRIGGER IF EXISTS on_school_before_del;")
-    mgr.conn.execute(text("""CREATE TRIGGER on_school_before_del
-        BEFORE DELETE ON schools FOR EACH ROW BEGIN
-            DELETE FROM users WHERE school_id=OLD.id;
-            DELETE FROM school_topic_err WHERE school_id=OLD.id;
-            DELETE FROM school_topic_err_snapshot WHERE school_id=OLD.id;
-            DELETE FROM school_stat_cache WHERE school_id=OLD.id;
-        END;
-        """))
-
-    # If school is added then we create school's guest user
-    # and also add entry to the school_stat_cache.
-    mgr.conn.execute("DROP TRIGGER IF EXISTS on_school_after_add;")
-    mgr.conn.execute(text("""CREATE TRIGGER on_school_after_add
-        AFTER INSERT ON schools FOR EACH ROW BEGIN
-            INSERT IGNORE INTO users
-            (name, surname, login, passwd, type, school_id) VALUES
-            (NEW.name, '', CONCAT(NEW.login, '-guest'),
-             MD5(CONCAT(NEW.login, '-guest:guest')), 'guest', NEW.id);
-            INSERT IGNORE INTO school_stat_cache(school_id) VALUES(NEW.id);
-        END;
-        """))
-
     # Stored procedure for update daily snapshot of the school
     # topics statistics. This procedure will be run daily by the update
     # script. See misc/dbupdate.py.

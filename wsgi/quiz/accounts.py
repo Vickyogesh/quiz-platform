@@ -46,13 +46,15 @@ class RequestProxy(object):
         self.server_url = server_url
         self.session_func = session_func
         if isinstance(session_func, dict):
+            self.is_dict = True
             self.call_save = False
         else:
+            self.is_dict = False
             self.call_save = call_save or hasattr(self._session, 'save')
 
     @property
     def _session(self):
-        return self.session_func()
+        return self.session_func if self.is_dict else self.session_func()
 
     # Construct accounts service URL.
     def _url(self, path):
@@ -242,8 +244,13 @@ class AccountApi(RequestProxy):
         self._check_response_status(response)
         return response.json()
 
-    def getSchoolStudents(self, school_id):
-        response = self.get('/schools/{0}/students'.format(school_id))
+    def getSchoolStudents(self, school_id, id_list=None):
+        if id_list is None:
+            url = '/schools/{0}/students'.format(school_id)
+        else:
+            ids = ','.join(str(x) for x in id_list)
+            url = '/schools/{0}/students?id={1}'.format(school_id, ids)
+        response = self.get(url)
         self._check_response_status(response)
         return response.json()
 

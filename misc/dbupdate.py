@@ -7,15 +7,19 @@ import logging
 from logging import StreamHandler
 from logging.handlers import RotatingFileHandler
 import time
+import traceback
 import os.path
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'wsgi'))
 from sqlalchemy import create_engine
 from quiz.settings import Settings
+#from quiz.accounts import AccountApi
 from dbtools import update
 
+settings = None
 
-def get_db_uri(path=None):
+
+def get_settings(path=None):
     if path is None:
         path = os.path.join(os.path.dirname(__file__),
                             '..',
@@ -25,13 +29,13 @@ def get_db_uri(path=None):
     else:
         paths = os.path.split(path)
 
+    global settings
     Settings.CONFIG_FILE = paths[1]
     settings = Settings([paths[0]])
-    return settings.dbinfo['database']
 
 
-def get_engine(path):
-    uri = get_db_uri(path)
+def get_engine():
+    uri = settings.dbinfo['database']
     engine = create_engine(uri)
     return engine
 
@@ -63,8 +67,17 @@ else:
 handler.setFormatter(fmt)
 logger.addHandler(handler)
 
-engine = get_engine(args.config)
-
+get_settings(args.config)
+# account = AccountApi(settings.main['accounts_url'])
+# try:
+#     login = settings.main['accounts_admin_login']
+#     passwd = settings.main['accounts_admin_passwd']
+#     account.login(login, passwd)
+# except:
+#     msg = traceback.format_exc()
+#     logger.critical(msg)
+# else:
+engine = get_engine()
 logger.info('Update started')
 start = time.time()
 update.process(engine, logger, args.clean)
@@ -72,3 +85,4 @@ end = time.time() - start
 logger.info('Update finished in %.3fs', end)
 
 engine.dispose()
+#account.logout()

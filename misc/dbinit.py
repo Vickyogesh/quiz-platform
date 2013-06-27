@@ -23,25 +23,19 @@ class Db(DbManager):
                            self.args.verbose,
                            self.args.new,
                            self.args.config)
-        self.put_users = self.args.test_users
 
     def parseArgs(self):
         parser = argparse.ArgumentParser(
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description='Quiz databse setup tool.', epilog='''
             Examples.
-            Setup database on a clean system with real users
-            and populate with data:
+            Setup database on a clean system and populate with data:
                     dbsetup.py -n -c config.ini
 
             Recreate tables and fill them with data:
                     dbsetup.py -c config.ini
 
-            Recreate tables and fill them with data and test users:
-                    dbsetup.py -t -c config.ini
-
-            NOTE: To recreate tables, fill them with data and
-            test users using default config just run: dbsetup.py
+            NOTE: To recreate tables, fill them with data just run: dbsetup.py
             ''')
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Verbose output.')
@@ -50,8 +44,6 @@ class Db(DbManager):
                             (default: ../test-data/config.ini).""")
         parser.add_argument('-n', '--new', action='store_true',
                             help='Create quiz database.')
-        parser.add_argument('-t', '--test-users', action='store_true',
-                            help='Initialize with test users instead of real.')
         parser.add_argument('-d', '--delimiter', default=',',
                             help="CSV delimiter (default: '%(default)s').")
         self.args = parser.parse_args()

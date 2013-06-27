@@ -48,15 +48,15 @@ def create_users(mgr):
     global sid
     print("Creating users...")
     engine = mgr.engine
-    engine.execute('DELETE FROM schools WHERE name="autoscuola"')
-    engine.execute("INSERT INTO schools VALUES(0, 'autoscuola', 'autoscuola', MD5(CONCAT('autoscuola', ':', 'autoscuola')));")
-    sid = engine.execute("SELECT id FROM schools WHERE login='autoscuola'").fetchone()[0]
-    for u in users:
-        u['sid'] = sid
 
-    sql = text("INSERT INTO users VALUES(0, :name, :sname, :login,  MD5(CONCAT(:login, ':', 'studente')), 'student', :sid, UTC_TIMESTAMP(), -1)")
-    for user in users:
-        engine.execute(sql, user)
+    sid = 1
+    # create guest student entry
+    engine.execute("DELETE FROM users WHERE school_id=1")
+    engine.execute("INSERT INTO users VALUES(1, 'guest', 1, UTC_TIMESTAMP(), -1)")
+
+    sql = text("INSERT INTO users VALUES(:id, 'student', 1, UTC_TIMESTAMP(), -1)")
+    for id in xrange(2, 5):
+        engine.execute(sql, id=id)
 
 
 def create_guestvisits(mgr):
@@ -71,7 +71,7 @@ def create_guestvisits(mgr):
             DECLARE d DATE DEFAULT NULL;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR select id from users where login="autoscuola-guest";
+            DECLARE cur CURSOR FOR select id from users where school_id=1;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             SET dt = DATE(UTC_TIMESTAMP());
@@ -190,13 +190,15 @@ def create_school_topic_err_snapshot(mgr):
             DECLARE d DATE DEFAULT NULL;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR SELECT id FROM schools where id = %d;
+            DECLARE cur CURSOR FOR SELECT {0};
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             PREPARE stmt FROM 'INSERT INTO school_topic_err_snapshot VALUES(?, ?, ?, ?)';
 
             SET dt = DATE(UTC_TIMESTAMP());
             OPEN cur;
+
+            DELETE FROM school_topic_err_snapshot WHERE school_id={0};
 
             START TRANSACTION;
             rloop: LOOP
@@ -227,7 +229,7 @@ def create_school_topic_err_snapshot(mgr):
 
             DEALLOCATE PREPARE stmt;
             CLOSE cur;
-        END;""" % sid)
+        END;""".format(sid))
     mgr.engine.execute("call tst()")
     mgr.engine.execute("DROP PROCEDURE IF EXISTS tst")
     print("Create uest visits ...done")

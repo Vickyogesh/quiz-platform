@@ -28,14 +28,6 @@ def create(mgr):
         );
 
 
-        CREATE TABLE schools(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-            name VARCHAR(100) NOT NULL,
-            login VARCHAR(100) NOT NULL,
-            passwd VARCHAR(100) NOT NULL,
-            CONSTRAINT PRIMARY KEY (id),
-            CONSTRAINT UNIQUE (login)
-        );
         CREATE TABLE school_topic_err(
             school_id INTEGER UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
@@ -76,11 +68,7 @@ def create(mgr):
 
 
         CREATE TABLE users(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-            name VARCHAR(100) NOT NULL,
-            surname VARCHAR(100) NOT NULL,
-            login VARCHAR(100) NOT NULL,
-            passwd VARCHAR(100) NOT NULL,
+            id INTEGER UNSIGNED NOT NULL,
             type ENUM('student', 'guest') NOT NULL,
             school_id INTEGER UNSIGNED NOT NULL,
             last_visit TIMESTAMP NOT NULL DEFAULT 0,
@@ -177,7 +165,6 @@ def create(mgr):
     mgr.meta.reflect(bind=mgr.engine)
     mgr.tbl_apps = mgr.meta.tables['applications']
     mgr.tbl_users = mgr.meta.tables['users']
-    mgr.tbl_schools = mgr.meta.tables['schools']
     mgr.tbl_chapters = mgr.meta.tables['chapters']
     mgr.tbl_topics = mgr.meta.tables['topics']
     mgr.tbl_questions = mgr.meta.tables['questions']
@@ -186,9 +173,6 @@ def create(mgr):
 def create_indices(mgr):
     print("Creating indices... applications")
     mgr.conn.execute('ALTER TABLE applications ADD UNIQUE ix_app(appkey);')
-
-    print("Creating indices... users")
-    mgr.conn.execute('ALTER TABLE users ADD UNIQUE ix_login(login);')
 
     print("Creating indices... topics")
     mgr.conn.execute('ALTER TABLE topics ADD INDEX ix_chid(chapter_id);')

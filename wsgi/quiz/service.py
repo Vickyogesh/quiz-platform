@@ -164,30 +164,17 @@ def get_topic_error(user, id):
     # School can access to exams of it's students only.
     if utype == 'school' and uid != info['student']['school_id']:
         raise Forbidden('Forbidden.')
-
     return JSONResponse(info)
 
 
 @app.get('/admin/schools', access=['admin'])
 def school_list():
     res = app.account.getSchools()
-    #res = app.core.getSchoolList()
     return JSONResponse(res)
 
 
 @app.post('/admin/newschool', access=['admin'])
 def add_school():
-    # data = app.request.json
-
-    # try:
-    #     name = data['name']
-    #     login = data['login']
-    #     passwd = data['passwd']
-    # except KeyError:
-    #     raise BadRequest('Missing parameter.')
-
-    # res = app.account.addSchool(name, login, passwd)
-    #res = app.core.createSchool(name, login, passwd)
     res = app.account.addSchool(raw=app.request.data)
     return JSONResponse(res)
 
@@ -203,7 +190,9 @@ def delete_school(id):
             raise BadRequest('Invalid request.')
 
     res = app.account.removeSchool(id)
-    #res = app.core.deleteSchool(id)
+
+    if res['status'] == 200:
+        res = app.core.deleteSchool(id)
     return JSONResponse(res)
 
 
@@ -213,39 +202,12 @@ def student_list(id):
     res = app.account.getSchoolStudents(school_id)
     return JSONResponse(res)
 
-    # if not app.isAdmin():
-    #     uid = app.session['user_id']
-    #     if uid != school_id:
-    #         raise Forbidden('Forbidden.')
-    # elif id == 'me':
-    #     raise Forbidden('Forbidden.')
-
-    # res = app.core.getStudentList(school_id)
-    # return JSONResponse(res)
-
 
 @app.post('/school/<uid:id>/newstudent', access=['school', 'admin'])
 def add_student(id):
     school_id = app.getUserId(id)
-    # data = app.request.json
-
-    # uid = app.session['user_id']
-    # if uid != school_id:
-    #     raise Forbidden('Forbidden.')
-
-    # try:
-    #     name = data['name']
-    #     surname = data['surname']
-    #     login = data['login']
-    #     passwd = data['passwd']
-    # except KeyError:
-    #     raise BadRequest('Missing parameter.')
-
-    # res = app.account.addStudent(name, surname, login, passwd, school_id)
     res = app.account.addStudent(school_id, raw=app.request.data)
     return JSONResponse(res)
-    # res = app.core.createStudent(name, surname, login, passwd, school_id)
-    # return JSONResponse(res)
 
 
 @app.post('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
@@ -260,13 +222,23 @@ def delete_student(id, student):
 
     id = app.getUserId(id)
     res = app.account.removeStudent(student)
-    return JSONResponse(res)
-    # uid = app.session['user_id']
-    # if uid != school_id:
-    #     raise Forbidden('Forbidden.')
 
-    # res = app.core.deleteStudent(school_id, student)
-    # return JSONResponse(res)
+    # Remove student from local DB if he was removed from accounts.
+    if res['status'] == 200:
+        app.core.deleteStudent(student)
+
+    return JSONResponse(res)
+
+
+def _get_ids(data):
+    return [x['id'] for x in data['best']] + [x['id'] for x in data['worst']]
+
+
+def _update_names(users, data):
+    for x in data:
+        user = users[x['id']]
+        x['name'] = user['name']
+        x['surname'] = user['surname']
 
 
 @app.get('/school/<uid:id>')
@@ -282,4 +254,23 @@ def school_stat(id):
 
     lang = app.getLang()
     res = app.core.getSchoolStat(school_id, lang)
+
+    # Since res doesn't contain user names then
+    # we need to get names from the account service and update result.
+    students = res['students']
+    lst = _get_ids(students['current']) \
+        + _get_ids(students['week']) \
+        + _get_ids(students['week3'])
+    lst = set(lst)
+    data = app.account.getSchoolStudents(school_id, lst)
+    lst = {}
+    for info in data['students']:
+        lst[info['id']] = info
+    _update_names(lst, students['current']['best'])
+    _update_names(lst, students['current']['worst'])
+    _update_names(lst, students['week']['best'])
+    _update_names(lst, students['week']['worst'])
+    _update_names(lst, students['week3']['best'])
+    _update_names(lst, students['week3']['worst'])
+
     return JSONResponse(res)

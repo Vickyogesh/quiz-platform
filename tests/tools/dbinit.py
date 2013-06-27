@@ -11,7 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'misc'))
 import argparse
 from sqlalchemy import text
 from dbtools import DbManager
-from dbtools.settings import TEST_SCHOOLS, TEST_USERS
 import fill
 import exampledata
 
@@ -250,36 +249,11 @@ class Db(DbManager):
                     self.conn.execute(sql, txt=txt, ans=1, ch=ch, topic=top)
                 top += 1
 
-    # see tests/core/test_admin.py
-    def createTestFunc(self):
-        sql = """CREATE PROCEDURE aux_create_test_users() BEGIN
-            TRUNCATE TABLE schools;
-            TRUNCATE TABLE users;
-            """
-
-        lst = []
-        for x in TEST_SCHOOLS:
-            lst.append("""INSERT INTO schools VALUES
-            (0, '{name}', '{login}',
-            '{passwd}');""".format(**x))
-        sql += '\n'.join(lst)
-
-        lst = []
-        for x in TEST_USERS:
-            lst.append("""INSERT INTO users(name, surname, login, passwd,
-            type, school_id) VALUES ('{name}', '{surname}', '{login}',
-            '{passwd}', '{type}', {school_id});""".format(**x))
-
-        sql += '\n'.join(lst) + ' END;'
-        self.conn.execute('DROP PROCEDURE IF EXISTS aux_create_test_users;')
-        self.conn.execute(sql)
-
     def fillData(self):
         if self.args.small:
             self.fillSmallData()
         else:
             self.fillBigData()
-        self.createTestFunc()
 
     def fillForPerformance(self):
         fill.do_fill(self)
