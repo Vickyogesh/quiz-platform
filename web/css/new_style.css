@@ -338,7 +338,7 @@ ul.nav li {
 
 /* statistics.html */
 
-.collapsable-list > li#exam {
+.collapsable-list > li#exam.iefix {
   background: #fff;
   behavior: none; /* IE fix. */
 }
