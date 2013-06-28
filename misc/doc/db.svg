@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -40,9 +40,9 @@
      inkscape:window-height="1018"
      id="namedview755"
      showgrid="false"
-     inkscape:zoom="0.68208776"
-     inkscape:cx="622.98047"
-     inkscape:cy="424.10736"
+     inkscape:zoom="1.3641755"
+     inkscape:cx="447.2184"
+     inkscape:cy="668.65283"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -245,7 +245,7 @@
        id="rect5712"
        style="fill:none;stroke:#000000;stroke-width:0.80000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <g
-       transform="translate(-9.3237861,-106.1447)"
+       transform="translate(-9.3237861,-114.35479)"
        id="g4500">
       <path
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#7f7f7f;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
@@ -383,7 +383,7 @@
       </g>
     </g>
     <g
-       transform="translate(-6.4898011,-106.1447)"
+       transform="translate(-6.4898011,-117.28696)"
        id="g4544">
       <path
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#7f7f7f;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
@@ -514,7 +514,7 @@
       </g>
     </g>
     <g
-       transform="translate(-24.064016,-106.1447)"
+       transform="translate(-23.477581,-110.83618)"
        id="g4470">
       <path
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#7f7f7f;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
@@ -706,79 +706,6 @@
            width="1117.9843"
            height="782.90076" />
       </g>
-    </g>
-    <g
-       transform="translate(-4.1050436,-106.1447)"
-       id="g4565">
-      <path
-         style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#7f7f7f;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-         d="m 39.347619,140.39316 c 0,-2.5039 2.027344,-4.53515 4.535156,-4.53515 l 67.464825,0 0,0 c 2.50391,0 4.53516,2.03125 4.53516,4.53515 l 0,4.53515 0,0 c 0,2.50391 -2.03125,4.53516 -4.53516,4.53516 l -67.464825,0 0,0 c -2.507812,0 -4.535156,-2.03125 -4.535156,-4.53516 l 0,-4.53515 z m 0,0"
-         id="path533"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:#97bdd9;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-         d="m 39.347616,140.39316 c 0,-2.5039 2.027344,-4.53515 4.535156,-4.53515 l 67.464828,0 0,0 c 2.50391,0 4.53516,2.03125 4.53516,4.53515 l 0,4.53516 0,0 c 0,2.5039 -2.03125,4.53515 -4.53516,4.53515 l -67.464828,0 0,0 c -2.507812,0 -4.535156,-2.03125 -4.535156,-4.53515 l 0,-4.53516 z m 0,0"
-         id="path535"
-         inkscape:connector-curvature="0" />
-      <g
-         style="fill:#000000;fill-opacity:1"
-         id="g539"
-         transform="translate(32.558654,16.209568)">
-        <use
-           xlink:href="#glyph0-3"
-           x="32.316406"
-           y="128.97656"
-           id="use541"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-10"
-           x="35.817638"
-           y="128.97656"
-           id="use543"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-13"
-           x="39.405235"
-           y="128.97656"
-           id="use545"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-12"
-           x="43.760181"
-           y="128.97656"
-           id="use547"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-12"
-           x="47.959"
-           y="128.97656"
-           id="use549"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-8"
-           x="52.157818"
-           y="128.97656"
-           id="use551"
-           width="1117.9843"
-           height="782.90076" />
-        <use
-           xlink:href="#glyph0-3"
-           x="54.210724"
-           y="128.97656"
-           id="use553"
-           width="1117.9843"
-           height="782.90076" />
-      </g>
-      <path
-         style="fill:none;stroke:#000000;stroke-width:0.56692898;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-         d="M 77.615188,142.66074"
-         id="path555"
-         inkscape:connector-curvature="0" />
     </g>
     <text
        sodipodi:linespacing="125%"

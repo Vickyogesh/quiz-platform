@@ -10,6 +10,7 @@ import json
 from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
 from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
+from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: school http requests: /school/<uid:id>/students,
@@ -20,7 +21,6 @@ class HttpSchoolTest(unittest.TestCase):
         self.req = requests.Session()
 
         r = self.req.get(url('/authorize'))
-
         nonce = r.json()['nonce']
         auth = json.dumps(createAuthFor('school', nonce))
         self.headers = {'content-type': 'application/json'}
@@ -31,9 +31,11 @@ class HttpSchoolTest(unittest.TestCase):
 
         self.engine = create_engine(db_uri, echo=False)
         cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self)
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
+        cleanupdb_onTearDownAccDb(self)
 
     # Check: get list of students.
     def test_studentList(self):
@@ -41,13 +43,13 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         students = data['students']
-        self.assertEqual(3, len(students))
+        self.assertEqual(2, len(students))
 
         r = self.req.get(url('/school/1/students'))
         self.assertEqual(200, r.status_code)
         data = r.json()
         students = data['students']
-        self.assertEqual(3, len(students))
+        self.assertEqual(2, len(students))
 
     # Check: create student with bad params.
     def test_newStudentBad(self):
@@ -63,7 +65,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
-        self.assertEqual('Missing parameter.', data['description'])
+        self.assertEqual('Invalid parameters.', data['description'])
 
         ### Check: missing params
 
@@ -72,21 +74,21 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
-        self.assertEqual('Missing parameter.', data['description'])
+        self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': '2', 'login': '22'})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
-        self.assertEqual('Missing parameter.', data['description'])
+        self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': '2', 'login': '22', 'surname': ''})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
-        self.assertEqual('Missing parameter.', data['description'])
+        self.assertEqual('Invalid parameters.', data['description'])
 
         ### Check: Wrong values
 
@@ -116,7 +118,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(200, data['status'])
-        self.assertEqual(5, data['id'])
+        self.assertEqual(4, data['id'])
 
     # Check: create duplicate student
     def test_newStudentDuplicate(self):
@@ -130,7 +132,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(200, data['status'])
-        self.assertEqual(5, data['id'])
+        self.assertEqual(4, data['id'])
 
         r = self.req.post(url('/school/me/newstudent'), data=student, headers=self.headers)
         self.assertEqual(200, r.status_code)
@@ -154,26 +156,29 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid request.', data['description'])
 
+        # This will not work due to different accounts api
+        # accounts API is DELETE /student/<id> and there is no school_id.
         # Check: delete non-existent school
-        r = self.req.post(url('/school/100/student/1?action=delete'))
-        self.assertEqual(200, r.status_code)
-        data = r.json()
-        self.assertEqual(403, data['status'])
-        self.assertEqual('Forbidden.', data['description'])
+        # r = self.req.post(url('/school/100/student/1?action=delete'))
+        # self.assertEqual(200, r.status_code)
+        # data = r.json()
+        # self.assertEqual(400, data['status'])
+        # self.assertEqual('Unknown student.', data['description'])
 
         # Check: delete non-existent school with HTTP DELETE
-        r = self.req.delete(url('/school/100/student/1'))
-        self.assertEqual(200, r.status_code)
-        data = r.json()
-        self.assertEqual(403, data['status'])
-        self.assertEqual('Forbidden.', data['description'])
+        # r = self.req.delete(url('/school/100/student/1'))
+        # self.assertEqual(200, r.status_code)
+        # data = r.json()
+        # self.assertEqual(400, data['status'])
+        # self.assertEqual('Unknown student.', data['description'])
 
+        # TODO: check me!
         # Check: delete student from another school
         r = self.req.delete(url('/school/me/student/2'))
         self.assertEqual(200, r.status_code)
         data = r.json()
-        self.assertEqual(400, data['status'])
-        self.assertEqual('Unknown student.', data['description'])
+        self.assertEqual(403, data['status'])
+        self.assertEqual('Forbidden.', data['description'])
 
     # Check: delete student via POST requests
     def test_delStudentPost(self):

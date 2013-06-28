@@ -11,6 +11,7 @@ from quiz.core.core import QuizCore
 
 
 # TODO: implement me.
+@unittest.skip('not implemented')
 class CoreStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}

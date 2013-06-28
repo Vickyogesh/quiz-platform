@@ -90,6 +90,10 @@
               }
             }
 
+            // Make line [0, 40] invisible.
+            // We do so because in IE it shows with black color.
+            echart.lines[2].attr("opacity", 0);
+
             // Update x-axis texts
             var xText = echart.axis[0].text.items;  
             for(i in xText){
@@ -464,7 +468,7 @@
 	        </div>  <!-- /Navigation -->
 
 	        <ul id="week" class="collapsable-list">
-	        	<li id="exam">
+	        	<li id="exam" class="iefix">
 		            <div id="wexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
@@ -473,7 +477,7 @@
 				</li>
 	        </ul>
 	        <ul id="month" class="collapsable-list">
-	        	<li id="exam">
+	        	<li id="exam" class="iefix">
 		            <div id="mexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">
@@ -482,7 +486,7 @@
 				</li>
 	        </ul>
 	        <ul id="all" class="collapsable-list">
-	        	<li id="exam">
+	        	<li id="exam" class="iefix">
 		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
 	        	</li>
 				<li id="topic">

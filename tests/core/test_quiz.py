@@ -26,19 +26,6 @@ class CoreQuizTest(unittest.TestCase):
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
 
-    # TODO: move to separate test
-    def test_getInfo(self):
-        name = 'testuser'
-        appkey = 'b929d0c46cf5609e0104e50d301b0b8b482e9bfc'
-
-        appid = self.core.getAppId(appkey)
-        user = self.core.getUserInfo(name, with_passwd=True)
-
-        self.assertEqual('aa4a5443cb91ee1810785314651e5dd1', user['passwd'])
-        self.assertEqual(4, user['id'])
-        self.assertEqual(3, appid)
-        self.assertEqual('student', user['type'])
-
     # Generate quiz for the user with ID 1 and topic ID 1,
     # questions text must be 'italian', number of questions must be 40.
     def test_get(self):

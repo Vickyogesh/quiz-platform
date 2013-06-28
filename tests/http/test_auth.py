@@ -7,13 +7,19 @@ import requests
 import unittest
 import json
 from tests_common import url, createAuthData, createAuthFor
+from tests_common import _pwd, cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: authorization http requests: /authorize;
+#@unittest.skip("Need to review http errors")
 class HttpAuthTest(unittest.TestCase):
     def setUp(self):
         self.req = requests.Session()
         self.headers = {'content-type': 'application/json'}
+        cleanupdb_onSetupAccDb(self, drop_users=True, add_users=True)
+
+    def tearDown(self):
+        cleanupdb_onTearDownAccDb(self)
 
     def test_getAuth(self):
         r = requests.get(url('/authorize'))
@@ -63,16 +69,16 @@ class HttpAuthTest(unittest.TestCase):
         r = requests.post(url('/authorize'), headers=self.headers, data=data)
         data = r.json()
         self.assertEqual(200, r.status_code)
-        self.assertEqual(400, data['status'])
-        self.assertEqual('Authorization is invalid.', data['description'])
+        self.assertEqual(401, data['status'])
+        self.assertEqual('Unauthorized.', data['description'])
 
         # Wrong login
         data = json.dumps(createAuthData(12, appkey=[1, 2]))
         r = requests.post(url('/authorize'), headers=self.headers, data=data)
         data = r.json()
         self.assertEqual(200, r.status_code)
-        self.assertEqual(400, data['status'])
-        self.assertEqual('Authorization is invalid.', data['description'])
+        self.assertEqual(401, data['status'])
+        self.assertEqual('Unauthorized.', data['description'])
 
         # Wrong digest
         data = createAuthData(12)
@@ -81,13 +87,18 @@ class HttpAuthTest(unittest.TestCase):
         r = requests.post(url('/authorize'), headers=self.headers, data=data)
         data = r.json()
         self.assertEqual(200, r.status_code)
-        self.assertEqual(400, data['status'])
-        self.assertEqual('Authorization is invalid.', data['description'])
+        self.assertEqual(401, data['status'])
+        self.assertEqual('Unauthorized.', data['description'])
 
     # See previuos note
     def test_ok(self):
-        data = json.dumps(createAuthFor('student'))
-        r = requests.post(url('/authorize'), headers=self.headers, data=data)
+        r = self.req.get(url('/authorize'))
+        nonce = r.json()['nonce']
+        auth = json.dumps(createAuthFor('student', nonce))
+        self.headers = {'content-type': 'application/json'}
+        r = self.req.post(url('/authorize'), data=auth, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, data['status'])
@@ -103,27 +114,55 @@ class HttpAuthTest(unittest.TestCase):
     ### Check various types of users
 
     def test_authAdmin(self):
-        data = json.dumps(createAuthFor('admin'))
-        r = requests.post(url('/authorize'), headers=self.headers, data=data)
-        user = r.json()['user']
-        self.assertEqual('admin', user['name'])
+        r = self.req.get(url('/authorize'))
+        nonce = r.json()['nonce']
+        auth = json.dumps(createAuthFor('admin', nonce))
+        self.headers = {'content-type': 'application/json'}
+        r = self.req.post(url('/authorize'), data=auth, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
+        user = data['user']
         self.assertEqual('admin', user['type'])
-        self.assertEqual(0, user['id'])
+        self.assertEqual('-1', user['id'])
+        self.assertNotIn('name', user)
         self.assertNotIn('surname', user)
 
     def test_authSchool(self):
-        data = json.dumps(createAuthFor('school'))
-        r = requests.post(url('/authorize'), headers=self.headers, data=data)
-        user = r.json()['user']
+        r = self.req.get(url('/authorize'))
+        nonce = r.json()['nonce']
+        auth = json.dumps(createAuthFor('school', nonce))
+        self.headers = {'content-type': 'application/json'}
+        r = self.req.post(url('/authorize'), data=auth, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+
+        # r = self.req.get(url('/authorize'))
+        # nonce = r.json()['nonce']
+        # data = json.dumps(createAuthFor('school', nonce))
+        # r = requests.post(url('/authorize'), headers=self.headers, data=data)
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
+        user = data['user']
         self.assertEqual('Chuck Norris School', user['name'])
         self.assertEqual('school', user['type'])
         self.assertIn('id', user)
         self.assertNotIn('surname', user)
 
     def test_authGuest(self):
-        data = json.dumps(createAuthFor('guest'))
-        r = requests.post(url('/authorize'), headers=self.headers, data=data)
-        user = r.json()['user']
+        r = self.req.get(url('/authorize'))
+        nonce = r.json()['nonce']
+        auth = json.dumps(createAuthFor('guest', nonce))
+        self.headers = {'content-type': 'application/json'}
+        r = self.req.post(url('/authorize'), data=auth, headers=self.headers)
+        self.assertEqual(200, r.status_code)
+
+        data = r.json()
+        self.assertEqual(200, data['status'])
+
+        user = data['user']
         self.assertEqual('Chuck Norris School', user['name'])
         self.assertEqual('', user['surname'])
         self.assertEqual('guest', user['type'])

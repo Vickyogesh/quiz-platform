@@ -103,6 +103,8 @@ def get_guest_stat(school):
     # Find school's guest ID.
     res = engine.execute(text("""SELECT id FROM users WHERE
         school_id=:id AND type='guest'"""), id=school).fetchone()
+    if res is None:
+        return
     guest_id = res[0]
 
     # Get visit statistics
@@ -124,25 +126,21 @@ def get_guest_stat(school):
 
 def get_current_student_rating(users_str):
     """Return list of best and worst students."""
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
+    res = engine.execute("""SELECT id, progress_coef FROM
         users WHERE id IN (%s) GROUP BY id ORDER by progress_coef DESC limit 3;
     """ % users_str)
     best = [{
         'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+        'coef': row[1]
+    } for row in res if row[1] != -1]
 
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
+    res = engine.execute("""SELECT id, progress_coef FROM
         users WHERE id IN (%s) GROUP BY id ORDER by progress_coef limit 3;
     """ % users_str)
     worst = [{
         'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': row[3]
-    } for row in res if row[3] != -1]
+        'coef': row[1]
+    } for row in res if row[1] != -1]
 
     return {'best': best, 'worst': worst}
 
@@ -156,14 +154,10 @@ def get_users_info(res):
     if not data:
         return []
     users = ','.join(users)
-    res = engine.execute("""SELECT id, name, surname, progress_coef FROM
+    res = engine.execute("""SELECT id, progress_coef FROM
         users WHERE id IN (%s) ORDER by progress_coef""" % users)
-    d = [{
-        'id': row[0],
-        'name': row[1],
-        'surname': row[2],
-        'coef': data[row[0]]
-    } for row in res if data[row[0]] != -1]
+    d = [{'id': row[0], 'coef': data[row[0]]}
+         for row in res if data[row[0]] != -1]
     return d
 
 

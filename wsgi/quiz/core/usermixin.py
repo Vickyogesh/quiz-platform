@@ -6,28 +6,10 @@ from .exceptions import QuizCoreError
 class UserMixin(object):
     """Mixin for working with user information. Used in QuizCore."""
     def __init__(self):
-        apps = self.apps
-        users = self.users
-
         self.__appid = self.sql("""SELECT id FROM applications
                                 WHERE appkey=:appkey""")
 
-        self.__school = self.sql("SELECT * FROM schools WHERE login=:login")
-
-        self.__user_by_login = self.sql("SELECT * FROM users WHERE login=:login")
-
         self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id")
-
-        self.__stmt = self.sql(select(
-            [users.c.id, users.c.name, users.c.surname,
-             users.c.passwd, users.c.type, apps.c.id],
-            and_(users.c.login == bindparam('login'),
-                 apps.c.appkey == bindparam('appkey')),
-            use_labels=True))
-
-        self.__getname = self.sql(select(
-            [users.c.name, users.c.surname, users.c.type],
-            users.c.id == bindparam('id')))
 
         self.__topicstat = self.sql("""SELECT
             t.id, t.text, t.text_fr, t.text_de,
@@ -68,11 +50,14 @@ class UserMixin(object):
             AND id IN (SELECT question_id FROM answers WHERE
             user_id=:user_id AND is_correct=0)) t;""")
 
-        self.__lastvisit = self.sql("""UPDATE
-            users SET last_visit=UTC_TIMESTAMP() WHERE id=:user_id""")
+        self.__lastvisit = self.sql("""INSERT
+            INTO users (id, type, school_id, last_visit)
+            VALUES(:user_id, :type, :school_id, UTC_TIMESTAMP())
+            ON DUPLICATE KEY UPDATE last_visit=VALUES(last_visit)""")
 
-    def updateUserLastVisit(self, user_id):
-        self.engine.execute(self.__lastvisit, user_id=user_id)
+    def updateUserLastVisit(self, user_id, type, school_id):
+        self.engine.execute(self.__lastvisit, user_id=user_id,
+                            type=type, school_id=school_id)
 
     def getAppId(self, appkey):
         try:
@@ -83,66 +68,14 @@ class UserMixin(object):
             raise QuizCoreError('Unknown application ID.')
         return row[0]
 
-    def _getSchoolByLogin(self, login, with_passwd=False):
-        try:
-            row = self.__school.execute(login=login).fetchone()
-        except SQLAlchemyError:
-            row = None
-        if row is None:
-            raise QuizCoreError('Unknown school.')
-        d = {'id': row[0], 'name': row[1], 'login': row[2], 'type': 'school'}
-        if with_passwd:
-            d['passwd'] = row[3]
-        return d
-
-    def __studentFromRow(self, row, with_passwd):
-        d = {'id': row[0], 'name': row[1], 'surname': row[2],
-             'login': row[3], 'type': row[5], 'school_id': row[6]}
-        if with_passwd:
-            d['passwd'] = row[4]
-        return d
-
-    def _getStudentById(self, user_id, with_passwd=False):
+    def _getStudentById(self, user_id):
         try:
             row = self.__user_by_id.execute(id=user_id).fetchone()
         except SQLAlchemyError:
             row = None
         if row is None:
             raise QuizCoreError('Unknown student.')
-        return self.__studentFromRow(row, with_passwd)
-
-    def _getStudentByLogin(self, login, with_passwd=False):
-        try:
-            row = self.__user_by_login.execute(login=login).fetchone()
-        except SQLAlchemyError:
-            row = None
-        if row is None:
-            raise QuizCoreError('Unknown student.')
-        return self.__studentFromRow(row, with_passwd)
-
-    def getUserInfo(self, login, with_passwd=False):
-        if login == 'admin':
-            d = {
-                'id': 0,
-                'name': 'admin',
-                'login': 'admin',
-                'type': 'admin',
-            }
-            if with_passwd:
-                d['passwd'] = self.admin_passwd
-            return d
-
-        info = None
-        try:
-            info = self._getStudentByLogin(login, with_passwd)
-        except QuizCoreError:
-            try:
-                info = self._getSchoolByLogin(login, with_passwd)
-            except QuizCoreError:
-                pass
-        if info is None:
-            raise QuizCoreError('Unknown user.')
-        return info
+        return {'id': row[0], 'type': row[1], 'school_id': row[2]}
 
     def _normErr(self, err):
         if err is None:

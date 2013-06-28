@@ -10,6 +10,7 @@ import json
 from sqlalchemy import create_engine
 from tests_common import db_uri, url, createAuthFor
 from tests_common import cleanupdb_onSetup, cleanupdb_onTearDown
+from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: statistics http requests: /student, /student/<id>,
@@ -31,9 +32,11 @@ class HttpStudentStatTest(unittest.TestCase):
 
         self.engine = create_engine(db_uri, echo=False)
         cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self, drop_users=True)
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
+        cleanupdb_onTearDownAccDb(self)
 
     # Check: request student stat.
     def test_student(self):
@@ -43,7 +46,7 @@ class HttpStudentStatTest(unittest.TestCase):
         self.assertIn('student', data)
         self.assertIn('exams', data)
         self.assertIn('topics', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
         r = self.req.get(url('/student/me'))
         self.assertEqual(200, r.status_code)
@@ -51,15 +54,15 @@ class HttpStudentStatTest(unittest.TestCase):
         self.assertIn('student', data)
         self.assertIn('exams', data)
         self.assertIn('topics', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
-        r = self.req.get(url('/student/4'))
+        r = self.req.get(url('/student/3'))
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertIn('student', data)
         self.assertIn('exams', data)
         self.assertIn('topics', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
     def test_studentExams(self):
         r = self.req.get(url('/student/me/exam'))
@@ -67,14 +70,14 @@ class HttpStudentStatTest(unittest.TestCase):
         data = r.json()
         self.assertIn('student', data)
         self.assertIn('exams', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
-        r = self.req.get(url('/student/4/exam'))
+        r = self.req.get(url('/student/3/exam'))
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertIn('student', data)
         self.assertIn('exams', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
     def test_studentTopicErroros(self):
         r = self.req.get(url('/student/me/topicerrors/1'))
@@ -82,14 +85,14 @@ class HttpStudentStatTest(unittest.TestCase):
         data = r.json()
         self.assertIn('student', data)
         self.assertIn('questions', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
-        r = self.req.get(url('/student/4/topicerrors/4'))
+        r = self.req.get(url('/student/3/topicerrors/4'))
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertIn('student', data)
         self.assertIn('questions', data)
-        self.assertEqual(4, data['student']['id'])
+        self.assertEqual(3, data['student']['id'])
 
 
 def suite():

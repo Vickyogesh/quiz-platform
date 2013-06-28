@@ -12,40 +12,32 @@ import hashlib
 import time
 
 from werkzeug.utils import cached_property
-from werkzeug.exceptions import HTTPException, BadRequest, Unauthorized, Forbidden
+from werkzeug.exceptions import HTTPException, BadRequest, Forbidden
 from werkzeug.routing import Map, Rule, BaseConverter
 from werkzeug.wrappers import Request, Response
 from beaker.middleware import SessionMiddleware
 
-from .middleware import QuizMiddleware
+# NOTE: currently not used.
+#from .middleware import QuizMiddleware
 from .settings import Settings
 from .core.core import QuizCore
 from .core.exceptions import QuizCoreError
-
-
-def _check_digest(nonce, digest, passwd):
-    m = hashlib.md5()
-    m.update('%s:%s' % (nonce, passwd))
-    mx = m.hexdigest()
-    return mx == digest
+from .accounts import AccountApi
 
 
 class QuizWWWAuthenticate(object):
     """"Provides simple WWW-Authenticate header for the Quiz service."""
-    def __init__(self):
+    def __init__(self, nonce):
         self.random = random.random()
         self.time = time.time()
+        self.nonce = nonce
 
     def to_header(self):
         """Convert the stored values into a WWW-Authenticate header."""
-        m = hashlib.md5()
-        m.update('{0}:{1}'.format(self.random, self.time))
-        return 'QuizAuth nonce="%s"' % m.hexdigest()
+        return 'QuizAuth nonce="%s"' % self.nonce
 
     def to_dict(self):
-        m = hashlib.md5()
-        m.update('{0}:{1}'.format(self.random, self.time))
-        return {'nonce': m.hexdigest()}
+        return {'nonce': self.nonce}
 
 
 class IdConverter(BaseConverter):
@@ -123,14 +115,21 @@ class QuizApp(object):
         * 'guest' access control.
     """
     def __init__(self):
+        self.session = None
         self.settings = self.__getSettings()
         self.core = QuizCore(self.settings)
         self.urls = Map(converters={'uid': IdConverter})
         self.endpoints = {}
-
+        self.__setup_accounts_api()
         # Default handlers for authorization.
         self.addRule('/authorize', self.onNewAuth, methods=['GET'])
         self.addRule('/authorize', self.onDoAuth, methods=['POST'])
+
+    def __setup_accounts_api(self):
+        def session_func():
+            return self.session
+        acc_url = self.settings.main['accounts_url']
+        self.account = AccountApi(acc_url, session_func)
 
     # Read application settings.
     # There may be two sources:
@@ -158,13 +157,14 @@ class QuizApp(object):
         response = self.__handleErrorsAsJSON(self.request)
         self.request = None  # TODO: do we really need this?
 
+        # NOTE: disabled, seems we don't need it anymore.
         # Add extra headers for the CORS support.
         # See middleware.py for more info.
-        try:
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            response.headers.add('Access-Control-Allow-Credentials', 'true')
-        except:
-            pass
+        # try:
+        #     response.headers.add('Access-Control-Allow-Origin', '*')
+        #     response.headers.add('Access-Control-Allow-Credentials', 'true')
+        # except:
+        #     pass
         return response(environ, start_response)
 
     # Catch runtime errors and convert them to JSON.
@@ -227,7 +227,7 @@ class QuizApp(object):
         try:
             user_type = self.session['user_type']
         except Exception:
-            raise Unauthorized('Unauthorized.')
+            raise Forbidden('Forbidden.')
         can = '*' in access or user_type in access
         return can
 
@@ -239,13 +239,15 @@ class QuizApp(object):
         # guest access and last visit time saving.
         if access:
             utype = self.session['user_type']
-            uid = self.session['user_id']
-            if utype == 'guest':
-                if not self.core.processGuestAccess(uid):
-                    raise Forbidden('Forbidden.')
             if utype == 'student' or utype == 'guest':
-                self.core.updateUserLastVisit(uid)
+                user = self.session['user']
+                uid = user['id']
+                sid = user['school_id']
+                self.core.updateUserLastVisit(uid, utype, sid)
 
+                if utype == 'guest':
+                    if not self.core.processGuestAccess(uid):
+                        raise Forbidden('Forbidden.')
         return handler(**args)
 
     def addRule(self, rule, func, endpoint=None, **opts):
@@ -325,7 +327,8 @@ class QuizApp(object):
         """Add sessions and CORS requests support to the app."""
         settings = app.settings
         app = SessionMiddleware(app, settings.session)
-        app = QuizMiddleware(app, settings.session['session.key'])
+        # NOTE: currently not used.
+        #app = QuizMiddleware(app, settings.session['session.key'])
         return app
 
     def isAdmin(self):
@@ -358,7 +361,9 @@ class QuizApp(object):
 
         :seealso: :class:`QuizWWWAuthenticate`.
         """
-        return JSONResponse(QuizWWWAuthenticate().to_dict(), status=401)
+        data = self.account.get_auth()
+        return JSONResponse(QuizWWWAuthenticate(data['nonce']).to_dict(),
+                            status=401)
 
     def onDoAuth(self):
         """Handle authorization."""
@@ -371,22 +376,19 @@ class QuizApp(object):
         except KeyError:
             raise BadRequest('Invalid parameters.')
 
+        user = self.account.send_auth(login, digest, nonce)
+
         try:
             appid = self.core.getAppId(appkey)
-            user = self.core.getUserInfo(login, with_passwd=True)
+            #user = self.core.getUserInfo(login, with_passwd=True)
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        if not _check_digest(nonce, digest, user['passwd']):
-            raise BadRequest('Authorization is invalid.')
-
-        self.session['app_id'] = appid
+        self.session['user'] = user
         self.session['user_id'] = user['id']
-        self.session['user_name'] = user['name']
-        self.session['user_login'] = user['login']
         self.session['user_type'] = user['type']
+        self.session['app_id'] = appid
         self.session.save()
-        del user['login']
 
         # NOTE: we you want to use 'beaker.session.secret' then use:
         # sid = self.session.__dict__['_headers']['cookie_out']

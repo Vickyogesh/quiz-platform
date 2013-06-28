@@ -36,3 +36,4 @@ How to push local branch to remote (upstream) master
 Example:
 
     git push test feature/name:master
+    git push origin feature/name:master
