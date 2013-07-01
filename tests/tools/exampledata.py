@@ -52,9 +52,9 @@ def create_users(mgr):
     sid = 1
     # create guest student entry
     engine.execute("DELETE FROM users WHERE school_id=1")
-    engine.execute("INSERT INTO users VALUES(1, 'guest', 1, UTC_TIMESTAMP(), -1)")
+    engine.execute("INSERT INTO users VALUES(1, 'guest', 1, 1, UTC_TIMESTAMP(), -1)")
 
-    sql = text("INSERT INTO users VALUES(:id, 'student', 1, UTC_TIMESTAMP(), -1)")
+    sql = text("INSERT INTO users VALUES(:id, 'student', 1, 1, UTC_TIMESTAMP(), -1)")
     for id in xrange(2, 5):
         engine.execute(sql, id=id)
 
@@ -71,7 +71,7 @@ def create_guestvisits(mgr):
             DECLARE d DATE DEFAULT NULL;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR select id from users where school_id=1;
+            DECLARE cur CURSOR FOR select id from users where school_id=1 and quiz_type=1;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             SET dt = DATE(UTC_TIMESTAMP());
@@ -87,7 +87,7 @@ def create_guestvisits(mgr):
                 SET d = dt;
                 WHILE (day <= numdays) DO
                     INSERT IGNORE INTO guest_access_snapshot
-                    VALUES(i, d, FLOOR(20 + (RAND() * 80)));
+                    VALUES(i, 1, d, FLOOR(20 + (RAND() * 80)));
 
                     SET day = day + 1;
                     SET d = d - interval 1 day;
@@ -106,11 +106,11 @@ def create_guestvisits(mgr):
 def create_exams(mgr):
     print("Create exams ...")
     core = QuizCore(mgr.settings)
-    res = mgr.engine.execute("SELECT id FROM users WHERE type='student' and school_id=%d" % sid)
+    res = mgr.engine.execute("SELECT id FROM users WHERE type='student' and school_id=%d and quiz_type=1" % sid)
     for row in res:
         id = row[0]
         for z in xrange(4):
-            info = core.createExam(id, 'it')
+            info = core.createExam(1, id, 'it')
             answers = [random.randint(0, 1) for row in info['questions']]
             eid = info['exam']['id']
             q = [x['id'] for x in info['questions']]
@@ -119,10 +119,10 @@ def create_exams(mgr):
     print("Create quiz results ...")
     for topic in xrange(1, 8):
         for x in xrange(4):
-            info = core.getQuiz(id, topic, 'it')
+            info = core.getQuiz(1, id, topic, 'it')
             q = [x['id'] for x in info['questions']]
             answers = [random.randint(0, 1) for row in info['questions']]
-            core.saveQuiz(id, topic, q, answers)
+            core.saveQuiz(1, id, topic, q, answers)
     core = None
 
 
@@ -138,10 +138,10 @@ def create_user_progress(mgr):
             DECLARE d DATE DEFAULT NULL;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR SELECT id FROM users WHERE type='student' and school_id=%d;
+            DECLARE cur CURSOR FOR SELECT id FROM users WHERE type='student' and school_id=%d and quiz_type=1;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-            PREPARE stmt FROM 'INSERT IGNORE INTO user_progress_snapshot VALUES(?, ?, ?)';
+            PREPARE stmt FROM 'INSERT IGNORE INTO user_progress_snapshot VALUES(?, 1, ?, ?)';
 
             SET dt = DATE(UTC_TIMESTAMP());
             OPEN cur;
@@ -193,12 +193,12 @@ def create_school_topic_err_snapshot(mgr):
             DECLARE cur CURSOR FOR SELECT {0};
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-            PREPARE stmt FROM 'INSERT INTO school_topic_err_snapshot VALUES(?, ?, ?, ?)';
+            PREPARE stmt FROM 'INSERT INTO school_topic_err_snapshot VALUES(?, 1, ?, ?, ?)';
 
             SET dt = DATE(UTC_TIMESTAMP());
             OPEN cur;
 
-            DELETE FROM school_topic_err_snapshot WHERE school_id={0};
+            DELETE FROM school_topic_err_snapshot WHERE school_id={0} and quiz_type=1;
 
             START TRANSACTION;
             rloop: LOOP
@@ -250,11 +250,11 @@ def create_topics_snapshots(mgr):
             DECLARE err FLOAT DEFAULT 0;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR SELECT id FROM users WHERE type='student' and school_id=%d;
+            DECLARE cur CURSOR FOR SELECT id FROM users WHERE type='student' and school_id=%d and quiz_type=1;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-            PREPARE stmt FROM 'INSERT IGNORE INTO topic_err_snapshot VALUES(?, ?, ?, ?)';
-            PREPARE stmt1 FROM 'INSERT IGNORE INTO topic_err_current VALUES(?, ?, ?, ?)';
+            PREPARE stmt FROM 'INSERT IGNORE INTO topic_err_snapshot VALUES(?, 1, ?, ?, ?)';
+            PREPARE stmt1 FROM 'INSERT IGNORE INTO topic_err_current VALUES(?, 1, ?, ?, ?)';
 
             SET dt = DATE(UTC_TIMESTAMP());
             OPEN cur;
