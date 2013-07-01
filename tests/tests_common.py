@@ -98,6 +98,7 @@ def cleanupdb_onTearDownAccDb(tst):
     tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
     tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
     tst.acc_engine.execute(tst.acc_schools.insert().values(
+        access_quiz_b=date(2050, 01, 01),
         name='Chuck Norris School',
         login='chuck@norris.com',
         passwd=_pwd('chuck@norris.com', 'boo')))

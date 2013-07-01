@@ -139,7 +139,7 @@ def get_student_exams(user):
 
     if utype == 'school' and user == 'me':
         raise Forbidden('Forbidden.')
-    elif uid != user_id:
+    elif utype != 'school' and uid != user_id:
         raise Forbidden('Forbidden.')
 
     exams = app.core.getExamList(app.quiz_type, user_id)
@@ -160,7 +160,7 @@ def get_topic_error(user, id):
     # Students can access only to their own data.
     utype = app.session['user_type']
     uid = app.session['user_id']
-    if uid != user_id:
+    if utype != 'school' and uid != user_id:
         raise Forbidden('Forbidden.')
 
     info = app.core.getTopicErrors(app.quiz_type, user_id, id, lang)

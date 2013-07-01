@@ -38,6 +38,7 @@ function onAuth(butObj)
       nonce: nonce,
       login: login,
       appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+      'quiz_type': 'quiz_b',
       digest: hex_md5(nonce + ':' + digest)
     };
 
