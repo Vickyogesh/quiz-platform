@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.exc import IntegrityError
 from .exceptions import QuizCoreError
 
@@ -15,9 +15,10 @@ class QuizMixin(object):
         # See getQuiz() comments for more info.
 
         self.__getquiz = self.sql(
-            """SELECT * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
+            """SELECT * FROM (SELECT * FROM questions q WHERE
+            quiz_type=:quiz_type AND topic_id=:topic_id
             AND id NOT IN (SELECT question_id FROM quiz_answers WHERE
-            user_id=:user_id) LIMIT 100) t
+            user_id=:user_id AND quiz_type=q.quiz_type) LIMIT 100) t
             ORDER BY RAND() LIMIT 40;""")
 
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
@@ -60,8 +61,9 @@ class QuizMixin(object):
     #
     # NOTE: if quiz answers will not be returned then current questions
     # may be appear in future quizzes.
-    def _getQuizQuestions(self, user_id, topic_id, lang):
-        res = self.__getquiz.execute(topic_id=topic_id, user_id=user_id)
+    def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang):
+        res = self.__getquiz.execute(quiz_type=quiz_type, topic_id=topic_id,
+                                     user_id=user_id)
         if lang == 'de':
             txt_lang = self.questions.c.text_de
         elif lang == 'fr':
@@ -84,10 +86,11 @@ class QuizMixin(object):
             quiz.append(d)
         return quiz
 
-    def getQuiz(self, user_id, topic_id, lang):
+    def getQuiz(self, quiz_type, user_id, topic_id, lang):
         """Return list of Quiz questions.
 
         Args:
+            quiz_type: Quiz type.
             user_id:   User ID for whom Quiz is generated.
             topic_id:  Topic ID from which get questions for the Quiz.
             lang:      Question language. Can be: (it, fr, de).
@@ -101,21 +104,25 @@ class QuizMixin(object):
         """
 
         # TODO: we need to validate topic ID.
-        questions = self._getQuizQuestions(user_id, topic_id, lang)
+        questions = self._getQuizQuestions(quiz_type, user_id, topic_id, lang)
 
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions:
             t = self.quiz_answers
-            self.engine.execute(t.delete().where(t.c.user_id == user_id))
-            questions = self._getQuizQuestions(user_id, topic_id, lang)
+            self.engine.execute(t.delete().where(and_(
+                t.c.quiz_type == quiz_type,
+                t.c.user_id == user_id)))
+            questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
+                                               lang)
 
         return {'topic': topic_id, 'questions': questions}
 
-    def saveQuiz(self, user_id, topic_id, questions, answers):
+    def saveQuiz(self, quiz_type, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.
 
         Args:
+            quiz_type:  Quiz type.
             user_id:    ID of the user for whom need to save the quiz.
             questions:  List of the quesions IDs.
             answers:    List of questions' answers.
@@ -131,13 +138,15 @@ class QuizMixin(object):
 
         # select and check answers
         q = self.questions
-        s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
+        s = select([q.c.id, q.c.answer], and_(
+                   q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
         res = self.engine.execute(s)
 
         ans = []
         for row, answer in zip(res, answers):
             ans.append({
                 'user_id': user_id,
+                'quiz_type': quiz_type,
                 'question_id': row[q.c.id],
                 'is_correct': row[q.c.answer] == answer
             })

@@ -30,7 +30,7 @@ def create(mgr):
 def answers(mgr):
     # If new answer is added then update number of
     # errors and answers of the topic in the
-    # topic_err_current table for then current date.
+    # topic_err_current table for the current date.
     # If there is no such row in the topic_err_current then
     # create it and set number of answers to 1.
     # Otherwise, increase number of answers and update
@@ -40,26 +40,28 @@ def answers(mgr):
         AFTER INSERT ON answers FOR EACH ROW BEGIN
             DECLARE school INTEGER UNSIGNED DEFAULT NULL;
             DECLARE topic INTEGER UNSIGNED;
+            DECLARE qtype INTEGER UNSIGNED;
             DECLARE err SMALLINT DEFAULT 0;
 
             SELECT school_id INTO school FROM users WHERE
-            id=NEW.user_id AND type='student';
+            id=NEW.user_id AND type='student' AND quiz_type=NEW.quiz_type;
 
-            SELECT topic_id INTO topic FROM questions
-            WHERE id=NEW.question_id;
+            SELECT topic_id, quiz_type INTO topic, qtype FROM questions
+            WHERE id=NEW.question_id AND quiz_type=NEW.quiz_type;
 
             IF NEW.is_correct = 0 THEN
                 SET err=1;
             END IF;
 
-            INSERT INTO topic_err_current VALUES (NEW.user_id, topic, err, 1)
+            INSERT INTO topic_err_current VALUES
+            (NEW.user_id, qtype, topic, err, 1)
             ON DUPLICATE KEY UPDATE err_count=err_count+VALUES(err_count),
             count=count+VALUES(count);
 
             IF school IS NOT NULL THEN
                 INSERT INTO school_topic_err
-                (school_id, topic_id, err_count, count)
-                VALUES (school, topic, err, 1) ON DUPLICATE KEY UPDATE
+                (school_id, topic_id, quiz_type, err_count, count)
+                VALUES (school, topic, qtype, err, 1) ON DUPLICATE KEY UPDATE
                 err_count=err_count+VALUES(err_count),
                 count=count+VALUES(count);
             END IF;
@@ -74,28 +76,30 @@ def answers(mgr):
         AFTER UPDATE ON answers FOR EACH ROW BEGIN
             DECLARE school INTEGER UNSIGNED DEFAULT NULL;
             DECLARE topic INTEGER UNSIGNED;
+            DECLARE qtype INTEGER UNSIGNED;
             DECLARE err SMALLINT DEFAULT -1;
 
             IF OLD.is_correct != NEW.is_correct THEN
                 SELECT school_id INTO school FROM users WHERE
-                id=NEW.user_id AND type='student';
+                id=NEW.user_id AND type='student' AND quiz_type=NEW.quiz_type;
 
-                SELECT topic_id INTO topic FROM questions
-                WHERE id=NEW.question_id;
+                SELECT topic_id, quiz_type INTO topic, qtype FROM questions
+                WHERE id=NEW.question_id AND quiz_type=NEW.quiz_type;
+
 
                 IF NEW.is_correct = 0 THEN
                     SET err=1;
                 END IF;
 
                 INSERT INTO topic_err_current VALUES
-                (NEW.user_id, topic, err, 1) ON DUPLICATE KEY UPDATE
+                (NEW.user_id, qtype, topic, err, 1) ON DUPLICATE KEY UPDATE
                 err_count=err_count+VALUES(err_count);
 
                 IF school IS NOT NULL THEN
                     INSERT INTO school_topic_err
-                    (school_id, topic_id, err_count, count)
-                    VALUES (school, topic, err, 1) ON DUPLICATE KEY UPDATE
-                    err_count=err_count+VALUES(err_count);
+                    (school_id, topic_id, quiz_type, err_count, count)
+                    VALUES (school, topic, qtype, err, 1) ON DUPLICATE KEY
+                    UPDATE err_count=err_count+VALUES(err_count);
                 END IF;
             END IF;
         END;
@@ -110,7 +114,7 @@ def topic_err_current(mgr):
     mgr.conn.execute(text("""CREATE TRIGGER on_topic_err_current_after_add
         AFTER INSERT ON topic_err_current FOR EACH ROW
         INSERT INTO topic_err_snapshot VALUES
-        (NEW.user_id, NEW.topic_id, DATE(UTC_TIMESTAMP()),
+        (NEW.user_id, NEW.quiz_type, NEW.topic_id, DATE(UTC_TIMESTAMP()),
          NEW.err_count/NEW.count*100)
         ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
         """))
@@ -120,7 +124,7 @@ def topic_err_current(mgr):
     mgr.conn.execute(text("""CREATE TRIGGER on_topic_err_current_after_upd
         AFTER UPDATE ON topic_err_current FOR EACH ROW
         INSERT INTO topic_err_snapshot VALUES
-        (NEW.user_id, NEW.topic_id, DATE(UTC_TIMESTAMP()),
+        (NEW.user_id, NEW.quiz_type, NEW.topic_id, DATE(UTC_TIMESTAMP()),
          NEW.err_count/NEW.count*100)
         ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
         """))
@@ -134,11 +138,11 @@ def users(mgr):
     mgr.conn.execute(text("""CREATE TRIGGER on_users_after_add
         AFTER INSERT ON users FOR EACH ROW BEGIN
             IF NEW.type = 'guest' THEN
-                INSERT IGNORE INTO guest_access VALUES(NEW.id, 0,
-                    UTC_TIMESTAMP()+ interval 1 hour);
+                INSERT IGNORE INTO guest_access VALUES(NEW.id, NEW.quiz_type,
+                    0, UTC_TIMESTAMP()+ interval 1 hour);
             ELSE
                 INSERT INTO user_progress_snapshot VALUES
-                (NEW.id, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
+                (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
                 ON DUPLICATE KEY UPDATE progress_coef=VALUES(progress_coef);
             END IF;
         END;
@@ -147,25 +151,27 @@ def users(mgr):
     # If progress_coef is changed for the student then update snapshot entry.
     # If user activity timestamp is changed and if user is guest
     # then we update number of requests.
+    # Also last school activity is updated in the school_stat_cache.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_users_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_users_after_upd
         AFTER UPDATE ON users FOR EACH ROW BEGIN
             IF NEW.type = 'student' AND NEW.progress_coef != OLD.progress_coef
             THEN
                 INSERT INTO user_progress_snapshot VALUES
-                (NEW.id, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
+                (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
                 ON DUPLICATE KEY UPDATE progress_coef=VALUES(progress_coef);
             ELSEIF NEW.type = 'guest' AND NEW.last_visit != OLD.last_visit THEN
                 UPDATE guest_access SET num_requests = num_requests + 1
-                WHERE id=NEW.id;
+                WHERE id=NEW.id AND quiz_type=NEW.quiz_type;
             END IF;
-            INSERT INTO school_stat_cache (school_id, last_activity, stat_cache)
-            VALUES (NEW.school_id, UTC_TIMESTAMP(), "")
+            INSERT INTO school_stat_cache
+            (school_id, quiz_type, last_activity, stat_cache)
+            VALUES (NEW.school_id, NEW.quiz_type, UTC_TIMESTAMP(), "")
             ON DUPLICATE KEY UPDATE last_activity=VALUES(last_activity);
         END;
         """))
 
-    # Before delete a user we delete all user's data.
+    # Before delete a user we delete all user's data for all types of quizzes.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_users_before_del;")
     mgr.conn.execute(text("""CREATE TRIGGER on_users_before_del
         BEFORE DELETE ON users FOR EACH ROW BEGIN
@@ -189,26 +195,28 @@ def schools(mgr):
     # script. See misc/dbupdate.py.
     mgr.conn.execute("DROP PROCEDURE IF EXISTS update_school_snapshot;")
     mgr.conn.execute(text("""CREATE PROCEDURE update_school_snapshot
-        (IN school INT UNSIGNED)
+        (IN school INT UNSIGNED, IN type INT UNSIGNED)
         BEGIN
             DECLARE topic INT UNSIGNED;
+            DECLARE qtype INT UNSIGNED;
             DECLARE err FLOAT DEFAULT -1;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR SELECT topic_id, err_count/count*100
-                FROM school_topic_err WHERE school_id=school;
+            DECLARE cur CURSOR FOR SELECT
+                topic_id, quiz_type, err_count/count*100 FROM school_topic_err
+                WHERE school_id=school AND quiz_type=type;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             OPEN cur;
             START TRANSACTION;
             rloop: LOOP
-                FETCH cur INTO topic, err;
+                FETCH cur INTO topic, qtype, err;
                 IF done THEN
                     LEAVE rloop;
                 END IF;
 
                 INSERT INTO school_topic_err_snapshot VALUES
-                (school, topic, DATE(UTC_TIMESTAMP()), err)
+                (school, qtype, topic, DATE(UTC_TIMESTAMP()), err)
                 ON DUPLICATE KEY UPDATE err_percent=VALUES(err_percent);
             END LOOP;
             COMMIT;
@@ -219,11 +227,13 @@ def schools(mgr):
 
 @add_me
 def quiz_answers(mgr):
+    # Helper function for updating answers.
     mgr.conn.execute("DROP PROCEDURE IF EXISTS upd_answer;")
     mgr.conn.execute(text("""CREATE PROCEDURE upd_answer
-        (IN user INTEGER UNSIGNED, IN quest INTEGER UNSIGNED, IN correct BOOLEAN)
+        (IN user INTEGER UNSIGNED, IN qtype INTEGER UNSIGNED,
+         IN quest INTEGER UNSIGNED, IN correct BOOLEAN)
         BEGIN
-            INSERT INTO answers VALUES(user, quest, correct)
+            INSERT INTO answers VALUES(user, qtype, quest, correct)
             ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct);
         END;
         """))
@@ -232,26 +242,31 @@ def quiz_answers(mgr):
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_quiz_answers_after_add;")
     mgr.conn.execute(text("""CREATE TRIGGER on_quiz_answers_after_add
         AFTER INSERT ON quiz_answers FOR EACH ROW
-        CALL upd_answer(NEW.user_id, NEW.question_id, NEW.is_correct);
+        CALL upd_answer(NEW.user_id, NEW.quiz_type, NEW.question_id,
+                        NEW.is_correct);
         """))
 
     # After updating quiz answer we update answers table.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_quiz_answers_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_quiz_answers_after_upd
         AFTER UPDATE ON quiz_answers FOR EACH
-        ROW CALL upd_answer(NEW.user_id, NEW.question_id, NEW.is_correct);
+        ROW CALL upd_answer(NEW.user_id, NEW.quiz_type, NEW.question_id,
+                            NEW.is_correct);
         """))
 
 
 @add_me
 def exam_answers(mgr):
     # Before updating exam answer we update answer table.
+    # NOTE: since exam ID is unique we don't need to specify
+    # question's quiz_type in the WHERE section.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_exam_answers_before_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_exam_answers_before_upd
         BEFORE UPDATE ON exam_answers FOR EACH ROW BEGIN
             DECLARE user INT UNSIGNED;
             SELECT user_id INTO user FROM exams WHERE id=NEW.exam_id;
-            CALL upd_answer(user, NEW.question_id, NEW.is_correct);
+            CALL upd_answer(user, NEW.quiz_type, NEW.question_id,
+                            NEW.is_correct);
         END;
         """))
 
@@ -259,6 +274,8 @@ def exam_answers(mgr):
 @add_me
 def exams(mgr):
     # Before delete exam we delete exam's answers.
+    # NOTE: since exam ID is unique we don't need to specify
+    # question's quiz_type.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_exams_before_del;")
     mgr.conn.execute(text("""CREATE TRIGGER on_exams_before_del
         BEFORE DELETE ON exams FOR EACH ROW
@@ -274,9 +291,11 @@ def exams(mgr):
             DECLARE coef FLOAT DEFAULT -1;
 
             SELECT SUM(IF(err_count > 4, 1, 0)) / count(end_time)
-            INTO coef FROM exams WHERE user_id=NEW.user_id;
+            INTO coef FROM exams WHERE user_id=NEW.user_id
+            AND quiz_type=NEW.quiz_type;
 
-            UPDATE users SET progress_coef=coef WHERE id=NEW.user_id;
+            UPDATE users SET progress_coef=coef WHERE id=NEW.user_id
+            AND quiz_type=NEW.quiz_type;
         END;
         """))
 
@@ -288,7 +307,7 @@ def guest_access(mgr):
     mgr.conn.execute(text("""CREATE TRIGGER on_guest_access_after_add
         AFTER INSERT ON guest_access FOR EACH ROW
         INSERT IGNORE INTO guest_access_snapshot VALUES
-        (NEW.id, DATE(UTC_TIMESTAMP()), 0);
+        (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), 0);
         """))
 
     # If guest's num_requests is changed then we count snapshot value.
@@ -298,7 +317,7 @@ def guest_access(mgr):
         AFTER UPDATE ON guest_access FOR EACH ROW BEGIN
             IF NEW.num_requests != OLD.num_requests THEN
                 INSERT INTO guest_access_snapshot VALUES
-                (NEW.id, DATE(UTC_TIMESTAMP()), 1)
+                (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), 1)
                 ON DUPLICATE KEY UPDATE num_requests = num_requests + 1;
             END IF;
         END;

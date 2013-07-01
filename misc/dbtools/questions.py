@@ -1,54 +1,67 @@
 def update_stat(mgr):
     print("Updating questions stat...")
-    mgr.conn.execute('DROP PROCEDURE IF EXISTS update_data_stat;')
-    mgr.conn.execute("""CREATE PROCEDURE update_data_stat()
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
+    mgr.conn.execute("""CREATE PROCEDURE set_chapters_info(IN type INT)
     BEGIN
     DECLARE done INT DEFAULT FALSE;
+    DECLARE qtype INTEGER UNSIGNED;
     DECLARE idval INTEGER UNSIGNED;
     DECLARE qmin_id INTEGER UNSIGNED;
     DECLARE qmax_id INTEGER UNSIGNED;
 
-    DECLARE ch_cur CURSOR FOR
-    SELECT c.id, q.mn, q.mx FROM chapters c
-                 INNER JOIN (
-                    SELECT chapter_id, min(id) mn, max(id) mx FROM questions
-                    GROUP BY chapter_id
-                 ) q ON c.id = q.chapter_id;
-
-    DECLARE top_cur CURSOR FOR
-    SELECT c.id, q.mn, q.mx FROM topics c
-                 INNER JOIN (
-                    SELECT topic_id, min(id) mn, max(id) mx FROM questions
-                    GROUP BY topic_id
-                 ) q ON c.id = q.topic_id;
+    DECLARE cur CURSOR FOR
+    SELECT quiz_type, chapter_id, min(id), max(id) FROM questions
+    WHERE quiz_type=type GROUP BY quiz_type, chapter_id;
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     START TRANSACTION;
-    OPEN ch_cur;
+    OPEN cur;
     ll: LOOP
-        FETCH ch_cur INTO idval, qmin_id, qmax_id;
+        FETCH cur INTO qtype, idval, qmin_id, qmax_id;
         IF done THEN
             LEAVE ll;
         END IF;
-        UPDATE chapters SET min_id=qmin_id, max_id=qmax_id WHERE id=idval;
+        UPDATE chapters SET min_id=qmin_id, max_id=qmax_id
+        WHERE id=idval AND quiz_type=qtype;
     END LOOP;
-    CLOSE ch_cur;
-
-    SET done = FALSE;
-    OPEN top_cur;
-    ll: LOOP
-        FETCH top_cur INTO idval, qmin_id, qmax_id;
-        IF done THEN
-            LEAVE ll;
-        END IF;
-        UPDATE topics SET min_id=qmin_id, max_id=qmax_id WHERE id=idval;
-    END LOOP;
-    CLOSE top_cur;
+    CLOSE cur;
     COMMIT;
-
     END;
     """)
 
-    mgr.conn.execute('call update_data_stat();')
-    mgr.conn.execute('DROP PROCEDURE IF EXISTS update_data_stat;')
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_topics_info;')
+    mgr.conn.execute("""CREATE PROCEDURE set_topics_info(IN type INT)
+    BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE qtype INTEGER UNSIGNED;
+    DECLARE idval INTEGER UNSIGNED;
+    DECLARE qmin_id INTEGER UNSIGNED;
+    DECLARE qmax_id INTEGER UNSIGNED;
+
+    DECLARE cur CURSOR FOR
+    SELECT quiz_type, topic_id, min(id), max(id) FROM questions
+    WHERE quiz_type=type GROUP BY quiz_type, topic_id;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    START TRANSACTION;
+    OPEN cur;
+    ll: LOOP
+        FETCH cur INTO qtype, idval, qmin_id, qmax_id;
+        IF done THEN
+            LEAVE ll;
+        END IF;
+        UPDATE topics SET min_id=qmin_id, max_id=qmax_id
+        WHERE id=idval AND quiz_type=qtype;
+    END LOOP;
+    CLOSE cur;
+    COMMIT;
+    END;
+    """)
+    mgr.conn.execute('CALL set_chapters_info(1);')
+    mgr.conn.execute('CALL set_chapters_info(2);')
+    mgr.conn.execute('CALL set_topics_info(1);')
+    mgr.conn.execute('CALL set_topics_info(2);')
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_topics_info;')

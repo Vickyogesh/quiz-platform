@@ -19,6 +19,7 @@ def remove(mgr):
     metadata.drop_all()
 
 
+# NOTE: quiz_type = 0 - QuizB related data
 def create(mgr):
     mgr.conn.execute("""CREATE TABLE applications(
             id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -30,79 +31,89 @@ def create(mgr):
 
         CREATE TABLE school_topic_err(
             school_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
             err_count SMALLINT NOT NULL DEFAULT 0,
             count SMALLINT NOT NULL DEFAULT 0,
             err_week FLOAT NOT NULL DEFAULT -1,
             err_week3 FLOAT NOT NULL DEFAULT -1,
-            CONSTRAINT PRIMARY KEY (school_id, topic_id)
+            CONSTRAINT PRIMARY KEY (school_id, quiz_type, topic_id)
         );
         CREATE TABLE school_topic_err_snapshot(
             school_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
             now_date DATE NOT NULL,
             err_percent FLOAT NOT NULL DEFAULT -1,
-            CONSTRAINT PRIMARY KEY (school_id, topic_id, now_date)
+            CONSTRAINT PRIMARY KEY (school_id, quiz_type, topic_id, now_date)
         );
         CREATE TABLE school_stat_cache(
             school_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             last_activity DATETIME NOT NULL DEFAULT 0,
             last_update DATETIME NOT NULL DEFAULT 0,
             stat_cache TEXT NOT NULL,
-            CONSTRAINT PRIMARY KEY (school_id)
+            CONSTRAINT PRIMARY KEY (school_id, quiz_type)
         );
 
 
         CREATE TABLE guest_access(
             id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
             period_end DATETIME NOT NULL,
-            CONSTRAINT PRIMARY KEY (id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
         CREATE TABLE guest_access_snapshot(
             guest_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             now_date DATE NOT NULL,
             num_requests SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (guest_id, now_date)
+            CONSTRAINT PRIMARY KEY (guest_id, quiz_type, now_date)
         );
 
 
         CREATE TABLE users(
             id INTEGER UNSIGNED NOT NULL,
             type ENUM('student', 'guest') NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             school_id INTEGER UNSIGNED NOT NULL,
             last_visit TIMESTAMP NOT NULL DEFAULT 0,
             progress_coef FLOAT NOT NULL DEFAULT -1,
-            CONSTRAINT PRIMARY KEY (id, school_id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type, school_id)
         );
         CREATE TABLE user_progress_snapshot(
             user_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             now_date DATE NOT NULL,
             progress_coef FLOAT NOT NULL DEFAULT -1,
-            CONSTRAINT PRIMARY KEY (user_id, now_date)
+            CONSTRAINT PRIMARY KEY (user_id, quiz_type, now_date)
         );
 
 
         CREATE TABLE chapters(
-            id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            id SMALLINT UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             priority TINYINT UNSIGNED NOT NULL,
             text VARCHAR(100) NOT NULL,
             min_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
             max_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
         CREATE TABLE topics(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+            id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             text VARCHAR(200) NOT NULL,
             text_fr VARCHAR(200),
             text_de VARCHAR(200),
             chapter_id SMALLINT UNSIGNED,
             min_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
             max_id INTEGER UNSIGNED NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
         CREATE TABLE questions(
-            id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+            id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             text VARCHAR(500) NOT NULL,
             text_fr VARCHAR(500),
             text_de VARCHAR(500),
@@ -111,41 +122,47 @@ def create(mgr):
             image_part VARCHAR(10),
             chapter_id SMALLINT UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
-            CONSTRAINT PRIMARY KEY (id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
 
 
         CREATE TABLE topic_err_current(
             user_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
             err_count SMALLINT NOT NULL DEFAULT 0,
             count SMALLINT NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (user_id, topic_id)
+            CONSTRAINT PRIMARY KEY (user_id, quiz_type, topic_id)
         );
         CREATE TABLE topic_err_snapshot(
             user_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             topic_id INTEGER UNSIGNED NOT NULL,
             now_date DATE NOT NULL,
             err_percent FLOAT NOT NULL DEFAULT -1,
-            CONSTRAINT PRIMARY KEY (user_id, topic_id, now_date)
+            CONSTRAINT PRIMARY KEY (user_id, quiz_type, topic_id, now_date)
         );
 
 
         CREATE TABLE answers(
             user_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
             is_correct BOOLEAN NOT NULL DEFAULT FALSE,
-            CONSTRAINT PRIMARY KEY (user_id, question_id)
+            CONSTRAINT PRIMARY KEY (user_id, quiz_type, question_id)
         );
         CREATE TABLE quiz_answers(
             user_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
-            is_correct BOOLEAN NOT NULL DEFAULT FALSE
+            is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+            CONSTRAINT PRIMARY KEY (user_id, quiz_type, question_id)
         );
         CREATE TABLE exam_answers(
             add_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
             exam_id INTEGER UNSIGNED NOT NULL,
             question_id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             is_correct BOOLEAN NOT NULL DEFAULT FALSE,
             CONSTRAINT PRIMARY KEY (add_id)
         );
@@ -153,11 +170,12 @@ def create(mgr):
 
         CREATE TABLE exams(
             id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
             user_id INTEGER UNSIGNED NOT NULL,
             start_time DATETIME NOT NULL,
             end_time DATETIME DEFAULT NULL,
             err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-            CONSTRAINT PRIMARY KEY (id)
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
         """)
 
@@ -181,14 +199,9 @@ def create_indices(mgr):
     mgr.conn.execute('ALTER TABLE questions ADD INDEX ix_tp(topic_id);')
     mgr.conn.execute('ALTER TABLE questions ADD INDEX ix_ch(chapter_id);')
 
-    print("Creating indices... quiz_answers")
-    mgr.conn.execute('ALTER TABLE quiz_answers ADD UNIQUE ix_quiz_answers(user_id, question_id);')
-
     print("Creating indices... exams")
     mgr.conn.execute('ALTER TABLE exams ADD INDEX ix_exams(user_id);')
-
-    print("Creating indices... exam_answers")
-    mgr.conn.execute('ALTER TABLE exam_answers ADD UNIQUE ix_exam_answers(exam_id, question_id);')
+    mgr.conn.execute('ALTER TABLE exam_answers ADD UNIQUE ix_exam_answers(exam_id, question_id, quiz_type)')
 
 
 def do_optimize(mgr):

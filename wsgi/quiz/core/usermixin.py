@@ -9,55 +9,59 @@ class UserMixin(object):
         self.__appid = self.sql("""SELECT id FROM applications
                                 WHERE appkey=:appkey""")
 
-        self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id")
+        self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id LIMIT 1")
 
         self.__topicstat = self.sql("""SELECT
             t.id, t.text, t.text_fr, t.text_de,
             IFNULL((SELECT err_count/count*100 FROM topic_err_current WHERE
-                user_id=:user_id AND topic_id=t.id), -1) current,
+                user_id=:user_id AND quiz_type=t.quiz_type AND
+                topic_id=t.id), -1) current,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-               user_id=:user_id AND topic_id = t.id AND
+               user_id=:user_id AND quiz_type=t.quiz_type AND
+               topic_id = t.id AND
                now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
                AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
                GROUP BY topic_id), -1) week,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-               user_id=:user_id AND topic_id = t.id AND
+               user_id=:user_id AND quiz_type=t.quiz_type AND
+               topic_id = t.id AND
                now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 29 DAY
                AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
                GROUP BY topic_id), -1) week3
-            from topics t""")
+            from topics t WHERE quiz_type=:quiz_type""")
 
         # NOTE: we skip 'in-progress' exams.
         self.__examstat = self.sql("""SELECT
-            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
-             FROM exams WHERE user_id=:user_id) current,
-            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
-             FROM exams WHERE user_id=:user_id AND
-             start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-             AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
-            (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
-             FROM exams WHERE user_id=:user_id AND
-             start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
-             AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
-            """)
+        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+         FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type)current,
+        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+         FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
+         start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
+         AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
+        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+         FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
+         start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
+         AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
+        """)
 
         self.__examlist = self.sql("""SELECT
             exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR
-            FROM exams WHERE user_id=:user_id;""")
+            FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type""")
 
-        self.__topicerr = self.sql("""SELECT
-            * FROM (SELECT * FROM questions WHERE topic_id=:topic_id
-            AND id IN (SELECT question_id FROM answers WHERE
-            user_id=:user_id AND is_correct=0)) t;""")
+        self.__topicerr = self.sql("""SELECT * FROM
+            (SELECT * FROM questions WHERE topic_id=:topic_id AND
+            quiz_type=:quiz_type AND id IN
+            (SELECT question_id FROM answers WHERE user_id=:user_id AND
+            is_correct=0 AND quiz_type=:quiz_type)) t""")
 
         self.__lastvisit = self.sql("""INSERT
-            INTO users (id, type, school_id, last_visit)
-            VALUES(:user_id, :type, :school_id, UTC_TIMESTAMP())
+            INTO users (id, type, quiz_type, school_id, last_visit)
+            VALUES(:user_id, :type, :quiz_type, :school_id, UTC_TIMESTAMP())
             ON DUPLICATE KEY UPDATE last_visit=VALUES(last_visit)""")
 
-    def updateUserLastVisit(self, user_id, type, school_id):
-        self.engine.execute(self.__lastvisit, user_id=user_id,
-                            type=type, school_id=school_id)
+    def updateUserLastVisit(self, quiz_type, user_id, type, school_id):
+        self.engine.execute(self.__lastvisit, quiz_type=quiz_type,
+                            user_id=user_id, type=type, school_id=school_id)
 
     def getAppId(self, appkey):
         try:
@@ -68,6 +72,8 @@ class UserMixin(object):
             raise QuizCoreError('Unknown application ID.')
         return row[0]
 
+    # NOTE: we don't use quiz_type here since even for multiple rows
+    # id, type and school id will be the same.
     def _getStudentById(self, user_id):
         try:
             row = self.__user_by_id.execute(id=user_id).fetchone()
@@ -86,7 +92,7 @@ class UserMixin(object):
             return 99
         return round(err)
 
-    def _getTopicsStat(self, user, lang):
+    def _getTopicsStat(self, quiz_type, user, lang):
         if lang == 'de':
             lang = 3
         elif lang == 'fr':
@@ -96,7 +102,7 @@ class UserMixin(object):
 
         # TODO: maybe preallocate with stat = [None] * x?
         stat = []
-        rows = self.__topicstat.execute(user_id=user)
+        rows = self.__topicstat.execute(user_id=user, quiz_type=quiz_type)
         for row in rows:
             stat.append({
                 'id': row[0],
@@ -109,9 +115,10 @@ class UserMixin(object):
             })
         return stat
 
-    def __getExamStat(self, user_id):
+    def __getExamStat(self, quiz_type, user_id):
         try:
-            row = self.__examstat.execute(user_id=user_id).fetchone()
+            row = self.__examstat.execute(user_id=user_id, quiz_type=quiz_type)
+            row = row.fetchone()
         except Exception:
             row = (-1, -1, -1)
         return {
@@ -131,20 +138,20 @@ class UserMixin(object):
         #         stat.append({'id': row[0], 'status': 'in-progress'})
         # return stat
 
-    def getUserStat(self, user_id, lang):
+    def getUserStat(self, quiz_type, user_id, lang):
         user = self._getStudentById(user_id)
-        topics = self._getTopicsStat(user_id, lang)
+        topics = self._getTopicsStat(quiz_type, user_id, lang)
         return {
             'student': user,
-            'exams': self.__getExamStat(user_id),
+            'exams': self.__getExamStat(quiz_type, user_id),
             'topics': topics
         }
 
     def _createExamInfo(self, exam_db_row):
-        start = exam_db_row[2]
-        end = exam_db_row[3]
-        errors = exam_db_row[4]
-        expired = exam_db_row[5]
+        start = exam_db_row[3]
+        end = exam_db_row[4]
+        errors = exam_db_row[5]
+        expired = exam_db_row[6]
 
         if end:
             if errors > 4:
@@ -164,20 +171,21 @@ class UserMixin(object):
             'status': status
         }
 
-    def _getExamList(self, user_id):
-        rows = self.__examlist.execute(user_id=user_id)
+    def _getExamList(self, quiz_type, user_id):
+        rows = self.__examlist.execute(user_id=user_id, quiz_type=quiz_type)
         return [self._createExamInfo(row) for row in rows]
 
-    def getExamList(self, user_id):
+    def getExamList(self, quiz_type, user_id):
         return {
             'student': self._getStudentById(user_id),
-            'exams': self._getExamList(user_id)
+            'exams': self._getExamList(quiz_type, user_id)
         }
 
-    def getTopicErrors(self, user_id, topic_id, lang):
+    def getTopicErrors(self, quiz_type, user_id, topic_id, lang):
         student = self._getStudentById(user_id)
 
-        rows = self.__topicerr.execute(user_id=user_id, topic_id=topic_id)
+        rows = self.__topicerr.execute(user_id=user_id, topic_id=topic_id,
+                                       quiz_type=quiz_type)
 
         if lang == 'de':
             txt_lang = self.questions.c.text_de

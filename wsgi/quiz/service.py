@@ -20,7 +20,7 @@ def create_quiz(topic):
     """ Get 40 questions from the DB and return them to the client. """
     user_id = app.getUserId()
     lang = app.getLang()
-    quiz = app.core.getQuiz(user_id, topic, lang)
+    quiz = app.core.getQuiz(app.quiz_type, user_id, topic, lang)
     return JSONResponse(quiz)
 
 
@@ -36,7 +36,7 @@ def save_quiz(topic):
     except KeyError:
         raise BadRequest('Missing parameter.')
 
-    app.core.saveQuiz(user_id, topic, id_list, answers)
+    app.core.saveQuiz(app.quiz_type, user_id, topic, id_list, answers)
     return JSONResponse()
 
 
@@ -49,7 +49,7 @@ def get_student_stat(user='me'):
     uid = app.getUserId()
     utype = app.session['user_type']
 
-    stat = app.core.getUserStat(user_id, lang)
+    stat = app.core.getUserStat(app.quiz_type, user_id, lang)
 
     # School can access to it's students only.
     if utype == 'school' and (user == 'me' or uid != stat['student']['school_id']):
@@ -70,7 +70,7 @@ def get_student_stat(user='me'):
 def get_error_review():
     user_id = app.getUserId()
     lang = app.getLang()
-    res = app.core.getErrorReview(user_id, lang)
+    res = app.core.getErrorReview(app.quiz_type, user_id, lang)
     return JSONResponse(res)
 
 
@@ -85,7 +85,7 @@ def save_error_review():
     except KeyError:
         raise BadRequest('Missing parameter.')
 
-    app.core.saveErrorReview(user_id, id_list, answers)
+    app.core.saveErrorReview(app.quiz_type, user_id, id_list, answers)
     return JSONResponse()
 
 
@@ -93,7 +93,7 @@ def save_error_review():
 def create_exam():
     user_id = app.getUserId()
     lang = app.getLang()
-    exam = app.core.createExam(user_id, lang)
+    exam = app.core.createExam(app.quiz_type, user_id, lang)
     return JSONResponse(exam)
 
 
@@ -139,10 +139,10 @@ def get_student_exams(user):
 
     if utype == 'school' and user == 'me':
         raise Forbidden('Forbidden.')
-    elif utype != 'school' and uid != user_id:
+    elif uid != user_id:
         raise Forbidden('Forbidden.')
 
-    exams = app.core.getExamList(user_id)
+    exams = app.core.getExamList(app.quiz_type, user_id)
 
     # School can access to exams of it's students only.
     if utype == 'school' and uid != exams['student']['school_id']:
@@ -160,10 +160,10 @@ def get_topic_error(user, id):
     # Students can access only to their own data.
     utype = app.session['user_type']
     uid = app.session['user_id']
-    if utype != 'school' and uid != user_id:
+    if uid != user_id:
         raise Forbidden('Forbidden.')
 
-    info = app.core.getTopicErrors(user_id, id, lang)
+    info = app.core.getTopicErrors(app.quiz_type, user_id, id, lang)
 
     # School can access to exams of it's students only.
     if utype == 'school' and uid != info['student']['school_id']:
@@ -247,7 +247,7 @@ def _update_names(users, data):
         x['surname'] = user['surname']
 
 
-@app.get('/school/<uid:id>')
+@app.get('/school/<uid:id>', access=['school', 'admin'])
 def school_stat(id):
     school_id = app.getUserId(id)
 
@@ -259,7 +259,7 @@ def school_stat(id):
         raise Forbidden('Forbidden.')
 
     lang = app.getLang()
-    res = app.core.getSchoolStat(school_id, lang)
+    res = app.core.getSchoolStat(app.quiz_type, school_id, lang)
 
     # Since res doesn't contain user names then
     # we need to get names from the account service and update result.

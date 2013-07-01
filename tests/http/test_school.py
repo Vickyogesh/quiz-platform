@@ -18,6 +18,10 @@ from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 # For more info see tests/core/test_school.py
 class HttpSchoolTest(unittest.TestCase):
     def setUp(self):
+        self.engine = create_engine(db_uri, echo=False)
+        cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self, drop_users=True, add_users=True)
+
         self.req = requests.Session()
 
         r = self.req.get(url('/authorize'))
@@ -29,10 +33,6 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, r.json()['status'])
 
-        self.engine = create_engine(db_uri, echo=False)
-        cleanupdb_onSetup(self.engine)
-        cleanupdb_onSetupAccDb(self)
-
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
         cleanupdb_onTearDownAccDb(self)
@@ -43,13 +43,13 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         students = data['students']
-        self.assertEqual(2, len(students))
+        self.assertEqual(3, len(students))
 
         r = self.req.get(url('/school/1/students'))
         self.assertEqual(200, r.status_code)
         data = r.json()
         students = data['students']
-        self.assertEqual(2, len(students))
+        self.assertEqual(3, len(students))
 
     # Check: create student with bad params.
     def test_newStudentBad(self):
@@ -118,7 +118,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(200, data['status'])
-        self.assertEqual(4, data['id'])
+        self.assertEqual(5, data['id'])
 
     # Check: create duplicate student
     def test_newStudentDuplicate(self):
@@ -132,7 +132,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         data = r.json()
         self.assertEqual(200, data['status'])
-        self.assertEqual(4, data['id'])
+        self.assertEqual(5, data['id'])
 
         r = self.req.post(url('/school/me/newstudent'), data=student, headers=self.headers)
         self.assertEqual(200, r.status_code)

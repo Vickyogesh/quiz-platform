@@ -1,6 +1,6 @@
 import random
 from datetime import datetime
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 #from profilestats import profile
 from .exceptions import QuizCoreError
 
@@ -9,15 +9,17 @@ class ExamMixin(object):
     """Mixin for working with exams. Used in QuizCore."""
     def __init__(self):
         # Get chapters info: priority and chapter's questions' id range.
-        sql = self.sql("SELECT priority, min_id, max_id FROM chapters")
+        sql = self.sql("""SELECT priority, min_id, max_id FROM chapters
+            WHERE quiz_type=:quiz_type""")
         self.__stmt_ch_info = sql
 
         self.__create_exam = self.sql(self.exams.insert().values(
+                                      quiz_type=0,
                                       start_time=func.utc_timestamp(),
                                       user_id=0))
 
-        self.__expires = self.sql("""SELECT
-            start_time + INTERVAL 3 HOUR, end_time
+        self.__exam_info = self.sql("""SELECT
+            start_time + INTERVAL 3 HOUR, end_time, quiz_type
             FROM exams WHERE id=:exam_id""")
 
         self.__getexam = self.sql("""SELECT exams.*,
@@ -25,20 +27,22 @@ class ExamMixin(object):
             FROM exams WHERE id=:exam_id""")
 
         self.__set_questions = self.sql(self.exam_answers.insert().values(
+                                        quiz_type=0,
                                         exam_id=0,
                                         question_id=0))
 
         self.__upd = self.sql("""INSERT INTO exam_answers
-            (exam_id, question_id, is_correct)
-            VALUES(:exam_id, :question_id, :is_correct)
+            (exam_id, question_id, quiz_type, is_correct)
+            VALUES(:exam_id, :question_id, :quiz_type, :is_correct)
             ON DUPLICATE KEY UPDATE is_correct = VALUES(is_correct)""")
 
         self.__examquest = self.sql("""SELECT q.*, e.is_correct FROM
             (SELECT * FROM exam_answers where exam_id=:exam_id ORDER BY add_id) e
-            LEFT JOIN questions q ON e.question_id=q.id;""")
+            LEFT JOIN questions q ON e.quiz_type=q.quiz_type AND e.question_id=q.id;""")
 
         self.__examids = self.sql("""SELECT
-            question_id FROM exam_answers WHERE exam_id=:exam_id""")
+            question_id FROM exam_answers WHERE exam_id=:exam_id
+            ORDER BY question_id""")
 
         self.__updexaminfo = self.sql("""UPDATE
             exams SET end_time=UTC_TIMESTAMP(), err_count=:errors
@@ -57,17 +61,11 @@ class ExamMixin(object):
     # This means what for row 1 we need select one question in the range
     # [1 - 100] and for row 2 we need select two (random) questions
     # in the range [101 - 200].
-    def __generate_idList(self):
-        # id_list = []
-        # res = self.__stmt_ch_info.execute()
-        # for row in res:
-        #     # priority = row[0], min_id = row[1], max_id = row[2]
-        #     id_list.extend(random.sample(xrange(row[1], row[2] + 1), row[0]))
-        # return id_list
+    def __generate_idList(self, quiz_type):
         id_norm = []
         id_high = []
         ids = None
-        res = self.__stmt_ch_info.execute()
+        res = self.__stmt_ch_info.execute(quiz_type=quiz_type)
         for row in res:
             # priority = row[0], min_id = row[1], max_id = row[2]
             ids = random.sample(xrange(row[1], row[2] + 1), row[0])
@@ -79,22 +77,23 @@ class ExamMixin(object):
         return id_norm, id_high
 
     #@profile
-    def __initExam(self, user_id, questions):
-        res = self.__create_exam.execute(user_id=user_id)
+    def __initExam(self, quiz_type, user_id, questions):
+        res = self.__create_exam.execute(quiz_type=quiz_type, user_id=user_id)
         exam_id = res.inserted_primary_key[0]
 
-        vals = [{'exam_id': exam_id, 'question_id': q} for q in questions]
+        vals = [{'exam_id': exam_id, 'quiz_type': quiz_type, 'question_id': q}
+                for q in questions]
         self.__set_questions.execute(vals)
         return exam_id
 
-    # Return expiration date and exam end time (if set).
-    def __getExpirationDate(self, exam_id):
-        row = self.__expires.execute(exam_id=exam_id).fetchone()
+    # Return expiration date, end time (if set) and quiz_type for exam.
+    def __getExamInfo(self, exam_id):
+        row = self.__exam_info.execute(exam_id=exam_id).fetchone()
         if row is None:
             raise QuizCoreError('Invalid exam ID.')
-        return row[0], row[1]
+        return row[0], row[1], row[2]
 
-    def __getQuestions(self, questions, lang, dest):
+    def __getQuestions(self, quiz_type, questions, lang, dest):
         q = self.questions
 
         if lang == 'de':
@@ -104,7 +103,8 @@ class ExamMixin(object):
         else:
             txt_lang = q.c.text
 
-        s = select([q], q.c.id.in_(questions))
+        s = q.select().where(and_(
+            q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
         res = self.engine.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
@@ -119,23 +119,25 @@ class ExamMixin(object):
             self._aux_question_delOptionalField(d)
             dest.append(d)
 
-    def createExam(self, user_id, lang):
-        norm, high = self.__generate_idList()
-        exam_id = self.__initExam(user_id, norm + high)
+    # NOTE: exam_id is always unique so we don't need to specify quiz_type
+    # for the __getExamInfo()
+    def createExam(self, quiz_type, user_id, lang):
+        norm, high = self.__generate_idList(quiz_type)
+        exam_id = self.__initExam(quiz_type, user_id, norm + high)
 
         questions = []
-        self.__getQuestions(norm, lang, questions)
-        self.__getQuestions(high, lang, questions)
+        self.__getQuestions(quiz_type, norm, lang, questions)
+        self.__getQuestions(quiz_type, high, lang, questions)
 
         # YYYY-MM-DDTHH:MM:SS
-        expires, _ = self.__getExpirationDate(exam_id)
+        expires, _, _ = self.__getExamInfo(exam_id)
         expires = str(expires)
         exam = {'id': exam_id, 'expires': expires}
         return {'exam': exam, 'questions': questions}
 
     #@profile
     def saveExam(self, exam_id, questions, answers):
-        expires, end_time = self.__getExpirationDate(exam_id)
+        expires, end_time, quiz_type = self.__getExamInfo(exam_id)
         now = datetime.utcnow()
 
         if end_time:
@@ -148,16 +150,19 @@ class ExamMixin(object):
             raise QuizCoreError('Wrong number of answers.')
 
         res = self.__examids.execute(exam_id=exam_id)
-        exam_questons = [row[0] for row in res]
+        exam_questions = [row[0] for row in res]
         questions, answers = self._aux_prepareLists(questions, answers)
 
+        # Get questions
         q = self.questions
-        s = select([q.c.id, q.c.answer], q.c.id.in_(exam_questons))
+        s = select([q.c.id, q.c.answer], and_(
+                   q.c.quiz_type == quiz_type,
+                   q.c.id.in_(exam_questions)))
         res = self.engine.execute(s)
 
         ans = []
         wrong = 0
-        for row, answer, qq, eq in zip(res, answers, questions, exam_questons):
+        for row, answer, qq, eq in zip(res, answers, questions, exam_questions):
             if qq != eq:
                 raise QuizCoreError('Invalid question ID.')
 
@@ -167,6 +172,7 @@ class ExamMixin(object):
             ans.append({
                 'exam_id': exam_id,
                 'question_id': row[q.c.id],
+                'quiz_type': quiz_type,
                 'is_correct': is_correct
             })
         with self.engine.begin() as conn:
@@ -179,7 +185,7 @@ class ExamMixin(object):
         if res is None:
             raise QuizCoreError('Invalid exam ID.')
 
-        user_id = res[1]
+        user_id = res[self.exams.c.user_id]
         exam = self._createExamInfo(res)
         student = self._getStudentById(user_id)
         res = self.__examquest.execute(exam_id=exam_id)

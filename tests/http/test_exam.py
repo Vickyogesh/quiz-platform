@@ -17,6 +17,10 @@ from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 # For more info see tests/core/test_exam.py
 class HttpExamTest(unittest.TestCase):
     def setUp(self):
+        self.engine = create_engine(db_uri, echo=False)
+        cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self, drop_users=True, add_users=True)
+
         self.req = requests.Session()
 
         r = self.req.get(url('/authorize'))
@@ -28,10 +32,6 @@ class HttpExamTest(unittest.TestCase):
         r = self.req.post(url('/authorize'), data=auth, headers=self.headers)
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, r.json()['status'])
-
-        self.engine = create_engine(db_uri, echo=False)
-        cleanupdb_onSetup(self.engine)
-        cleanupdb_onSetupAccDb(self, drop_users=True)
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)

@@ -190,7 +190,7 @@ class HttpAccessTest(HttpStatusTest):
 
         # student from another school (school guest)
         self.assertHttp_Forbidden(req.get(url('/student/2')))
-        
+
         self.assertHttp_Forbidden(req.get(url('/errorreview')))
         self.assertHttp_Forbidden(req.post(url('/errorreview')))
 
@@ -200,7 +200,6 @@ class HttpAccessTest(HttpStatusTest):
 
         self.assertHttp_Forbidden(req.get(url('/student/me/exam')))
         self.assertHttp_Ok(req.get(url('/student/1/exam')))
-        self.assertHttp_Forbidden(req.get(url('/student/2/exam')))
 
         # student from another school (school guest)
         self.assertHttp_Forbidden(req.get(url('/student/2/exam')))

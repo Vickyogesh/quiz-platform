@@ -36,8 +36,6 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
-
-        self.admin_passwd = settings.main['admin_password']
         self.guest_allowed_requests = settings.main['guest_allowed_requests']
 
     # Setup db connection and tables

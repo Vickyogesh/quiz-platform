@@ -6,19 +6,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
+from sqlalchemy import select
 from datetime import datetime, timedelta
 from collections import namedtuple
 from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
 from quiz.core.core import QuizCore
 from quiz.core.exceptions import QuizCoreError
 
-ExamInfo = namedtuple('ExamInfo', 'id user_id start end err_count')
+ExamInfo = namedtuple('ExamInfo', 'id quiz_type user_id start end err_count')
 
 
 # Helper function to create exam & save answers.
 # Returns result exam info
-def pass_exam(tst, answers):
-    info = tst.core.createExam(4, 'it')
+def pass_exam(tst, quiz_type, answers, user_id=4):
+    info = tst.core.createExam(quiz_type, user_id, 'it')
     exam_id = info['exam']['id']
     questions = list(sorted([q['id'] for q in info['questions']]))
 
@@ -30,7 +31,7 @@ def pass_exam(tst, answers):
 class CoreExamTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
+        self.main = {'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine
@@ -39,10 +40,13 @@ class CoreExamTest(unittest.TestCase):
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
 
+    def sql(self, *args, **kwargs):
+        return self.engine.execute(*args, **kwargs)
+
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
     def test_questionIds(self):
-        norm, high = self.core._ExamMixin__generate_idList()
+        norm, high = self.core._ExamMixin__generate_idList(1)
         self.assertEqual(25, len(norm))
         self.assertEqual(15, len(high))
         ids = list(sorted(norm+high))
@@ -52,7 +56,7 @@ class CoreExamTest(unittest.TestCase):
         # |----------+-----+------
         # |     1    |    1    |  100
         # |     2    |   101   |  200
-        chapters_info = self.core._ExamMixin__stmt_ch_info.execute()
+        chapters_info = self.core._ExamMixin__stmt_ch_info.execute(quiz_type=1)
         index = 0
 
         # Check if item in ids is in correct range.
@@ -71,8 +75,7 @@ class CoreExamTest(unittest.TestCase):
 
     # Test new exam fields.
     def test_newFields(self):
-        info = self.core.createExam(3, 'it')
-
+        info = self.core.createExam(1, 3, 'it')
         # Check return value
         # there must be 'exam' and 'question' fields.
 
@@ -107,62 +110,56 @@ class CoreExamTest(unittest.TestCase):
         self.assertIn('text', question)
         self.assertIn('answer', question)
 
-    # Test if for new exam 'exams' and 'exams_stat' tables are filled
+    # Test if exam related tables are filled for the new exam.
     def test_newDBTables(self):
+        e = self.core.exams
+        ea = self.core.exam_answers
+        a = self.core.answers
+
         # Make sure there is no exams
-        res = self.engine.execute("SELECT count(*) from exams").fetchone()
-        self.assertEqual(0, res[0])
+        res = self.sql(e.select()).fetchall()
+        self.assertFalse(res)
 
-        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
-        self.assertEqual(0, res[0])
+        res = self.sql(ea.select()).fetchall()
+        self.assertFalse(res)
 
-        res = self.engine.execute("SELECT count(*) from answers").fetchone()
-        self.assertEqual(0, res[0])
+        res = self.sql(a.select()).fetchall()
+        self.assertFalse(res)
 
-        info = self.core.createExam(3, 'it')
+        info = self.core.createExam(1, 3, 'it')
 
         # After new exam generation there must be one entry in the
         # 'exams' table which describes exam and also 'exam_answers'
         # must contain 40 exam questions, but 'answers' will not be updated.
-        res = self.engine.execute("SELECT count(*) from exams").fetchone()
-        self.assertEqual(1, res[0])
-
-        res = self.engine.execute("SELECT count(*) from exam_answers").fetchone()
-        self.assertEqual(40, res[0])
-
-        res = self.engine.execute("SELECT count(*) from answers").fetchone()
-        self.assertEqual(0, res[0])
 
         ### Check exam metadata
 
-        res = self.engine.execute("SELECT * from exams").fetchone()
-        exam_id = res[0]
-        user_id = res[1]
-        start = res[2]
-        end = res[3]
-        err_count = res[4]
-
+        res = self.sql(e.select()).fetchall()
+        self.assertEqual(1, len(res))
+        res = res[0]
+        exam_id = res[e.c.id]
         self.assertEqual(info['exam']['id'], exam_id)
-        self.assertEqual(3, user_id)
-        self.assertEqual(0, err_count)
-        self.assertEqual(None, end)
+        self.assertEqual(1, res[e.c.quiz_type])
+        self.assertEqual(3, res[e.c.user_id])
+        self.assertEqual(0, res[e.c.err_count])
+        self.assertIsNone(res[e.c.end_time])
 
         now = datetime.utcnow()
-        delta = now - start
+        delta = now - res[e.c.start_time]
         delta = abs(delta.total_seconds())
         self.assertTrue(delta <= 5)
 
         ### Check exam questions
 
-        res = self.engine.execute(
-            "SELECT question_id,is_correct from exam_answers WHERE exam_id="
-            + str(exam_id))
+        res = self.sql(select([ea])
+                       .where(ea.c.exam_id == exam_id))
 
         table_questions = []
         answers = []
         for row in res:
-            table_questions.append(row[0])
-            answers.append(row[1])
+            self.assertEqual(1, row[ea.c.quiz_type])
+            table_questions.append(row[ea.c.question_id])
+            answers.append(row[ea.c.is_correct])
         table_questions = list(sorted(table_questions))
 
         questions = [q['id'] for q in info['questions']]
@@ -173,6 +170,14 @@ class CoreExamTest(unittest.TestCase):
         # every answer must be wrong by default
         self.assertEqual(answers, [0] * 40)
 
+        # Fast check exam creation for the another quiz type
+        info = self.core.createExam(2, 3, 'it')
+        exam_id2 = info['exam']['id']
+        res = self.sql(select([ea]).where(ea.c.exam_id == exam_id2)).fetchall()
+        self.assertEqual(40, len(res))
+        for row in res:
+            self.assertEqual(2, row[ea.c.quiz_type])
+
     # Check exam saving with wrong data
     def test_saveWrong(self):
         # try to save non-existent exam
@@ -180,7 +185,7 @@ class CoreExamTest(unittest.TestCase):
             self.core.saveExam(1, [], [])
 
         # We have to create exam before continue testing
-        info = self.core.createExam(3, 'it')
+        info = self.core.createExam(1, 3, 'it')
         exam_id = info['exam']['id']
 
         # Try to save with wrong number of answers
@@ -200,19 +205,19 @@ class CoreExamTest(unittest.TestCase):
         # NOTE: expiration date will be checked before questions
         # validation so we can pass fake values.
         with self.assertRaisesRegexp(QuizCoreError, 'Exam is expired.'):
-            self.engine.execute("UPDATE exams SET start_time='1999-01-12'")
+            self.sql("UPDATE exams SET start_time='1999-01-12'")
             self.core.saveExam(exam_id, [0] * 40, [0] * 40)
 
     # Helper function to get exam metadate dirrectly from the DB.
     def _getExamInfo(self, id):
-        res = self.engine.execute("SELECT * FROM exams WHERE id=" + str(id))
+        res = self.sql("SELECT * FROM exams WHERE id=" + str(id))
         res = res.fetchone()
-        return ExamInfo(id=res[0], user_id=res[1], start=res[2],
-                        end=res[3], err_count=res[4])
+        return ExamInfo(id=res[0], quiz_type=res[1], user_id=res[2],
+                        start=res[3], end=res[4], err_count=res[5])
 
     # Check normal exam save
     def test_save(self):
-        info = self.core.createExam(3, 'it')
+        info = self.core.createExam(1, 3, 'it')
         exam_id = info['exam']['id']
         questions = [q['id'] for q in info['questions']]
         questions = list(sorted(questions))
@@ -221,10 +226,10 @@ class CoreExamTest(unittest.TestCase):
         answers = [1] * 40
         answers[:5] = [0] * 5
         self.core.saveExam(exam_id, questions, answers)
-
+        return
         ### Check exam answers
 
-        res = self.engine.execute(
+        res = self.sql(
             "SELECT question_id,is_correct from exam_answers WHERE exam_id="
             + str(exam_id))
 
@@ -235,6 +240,7 @@ class CoreExamTest(unittest.TestCase):
         # We don't check start time
         exam = self._getExamInfo(exam_id)
         self.assertEqual(3, exam.user_id)
+        self.assertEqual(1, exam.quiz_type)
         self.assertEqual(5, exam.err_count)
 
         now = datetime.utcnow()
@@ -242,7 +248,7 @@ class CoreExamTest(unittest.TestCase):
         self.assertTrue(delta <= 5)
 
         ### Check errors
-        res = self.engine.execute("SELECT question_id from answers where is_correct=FALSE")
+        res = self.sql("SELECT question_id from answers where is_correct=FALSE")
         err_questions = [row[0] for row in res]
         err_questions = list(sorted(err_questions))
         self.assertEqual(questions[0:5], err_questions)
@@ -254,7 +260,7 @@ class CoreExamTest(unittest.TestCase):
             self.core.getExamInfo(1, 'it')
 
         # Check status for the fresh exam
-        info = self.core.createExam(4, 'it')
+        info = self.core.createExam(1, 4, 'it')
         exam_id = info['exam']['id']
         exam_questions = info['questions']
 
@@ -288,7 +294,7 @@ class CoreExamTest(unittest.TestCase):
     def test_statusPassed(self):
         # Pass with no errors and check status:
         # Since we made no errors then exam must be passed.
-        info = pass_exam(self, [1] * 40)
+        info = pass_exam(self, 1, [1] * 40)
         exam = info['exam']
         self.assertEqual('passed', exam['status'])
         self.assertEqual(0, exam['errors'])
@@ -296,7 +302,7 @@ class CoreExamTest(unittest.TestCase):
         # Pass with 1 error and check status.
         answers = [1] * 40
         answers[0] = 0
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
         exam = info['exam']
         self.assertEqual('passed', exam['status'])
         self.assertEqual(1, exam['errors'])
@@ -304,7 +310,7 @@ class CoreExamTest(unittest.TestCase):
         # Pass with 2 errors and check status.
         answers = [1] * 40
         answers[:2] = [0, 0]
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
         exam = info['exam']
         self.assertEqual('passed', exam['status'])
         self.assertEqual(2, exam['errors'])
@@ -312,7 +318,7 @@ class CoreExamTest(unittest.TestCase):
         # Pass with 3 errors and check status.
         answers = [1] * 40
         answers[:3] = [0, 0, 0]
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
         exam = info['exam']
         self.assertEqual('passed', exam['status'])
         self.assertEqual(3, exam['errors'])
@@ -320,7 +326,16 @@ class CoreExamTest(unittest.TestCase):
         # Pass with 3 errors and check status.
         answers = [1] * 40
         answers[:4] = [0, 0, 0, 0]
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
+        exam = info['exam']
+        self.assertEqual('passed', exam['status'])
+        self.assertEqual(4, exam['errors'])
+
+        # Fast pass exam for quiz type 2
+        # By default quiz type answers must be False
+        answers = [0] * 40
+        answers[:4] = [1, 1, 1, 1]
+        info = pass_exam(self, 2, answers)
         exam = info['exam']
         self.assertEqual('passed', exam['status'])
         self.assertEqual(4, exam['errors'])
@@ -330,7 +345,7 @@ class CoreExamTest(unittest.TestCase):
         # 5 errors.
         answers = [1] * 40
         answers[0:5] = [0] * 5
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
         exam = info['exam']
         self.assertEqual('failed', exam['status'])
         self.assertEqual(5, exam['errors'])
@@ -338,17 +353,25 @@ class CoreExamTest(unittest.TestCase):
         # 15 errors.
         answers = [1] * 40
         answers[0:15] = [0] * 15
-        info = pass_exam(self, answers)
+        info = pass_exam(self, 1, answers)
         exam = info['exam']
         self.assertEqual('failed', exam['status'])
         self.assertEqual(15, exam['errors'])
+
+        # 10 errors, but for quiz type 2.
+        answers = [0] * 40
+        answers[0:10] = [1] * 10
+        info = pass_exam(self, 2, answers)
+        exam = info['exam']
+        self.assertEqual('failed', exam['status'])
+        self.assertEqual(10, exam['errors'])
 
 
 # Test: exam statistics.
 class CoreExamStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
+        self.main = {'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.questions = self.core.questions
         self.engine = self.core.engine
@@ -357,83 +380,104 @@ class CoreExamStatTest(unittest.TestCase):
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
 
+    def sql(self, *args, **kwargs):
+        return self.engine.execute(*args, **kwargs)
+
     # Check: progress_coef if only one exam is passed (successfully).
     def test_updateCoefOneOk(self):
         # Pass exam with no errors and check progress_coef:
         # Since we made no errors then progress_coef must be 0.
         # This means what there is 0% of errors, ie all exams is passed.
-        pass_exam(self, [1] * 40)
+        pass_exam(self, 1, [1] * 40)
+        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        row = self.sql(sql).fetchone()
+        self.assertEqual(0, row[0])
 
-        sql = "SELECT progress_coef from users where id=4"
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 2, [0] * 40, user_id=3)
+        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        row = self.sql(sql).fetchone()
         self.assertEqual(0, row[0])
 
     # Check: progress_coef if only one exam is passed (failed).
     def test_updateCoefOneFail(self):
-        pass_exam(self, [1] * 20 + [0] * 20)
+        pass_exam(self, 1, [1] * 20 + [0] * 20)
+        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        row = self.sql(sql).fetchone()
+        self.assertEqual(1, row[0])
 
-        sql = "SELECT progress_coef from users where id=4"
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 2, [1] * 20 + [0] * 20, user_id=3)
+        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        row = self.sql(sql).fetchone()
         self.assertEqual(1, row[0])
 
     # Check: progress_coef with exam which is in progress.
     def test_updateCoefProgressExam(self):
-        self.core.createExam(4, 'it')
+        # Since 'in-progress' exams are skipped then progress_coef will be -1.
+        self.core.createExam(1, 4, 'it')
+        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        row = self.sql(sql).fetchone()
+        self.assertEqual(-1, row[0])
 
-        # Since 'in-progress' exams are skipped then
-        # progress_coef will be -1.
-        sql = "SELECT progress_coef from users where id=4"
-        row = self.engine.execute(sql).fetchone()
+        self.core.createExam(2, 3, 'it')
+        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        row = self.sql(sql).fetchone()
         self.assertEqual(-1, row[0])
 
     # Check: progress_coef if two exams are passed (failed & successfully).
     def test_updateCoefTwoExams(self):
-        pass_exam(self, [1] * 40)
-        pass_exam(self, [1] * 20 + [0] * 20)
-
-        sql = "SELECT progress_coef from users where id=4"
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 1, [1] * 40)
+        pass_exam(self, 1, [1] * 20 + [0] * 20)
+        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.5, row[0], 1)
+
+        pass_exam(self, 2, [0] * 40, user_id=3)
+        pass_exam(self, 2, [1] * 40, user_id=3)
+        pass_exam(self, 2, [1] * 40, user_id=3)
+        pass_exam(self, 2, [1] * 40, user_id=3)
+        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        row = self.sql(sql).fetchone()
+        self.assertAlmostEqual(0.75, row[0], 2)
 
     # Check: progress_coef for all exam types.
     def test_updateCoef(self):
         # Pass one exam, fail one exam, and create 'in-progress' exam.
-        pass_exam(self, [1] * 40)
-        pass_exam(self, [1] * 20 + [0] * 20)
-        self.core.createExam(4, 'it')
+        pass_exam(self, 1, [1] * 40)
+        pass_exam(self, 1, [1] * 20 + [0] * 20)
+        self.core.createExam(1, 4, 'it')
 
         # We must have 50% of errors.
-        sql = "SELECT progress_coef from users where id=4"
-        row = self.engine.execute(sql).fetchone()
+        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.5, row[0], 1)
 
         # Pass one more exam, so ~33% of errors
         # 1 failed and 2 passed, 3 exams overall (we skip 'in-progress') = 1/3
-        pass_exam(self, [1] * 40)
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 1, [1] * 40)
+        row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.33, row[0], 2)
 
         # Fail exam
         # 2 failed and 2 passed, total 4 = 2/2
-        pass_exam(self, [1] * 20 + [0] * 20)
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 1, [1] * 20 + [0] * 20)
+        row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.5, row[0], 1)
 
         # 3 failed and 2 passed, total 5 = 3/5
-        pass_exam(self, [1] * 20 + [0] * 20)
-        row = self.engine.execute(sql).fetchone()
+        pass_exam(self, 1, [1] * 20 + [0] * 20)
+        row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.6, row[0], 1)
 
     # Check: exam snapshot update.
     def test_snapshot(self):
         # update current coef and check snapshot
-        sql = "UPDATE users SET progress_coef=0.23 WHERE id=4"
-        self.engine.execute(sql)
+        sql = "UPDATE users SET progress_coef=0.23 WHERE id=4 and quiz_type=1"
+        self.sql(sql)
 
         # Since we cleanup user_progress_snapshot in setUp()
         # then we'll have only one row
-        sql = "SELECT * FROM user_progress_snapshot WHERE user_id=4"
-        res = self.engine.execute(sql).fetchall()
+        sql = "SELECT * FROM user_progress_snapshot WHERE user_id=4 and quiz_type=1"
+        res = self.sql(sql).fetchall()
         self.assertEqual(1, len(res))
         row = res[0]
 
@@ -442,13 +486,13 @@ class CoreExamStatTest(unittest.TestCase):
         self.assertAlmostEqual(0.23, row['progress_coef'], 2)
 
         # One more change
-        sql = "UPDATE users SET progress_coef=0.25 WHERE id=4"
-        self.engine.execute(sql)
+        sql = "UPDATE users SET progress_coef=0.25 WHERE id=4 and quiz_type=1"
+        self.sql(sql)
 
         # Since we cleanup user_progress_snapshot in setUp()
         # then we'll have only one row
-        sql = "SELECT * FROM user_progress_snapshot WHERE user_id=4"
-        res = self.engine.execute(sql).fetchall()
+        sql = "SELECT * FROM user_progress_snapshot WHERE user_id=4 and quiz_type=1"
+        res = self.sql(sql).fetchall()
         self.assertEqual(1, len(res))
         row = res[0]
 

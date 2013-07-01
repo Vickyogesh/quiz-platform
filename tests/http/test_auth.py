@@ -7,7 +7,7 @@ import requests
 import unittest
 import json
 from tests_common import url, createAuthData, createAuthFor
-from tests_common import _pwd, cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
+from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 
 
 # Test: authorization http requests: /authorize;
@@ -77,8 +77,8 @@ class HttpAuthTest(unittest.TestCase):
         r = requests.post(url('/authorize'), headers=self.headers, data=data)
         data = r.json()
         self.assertEqual(200, r.status_code)
-        self.assertEqual(401, data['status'])
-        self.assertEqual('Unauthorized.', data['description'])
+        self.assertEqual(400, data['status'])
+        self.assertEqual('Authorization is invalid.', data['description'])
 
         # Wrong digest
         data = createAuthData(12)

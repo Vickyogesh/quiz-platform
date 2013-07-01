@@ -45,6 +45,7 @@ with the user's authorization information.
 
      * nonce - server nonce
      * appid - application ID
+     * quiz_type - quiz type
      * login - user login
      * digest - authorization digest
 
@@ -72,6 +73,7 @@ with the user's authorization information.
         "nonce": "cf7d8c2e4511132eb3acf7082e9147d9",
         "login": "testuser",
         "appid": "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+        "quiz_type": "quiz_b",
         "digest": "2389ce38fd88cfcdce0484269cbbccb2"
       }
 

@@ -8,6 +8,7 @@ import os.path
 import argparse
 import csv
 from dbtools import DbManager
+from dbtools.settings import QUIZ_B
 
 
 # Input files
@@ -59,7 +60,7 @@ class Db(DbManager):
                 if is_first:
                     is_first = False
                     continue
-                lines.append({'priority': row[2], 'text': row[1]})
+                lines.append({'quiz_type': QUIZ_B, 'priority': row[2], 'text': row[1]})
             self.conn.execute(self.tbl_chapters.insert(), lines)
 
     def fillTopics(self):
@@ -77,6 +78,7 @@ class Db(DbManager):
                 text_fr = row[4] or text
                 text_de = row[5] or text
                 lines.append({
+                    'quiz_type': QUIZ_B,
                     'text': text,
                     'text_fr': text_fr,
                     'text_de': text_de,
@@ -96,6 +98,7 @@ class Db(DbManager):
                     is_first = False
                     continue
                 lines.append({
+                    'quiz_type': QUIZ_B,
                     'text': row[7],
                     'text_fr': row[11],
                     'text_de': row[12],
