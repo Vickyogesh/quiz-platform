@@ -81,7 +81,7 @@ class UserMixin(object):
             row = None
         if row is None:
             raise QuizCoreError('Unknown student.')
-        return {'id': row[0], 'type': row[1], 'school_id': row[2]}
+        return {'id': row[0], 'type': row[1], 'school_id': row[3]}
 
     def _normErr(self, err):
         if err is None:
