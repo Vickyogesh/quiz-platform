@@ -261,10 +261,10 @@
 				else 
 					id = "#quiz0" + (j+1) + " .text";
 					
-				var text = quizData[i].text;
+				var text = quizData[i].id.toString() + " | " + quizData[i].text;
 				$(id).html(text);
 				
-				if (i == curIndex && quizData[i].image != "") {
+				if (i == curIndex && quizData[i].image !== "" && quizData[i].image !== undefined) {
 					var image = "/img/" + quizData[i].image + ".jpg";
 					$("#imagearea img").attr("src", image);
 					$("#imagearea span").html("fig. " + quizData[i].image);
@@ -339,7 +339,7 @@
 				$('#quizlistarea').css('overflow-x', 'hidden');
 								
 				id = "#quiz0" + (i+1) + " .text";
-				var text = quizData[i].text;
+				var text = quizData[i].id.toString() + " | " + quizData[i].text;
 				$(id).html(text);
 				
 				if (answer_list[i] == 1) {
