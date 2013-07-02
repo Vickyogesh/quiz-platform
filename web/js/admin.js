@@ -164,6 +164,7 @@ function onAuth()
     var auth = {
       nonce: nonce,
       login: login,
+      quiz_type: "quiz_b",
       appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
       digest: hex_md5(nonce + ':' + digest)
     };
