@@ -54,9 +54,9 @@ class ExamMixin(object):
     # Example:
     #
     # | priority | min_id  |  max_id
-    # |----------+-----+------
-    # |     1    |    1    |  100
-    # |     2    |   101   |  200
+    # |----------+---------+---------
+    # |     1    |    1    |   100
+    # |     2    |   101   |   200
     #
     # This means what for row 1 we need select one question in the range
     # [1 - 100] and for row 2 we need select two (random) questions
@@ -189,23 +189,24 @@ class ExamMixin(object):
         exam = self._createExamInfo(res)
         student = self._getStudentById(user_id)
         res = self.__examquest.execute(exam_id=exam_id)
+        q = self.questions
 
         if lang == 'de':
-            txt_lang = 3
+            txt_lang = q.c.text_de
         elif lang == 'fr':
-            txt_lang = 2
+            txt_lang = q.c.text_fr
         else:
-            txt_lang = 1
+            txt_lang = q.c.text
 
         questions = []
         for row in res:
             d = {
-                'id': row[0],
+                'id': row[q.c.id],
                 'text': row[txt_lang],
-                'answer': row[4],
-                'image': row[5],
-                'image_bis': row[6],
-                'is_correct': row[9]
+                'answer': row[q.c.answer],
+                'image': row[q.c.image],
+                'image_bis': row[q.c.image_part],
+                'is_correct': row[10]
             }
             self._aux_question_delOptionalField(d)
             questions.append(d)
