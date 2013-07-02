@@ -41,3 +41,7 @@ TEST_USERS = [
         'type': 'student',
         'school_id': 1
     }]
+
+
+# Quiz types
+QUIZ_B = 1

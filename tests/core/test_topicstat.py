@@ -22,17 +22,23 @@ def now():
     return datetime.utcnow().date()
 
 
+# NOTE: old tests - we disabled them.
+
 # Test: topic_err_current and topic_err_history
+@unittest.skip
 class CoreTopicHistoryTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
+        self.main = {'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.engine = self.core.engine
         cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
+
+    def sql(self, *args, **kwargs):
+        return self.engine.execute(*args, **kwargs)
 
     # Check: add new answer.
     # answers -> topic_err_current -> topic_err_snapshot
@@ -41,23 +47,23 @@ class CoreTopicHistoryTest(unittest.TestCase):
     # Also new row will be added to the topic_err_snapshot
     # (or updated if date the same).
     def test_add(self):
-        self.engine.execute("INSERT INTO answers VALUES(4, 1, 0)")
-        res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
+        self.sql("INSERT INTO answers VALUES(4, 1, 0)")
+        res = self.sql("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
         self.assertEqual(R(user=4, topic=1, err=1, count=1), res[0])
 
-        self.engine.execute("INSERT INTO answers VALUES(4, 2, 1)")
-        res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
+        self.sql("INSERT INTO answers VALUES(4, 2, 1)")
+        res = self.sql("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
         self.assertEqual(R(user=4, topic=1, err=1, count=2), res[0])
 
-        self.engine.execute("INSERT INTO answers VALUES(4, 203, 1)")
-        res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
+        self.sql("INSERT INTO answers VALUES(4, 203, 1)")
+        res = self.sql("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(2, len(res))
         self.assertEqual(R(user=4, topic=1, err=1, count=2,), res[0])
         self.assertEqual(R(user=4, topic=2, err=0, count=1,), res[1])
 
-        res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
+        res = self.sql("SELECT * FROM topic_err_snapshot").fetchall()
         self.assertEqual(2, len(res))
         self.assertEqual(S(user=4, topic=1, date=now(), err=50), res[0])
         self.assertEqual(S(user=4, topic=2, date=now(), err=0), res[1])
@@ -66,12 +72,12 @@ class CoreTopicHistoryTest(unittest.TestCase):
     def test_update(self):
         R = TopicErrLastRow
 
-        self.engine.execute("INSERT INTO answers VALUES (4, 1, 0), (4, 2, 1)")
-        self.engine.execute("UPDATE answers SET is_correct=1 WHERE question_id=1")
-        res = self.engine.execute("SELECT * FROM topic_err_current").fetchall()
+        self.sql("INSERT INTO answers VALUES (4, 1, 0), (4, 2, 1)")
+        self.sql("UPDATE answers SET is_correct=1 WHERE question_id=1")
+        res = self.sql("SELECT * FROM topic_err_current").fetchall()
         self.assertEqual(1, len(res))
         self.assertEqual(R(user=4, topic=1, err=0, count=2), res[0])
-        res = self.engine.execute("SELECT * FROM topic_err_snapshot").fetchall()
+        res = self.sql("SELECT * FROM topic_err_snapshot").fetchall()
         self.assertEqual(1, len(res))
         self.assertEqual(S(user=4, topic=1, date=now(), err=0), res[0])
 
@@ -90,15 +96,15 @@ class CoreTopicHistoryTest(unittest.TestCase):
                 'now_date': dt - timedelta(days=x),
                 'err_percent': 12 + x
             })
-        self.engine.execute(t.insert(), lst)
-        # res = self.engine.execute(t.select()).fetchall()
+        self.sql(t.insert(), lst)
+        # res = self.sql(t.select()).fetchall()
         # for r in res:
         #     print r
 
         #tm = dt - timedelta(days=4)
-        self.engine.execute(curr.insert(), user_id=4, topic_id=1,
+        self.sql(curr.insert(), user_id=4, topic_id=1,
                             err_count=20, count=40)
-        #res = self.engine.execute("SELECT * FROM topic_err_current").fetchone()
+        #res = self.sql("SELECT * FROM topic_err_current").fetchone()
 
 
 # Test: topic statistics calculation in various situations.
@@ -106,7 +112,7 @@ class CoreTopicHistoryTest(unittest.TestCase):
 class CoreTopicStatTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.main = {'admin_password': '', 'guest_allowed_requests': 10}
+        self.main = {'guest_allowed_requests': 10}
         self.core = QuizCore(self)
         self.engine = self.core.engine
         cleanupdb_onSetup(self.engine)
@@ -115,9 +121,12 @@ class CoreTopicStatTest(unittest.TestCase):
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)
 
+    def sql(self, *args, **kwargs):
+        return self.engine.execute(*args, **kwargs)
+
     # Helper function to get number of questions in all topics.
     def _getTopicInfo(self):
-        res = self.engine.execute("SELECT id, max_id - min_id + 1 FROM topics")
+        res = self.sql("SELECT id, max_id - min_id + 1 FROM topics")
         return [row[1] for row in res]
 
     # Check stat if there are no enough info
@@ -140,33 +149,33 @@ class CoreTopicStatTest(unittest.TestCase):
 
         # Put one question to the errors table.
         ins = err.insert().values(user_id=1, question_id=1)
-        self.engine.execute(ins)
+        self.sql(ins)
 
         # We must have one error for the topic.
         # We can skip filtering rules since table is empty initially.
-        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        res = self.sql("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(1, res[0])
 
         # Put more questions.
         ins = err.insert().values([{'user_id': 1, 'question_id': 2},
                                    {'user_id': 1, 'question_id': 3}])
-        self.engine.execute(ins)
+        self.sql(ins)
 
-        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        res = self.sql("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(3, res[0])
 
         # Remove two questions from the erros table
         d = err.delete().where(err.c.question_id.in_([1, 3]))
-        self.engine.execute(d)
+        self.sql(d)
 
         # Now we again have only one error
-        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        res = self.sql("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(1, res[0])
 
         # Remove last error
         d = err.delete().where(err.c.question_id == 2)
-        self.engine.execute(d)
-        res = self.engine.execute("SELECT err_count from topics_stat").fetchone()
+        self.sql(d)
+        res = self.sql("SELECT err_count from topics_stat").fetchone()
         self.assertEqual(0, res[0])
 
     # Check triggers algo for multiple topics
@@ -183,9 +192,9 @@ class CoreTopicStatTest(unittest.TestCase):
                                    {'user_id': 1, 'question_id': 2005},
                                    {'user_id': 1, 'question_id': 10001}
                                    ])
-        self.engine.execute(ins)
+        self.sql(ins)
 
-        res = self.engine.execute("SELECT topic_id, err_count from topics_stat")
+        res = self.sql("SELECT topic_id, err_count from topics_stat")
         data = [(row[0], row[1]) for row in res]
         self.assertEqual((1, 2), data[0])
         self.assertEqual((2, 3), data[1])
@@ -208,10 +217,10 @@ class CoreTopicStatTest(unittest.TestCase):
         q = self.core.questions
         sel = select([q.c.topic_id]).where(q.c.id.in_(questions))
         sel = sel.group_by(q.c.topic_id)
-        res = self.engine.execute(sel)
+        res = self.sql(sel)
         tid = list(sorted([row[0] for row in res]))
 
-        res = self.engine.execute("SELECT topic_id, err_count from topics_stat")
+        res = self.sql("SELECT topic_id, err_count from topics_stat")
         for row, t in zip(res, tid):
             self.assertEqual(t, row[0])
             # there may be more errors because multiple questions

@@ -17,6 +17,9 @@ from tests_common import cleanupdb_onSetupAccDb, cleanupdb_onTearDownAccDb
 # For more info see tests/core/test_review.py
 class HttpReviewTest(unittest.TestCase):
     def setUp(self):
+        self.engine = create_engine(db_uri, echo=False)
+        cleanupdb_onSetup(self.engine)
+        cleanupdb_onSetupAccDb(self, drop_users=True, add_users=True)
         self.req = requests.Session()
 
         r = self.req.get(url('/authorize'))
@@ -29,10 +32,7 @@ class HttpReviewTest(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, r.json()['status'])
 
-        self.engine = create_engine(db_uri, echo=False)
-        cleanupdb_onSetup(self.engine)
-        cleanupdb_onSetupAccDb(self)
-        self.engine.execute("INSERT IGNORE INTO answers VALUES (3,1,0),(3,2,0)")
+        self.engine.execute("INSERT IGNORE INTO answers VALUES (3,1,1,0),(3,1,2,0)")
 
     def tearDown(self):
         cleanupdb_onTearDown(self.engine)

@@ -4,9 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
-
 import unittest
-import hashlib
 from quiz.settings import Settings
 
 
@@ -35,7 +33,7 @@ class CoreSettingsTest(unittest.TestCase):
         self.assertEqual('quiz', info['dbname'])
         self.assertEqual('charset=utf8', info['params'])
         self.assertEqual('mysql://quiz:quiz@192.168.56.101/quiz?charset=utf8',
-            info['database'])
+                         info['database'])
 
         # test URI without trailing slash and params
         Settings.CONFIG_FILE = 'config2.ini'
@@ -75,10 +73,6 @@ class CoreSettingsTest(unittest.TestCase):
         Settings.CONFIG_FILE = 'config3.ini'
         settings = Settings([self.path], verbose=False)
         main = settings.main
-
-        m = hashlib.md5()
-        m.update('admin:ari09Xsw_')
-        self.assertEqual(m.hexdigest(), main['admin_password'])
         self.assertEqual(10, main['guest_allowed_requests'])
 
 

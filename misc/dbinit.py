@@ -8,6 +8,7 @@ import os.path
 import argparse
 import csv
 from dbtools import DbManager
+from dbtools.settings import QUIZ_B
 
 
 # Input files
@@ -55,11 +56,13 @@ class Db(DbManager):
             reader = csv.reader(csvfile, delimiter=self.args.delimiter)
             lines = []
             is_first = True
+            id = 1
             for row in reader:
                 if is_first:
                     is_first = False
                     continue
-                lines.append({'priority': row[2], 'text': row[1]})
+                lines.append({'id': id, 'quiz_type': QUIZ_B, 'priority': row[2], 'text': row[1]})
+                id += 1
             self.conn.execute(self.tbl_chapters.insert(), lines)
 
     def fillTopics(self):
@@ -69,6 +72,7 @@ class Db(DbManager):
             reader = csv.reader(csvfile, delimiter=self.args.delimiter)
             lines = []
             is_first = True
+            id = 1
             for row in reader:
                 if is_first:
                     is_first = False
@@ -77,11 +81,14 @@ class Db(DbManager):
                 text_fr = row[4] or text
                 text_de = row[5] or text
                 lines.append({
+                    'id': id,
+                    'quiz_type': QUIZ_B,
                     'text': text,
                     'text_fr': text_fr,
                     'text_de': text_de,
                     'chapter_id': row[2]
                 })
+                id += 1
             self.conn.execute(self.tbl_topics.insert(), lines)
 
     def fillQuestions(self):
@@ -91,11 +98,14 @@ class Db(DbManager):
             reader = csv.reader(csvfile, delimiter=self.args.delimiter)
             lines = []
             is_first = True
+            id = 1
             for row in reader:
                 if is_first:
                     is_first = False
                     continue
                 lines.append({
+                    'id': id,
+                    'quiz_type': QUIZ_B,
                     'text': row[7],
                     'text_fr': row[11],
                     'text_de': row[12],
@@ -105,6 +115,7 @@ class Db(DbManager):
                     'chapter_id': row[1],
                     'topic_id': row[4]
                 })
+                id += 1
             self.conn.execute(self.tbl_questions.insert(), lines)
 
     def fillData(self):

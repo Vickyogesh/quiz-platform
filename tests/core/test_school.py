@@ -15,7 +15,7 @@ from quiz.core.exceptions import QuizCoreError
 class CoreSchoolTest(unittest.TestCase):
     def setUp(self):
         self.dbinfo = {'database': db_uri, 'verbose': 'false'}
-        self.main = {'admin_password': '', 'guest_allowed_requests': 2}
+        self.main = {'guest_allowed_requests': 2}
         self.core = QuizCore(self)
         self.engine = self.core.engine
         cleanupdb_onSetup(self.engine)
@@ -31,7 +31,7 @@ class CoreSchoolTest(unittest.TestCase):
     def test_deleteStudent(self):
         # create exam and answer some questions.
         # See core/test_exam.py for more info.
-        info = self.core.createExam(3, 'it')
+        info = self.core.createExam(1, 3, 'it')
         questions = [q['id'] for q in info['questions']]
         questions = list(sorted(questions))
         answers = [1] * 40
@@ -40,7 +40,7 @@ class CoreSchoolTest(unittest.TestCase):
 
         # Put some quiz answers
         # See core/test_quiz.py for more info.
-        self.core.saveQuiz(3, 1, [10, 12, 13], [1, 1, 0])
+        self.core.saveQuiz(1, 3, 1, [10, 12, 13], [1, 1, 0])
 
         # Now we must have rows in the following tables:
         # exams, exam_answers, topics_stat, errors, quiz_answers;
@@ -58,7 +58,7 @@ class CoreSchoolTest(unittest.TestCase):
         res = self.engine.execute("SELECT count(*) from quiz_answers").fetchone()
         self.assertLessEqual(1, res[0])
         res = self.engine.execute("SELECT count(*) from users").fetchone()
-        self.assertEqual(4, res[0])
+        self.assertEqual(5, res[0])
 
         # Now we can delete school and see
         # if all generated date will be removed too.

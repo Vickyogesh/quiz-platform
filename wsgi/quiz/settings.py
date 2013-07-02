@@ -1,6 +1,5 @@
 import ConfigParser
 import os.path
-import hashlib
 
 
 class Settings(object):
@@ -44,9 +43,6 @@ class Settings(object):
     def _parse_main(self, cfg):
         self.main = {}
         self._fill_params(cfg, self.main, 'main')
-        m = hashlib.md5()
-        m.update('admin:%s' % self.main['admin_password'])
-        self.main['admin_password'] = m.hexdigest()
         self.main['guest_allowed_requests'] = int(self.main['guest_allowed_requests'])
 
     # Put session info to the self.session

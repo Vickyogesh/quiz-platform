@@ -1,18 +1,19 @@
-from sqlalchemy import select
+from sqlalchemy import select, and_
 
 
 class ErrorReviewMixin(object):
     """This mixin provides Error Review feature. Used in QuizCore."""
     def __init__(self):
-        self.__geterrors = self.sql(""" SELECT * FROM questions q INNER JOIN
-            (SELECT question_id id FROM answers WHERE user_id=:user_id
-             AND is_correct=0 LIMIT 100) e USING(id) ORDER BY RAND() LIMIT 40;
+        self.__geterrors = self.sql("""SELECT q.* FROM questions q INNER JOIN
+            (SELECT question_id id, quiz_type FROM answers
+             WHERE quiz_type=:quiz_type AND user_id=:user_id
+             AND is_correct=0 LIMIT 100) e
+            ON q.quiz_type=e.quiz_type AND q.id=e.id ORDER BY RAND() LIMIT 40;
         """)
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
 
-    def getErrorReview(self, user, lang):
-        res = self.__geterrors.execute(user_id=user)
-
+    def getErrorReview(self, quiz_type, user, lang):
+        res = self.__geterrors.execute(quiz_type=quiz_type, user_id=user)
         if lang == 'de':
             lang = self.questions.c.text_de
         elif lang == 'fr':
@@ -30,36 +31,29 @@ class ErrorReviewMixin(object):
                 'image': row[self.questions.c.image],
                 'image_bis': row[self.questions.c.image_part]
             }
-
             self._aux_question_delOptionalField(d)
             questions.append(d)
         return {'questions': questions}
 
-    def saveErrorReview(self, user, questions, answers):
+    def saveErrorReview(self, quiz_type, user, questions, answers):
         questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers
         q = self.questions
-        s = select([q.c.id, q.c.answer], q.c.id.in_(questions))
+        s = select([q.c.id, q.c.answer], and_(
+                   q.c.quiz_type == quiz_type,
+                   q.c.id.in_(questions)))
         res = self.engine.execute(s)
 
         ans = []
         for row, answer in zip(res, answers):
             ans.append({
                 'user_id': user,
+                'quiz_type': quiz_type,
                 'question_id': row[q.c.id],
                 'is_correct': row[q.c.answer] == answer
             })
-        # ans = [row[q.c.id] for row, answer in zip(res, answers)
-        #        if row[q.c.answer] == answer]
-        # ans = []
-        # for row, answer in zip(res, answers):
-        #     if row[q.c.answer] == answer:
-        #         ans.append(row[q.c.id])
         if ans:
             with self.engine.begin() as conn:
                 t = self.answers
                 conn.execute(t.insert(append_string=self.__add), ans)
-                # d = t.delete().where(and_(t.c.user_id == user,
-                #                      t.c.question_id.in_(ans)))
-                # conn.execute(d)

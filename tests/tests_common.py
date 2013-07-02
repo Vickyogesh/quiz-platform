@@ -1,7 +1,8 @@
 # common test parameters
 import hashlib
 import unittest
-from sqlalchemy import create_engine, MetaData, text
+from datetime import date
+from sqlalchemy import create_engine, MetaData
 
 app_id = '32bfe1c505d4a2a042bafd53993f10ece3ccddca'
 user = 'testuser'
@@ -18,40 +19,41 @@ def url(path):
 
 
 def cleanupdb_onSetup(engine, drop_users=False):
-    with engine.begin() as conn:
-        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
-        conn.execute("TRUNCATE TABLE topic_err_current;")
-        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
-        conn.execute("TRUNCATE TABLE quiz_answers;")
-        conn.execute("TRUNCATE TABLE exam_answers;")
-        conn.execute("TRUNCATE TABLE exams;")
-        conn.execute("TRUNCATE TABLE answers;")
-        conn.execute("TRUNCATE TABLE topic_err_current;")
-        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
-        if drop_users:
-            conn.execute("TRUNCATE TABLE users;")
-            conn.execute("TRUNCATE TABLE guest_access;")
+    engine.execute("TRUNCATE TABLE user_progress_snapshot;")
+    engine.execute("TRUNCATE TABLE topic_err_current;")
+    engine.execute("TRUNCATE TABLE topic_err_snapshot;")
+    engine.execute("TRUNCATE TABLE quiz_answers;")
+    engine.execute("TRUNCATE TABLE exam_answers;")
+    engine.execute("TRUNCATE TABLE exams;")
+    engine.execute("TRUNCATE TABLE answers;")
+    engine.execute("TRUNCATE TABLE school_topic_err;")
+    engine.execute("TRUNCATE TABLE school_topic_err_snapshot;")
+    engine.execute("TRUNCATE TABLE school_stat_cache;")
+    if drop_users:
+        engine.execute("TRUNCATE TABLE users;")
+        engine.execute("TRUNCATE TABLE guest_access;")
+        engine.execute("TRUNCATE TABLE guest_access_snapshot;")
 
 
 def cleanupdb_onTearDown(engine):
-    with engine.begin() as conn:
-        conn.execute("TRUNCATE TABLE user_progress_snapshot;")
-        conn.execute("TRUNCATE TABLE topic_err_current;")
-        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
-        conn.execute("TRUNCATE TABLE quiz_answers;")
-        conn.execute("TRUNCATE TABLE exam_answers;")
-        conn.execute("TRUNCATE TABLE exams;")
-        conn.execute("TRUNCATE TABLE answers;")
-        conn.execute("TRUNCATE TABLE topic_err_current;")
-        conn.execute("TRUNCATE TABLE topic_err_snapshot;")
-        conn.execute("TRUNCATE TABLE guest_access;")
-        conn.execute("TRUNCATE TABLE users;")
-        #conn.execute("DELETE FROM users WHERE school_id=1")
-        conn.execute("INSERT INTO users VALUES(1, 'guest', 1, UTC_TIMESTAMP(), -1)")
-        conn.execute("INSERT INTO users VALUES(2, 'guest', 2, UTC_TIMESTAMP(), -1)")
-        conn.execute("INSERT INTO users VALUES(3, 'student', 1, UTC_TIMESTAMP(), -1)")
-        conn.execute("INSERT INTO users VALUES(4, 'student', 1, UTC_TIMESTAMP(), -1)")
-
+    engine.execute("TRUNCATE TABLE user_progress_snapshot;")
+    engine.execute("TRUNCATE TABLE topic_err_current;")
+    engine.execute("TRUNCATE TABLE topic_err_snapshot;")
+    engine.execute("TRUNCATE TABLE quiz_answers;")
+    engine.execute("TRUNCATE TABLE exam_answers;")
+    engine.execute("TRUNCATE TABLE exams;")
+    engine.execute("TRUNCATE TABLE answers;")
+    engine.execute("TRUNCATE TABLE guest_access;")
+    engine.execute("TRUNCATE TABLE guest_access_snapshot;")
+    engine.execute("TRUNCATE TABLE users;")
+    engine.execute("TRUNCATE TABLE school_topic_err;")
+    engine.execute("TRUNCATE TABLE school_topic_err_snapshot;")
+    engine.execute("TRUNCATE TABLE school_stat_cache;")
+    engine.execute("INSERT INTO users VALUES(1, 'guest', 1, 1, UTC_TIMESTAMP(), -1)")
+    engine.execute("INSERT INTO users VALUES(2, 'guest', 1, 2, UTC_TIMESTAMP(), -1)")
+    engine.execute("INSERT INTO users VALUES(3, 'student', 1, 1, UTC_TIMESTAMP(), -1)")
+    engine.execute("INSERT INTO users VALUES(3, 'student', 2, 1, UTC_TIMESTAMP(), -1)")
+    engine.execute("INSERT INTO users VALUES(4, 'student', 1, 1, UTC_TIMESTAMP(), -1)")
     engine.dispose()
 
 
@@ -68,6 +70,7 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
         tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
     if add_users:
         tst.acc_engine.execute(tst.acc_schools.insert().values(
+            access_quiz_b=date(2050, 01, 01),
             name='Chuck Norris School',
             login='chuck@norris.com',
             passwd=_pwd('chuck@norris.com', 'boo')))
@@ -95,6 +98,7 @@ def cleanupdb_onTearDownAccDb(tst):
     tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
     tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
     tst.acc_engine.execute(tst.acc_schools.insert().values(
+        access_quiz_b=date(2050, 01, 01),
         name='Chuck Norris School',
         login='chuck@norris.com',
         passwd=_pwd('chuck@norris.com', 'boo')))
@@ -126,19 +130,21 @@ def _createDigest(nonce, username, passwd):
     return m.hexdigest()
 
 
-def createAuthData(nonce, appkey=None, login=None, passwd=None):
+def createAuthData(nonce, appkey=None, login=None, passwd=None,
+                   quiz_type='quiz_b'):
     user_login = login or user
     user_pass = passwd or password
     return {
         'nonce': nonce,
         'appid': appkey or app_id,
         'login': user_login,
+        'quiz_type': quiz_type,
         'digest': _createDigest(nonce, user_login, user_pass)
     }
 
 
 # type: admin. school, guest, student
-def createAuthFor(type, nonce=123):
+def createAuthFor(type, nonce=123, quiz_type='quiz_b'):
     auth = {
         'admin': {'login': 'admin', 'passwd': 's=myA{xOYQ.(Vbgx26'},
         'school': {'login': 'chuck@norris.com', 'passwd': 'boo'},
@@ -150,6 +156,7 @@ def createAuthFor(type, nonce=123):
     return {
         'nonce': nonce,
         'appid': app_id,
+        'quiz_type': quiz_type,
         'login': user['login'],
         'digest': _createDigest(nonce, user['login'], user['passwd'])
     }
@@ -185,10 +192,12 @@ class HttpStatusTest(unittest.TestCase):
             raise self.failureException('Non 200 response from server.')
 
         data = response.json()
-        if 'status' not in data or 'description' not in data:
+        if 'status' not in data:
             raise self.failureException('Malformed server error response.')
 
         if data['status'] == 403:
+            if 'description' not in data:
+                raise self.failureException('Malformed server error response.')
             if data['description'] != 'Forbidden.':
                 print data
                 raise self.failureException('Forbidden, but wrong description.')

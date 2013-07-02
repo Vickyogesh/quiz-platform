@@ -25,6 +25,7 @@ NUM_QUESTIONS = 200
 NUM_SCHOOLS = 200
 NUM_STUDENTS = 4
 NUM_ANS_QUESTIONS = NUM_QUESTIONS * 0.7
+NUM_QUIZ_TYPES = 3
 
 
 class Db(DbManager):
@@ -56,30 +57,31 @@ class Db(DbManager):
                             help="Fill with example school data.")
         self.args = parser.parse_args()
 
-    def createUsers(self):
-        print('Populating: %d schools with %d users per school...'
-              % (NUM_SCHOOLS, NUM_STUDENTS))
+    # NOTE: Old code, not used.
+    # def createUsers(self):
+    #     print('Populating: %d schools with %d users per school...'
+    #           % (NUM_SCHOOLS, NUM_STUDENTS))
 
-        for i in range(1, NUM_SCHOOLS):
-            vals = []
-            tmp = 'school%d' % i
-            vals.append({
-                'name': tmp,
-                'login': tmp,
-                'passwd': self._create_digest(tmp, tmp),
-                'type': 'school',
-                'school_id': 0
-            })
-            for j in range(1, NUM_STUDENTS):
-                tmp = 'student%d.%d' % (i, j)
-                vals.append({
-                    'name': tmp,
-                    'login': tmp,
-                    'passwd': self._create_digest(tmp, tmp),
-                    'type': 'student',
-                    'school_id': i
-                })
-            self.conn.execute(self.tbl_users.insert(), vals)
+    #     for i in range(1, NUM_SCHOOLS):
+    #         vals = []
+    #         tmp = 'school%d' % i
+    #         vals.append({
+    #             'name': tmp,
+    #             'login': tmp,
+    #             'passwd': self._create_digest(tmp, tmp),
+    #             'type': 'school',
+    #             'school_id': 0
+    #         })
+    #         for j in range(1, NUM_STUDENTS):
+    #             tmp = 'student%d.%d' % (i, j)
+    #             vals.append({
+    #                 'name': tmp,
+    #                 'login': tmp,
+    #                 'passwd': self._create_digest(tmp, tmp),
+    #                 'type': 'student',
+    #                 'school_id': i
+    #             })
+    #         self.conn.execute(self.tbl_users.insert(), vals)
 
     def fillBigData(self):
         print("Preparing to populate with test data...")
@@ -95,33 +97,38 @@ class Db(DbManager):
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_answers;')
 
         self.conn.execute(text(
-            """CREATE PROCEDURE aux_chapters()
+            """CREATE PROCEDURE aux_chapters(IN type INT)
             BEGIN
                 DECLARE i INT DEFAULT 1;
-                PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, 1, ?, 0, 0)';
+                PREPARE stmt FROM 'INSERT INTO chapters VALUES(?, ?, 1, ?, 0, 0)';
                 START TRANSACTION;
                 WHILE (i <= {chapters}) DO
                     SET @a = i;
-                    SET @b = CONCAT('chapter ', i);
-                    EXECUTE stmt USING @a, @b;
+                    SET @b = type;
+                    SET @c = CONCAT('chapter ', i, ' type: ', type);
+                    EXECUTE stmt USING @a, @b, @c;
                     SET i = i + 1;
                 END WHILE;
                 COMMIT;
                 DEALLOCATE PREPARE stmt;
             END;
-            CREATE PROCEDURE aux_topics()
+            CREATE PROCEDURE aux_topics(IN type INT)
             BEGIN
                 DECLARE i INT DEFAULT 1;
                 DECLARE j INT DEFAULT 1;
+                DECLARE idx INT DEFAULT 1;
 
-                PREPARE stmt FROM 'INSERT INTO topics(text, chapter_id) VALUES(?, ?)';
+                PREPARE stmt FROM 'INSERT INTO topics(id, quiz_type, text, chapter_id) VALUES(?, ?, ?, ?)';
                 START TRANSACTION;
                 WHILE (i <= {chapters}) DO
                     WHILE (j <= {topics}) DO
-                        SET @a = CONCAT('topic ', i, '.', j);
-                        SET @b = i;
-                        EXECUTE stmt USING @a, @b;
+                        SET @ix = idx;
+                        SET @a = type;
+                        SET @b = CONCAT('topic ', i, '.', j, ' type: ', type);
+                        SET @c = i;
+                        EXECUTE stmt USING @ix, @a, @b, @c;
                         SET j = j + 1;
+                        SET idx = idx + 1;
                     END WHILE;
                     SET i = i + 1;
                     SET j = 1;
@@ -130,24 +137,29 @@ class Db(DbManager):
                 update chapters set priority=2 where id > 10;
                 DEALLOCATE PREPARE stmt;
             END;
-            CREATE PROCEDURE aux_questions()
+            CREATE PROCEDURE aux_questions(IN type INT, IN ans INT)
             BEGIN
                 DECLARE chap INT DEFAULT 1;
                 DECLARE top INT DEFAULT 1;
                 DECLARE quest INT DEFAULT 1;
                 DECLARE n INT DEFAULT 1;
+                DECLARE i INT DEFAULT 1;
                 SET n = {chapters} * {topics};
 
-                PREPARE stmt FROM 'INSERT INTO questions(text, answer, chapter_id, topic_id) VALUES(?, 1, ?, ?)';
+                PREPARE stmt FROM 'INSERT INTO questions(id, quiz_type, text, answer, chapter_id, topic_id) VALUES(?, ?, ?, ?, ?, ?)';
                 START TRANSACTION;
                 WHILE (chap <= {chapters}) DO
                     WHILE (top <= {topics}) DO
                         WHILE (quest <= {questions}) DO
-                            SET @a = CONCAT('question ', chap, '.', top, '.', quest);
-                            SET @b = chap;
-                            SET @c = top + (chap - 1) * {topics};
-                            EXECUTE stmt USING @a, @b, @c;
+                            SET @i = i;
+                            SET @a = type;
+                            SET @b = CONCAT('question ', chap, '.', top, '.', quest, ' type: ', type);
+                            SET @c = chap;
+                            SET @d = top + (chap - 1) * {topics};
+                            SET @answ = ans;
+                            EXECUTE stmt USING @i, @a, @b, @answ, @c, @d;
                             SET quest = quest + 1;
+                            SET i = i + 1;
                         END WHILE;
                         SET top = top + 1;
                         SET quest = 1;
@@ -199,15 +211,18 @@ class Db(DbManager):
                        num_ans=NUM_ANS_QUESTIONS)))
 
         print("Populating with test data... chapters")
-        self.conn.execute('call aux_chapters();')
+        self.conn.execute('call aux_chapters(1);')
+        self.conn.execute('call aux_chapters(2);')
 
         print("Populating with test data... topics")
-        self.conn.execute('call aux_topics();')
+        self.conn.execute('call aux_topics(1);')
+        self.conn.execute('call aux_topics(2);')
 
         print("Populating with test data... questions")
-        self.conn.execute('call aux_questions();')
+        self.conn.execute('call aux_questions(1, 1);')
+        self.conn.execute('call aux_questions(2, 0);')
 
-        if self.args.qs:
+        if self.args.qs:  # TODO: not worked, fix me
             print("Populating answers...")
             self.conn.execute('call aux_answers();')
         #create_more_users()
@@ -216,6 +231,7 @@ class Db(DbManager):
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_questions;')
         self.conn.execute('DROP PROCEDURE IF EXISTS aux_answers;')
 
+    # TODO: update me to use for new db structure.
     def fillSmallData(self):
         print("Preparing to populate with SMALL test data...")
         self.conn.execute('TRUNCATE TABLE chapters;')

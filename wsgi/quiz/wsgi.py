@@ -8,8 +8,8 @@ except ImportError:
 import os.path
 import random
 import traceback
-import hashlib
 import time
+from datetime import datetime
 
 from werkzeug.utils import cached_property
 from werkzeug.exceptions import HTTPException, BadRequest, Forbidden
@@ -114,6 +114,16 @@ class QuizApp(object):
         * Requests access privileges.
         * 'guest' access control.
     """
+
+    QUIZ_TYPE_ID = {
+        'quiz_b': 1,
+        'quiz_boat': 2,
+        'quiz_bike': 2
+    }
+
+    def _getQuizType(self, quiz_name):
+        return self.QUIZ_TYPE_ID.get(quiz_name, None)
+
     def __init__(self):
         self.session = None
         self.settings = self.__getSettings()
@@ -204,7 +214,7 @@ class QuizApp(object):
         endpoint, args = adapter.match()
         access, handler = self.endpoints[endpoint]
 
-        if self.__can_access(access):
+        if self.__can_access(access, request):
             return self.__call_handler(access, handler, args)
         else:
             raise Forbidden('Forbidden.')
@@ -221,13 +231,18 @@ class QuizApp(object):
     # If user type is present in the access property of the API call
     # then the call will be allowed.
     # If access contains '*' then API call is allowed to any authorized user.
-    def __can_access(self, access):
+    def __can_access(self, access, request):
         if access is None:
             return True
         try:
             user_type = self.session['user_type']
+            self.quiz_type = self.session['quiz_type']
+            # access_end_date = self.session['access_end_date']
+            # TODO: is it fast to get date for each request?
+            # if request.date > access_end_date:
+            #     return False
         except Exception:
-            raise Forbidden('Forbidden.')
+            return False
         can = '*' in access or user_type in access
         return can
 
@@ -243,10 +258,10 @@ class QuizApp(object):
                 user = self.session['user']
                 uid = user['id']
                 sid = user['school_id']
-                self.core.updateUserLastVisit(uid, utype, sid)
+                self.core.updateUserLastVisit(self.quiz_type, uid, utype, sid)
 
                 if utype == 'guest':
-                    if not self.core.processGuestAccess(uid):
+                    if not self.core.processGuestAccess(self.quiz_type, uid):
                         raise Forbidden('Forbidden.')
         return handler(**args)
 
@@ -365,6 +380,25 @@ class QuizApp(object):
         return JSONResponse(QuizWWWAuthenticate(data['nonce']).to_dict(),
                             status=401)
 
+    # Raises error if access is denied or returns expiration date.
+    def _validateQuizAccess(self, quiz_type, quiz_type_id, user):
+        access = user['access']
+        date_str = access.get('access_' + quiz_type, None)
+        if not date_str:
+            raise Forbidden('Forbidden.')
+
+        # Convert string to date.
+        try:
+            d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            raise BadRequest('Unexpected account data.')
+
+        now = datetime.utcnow().date()
+        if d < now:
+            raise Forbidden('Forbidden.')
+        else:
+            return d
+
     def onDoAuth(self):
         """Handle authorization."""
         data = self.request.json
@@ -376,17 +410,33 @@ class QuizApp(object):
         except KeyError:
             raise BadRequest('Invalid parameters.')
 
-        user = self.account.send_auth(login, digest, nonce)
-
         try:
             appid = self.core.getAppId(appkey)
-            #user = self.core.getUserInfo(login, with_passwd=True)
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
+
+        user = self.account.send_auth(login, digest, nonce)
+
+        can_check_date = user['type'] != 'admin'
+
+        try:
+            quiz_type = data["quiz_type"]
+        except KeyError:
+            raise BadRequest('Invalid parameters.')
+
+        quiz_type_id = self._getQuizType(quiz_type)
+        if quiz_type_id is None:
+            raise BadRequest('Invalid parameters.')
+
+        if can_check_date:
+            end_date = self._validateQuizAccess(quiz_type, quiz_type_id, user)
 
         self.session['user'] = user
         self.session['user_id'] = user['id']
         self.session['user_type'] = user['type']
+        self.session['quiz_type'] = quiz_type_id
+        if can_check_date:
+            self.session['access_end_date'] = end_date
         self.session['app_id'] = appid
         self.session.save()
 

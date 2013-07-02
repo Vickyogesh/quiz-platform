@@ -26,15 +26,13 @@ def create_users(mgr):
 
             START TRANSACTION;
             WHILE (school <= schools) DO
-                SET @a = CONCAT('school_', school);
 
-                INSERT INTO schools VALUES(0, @a, @a, MD5(CONCAT(@a, ':', @a)));
+                INSERT INTO users VALUES
+                (0, 'guest', school, UTC_TIMESTAMP(), -1);
 
                 WHILE (user <= users) DO
-                    SET @a = CONCAT('user_', school, '_', user);
                     INSERT INTO users VALUES
-                    (0, @a, @a, @a, MD5(CONCAT(@a, ':', @a)), 'student', school, UTC_TIMESTAMP(), -1);
-
+                    (0, 'student', school, UTC_TIMESTAMP(), -1);
                     SET user = user + 1;
                 END WHILE;
 
@@ -54,13 +52,14 @@ def create_guestvisits(mgr):
     mgr.conn.execute("""CREATE PROCEDURE tst()
         BEGIN
             DECLARE i INT DEFAULT 1;
+            DECLARE qtype INT DEFAULT 0;
             DECLARE numdays INT DEFAULT 35;
             DECLARE day INT DEFAULT 1;
             DECLARE dt DATE DEFAULT NULL;
             DECLARE d DATE DEFAULT NULL;
 
             DECLARE done INT DEFAULT FALSE;
-            DECLARE cur CURSOR FOR SELECT id FROM guest_access;
+            DECLARE cur CURSOR FOR SELECT id, quiz_type FROM guest_access;
             DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 
@@ -69,7 +68,7 @@ def create_guestvisits(mgr):
 
             START TRANSACTION;
             rloop: LOOP
-                FETCH cur INTO i;
+                FETCH cur INTO i, qtype;
                 IF done THEN
                     LEAVE rloop;
                 END IF;
@@ -77,7 +76,7 @@ def create_guestvisits(mgr):
                 SET d = dt;
                 WHILE (day <= numdays) DO
                     INSERT IGNORE INTO guest_access_snapshot
-                    VALUES(i, d, FLOOR(20 + (RAND() * 80)));
+                    VALUES(i, qtype, d, FLOOR(20 + (RAND() * 80)));
 
                     SET day = day + 1;
                     SET d = d - interval 1 day;
@@ -96,7 +95,7 @@ def create_guestvisits(mgr):
 def create_exams(mgr):
     print("Create exams ...")
     mgr.conn.execute("DROP PROCEDURE IF EXISTS tst")
-    mgr.conn.execute("""CREATE PROCEDURE tst()
+    mgr.conn.execute("""CREATE PROCEDURE tst(type)
         BEGIN
             DECLARE numdays INT DEFAULT 35;
             DECLARE user INT DEFAULT 1;
