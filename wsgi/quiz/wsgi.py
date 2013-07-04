@@ -116,9 +116,9 @@ class QuizApp(object):
     """
 
     QUIZ_TYPE_ID = {
-        'quiz_b': 1,
-        'quiz_boat': 2,
-        'quiz_bike': 2
+        'b2011': 1,
+        'boat': 2,
+        'bike': 3
     }
 
     def _getQuizType(self, quiz_name):
@@ -383,7 +383,7 @@ class QuizApp(object):
     # Raises error if access is denied or returns expiration date.
     def _validateQuizAccess(self, quiz_type, quiz_type_id, user):
         access = user['access']
-        date_str = access.get('access_' + quiz_type, None)
+        date_str = access.get(quiz_type, None)
         if not date_str:
             raise Forbidden('Forbidden.')
 

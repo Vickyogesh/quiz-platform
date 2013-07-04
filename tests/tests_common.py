@@ -1,6 +1,7 @@
 # common test parameters
 import hashlib
 import unittest
+import json
 from datetime import date
 from sqlalchemy import create_engine, MetaData
 
@@ -70,7 +71,7 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
         tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
     if add_users:
         tst.acc_engine.execute(tst.acc_schools.insert().values(
-            access_quiz_b=date(2050, 01, 01),
+            access=json.dumps({'b2011': '2050-01-01'}),
             name='Chuck Norris School',
             login='chuck@norris.com',
             passwd=_pwd('chuck@norris.com', 'boo')))
@@ -98,7 +99,7 @@ def cleanupdb_onTearDownAccDb(tst):
     tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
     tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
     tst.acc_engine.execute(tst.acc_schools.insert().values(
-        access_quiz_b=date(2050, 01, 01),
+        access=json.dumps({'b2011': '2050-01-01'}),
         name='Chuck Norris School',
         login='chuck@norris.com',
         passwd=_pwd('chuck@norris.com', 'boo')))
@@ -131,7 +132,7 @@ def _createDigest(nonce, username, passwd):
 
 
 def createAuthData(nonce, appkey=None, login=None, passwd=None,
-                   quiz_type='quiz_b'):
+                   quiz_type='b2011'):
     user_login = login or user
     user_pass = passwd or password
     return {
@@ -144,7 +145,7 @@ def createAuthData(nonce, appkey=None, login=None, passwd=None,
 
 
 # type: admin. school, guest, student
-def createAuthFor(type, nonce=123, quiz_type='quiz_b'):
+def createAuthFor(type, nonce=123, quiz_type='b2011'):
     auth = {
         'admin': {'login': 'admin', 'passwd': 's=myA{xOYQ.(Vbgx26'},
         'school': {'login': 'chuck@norris.com', 'passwd': 'boo'},
