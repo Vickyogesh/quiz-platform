@@ -20,7 +20,8 @@ def create_quiz(topic):
     """ Get 40 questions from the DB and return them to the client. """
     user_id = app.getUserId()
     lang = app.getLang()
-    quiz = app.core.getQuiz(app.quiz_type, user_id, topic, lang)
+    force = app.request.args.get('force', False)
+    quiz = app.core.getQuiz(app.quiz_type, user_id, topic, lang, force)
     return JSONResponse(quiz)
 
 

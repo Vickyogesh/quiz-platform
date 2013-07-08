@@ -86,7 +86,7 @@ class QuizMixin(object):
             quiz.append(d)
         return quiz
 
-    def getQuiz(self, quiz_type, user_id, topic_id, lang):
+    def getQuiz(self, quiz_type, user_id, topic_id, lang, force):
         """Return list of Quiz questions.
 
         Args:
@@ -94,6 +94,8 @@ class QuizMixin(object):
             user_id:   User ID for whom Quiz is generated.
             topic_id:  Topic ID from which get questions for the Quiz.
             lang:      Question language. Can be: (it, fr, de).
+            force:     If all questions are answered then reset quiz state
+                       and start quiz from the beginning.
 
         Question is represented as a dictionary with the following items:
             id        - question ID in the DB
@@ -108,7 +110,7 @@ class QuizMixin(object):
 
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
-        if not questions:
+        if not questions and force:
             t = self.quiz_answers
             self.engine.execute(t.delete().where(and_(
                 t.c.quiz_type == quiz_type,
