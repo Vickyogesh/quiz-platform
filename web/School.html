@@ -42,6 +42,15 @@
 
 		}
 
+		function create_student_html(id, name, surname) {
+			var html = '<li style="position: relative"><div id="data">'
+			html += '<a id="' + id + '" href="Statistics.html?id=' + id + '">';
+			html += name + " " + surname;
+			html += '</a></div>';
+			html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
+			return html;
+		}
+
 		window.qsid = sessionStorage.getItem('quizqsid');
 		
 		WaitMsg.show();
@@ -59,12 +68,8 @@
 			var html = "";
 			var lst = data.students;
 			for (var i = 0; i < lst.length; i++) {
-				html += '<li style="position: relative"><div id="data">'
-				html += '<a id="' + lst[i].id + '" href="Statistics.html?id='
-					 + lst[i].id + '">';
-				html += lst[i].name + " " + lst[i].surname;
-				html += '</a></div>';
-				html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
+				html += create_student_html(lst[i].id, lst[i].name,
+				                            lst[i].surname);
 			}
 
 			$("#school_menu #students").append(html);
@@ -113,7 +118,7 @@
 			var login = $("#school_addstudent #login").val();
 			var passwd = $("#school_addstudent #passwd").val();
 
-			var data = {
+			var info = {
 				name: name,
 				surname: surname,
 				login: login,
@@ -125,7 +130,7 @@
 
 			WaitMsg.show();
 			
-			aux_postJSON(url("/v1/school/me/newstudent"), data, function (data) {
+			aux_postJSON(url("/v1/school/me/newstudent"), info, function (data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
 					aux_showJSONError(data);
@@ -135,6 +140,13 @@
 					$("#school_addstudent #surname").val("");
 					$("#school_addstudent #login").val("");
 					$("#school_addstudent #passwd").val("");
+					var html = create_student_html(data.id, info.name,
+					                               info.surname);
+					$("#school_menu #students").append(html);
+					$('#ctrl:last-child a').click(function() {
+						var item = $(this).parent().parent();
+						delStudent(item);
+					});
 					WaitMsg.hide();
 					alert('Added successfully!');
 				}
