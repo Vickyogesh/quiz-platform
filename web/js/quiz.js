@@ -351,6 +351,12 @@ function setQuizEnv() {
         }
         
         var html;
+        quizhtml2 = '<div class="maintext" style="background-color:#869fbb;">';
+        quizhtml2 += '<p></p></div>';
+        quizhtml2 += '<div class="answer" style="background-color:#869fbb;">';
+        quizhtml2 += '<img class="topt" src="img/true.png"/>';
+        quizhtml2 += '<img class="fopt" src="img/false.png" />';
+        quizhtml2 += '</div>';          
         
         for (i = 0; i < quizData.length; i++) {
             html = '<div id="quiz0' + (i+1) + style;
@@ -361,7 +367,7 @@ function setQuizEnv() {
             $('#quizlistarea').css('overflow-y', 'scroll');
             $('#quizlistarea').css('overflow-x', 'hidden');
                             
-            id = "#quiz0" + (i+1) + " .text";
+            id = "#quiz0" + (i+1) + " .maintext p";
             var text = quizData[i].id.toString() + " | " + quizData[i].text;
             $(id).html(text);
             
@@ -380,6 +386,7 @@ function setQuizEnv() {
             
             // checking answer is correct
             id = "#quiz0" + (i+1) + " .answer";
+
             if (total_answers[i] != null) {
                 $(id).removeClass('trueAnswer');
                 $(id).removeClass('falseAnswer');
@@ -391,7 +398,18 @@ function setQuizEnv() {
                     $(id).addClass('falseAnswer');
                 }
             }
+
+            id = "#quiz0" + (i+1);
+            var ansHeight = $(id + " .maintext").height();
+            var ansTop = (ansHeight - $(id + " .topt").height()) / 2;
+            $(id + " .answer").height(ansHeight);
+            $(id + " .answer").css("margin-top", $(id + " .maintext").css("margin-top"));
+            $(id + " .topt").css('margin-top', ansTop + 'px');
+            $(id + " .fopt").css('margin-top', ansTop + 'px');
+
         }
+        // $(".text").addClass("res");
+        // $(".answer").addClass("res");
     }
     
     // set height of the scroll bar
