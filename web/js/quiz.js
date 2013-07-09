@@ -80,7 +80,7 @@ function saveState() {
 
 function push_answer(index, ans) {
     var qid = quizData[index].id;
-    console.log('push_answer for '+ qid, index, ans);
+    //console.log('push_answer for '+ qid, index, ans);
 
     total_ids.push(qid);
     total_answers.push(ans);
@@ -92,7 +92,7 @@ function sendAnswers(callback) {
     if (current_ids.length == 0)
         return
 
-    console.log('send answers ln='+ current_ids.length + ': ' + current_ids)
+    //console.log('send answers ln='+ current_ids.length + ': ' + current_ids)
     var data = {
         questions: current_ids,
         answers: current_answers
@@ -128,7 +128,7 @@ function alreadyAnswered(nIndex) {
 }
 
 function fillupQuiz(force) {
-    console.log("fillupQuiz", force);
+    //console.log("fillupQuiz", force);
     var lang = "it";
     var uri = url("/v1/quiz/" + topicIndex);
     var data = {};
@@ -137,7 +137,7 @@ function fillupQuiz(force) {
         data.lang = lang;
 
     function do_get(d, force, on_ok) {
-        console.log("do_get", force);
+        //console.log("do_get", force);
         WaitMsg.show();
         var p = uri;
         if (force)
@@ -153,11 +153,11 @@ function fillupQuiz(force) {
     }
 
     function do_show(data) {
-        console.log("do_show", data.questions.length);
-        var tmp = []
-        for (var i = 0; i < data.questions.length; i++)
-            tmp.push(data.questions[i].id);
-        console.log(tmp.toString());
+        //console.log("do_show", data.questions.length);
+        // var tmp = []
+        // for (var i = 0; i < data.questions.length; i++)
+        //     tmp.push(data.questions[i].id);
+        //console.log(tmp.toString());
 
         WaitMsg.hide();
         $("#topicgroup").hide();
@@ -177,11 +177,11 @@ function fillupQuiz(force) {
             if (!hasQuestion(q.id))
                 quizData.push(q);
         }
-        console.log("total", quizData.length);
-        tmp = [];
-        for (var i = 0; i < quizData.length; i++)
-            tmp.push(quizData[i].id);
-        console.log(tmp.toString());
+        //console.log("total", quizData.length);
+        // tmp = [];
+        // for (var i = 0; i < quizData.length; i++)
+        //     tmp.push(quizData[i].id);
+        //console.log(tmp.toString());
         setQuizEnv();
     }
 
@@ -253,8 +253,8 @@ function setQuizEnv() {
         $("#imagearea > div").hide();
         $("#imagearea img").attr("src", "");
 
-        console.log('window [' +(curIndex - 2)+', '+(curIndex +3)+'] max='
-                    +quizData.length +', current='+curIndex);
+        //console.log('window [' +(curIndex - 2)+', '+(curIndex +3)+'] max='
+                    // +quizData.length +', current='+curIndex);
 
         for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
             var id;
@@ -408,8 +408,6 @@ function setQuizEnv() {
             $(id + " .fopt").css('margin-top', ansTop + 'px');
 
         }
-        // $(".text").addClass("res");
-        // $(".answer").addClass("res");
     }
     
     // set height of the scroll bar
@@ -423,7 +421,7 @@ $(document).ready(function() {
     $("#topicgroup #chapterarea").empty();
     for (i = 0; i < chapter_list.length; i++) {
         htmlVal = '<div id="chapter' + (i+1)
-                + '" class="slider" style="font-size:15px; background-color:#707070; cursor:pointer;">';
+                + '" class="slider chap" style="font-size:15px; background-color:#707070; cursor:pointer;">';
         htmlVal += '<p style="padding-left:10px; float:left">';
         htmlVal += '<a>Capitolo ' + (i+1) + '</a>';
         htmlVal += '<div id="expandsign" style="float:right; width:15px; height:15px; margin:7px"></div>';
@@ -472,6 +470,8 @@ $(document).ready(function() {
         });
     
     $('#endbut').click(function(){
+        if (current_ids.length == 0)
+            return;
         WaitMsg.show();
         bTerminated = true;
 
@@ -545,7 +545,7 @@ $(document).ready(function() {
         $(esignid).addClass('collapse');
     }
     
-    $('.slider').click(function(){
+    $('.slider.chap').click(function(){
         var checkElement = $(this).next();
         var esignid = '#' + $(this).attr('id') + ' #expandsign';
         
