@@ -165,7 +165,7 @@ function fillupQuiz(force) {
         $("#quizarea #topic h1").html(topic_list[data.topic-1]);
 
         function hasQuestion(id) {
-            for (var i = curIndex; i < quizData.length; i++) {
+            for (var i = 0; i < quizData.length; i++) {
                 if (quizData[i].id == id)
                     return true;
             }
