@@ -153,6 +153,16 @@
 		
 		bFromExam = sessionStorage.getItem('quizfromexam');
 		
+
+        function no_activity() {
+            $("#student_stat .header .item").html("Nessuna attività di studente");
+            $(".blueline").hide();
+            $("#week").hide();
+            $("#month").hide();
+            $("#all").hide();
+            $("#work_area").show();                           
+        }
+
 		WaitMsg.show();
 		$("#work_area").hide();
 						
@@ -163,9 +173,13 @@
 			
 		$.getJSON(urlstat, function(data) {
 			if (data.status != 200) {
-				WaitMsg.hide();
-				aux_showJSONError(data);
-				return;
+                WaitMsg.hide();
+                // Means: probably no student activity
+                if (data.description == "Unknown student.")
+                    no_activity();
+                else
+                    aux_showJSONError(data);
+                return;
 			}
 			examData = data;
 			data = {};
@@ -179,8 +193,12 @@
 			$.getJSON(urlstat, data, function(data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
-					aux_showJSONError(data);
-					return;
+                    // Means: probably no student activity
+                    if (data.description == "Unknown student.")
+                        no_activity();
+                    else
+                        aux_showJSONError(data);
+                    return;
 				}
 				WaitMsg.hide();
 				$("#work_area").show();
