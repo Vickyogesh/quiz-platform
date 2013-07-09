@@ -159,7 +159,8 @@ class QuizMixin(object):
 
         if ans:
             try:
-                self.engine.execute(self.quiz_answers.insert(), ans)
+                with self.engine.begin() as conn:
+                    conn.execute(self.quiz_answers.insert(), ans)
             except IntegrityError as e:
                 g = self.__rx.match(e.message)
                 if g and g.group(1):
