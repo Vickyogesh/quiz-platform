@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import select, and_
 from sqlalchemy.exc import IntegrityError
 from .exceptions import QuizCoreError
@@ -13,6 +14,8 @@ class QuizMixin(object):
     """
     def __init__(self):
         # See getQuiz() comments for more info.
+
+        self.__rx = re.compile(".*Duplicate entry '\d+-\d+-(\d+)'")
 
         self.__getquiz = self.sql(
             """SELECT * FROM (SELECT * FROM questions q WHERE
@@ -143,6 +146,7 @@ class QuizMixin(object):
         s = select([q.c.id, q.c.answer], and_(
                    q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
         res = self.engine.execute(s)
+        print("save answers", questions)
 
         ans = []
         for row, answer in zip(res, answers):
@@ -156,5 +160,9 @@ class QuizMixin(object):
         if ans:
             try:
                 self.engine.execute(self.quiz_answers.insert(), ans)
-            except IntegrityError:
-                raise QuizCoreError('Already answered.')
+            except IntegrityError as e:
+                g = self.__rx.match(e.message)
+                if g and g.group(1):
+                    raise QuizCoreError('Already answered: %s.' % g.group(1))
+                else:
+                    raise QuizCoreError('Already answered.')
