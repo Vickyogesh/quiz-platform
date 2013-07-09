@@ -1,7 +1,7 @@
 (function() {
 	var a = new Image(); a.src = "images/wait.gif";
-	var b = new Image(); b.src = "images/pleasewait.png";
-	var c = new Image(); c.src = "images/searching.png";
+	// var b = new Image(); b.src = "images/pleasewait.png";
+	// var c = new Image(); c.src = "images/searching.png";
 })();
 
 var WaitMsg = {
