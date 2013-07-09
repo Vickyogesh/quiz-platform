@@ -155,7 +155,6 @@ class QuizMixin(object):
 
         if ans:
             try:
-                with self.engine.begin() as conn:
-                    conn.execute(self.quiz_answers.insert(), ans)
+                self.engine.execute(self.quiz_answers.insert(), ans)
             except IntegrityError:
                 raise QuizCoreError('Already answered.')
