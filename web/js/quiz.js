@@ -60,6 +60,7 @@ var curIndex;
 var current_ids = [];
 var current_answers = [];
 
+var idMap = {}
 var quizData = [];
 var total_ids = [];
 var total_answers = [];
@@ -165,17 +166,15 @@ function fillupQuiz(force) {
         $("#quizarea #topic h1").html(topic_list[data.topic-1]);
 
         function hasQuestion(id) {
-            for (var i = 0; i < quizData.length; i++) {
-                if (quizData[i].id == id)
-                    return true;
-            }
-            return false;
+            return idMap[id];
         }
 
         for (var i = 0; i < data.questions.length; i++) {
             var q = data.questions[i];
-            if (!hasQuestion(q.id))
+            if (!hasQuestion(q.id)) {
                 quizData.push(q);
+                idMap[q.id] = true;
+            }
         }
         console.log("total", quizData.length);
         tmp = [];
