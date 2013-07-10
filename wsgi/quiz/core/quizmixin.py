@@ -87,6 +87,7 @@ class QuizMixin(object):
 
             self._aux_question_delOptionalField(d)
             quiz.append(d)
+        res.close()
         return quiz
 
     def getQuiz(self, quiz_type, user_id, topic_id, lang, force):
@@ -161,8 +162,7 @@ class QuizMixin(object):
 
         if ans:
             try:
-                with self.engine.begin() as conn:
-                    conn.execute(self.quiz_answers.insert(), ans)
+                self.engine.execute(self.quiz_answers.insert(), ans)
             except IntegrityError as e:
                 g = self.__rx.match(e.message)
                 if g and g.group(1):
