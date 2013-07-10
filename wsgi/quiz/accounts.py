@@ -203,10 +203,10 @@ class AccountApi(RequestProxy):
         if 'raw' in kwargs:
             raw = kwargs['raw']
             if 'access: ' not in raw and raw != '{}':
-                kwargs = raw[:-1] + ', "access": {"access_quiz_b": "2150-01-01"}}'
+                kwargs = raw[:-1] + ', "access": {"b2011": "2150-01-01"}}'
         else:
             if 'access' not in kwargs:
-                kwargs['access'] = {'access_quiz_b': '2150-01-01'}
+                kwargs['access'] = {'b2011': '2150-01-01'}
 
         response = self.post('/schools', data=kwargs)
         self._check_response_status(response)

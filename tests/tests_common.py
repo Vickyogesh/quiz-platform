@@ -62,6 +62,8 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
     tst.acc_engine = create_engine(acc_db_uri, echo=False)
     tst.acc_meta = MetaData()
     tst.acc_meta.reflect(tst.acc_engine)
+    tst.acc_permissions = tst.acc_meta.tables['acc_permissions']
+    tst.acc_access = tst.acc_meta.tables['acc_access']
     tst.acc_schools = tst.acc_meta.tables['acc_schools']
     tst.acc_users = tst.acc_meta.tables['acc_users']
     if drop_users:
@@ -69,9 +71,16 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
         tst.acc_engine.execute("DELETE FROM acc_schools")
         tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
         tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
+
+    # Default permissions
+    tst.acc_engine.execute("DELETE FROM acc_permissions")
+    tst.acc_engine.execute("DELETE FROM acc_access")
+    lst = [{'name': 'b2011'}, {'name': 'b2013'}, {'name': 'bike'},
+           {'name': 'boat'}, {'name': 'ebook'}]
+    tst.acc_engine.execute(tst.acc_permissions.insert(), lst)
+
     if add_users:
         tst.acc_engine.execute(tst.acc_schools.insert().values(
-            access=json.dumps({'b2011': '2050-01-01'}),
             name='Chuck Norris School',
             login='chuck@norris.com',
             passwd=_pwd('chuck@norris.com', 'boo')))
@@ -91,6 +100,9 @@ def cleanupdb_onSetupAccDb(tst, drop_users=False, add_users=False):
             login='testuser2',
             passwd=_pwd('testuser2', 'testpasswd'),
             school_id=1))
+        tst.acc_engine.execute(tst.acc_access.insert(), [
+            {'school_id': 1, 'permission': 'b2011', 'expires': '2050-01-01'}
+        ])
 
 
 def cleanupdb_onTearDownAccDb(tst):
@@ -98,8 +110,15 @@ def cleanupdb_onTearDownAccDb(tst):
     tst.acc_engine.execute("DELETE FROM acc_schools")
     tst.acc_engine.execute("ALTER TABLE acc_schools AUTO_INCREMENT=1")
     tst.acc_engine.execute("ALTER TABLE acc_users AUTO_INCREMENT=1")
+
+    # Default permissions
+    tst.acc_engine.execute("DELETE FROM acc_permissions")
+    tst.acc_engine.execute("DELETE FROM acc_access")
+    lst = [{'name': 'b2011'}, {'name': 'b2013'}, {'name': 'bike'},
+           {'name': 'boat'}, {'name': 'ebook'}]
+    tst.acc_engine.execute(tst.acc_permissions.insert(), lst)
+
     tst.acc_engine.execute(tst.acc_schools.insert().values(
-        access=json.dumps({'b2011': '2050-01-01'}),
         name='Chuck Norris School',
         login='chuck@norris.com',
         passwd=_pwd('chuck@norris.com', 'boo')))
@@ -113,6 +132,9 @@ def cleanupdb_onTearDownAccDb(tst):
         login='testuser',
         passwd=_pwd('testuser', 'testpasswd'),
         school_id=1))
+    tst.acc_engine.execute(tst.acc_access.insert(), [
+        {'school_id': 1, 'permission': 'b2011', 'expires': '2050-01-01'}
+    ])
     tst.acc_engine.dispose()
 
 
