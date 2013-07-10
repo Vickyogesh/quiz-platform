@@ -14,11 +14,11 @@ from . import tables, func, default_data, questions
 
 
 class DbManager(object):
-    def __init__(self, verbose=False, create_db=False, cfg_path=None):
+    def __init__(self, verbose=False, cfg_path=None):
         self.start_time = time.time()
         self._verbose = verbose
         self.__readSettints(cfg_path)
-        self.__setup(create_db)
+        self.__setup()
         self.put_users = False
 
     def __readSettints(self, path=None):
@@ -35,13 +35,7 @@ class DbManager(object):
         Settings.CONFIG_FILE = paths[1]
         self.settings = Settings([paths[0]])
 
-    def __setup(self, create_db):
-        if create_db:
-            print('Creating db...')
-            engine = create_engine(self.settings.dbinfo['uri'],
-                                   echo=self._verbose)
-            engine.execute('CREATE DATABASE IF NOT EXISTS quiz;')
-
+    def __setup(self):
         print('Setup...')
         self.engine = create_engine(self.settings.dbinfo['database'],
                                     echo=self._verbose)

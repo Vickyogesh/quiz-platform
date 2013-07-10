@@ -150,8 +150,8 @@ class QuizApp(object):
     # and (1) must be used for production.
     def __getSettings(self):
         # Construct data path using OpenShift env
-        oshift_path = os.getenv('OPENSHIFT_DATA_DIR', '')
-        oshift_path = os.path.join(oshift_path, 'quiz')
+        oshift_path = os.getenv('OPENSHIFT_REPO_DIR', '-')
+        oshift_path = os.path.join(oshift_path, 'misc')
         oshift_path = os.path.normpath(oshift_path)
 
         # Construct additional data path for testing purpose.

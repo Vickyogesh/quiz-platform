@@ -33,7 +33,6 @@ class Db(DbManager):
         self.parseArgs()
         DbManager.__init__(self,
                            self.args.verbose,
-                           self.args.new,
                            self.args.config)
         self.put_users = True
 
@@ -43,8 +42,6 @@ class Db(DbManager):
             description='Quiz test databse setup tool.')
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Verbose output.')
-        parser.add_argument('-n', '--new', action='store_true',
-                            help='Create quiz database.')
         parser.add_argument('-c', '--config', default=None,
                             help="Configuration file (default: ../test-data/config.ini).")
         parser.add_argument('-s', '--small', action='store_true',

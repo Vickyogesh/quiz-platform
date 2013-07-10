@@ -4,24 +4,9 @@
 # up again.  This script gets executed directly, so it could be python, php,
 # ruby, etc.
 
-if [ ! -f $OPENSHIFT_DATA_DIR/quiz/config.ini ]; then
-echo "Updating config.ini..."
-cp $OPENSHIFT_REPO_DIR/misc/config.ini $OPENSHIFT_DATA_DIR/quiz
-fi
-
-if [ ! -f $OPENSHIFT_DATA_DIR/quiz/uwsgi.ini ]; then
-echo "Updating uwsgi.ini..."
-cp $OPENSHIFT_REPO_DIR/misc/uwsgi.ini $OPENSHIFT_DATA_DIR/quiz
-fi
-
-if [ ! -f $OPENSHIFT_DATA_DIR/quiz/nginx.conf ]; then
-echo "Updating nginx.conf..."
-cp $OPENSHIFT_REPO_DIR/misc/nginx.conf $OPENSHIFT_DATA_DIR/quiz
-fi
-
 echo "Pre-processing nginx config..."
 env | sed 's/[\%]/\\&/g;s/\([^=]*\)=\(.*\)/s%${\1}%\2%/' > $OPENSHIFT_TMP_DIR/sed.script
-cat $OPENSHIFT_DATA_DIR/quiz/nginx.conf | sed -f $OPENSHIFT_TMP_DIR/sed.script > $OPENSHIFT_DATA_DIR/nginx/conf/nginx.conf
+cat $OPENSHIFT_REPO_DIR/misc/nginx.conf | sed -f $OPENSHIFT_TMP_DIR/sed.script > $OPENSHIFT_DATA_DIR/nginx/conf/nginx.conf
 
 if [ ! -d $OPENSHIFT_DATA_DIR/quiz/img ]; then
 echo "Unpacking images..."

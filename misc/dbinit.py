@@ -22,7 +22,6 @@ class Db(DbManager):
         self.parseArgs()
         DbManager.__init__(self,
                            self.args.verbose,
-                           self.args.new,
                            self.args.config)
 
     def parseArgs(self):
@@ -30,9 +29,6 @@ class Db(DbManager):
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description='Quiz databse setup tool.', epilog='''
             Examples.
-            Setup database on a clean system and populate with data:
-                    dbsetup.py -n -c config.ini
-
             Recreate tables and fill them with data:
                     dbsetup.py -c config.ini
 
@@ -43,8 +39,6 @@ class Db(DbManager):
         parser.add_argument('-c', '--config', default=None,
                             help="""Configuration file
                             (default: ../test-data/config.ini).""")
-        parser.add_argument('-n', '--new', action='store_true',
-                            help='Create quiz database.')
         parser.add_argument('-d', '--delimiter', default=',',
                             help="CSV delimiter (default: '%(default)s').")
         self.args = parser.parse_args()
