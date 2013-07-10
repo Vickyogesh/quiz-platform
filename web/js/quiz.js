@@ -81,7 +81,7 @@ function saveState() {
 
 function push_answer(index, ans) {
     var qid = quizData[index].id;
-    console.log('push_answer for '+ qid, index, ans);
+    // console.log('push_answer for '+ qid, index, ans);
 
     total_ids.push(qid);
     total_answers.push(ans);
@@ -93,7 +93,7 @@ function sendAnswers(callback) {
     if (current_ids.length == 0)
         return
 
-    console.log('send answers ln='+ current_ids.length + ': ' + current_ids)
+    // console.log('send answers ln='+ current_ids.length + ': ' + current_ids)
     var data = {
         questions: current_ids,
         answers: current_answers
@@ -154,11 +154,11 @@ function fillupQuiz(force) {
     }
 
     function do_show(data) {
-        console.log("do_show", data.questions.length);
-        var tmp = []
-        for (var i = 0; i < data.questions.length; i++)
-            tmp.push(data.questions[i].id);
-        console.log(tmp.toString());
+        // console.log("do_show", data.questions.length);
+        // var tmp = []
+        // for (var i = 0; i < data.questions.length; i++)
+        //     tmp.push(data.questions[i].id);
+        // console.log(tmp.toString());
 
         WaitMsg.hide();
         $("#topicgroup").hide();
@@ -176,11 +176,11 @@ function fillupQuiz(force) {
                 idMap[q.id] = true;
             }
         }
-        console.log("total", quizData.length);
-        tmp = [];
-        for (var i = 0; i < quizData.length; i++)
-            tmp.push(quizData[i].id);
-        console.log(tmp.toString());
+        // console.log("total", quizData.length);
+        // tmp = [];
+        // for (var i = 0; i < quizData.length; i++)
+        //     tmp.push(quizData[i].id);
+        // console.log(tmp.toString());
         setQuizEnv();
     }
 
