@@ -29,7 +29,7 @@ class CoreQuizTest(unittest.TestCase):
     # Generate quiz for the user with ID 1 and topic ID 1,
     # questions text must be 'italian', number of questions must be 40.
     def test_get(self):
-        quiz = self.core.getQuiz(1, 3, 1, 'it')
+        quiz = self.core.getQuiz(1, 3, 1, 'it', False)
         questions = quiz['questions']
 
         self.assertEqual(1, quiz['topic'])
@@ -45,15 +45,15 @@ class CoreQuizTest(unittest.TestCase):
         self.assertIn('answer', question)
 
         # Get quiz for the topic with with wrong id - must return empty list
-        quiz = self.core.getQuiz(1, 12, 9000, 'it')
+        quiz = self.core.getQuiz(1, 12, 9000, 'it', False)
         self.assertEqual(0, len(quiz['questions']))
 
-        quiz = self.core.getQuiz(10, 1, 1, 'it')
+        quiz = self.core.getQuiz(10, 1, 1, 'it', False)
         self.assertEqual(0, len(quiz['questions']))
 
     # Testing wrong data processing.
     def test_saveBadData(self):
-        quiz = self.core.getQuiz(1, 3, 1, 'it')
+        quiz = self.core.getQuiz(1, 3, 1, 'it', False)
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -82,7 +82,7 @@ class CoreQuizTest(unittest.TestCase):
 
     # Test normal behaviour.
     def test_save(self):
-        quiz = self.core.getQuiz(1, 3, 1, 'it')
+        quiz = self.core.getQuiz(1, 3, 1, 'it', False)
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -133,7 +133,7 @@ class CoreQuizTest(unittest.TestCase):
 
     # Test if answered questions are not present in future quezzes.
     def test_random(self):
-        quiz = self.core.getQuiz(2, 3, 1, 'it')
+        quiz = self.core.getQuiz(2, 3, 1, 'it', False)
         quiz = quiz['questions']
         questions = [x['id'] for x in quiz]
         questions = list(sorted(questions))
@@ -150,7 +150,7 @@ class CoreQuizTest(unittest.TestCase):
         # Simulate 10 new quzzes and check if
         # answered questions are present in them.
         for x in xrange(10):
-            quiz = self.core.getQuiz(2, 3, 1, 'it')
+            quiz = self.core.getQuiz(2, 3, 1, 'it', False)
             quiz = quiz['questions']
             questions = [x['id'] for x in quiz]
             self.assertNotIn(q2, questions)
