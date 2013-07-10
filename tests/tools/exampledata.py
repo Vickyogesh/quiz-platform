@@ -119,8 +119,10 @@ def create_exams(mgr):
     print("Create quiz results ...")
     for topic in xrange(1, 8):
         for x in xrange(4):
-            info = core.getQuiz(1, id, topic, 'it')
+            info = core.getQuiz(1, id, topic, 'it', False)
             q = [x['id'] for x in info['questions']]
+            if not q:
+                continue
             answers = [random.randint(0, 1) for row in info['questions']]
             core.saveQuiz(1, id, topic, q, answers)
     core = None

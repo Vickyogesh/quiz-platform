@@ -3,6 +3,7 @@ import os.path
 import sys
 import time
 import hashlib
+import traceback
 
 # to use settings
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
@@ -75,8 +76,8 @@ class DbManager(object):
         msg = ''
         try:
             self._do_run()
-        except Exception as e:
-            print(e)
+        except Exception:
+            traceback.print_exc()
             print('Rollback changes...')
             msg = '[Interrupted] '
             t.rollback()
