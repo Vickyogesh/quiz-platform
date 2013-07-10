@@ -122,7 +122,6 @@ class QuizMixin(object):
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
                                                lang)
 
-        print "QUESTIONS: ", [q['id'] for q in questions]
         return {'topic': topic_id, 'questions': questions}
 
     def saveQuiz(self, quiz_type, user_id, topic_id, questions, answers):
@@ -140,7 +139,6 @@ class QuizMixin(object):
         .. note::
            questions and answers must have tha same length.
         """
-        # self.saveQuestions(user_id, questions, answers)
         questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers
@@ -148,8 +146,6 @@ class QuizMixin(object):
         s = select([q.c.id, q.c.answer], and_(
                    q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
         res = self.engine.execute(s)
-
-        print "ANSWERS:", questions
 
         ans = []
         for row, answer in zip(res, answers):
