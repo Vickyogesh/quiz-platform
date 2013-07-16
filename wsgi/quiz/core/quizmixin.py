@@ -1,6 +1,7 @@
 import re
 from sqlalchemy import select, and_
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from .exceptions import QuizCoreError
 
 
@@ -14,38 +15,18 @@ class QuizMixin(object):
     """
     def __init__(self):
         # See getQuiz() comments for more info.
-
         self.__rx = re.compile(".*Duplicate entry '\d+-\d+-(\d+)'")
-
-        self.__getquiz = self.sql(
-            """SELECT * FROM (SELECT * FROM questions q WHERE
-            quiz_type=:quiz_type AND topic_id=:topic_id
-            AND id NOT IN (SELECT question_id FROM quiz_answers WHERE
-            user_id=:user_id AND quiz_type=q.quiz_type) LIMIT 100) t
-            ORDER BY RAND() LIMIT 40;""")
-
         self.__add = "ON DUPLICATE KEY UPDATE is_correct=VALUES(is_correct)"
 
-    # Get 40 random questions from for the specified topic which are
-    # not answered by the specified user.
-    # Answered quiz questions are placed in the quiz_answers.
-    #
-    # Query parts:
-    # * how to get answered questions:
-    #
-    #       SELECT question_id FROM quiz_answers WHERE user_id=1;
-    #
-    # * how to filter out answered questions for the topic:
-    #
-    #       SELECT * FROM questions WHERE topic_id=1 AND
-    #       id NOT IN (SELECT question_id FROM quiz_answers WHERE
-    #       user_id=1);
-    #
-    # Result query:
-    #
-    #   SELECT * FROM (SELECT * FROM questions WHERE topic_id=1
-    #   AND id NOT IN (SELECT question_id FROM quiz_answers WHERE
-    #   user_id=1) LIMIT 100) t ORDER BY RAND() LIMIT 40;
+    # TODO: what about performance?
+    # Construct query of the form:
+    # SELECT * FROM (
+    #   SELECT * FROM questions q WHERE quiz_type=A AND topic_id=B
+    #   AND id NOT IN (C) AND id NOT IN (
+    #       SELECT question_id FROM quiz_answers WHERE user_id=D
+    #       AND quiz_type=q.quiz_type)
+    #   LIMIT 100
+    # ) t ORDER BY RAND() LIMIT 40;
     #
     # NOTE: to increase ORDER BY RAND() we use very simple trick - just
     # limit subselect before ORDER with 100 rows which ORDER BY RAND()
@@ -64,9 +45,44 @@ class QuizMixin(object):
     #
     # NOTE: if quiz answers will not be returned then current questions
     # may be appear in future quizzes.
-    def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang):
-        res = self.__getquiz.execute(quiz_type=quiz_type, topic_id=topic_id,
-                                     user_id=user_id)
+    def __getQuery(self, quiz_type, user_id, topic_id, exclude):
+        q = self.questions
+        qa = self.quiz_answers
+
+        # SELECT question_id FROM quiz_answers WHERE
+        # user_id=:user_id AND quiz_type=q.quiz_type
+        stmt = select([qa.c.question_id]).where(and_(
+            qa.c.user_id == user_id, qa.c.quiz_type == q.c.quiz_type))
+
+        # SELECT * FROM questions q WHERE quiz_type=:quiz_type
+        # AND topic_id=:topic_id AND id NOT IN (:exclude) AND id NOT IN (...)
+        # LIMIT 100
+        if exclude is not None:
+            not_in = [q.c.id.notin_(exclude), q.c.id.notin_(stmt)]
+        else:
+            not_in = [q.c.id.notin_(stmt)]
+
+        stmt2 = select([q]).where(and_(
+            q.c.quiz_type == quiz_type,
+            q.c.topic_id == topic_id,
+            *not_in
+        )).limit(100).alias('t')
+
+        # Final query
+        stmt3 = select([stmt2]).order_by(func.rand()).limit(40)
+        return stmt3
+
+    # Get 40 random questions from for the specified topic which are
+    # not answered by the specified user.
+    # Answered quiz questions are placed in the quiz_answers.
+    def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang, exclude):
+        query = self.__getQuery(quiz_type, user_id, topic_id, exclude)
+        try:
+            res = self.engine.execute(query)
+        except SQLAlchemyError as e:
+            print e
+            raise QuizCoreError('Invalid parameters.')
+
         if lang == 'de':
             txt_lang = self.questions.c.text_de
         elif lang == 'fr':
@@ -90,7 +106,7 @@ class QuizMixin(object):
         res.close()
         return quiz
 
-    def getQuiz(self, quiz_type, user_id, topic_id, lang, force):
+    def getQuiz(self, quiz_type, user_id, topic_id, lang, force, exclude=None):
         """Return list of Quiz questions.
 
         Args:
@@ -108,9 +124,9 @@ class QuizMixin(object):
             image     - image ID to illustrate the question (optional)
             image_bis - image type ID (optional)
         """
-
-        # TODO: we need to validate topic ID.
-        questions = self._getQuizQuestions(quiz_type, user_id, topic_id, lang)
+        # TODO: do we need to validate topic ID?
+        questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
+                                           lang, exclude)
 
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
@@ -120,7 +136,7 @@ class QuizMixin(object):
                 t.c.quiz_type == quiz_type,
                 t.c.user_id == user_id)))
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
-                                               lang)
+                                               lang, exclude)
 
         return {'topic': topic_id, 'questions': questions}
 

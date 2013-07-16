@@ -1,4 +1,5 @@
 from werkzeug.exceptions import BadRequest, Forbidden, Unauthorized
+from .core.exceptions import QuizCoreError
 from .wsgi import QuizApp, JSONResponse
 
 app = QuizApp()
@@ -21,7 +22,16 @@ def create_quiz(topic):
     user_id = app.getUserId()
     lang = app.getLang()
     force = app.request.args.get('force', False)
-    quiz = app.core.getQuiz(app.quiz_type, user_id, topic, lang, force)
+    exclude = app.request.args.get('exclude', None)
+
+    if exclude is not None:
+        try:
+            exclude = exclude.split(',')
+            exclude = [int(x) for x in exclude]
+        except ValueError:
+            raise QuizCoreError('Invalid parameters.')
+
+    quiz = app.core.getQuiz(app.quiz_type, user_id, topic, lang, force, exclude)
     return JSONResponse(quiz)
 
 
