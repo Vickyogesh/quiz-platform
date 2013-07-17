@@ -148,7 +148,7 @@ function fillupQuiz(force) {
         var p = uri;
 
         if (exclude.length != 0)
-            p += "?exclude=" + exclude.toString()
+            p += "?exclude=" + exclude.toString();
         if (force) {
             if (exclude.length != 0)
                 p += '&';
@@ -516,6 +516,9 @@ $(document).ready(function() {
     
     
     $('#quizlistarea').mousewheel(function(event, delta, deltaX, deltaY) {
+        if (bTerminated) {
+            return;
+        }
         if (deltaY > 0) {
             if (alreadyAnswered(curIndex - 1) == true) {
                 curIndex--;

@@ -22,8 +22,8 @@ def create_quiz(topic):
     user_id = app.getUserId()
     lang = app.getLang()
     force = app.request.args.get('force', False)
-    exclude = app.request.args.get('exclude', None)
 
+    exclude = app.request.args.get('exclude', None)
     if exclude is not None:
         try:
             exclude = exclude.split(',')
@@ -81,7 +81,16 @@ def get_student_stat(user='me'):
 def get_error_review():
     user_id = app.getUserId()
     lang = app.getLang()
-    res = app.core.getErrorReview(app.quiz_type, user_id, lang)
+
+    exclude = app.request.args.get('exclude', None)
+    if exclude is not None:
+        try:
+            exclude = exclude.split(',')
+            exclude = [int(x) for x in exclude]
+        except ValueError:
+            raise QuizCoreError('Invalid parameters.')
+
+    res = app.core.getErrorReview(app.quiz_type, user_id, lang, exclude)
     return JSONResponse(res)
 
 
