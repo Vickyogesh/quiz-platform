@@ -435,6 +435,7 @@ class QuizApp(object):
         self.session['user_id'] = user['id']
         self.session['user_type'] = user['type']
         self.session['quiz_type'] = quiz_type_id
+        self.session['quiz_type_name'] = quiz_type
         if can_check_date:
             self.session['access_end_date'] = end_date
         self.session['app_id'] = appid

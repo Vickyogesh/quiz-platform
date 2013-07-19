@@ -8,6 +8,7 @@ import requests
 from werkzeug.http import parse_dict_header
 from werkzeug.exceptions import default_exceptions, abort
 from werkzeug.http import dump_cookie
+from werkzeug.urls import url_encode
 
 
 def _create_digest(login, passwd):
@@ -311,5 +312,42 @@ class AccountApi(RequestProxy):
         if 'raw' in kwargs:
             kwargs = kwargs['raw']
         response = self.put('/students/{0}'.format(id), data=kwargs)
+        self._check_response_status(response)
+        return response.json()
+
+    def __getCurrentSession(self):
+        if self.PARENT_SESSION_KEY in self._session:
+            if self._session_cookie is not None:
+                sess = self._session[self.PARENT_SESSION_KEY]
+                i = sess.find('=')
+                e = sess.find('; Path')
+                return sess[i + 1:e]
+
+    # Currently it works like the following:
+    # We take accounts session which is a signed session cookie (for now)
+    # and split it into two parts - first part will be 'token', second part
+    # will be 'fid'. Also we pass 'sender' which provides info about
+    # sender service.
+    # See to_user_page() in the accmanager/views/webapi.py;
+    def getAccountRemoteUrl(self, sender=None):
+        """Constructs URL for user's account page.
+
+        Allows to transfer current authorization data to the accounts
+        service to perform automatic login to the accounts service.
+        """
+        sess = self.__getCurrentSession()
+        if sess is None:
+            return ''
+        ln = len(sess)
+        i1 = ln / 2 + 3
+        token = sess[:i1]
+        fid = sess[i1:]
+        add = url_encode({'token': token, 'fid': fid, 'sender': sender})
+        url = self._url('/userpage?' + add)
+        return url
+
+    def getUserInfo(self):
+        """Return current user account information."""
+        response = self.get('/userinfo')
         self._check_response_status(response)
         return response.json()

@@ -9,6 +9,7 @@
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/account.js"></script>
 
 <!--Please wait-->
 <link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
@@ -17,10 +18,37 @@
 
 <script>
     $(document).ready(function() {
-        window.qsid = sessionStorage.getItem('quizqsid');
-        window.name = sessionStorage.getItem('quizname');
-        $(".header .item").html(window.name);
+        if (getUrlParameterByName("upd") == "1") {
+            WaitMsg.show();
+            $.getJSON(url("/v1/userinfo"), function(data) {
+                WaitMsg.hide();
+                if (data.status != 200) {
+                    aux_showJSONError(data);
+                    return;
+                }
 
+                var name = data.user.name;
+                if (data.user.surname)
+                    name += ' ' + data.user.surname;
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+
+                $(".header .item a").html(window.name);
+                window.location.search = null;
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+        else {
+            window.qsid = sessionStorage.getItem('quizqsid');
+            window.name = sessionStorage.getItem('quizname');
+            $(".header .item a").html(window.name);
+        }
+
+
+        $("#cnt").attr("src", "");
         var nwidth = $(window).width();
         
         $("#quiz").click(function(){
@@ -49,15 +77,21 @@
         $("#bttExit").click(function() {
             doLogout();
         });
+
+        $("#bttAccount").click(function() {
+            editAccount();
+        });
     });
 </script>
 </head>
 
 <body>
     <div id="work_area">
-        <div class="content-box" style="width:732px;">
+        <div id="studentmenu" class="content-box" style="width:732px;">
             <div class="header">
-                <div class="item"></div>
+                <div class="item">
+                    <a href="#" id="bttAccount" class="lustre-button-dark"></a>
+                </div>
             </div>
             <div class="hline"></div>
             <div class="row" style="margin-top:40px; margin-bottom:40px">
@@ -80,13 +114,15 @@
                     </a>
                 </div>
                 <div class="item">
-                    <a href="#" id="bttExit" class="lustre-button">                     <span class="btt_inline">ESCI</span>
+                    <a href="#" id="bttExit" class="lustre-button">
+                        <span class="btt_inline">ESCI</span>
                         <img src="img/esc.png" class="btt_inline"/>
                     </a>
                 </div>
                 <div class="item"></div>
             </div>
         </div>
+
     </div>
 </body>
 

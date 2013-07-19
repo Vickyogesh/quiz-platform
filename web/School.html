@@ -12,6 +12,7 @@
 <script type="text/javascript" src="js/md5-min.js"></script>
 <script type="text/javascript" src="js/parsley.min.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/account.js"></script>
 <script src="js/jquery.infieldlabel.min.js" type="text/javascript"></script>
 <script src="js/jquery.placeholder.min.js" type="text/javascript"></script>
 
@@ -22,8 +23,7 @@
 
 
 <script>
-	$(document).ready(function() {	
-		$('input, textarea').placeholder();
+	$(document).ready(function() {
 		function delStudent(item) {
 			var id = item.find('#data a').attr("id");
 			var name = item.find('#data a').text();
@@ -50,41 +50,6 @@
 			html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
 			return html;
 		}
-
-		window.qsid = sessionStorage.getItem('quizqsid');
-		
-		WaitMsg.show();
-		$("#school_menu").hide();
-		$("#school_addstudent").hide();
-		
-		$.getJSON(url("/v1/school/me/students"), function(data) {
-			if (data.status != 200) {
-				WaitMsg.hide();
-				aux_showJSONError(data);
-				return;
-			}
-			
-			$("#school_menu .header .item").html(window.name);
-			var html = "";
-			var lst = data.students;
-			for (var i = 0; i < lst.length; i++) {
-				html += create_student_html(lst[i].id, lst[i].name,
-				                            lst[i].surname);
-			}
-
-			$("#school_menu #students").append(html);
-			$('#ctrl a').click(function() {
-				var item = $(this).parent().parent();
-				delStudent(item);
-			});
-
-			$("#school_menu").show();
-			WaitMsg.hide();
-		})
-		.error(function(data) {
-			WaitMsg.hide();
-			aux_showError(data.responseText, data.status);
-		});
 		
 		// slide feature
 		$('#stListBut a').click(function(){
@@ -159,7 +124,77 @@
 
 		$("#bttExit").click(function() {
 			doLogout();
-		})
+		});
+        $("#bttAccount").click(function() {
+            editAccount();
+        });
+
+
+        function doLoad() {
+            WaitMsg.show();
+            $("#school_menu").hide();
+            $("#school_addstudent").hide();
+            
+            $.getJSON(url("/v1/school/me/students"), function(data) {
+                if (data.status != 200) {
+                    WaitMsg.hide();
+                    aux_showJSONError(data);
+                    return;
+                }
+                
+                $("#school_menu .header .item a").html(window.name);
+                var html = "";
+                var lst = data.students;
+                for (var i = 0; i < lst.length; i++) {
+                    html += create_student_html(lst[i].id, lst[i].name,
+                                                lst[i].surname);
+                }
+
+                $("#school_menu #students").append(html);
+                $('#ctrl a').click(function() {
+                    var item = $(this).parent().parent();
+                    delStudent(item);
+                });
+
+                $("#school_menu").show();
+                WaitMsg.hide();
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+
+        $('input, textarea').placeholder();
+        window.qsid = sessionStorage.getItem('quizqsid');
+
+
+        if (getUrlParameterByName("upd") == "1") {
+            WaitMsg.show();
+            $.getJSON(url("/v1/userinfo"), function(data) {
+                WaitMsg.hide();
+                if (data.status != 200) {
+                    aux_showJSONError(data);
+                    return;
+                }
+
+                var name = data.user.name;
+                console.log(name);
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+                window.location.search = null;
+                //doLoad();
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+
+        else {
+            doLoad();
+        }
+
 	});
 </script>
 </head>
@@ -167,7 +202,9 @@
 <body>
 	<div id="work_area">
         <div id="school_menu" class="content-box">
-            <div class="header"><div class="item"></div></div>
+            <div class="header"><div class="item">
+            	<a href="#" id="bttAccount" class="lustre-button-dark"></a>
+            </div></div>
         	<ul class="collapsable-list">
     			<li id="statis">
 					<a href='#' class="lustre-button">STATISTICHE</a>

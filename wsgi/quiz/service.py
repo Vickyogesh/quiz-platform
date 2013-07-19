@@ -5,15 +5,27 @@ from .wsgi import QuizApp, JSONResponse
 app = QuizApp()
 
 
-@app.get('/authorize/status')
+@app.get('/accounturl')
+def get_account_url():
+    sender = app.session['quiz_type_name']
+    url = app.account.getAccountRemoteUrl(sender)
+    return JSONResponse({'url': url})
+
+
+@app.get('/userinfo')
 def get_authorize_status():
-    try:
-        login = app.session['user_login']
-        user = app.core.getUserInfo(login)
-    except KeyError:
-        raise Unauthorized('Unauthorized.')
-    del user['login']
-    return JSONResponse({'user': user})
+    info = app.account.getUserInfo()
+    return JSONResponse(info)
+
+# @app.get('/authorize/status')
+# def get_authorize_status():
+#     try:
+#         login = app.session['user_login']
+#         user = app.core.getUserInfo(login)
+#     except KeyError:
+#         raise Unauthorized('Unauthorized.')
+#     del user['login']
+#     return JSONResponse({'user': user})
 
 
 @app.get('/quiz/<int:topic>', access=['student', 'guest'])
