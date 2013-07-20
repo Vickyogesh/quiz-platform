@@ -178,7 +178,10 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
         """)
+    reflect(mgr)
 
+
+def reflect(mgr):
     mgr.meta = MetaData()
     mgr.meta.reflect(bind=mgr.engine)
     mgr.tbl_apps = mgr.meta.tables['applications']

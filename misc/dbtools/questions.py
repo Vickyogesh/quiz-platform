@@ -1,5 +1,15 @@
 def update_stat(mgr):
     print("Updating questions stat...")
+    create_func(mgr)
+    mgr.conn.execute('CALL set_chapters_info(1);')
+    mgr.conn.execute('CALL set_chapters_info(2);')
+    mgr.conn.execute('CALL set_topics_info(1);')
+    mgr.conn.execute('CALL set_topics_info(2);')
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
+    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_topics_info;')
+
+
+def create_func(mgr):
     mgr.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
     mgr.conn.execute("""CREATE PROCEDURE set_chapters_info(IN type INT)
     BEGIN
@@ -59,9 +69,3 @@ def update_stat(mgr):
     COMMIT;
     END;
     """)
-    mgr.conn.execute('CALL set_chapters_info(1);')
-    mgr.conn.execute('CALL set_chapters_info(2);')
-    mgr.conn.execute('CALL set_topics_info(1);')
-    mgr.conn.execute('CALL set_topics_info(2);')
-    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
-    mgr.conn.execute('DROP PROCEDURE IF EXISTS set_topics_info;')

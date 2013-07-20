@@ -41,6 +41,8 @@ class Db(DbManager):
                             (default: ../test-data/config.ini).""")
         parser.add_argument('-d', '--delimiter', default=',',
                             help="CSV delimiter (default: '%(default)s').")
+        parser.add_argument('-cqc', action='store_true',
+                            help="Fill with CQC questions.")
         self.args = parser.parse_args()
 
     def fillChapters(self):
@@ -116,6 +118,13 @@ class Db(DbManager):
         self.fillChapters()
         self.fillTopics()
         self.fillQuestions()
+
+    def _do_run(self):
+        if self.args.cqc:
+            from dbtools import cqc
+            cqc.run(self)
+        else:
+            DbManager._do_run(self)
 
 
 Db().run()
