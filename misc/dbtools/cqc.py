@@ -1,4 +1,4 @@
-import string
+# -*- coding: utf-8 -*-
 import os.path
 import sqlite3
 from . import tables

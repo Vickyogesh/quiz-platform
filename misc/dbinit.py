@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 ''' Script for setup Quiz databse. '''
 
 from __future__ import print_function
@@ -36,6 +37,8 @@ class Db(DbManager):
             ''')
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Verbose output.')
+        parser.add_argument('-b2011', action='store_true',
+                            help='Just recreate b2011 questions.')
         parser.add_argument('-c', '--config', default=None,
                             help="""Configuration file
                             (default: ../test-data/config.ini).""")
@@ -57,7 +60,9 @@ class Db(DbManager):
                 if is_first:
                     is_first = False
                     continue
-                lines.append({'id': id, 'quiz_type': QUIZ_B, 'priority': row[2], 'text': row[1]})
+                lines.append({'id': id, 'quiz_type': QUIZ_B,
+                             'priority': row[2],
+                             'text': row[1].decode('utf8')})
                 id += 1
             self.conn.execute(self.tbl_chapters.insert(), lines)
 
@@ -79,9 +84,9 @@ class Db(DbManager):
                 lines.append({
                     'id': id,
                     'quiz_type': QUIZ_B,
-                    'text': text,
-                    'text_fr': text_fr,
-                    'text_de': text_de,
+                    'text': text.decode('utf8'),
+                    'text_fr': text_fr.decode('utf8'),
+                    'text_de': text_de.decode('utf8'),
                     'chapter_id': row[2]
                 })
                 id += 1
@@ -102,9 +107,9 @@ class Db(DbManager):
                 lines.append({
                     'id': id,
                     'quiz_type': QUIZ_B,
-                    'text': row[7],
-                    'text_fr': row[11],
-                    'text_de': row[12],
+                    'text': row[7].decode('utf8'),
+                    'text_fr': row[11].decode('utf8'),
+                    'text_de': row[12].decode('utf8'),
                     'answer': row[8] == 'V',
                     'image': row[9],
                     'image_part': row[10],
@@ -120,6 +125,13 @@ class Db(DbManager):
         self.fillQuestions()
 
     def _do_run(self):
+        if self.args.b2011:
+            self.recreate = False
+            self.engine.execute('TRUNCATE TABLE applications')
+            self.engine.execute('TRUNCATE TABLE chapters')
+            self.engine.execute('TRUNCATE TABLE topics')
+            self.engine.execute('TRUNCATE TABLE questions')
+
         if self.args.cqc:
             from dbtools import cqc
             cqc.run(self)
