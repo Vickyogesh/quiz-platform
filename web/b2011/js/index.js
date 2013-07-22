@@ -46,7 +46,7 @@ function onAuth(butObj)
     aux_postJSON(url("/v1/authorize"), auth, function (data) {
       if (data.status != 200) {
         doQuit();
-  		  alert("Authorization is not passed." + data.status);
+  		  alert("Nome utente o password non validi.");
       }
       else {      	
       	var name = data.user.name;
