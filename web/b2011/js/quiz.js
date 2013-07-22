@@ -504,7 +504,7 @@ $(document).ready(function() {
             else
             {
                 WaitMsg.hide();
-                alert('Done! Number of errors: ' + total_errors);
+                alert('Fatto! Hai commesso ' + total_errors + ' errori.');
                 setQuizEnv();
             }
         });
