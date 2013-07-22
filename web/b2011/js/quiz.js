@@ -68,14 +68,13 @@ var total_errors = 0;
 var can_ask_more = true;
 
 function saveState() {
-    for (i = 0; i < quizData.length; i++) {
-        if (current_answers[i] != null) {
-            if (parseInt(quizData[i].answer) != current_answers[i]) {
-                total_errors++;
-            }
-        }
-    }
-
+    // for (i = 0; i < quizData.length; i++) {
+    //     if (current_answers[i] != null) {
+    //         if (parseInt(quizData[i].answer) != current_answers[i]) {
+    //             total_errors++;
+    //         }
+    //     }
+    // }
     current_ids = [];
     current_answers = [];
 }
@@ -409,6 +408,7 @@ function setQuizEnv() {
                     $(id).addClass('trueAnswer');
                 }
                 else {
+                    total_errors++;
                     $(id).addClass('falseAnswer');
                 }
             }
@@ -504,8 +504,9 @@ $(document).ready(function() {
             else
             {
                 WaitMsg.hide();
-                alert('Fatto! Hai commesso ' + total_errors + ' errori.');
+                total_errors = 0;
                 setQuizEnv();
+                alert('Fatto! Hai commesso ' + total_errors + ' errori.');
             }
         });
     });     
