@@ -209,6 +209,19 @@ a.cssSubmitButton:hover {
 	cursor:pointer;
 }
 
+#quiz03 .topt {
+    width:24px; 
+    height:24px; 
+    margin-top:8px; 
+    margin-left:12px; 
+}
+#quiz03 .fopt {
+    width:24px; 
+    height:24px; 
+    margin-top:8px; 
+    margin-left:14px; 
+}
+
 #quizarea .text, #reviewarea .text {
 	margin: 3px 0px 3px 15px;
 	height:23px;

@@ -28,7 +28,7 @@
 	height: 66px;
 	z-index: 100000;
 }
-.wait-msg .wait-circle { position: absolute; background: url(wait.gif) left center no-repeat; height: 50px; width: 50px; left: 8px ; top: 4px; }
+.wait-msg .wait-circle { position: absolute; background: url(wait.gif) left center no-repeat; height: 50px; width: 50px; left: 7px ; top: 4px; }
 
 .wait-msg .search-icon{
 	background: url(searching.png) left center no-repeat;
