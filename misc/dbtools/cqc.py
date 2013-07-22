@@ -1,32 +1,21 @@
 import string
 import os.path
+import sqlite3
 from . import tables
 from . import questions
 from .settings import CQC
 
 _mgr = None
-_chid = 0
-_tid = 0
-_qid = 0
 
 
 def run(mgr):
     print "Fill with CQC questions..."
     global _mgr
-    global _chid
-    global _tid
-    global _qid
     _mgr = mgr
-    _chid = 0
-    _tid = 0
-    _qid = 0
 
     tables.reflect(_mgr)
     pre_process()
-
-    d = os.path.dirname(__file__)
-    path = os.path.join(d, '..', 'dbdata', 'cqc.txt')
-    parser(path, updater)
+    do_fill()
     post_process()
 
 
@@ -49,54 +38,22 @@ def post_process():
     tables.do_optimize(_mgr)
 
 
-def parser(name, fn):
-    chapter = ''
-    txt = ''
-    ans = ''
-    items = []
-    f = open(name, 'r')
+def do_fill():
+    db = os.path.dirname(__file__)
+    db = os.path.join(db, '..', 'dbdata', 'cqc.sqlite')
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    c.execute('SELECT * FROM questions')
 
-    for line in f:
-        row = line[:-1]
-        if row[0] in string.digits and row[-1] == ')':
-            if txt:
-                items.append((chapter, ans, txt))
-                fn(items)
-            items = []
-            chapter = int(row[:2])
-            txt = ''
-            ans = ''
-            multiline = False
-        elif row[0] in 'VF':
-            if txt:
-                items.append((chapter, ans, txt))
-            ans = row[0] == 'V'
-            multiline = row[-1] == ']'
-            if multiline:
-                txt = ''
-                continue
-            else:
-                idx = row.find(']')
-                txt = row[idx + 2:]
-                # txt = row[idx + 2:].decode('utf-8')
-        elif multiline:
-            txt += row.decode('utf-8')
-    items.append((chapter, ans, txt))
-    fn(items)
-
-
-def updater(items):
-    global _chid
-    global _tid
-    global _qid
-
+    _chid = 0
+    _tid = 0
+    _qid = 0
     t = _mgr.tbl_questions
     data = []
-
-    for item in items:
-        chapter_id = item[0]
-        answer = item[1]
-        text = item[2]
+    for row in c:
+        chapter_id = row[0]
+        answer = row[1]
+        text = row[2]
 
         _qid += 1
         if _chid != chapter_id:
@@ -120,15 +77,4 @@ def updater(items):
         })
 
     _mgr.engine.execute(t.insert(), data)
-
-
-# def func(items):
-#     c.executemany('INSERT INTO questions VALUES(?,?,?)', items)
-
-
-# conn = sqlite3.connect('out.sqlite')
-# c = conn.cursor()
-# c.execute('CREATE TABLE IF NOT EXISTS questions(chapter, answer, question)')
-# c.execute('DELETE FROM questions')
-# parser('src.txt', func)
-# conn.commit()
+    conn.close()
