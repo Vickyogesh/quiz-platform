@@ -20,6 +20,7 @@ class DbManager(object):
         self.__readSettints(cfg_path)
         self.__setup()
         self.put_users = False
+        self.recreate = True
 
     def __readSettints(self, path=None):
         if path is None:
@@ -57,7 +58,7 @@ class DbManager(object):
 
     def _do_run(self):
         self.before()
-        tables.recreate(self)
+        tables.recreate(self, self.recreate)
         func.create(self)
         default_data.fill(self)
         self.fillData()

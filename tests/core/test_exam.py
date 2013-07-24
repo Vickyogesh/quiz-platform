@@ -19,7 +19,10 @@ ExamInfo = namedtuple('ExamInfo', 'id quiz_type user_id start end err_count')
 # Helper function to create exam & save answers.
 # Returns result exam info
 def pass_exam(tst, quiz_type, answers, user_id=4):
-    info = tst.core.createExam(quiz_type, user_id, 'it')
+    exam_type = None
+    if quiz_type == 2:
+        exam_type = 'merci'
+    info = tst.core.createExam(quiz_type, user_id, 'it', exam_type)
     exam_id = info['exam']['id']
     questions = list(sorted([q['id'] for q in info['questions']]))
 
@@ -46,7 +49,7 @@ class CoreExamTest(unittest.TestCase):
     # Check if generated ids are in correct question ranges.
     # See ExamMixin.__generate_idList() for more info.
     def test_questionIds(self):
-        norm, high = self.core._ExamMixin__generate_idList(1)
+        norm, high = self.core._ExamMixin__generate_idList(1, 1)
         self.assertEqual(25, len(norm))
         self.assertEqual(15, len(high))
         ids = list(sorted(norm+high))
@@ -171,10 +174,10 @@ class CoreExamTest(unittest.TestCase):
         self.assertEqual(answers, [0] * 40)
 
         # Fast check exam creation for the another quiz type
-        info = self.core.createExam(2, 3, 'it')
+        info = self.core.createExam(2, 3, 'it', 'merci')
         exam_id2 = info['exam']['id']
         res = self.sql(select([ea]).where(ea.c.exam_id == exam_id2)).fetchall()
-        self.assertEqual(40, len(res))
+        self.assertEqual(60, len(res))
         for row in res:
             self.assertEqual(2, row[ea.c.quiz_type])
 
@@ -333,12 +336,13 @@ class CoreExamTest(unittest.TestCase):
 
         # Fast pass exam for quiz type 2
         # By default quiz type answers must be False
-        answers = [0] * 40
-        answers[:4] = [1, 1, 1, 1]
+        # For quiz type 2 (CQC) exam is passed if there are <=6 errors
+        answers = [0] * 60
+        answers[:6] = [1, 1, 1, 1, 1, 1]
         info = pass_exam(self, 2, answers)
         exam = info['exam']
+        self.assertEqual(6, exam['errors'])
         self.assertEqual('passed', exam['status'])
-        self.assertEqual(4, exam['errors'])
 
     # Check failed status (more than 4 errors).
     def test_statusFailed(self):
@@ -359,7 +363,7 @@ class CoreExamTest(unittest.TestCase):
         self.assertEqual(15, exam['errors'])
 
         # 10 errors, but for quiz type 2.
-        answers = [0] * 40
+        answers = [0] * 60
         answers[0:10] = [1] * 10
         info = pass_exam(self, 2, answers)
         exam = info['exam']
@@ -393,7 +397,7 @@ class CoreExamStatTest(unittest.TestCase):
         row = self.sql(sql).fetchone()
         self.assertEqual(0, row[0])
 
-        pass_exam(self, 2, [0] * 40, user_id=3)
+        pass_exam(self, 2, [0] * 60, user_id=3)
         sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
         row = self.sql(sql).fetchone()
         self.assertEqual(0, row[0])
@@ -405,7 +409,7 @@ class CoreExamStatTest(unittest.TestCase):
         row = self.sql(sql).fetchone()
         self.assertEqual(1, row[0])
 
-        pass_exam(self, 2, [1] * 20 + [0] * 20, user_id=3)
+        pass_exam(self, 2, [1] * 40 + [0] * 20, user_id=3)
         sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
         row = self.sql(sql).fetchone()
         self.assertEqual(1, row[0])
@@ -418,7 +422,7 @@ class CoreExamStatTest(unittest.TestCase):
         row = self.sql(sql).fetchone()
         self.assertEqual(-1, row[0])
 
-        self.core.createExam(2, 3, 'it')
+        self.core.createExam(2, 3, 'it', 'merci')
         sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
         row = self.sql(sql).fetchone()
         self.assertEqual(-1, row[0])
@@ -431,10 +435,10 @@ class CoreExamStatTest(unittest.TestCase):
         row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.5, row[0], 1)
 
-        pass_exam(self, 2, [0] * 40, user_id=3)
-        pass_exam(self, 2, [1] * 40, user_id=3)
-        pass_exam(self, 2, [1] * 40, user_id=3)
-        pass_exam(self, 2, [1] * 40, user_id=3)
+        pass_exam(self, 2, [0] * 60, user_id=3)
+        pass_exam(self, 2, [1] * 60, user_id=3)
+        pass_exam(self, 2, [1] * 60, user_id=3)
+        pass_exam(self, 2, [1] * 60, user_id=3)
         sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
         row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.75, row[0], 2)

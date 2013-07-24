@@ -1,0 +1,42 @@
+.wait-msg { 
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.wait-msg .wait-back {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #fff;
+	-moz-opacity: 0.4;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+	z-index: 999;
+}
+
+.wait-msg .wait-icon{
+	background: url(pleasewait.png) left center no-repeat;
+	padding-left: 60px;
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	width: 166px;
+	height: 66px;
+	z-index: 100000;
+}
+.wait-msg .wait-circle { position: absolute; background: url(wait.gif) left center no-repeat; height: 50px; width: 50px; left: 7px ; top: 4px; }
+
+.wait-msg .search-icon{
+	background: url(searching.png) left center no-repeat;
+	padding-left: 60px;
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	width: 170px;
+	height: 66px;
+	z-index: 100000;
+}

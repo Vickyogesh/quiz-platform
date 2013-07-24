@@ -45,3 +45,5 @@ TEST_USERS = [
 
 # Quiz types
 QUIZ_B = 1
+CQC = 2
+

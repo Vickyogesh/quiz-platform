@@ -1,0 +1,438 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Quiz tests</title>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+  <style type="text/css">
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        border: 1px solid #e5e5e5;
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+      .tabbable {
+        padding-top: 100;
+      }
+      .tab-pane input[type="text"] {
+        height: auto;
+      }
+      #quiztab .well {
+        margin-top: 0px
+      }
+  </style>
+</head>
+
+<body>
+
+  <!-- Message box -->
+  <div class="modal hide" id="msg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Error</h3>
+    </div>
+    <div class="modal-body">
+      text
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Close</a>
+    </div>
+  </div> <!-- /modal -->
+
+  <div class="container">
+
+    <!-- Login panel -->
+    <form class="well form-signin">
+      <h2 class="form-signin-heading">Authorization</h2>
+      <input type="text" class="input-block-level" placeholder="Login" id="login" value="testuser">
+      <input type="password" class="input-block-level" placeholder="Password" id="pass" value="testpasswd">
+      <button class="btn btn-large btn-primary" type="button">Login</button><br/>
+      <button class="btn btn-link" type="button" id="continue">Continue with root login</button>
+      <button class="btn btn-link" type="button" id="quit">Logout</button>
+    </form>
+
+    <div class="tabbable hide" id="features">
+      <h3>Quiz API v1 features</h3>
+      <h5><span id="uname"></span><a class="btn btn-mini btn-link" id="bttQuit">quit</a></h5>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#quiztab" data-toggle="tab">Quiz</a></li>
+        <li><a href="#examtab" data-toggle="tab">Exam</a></li>
+        <li><a href="#reviewtab" data-toggle="tab">Error Review</a></li>
+        <li><a href="#studentstattab" data-toggle="tab">Student Stat</a></li>
+        <li><a href="#examlisttab" data-toggle="tab">Exam List</a></li>
+        <li><a href="#examinfotab" data-toggle="tab">Exam Info</a></li>
+        <li><a href="#topicerrtab" data-toggle="tab">Topic Errors</a></li>
+        <li><a href="#admintab" data-toggle="tab">Admin</a></li>
+        <li><a href="#schooltab" data-toggle="tab">School</a></li>
+      </ul>
+      <div class="tab-content">
+
+        <!-- QUIZ CONTENT -->
+        <div class="tab-pane active" id="quiztab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="topic">Topic:</label>
+            <input type="text" class="input-small" id="topic" value="1">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttQuizGet">Get quiz</a>
+            <a class="btn btn-inverse" id="bttQuizSend">Send quiz</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <table class="table table-hover">  <!-- QUIZ TABLE -->
+            <thead>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+                <th><input type="checkbox"></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane quiztab -->
+
+        <!-- EXAM CONTENT -->
+        <div class="tab-pane" id="examtab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttExamGet">Get Exam</a>
+            <a class="btn btn-inverse" id="bttExamSend">Send Exam</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <div class="hide" id="examid"></div>
+          <h4 id="expire"></h4>
+          <table class="table table-hover" id="examtable">  <!-- EXAM TABLE -->
+            <thead>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+                <th><input type="checkbox"></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane examtab -->
+
+        <!-- ERROR REVIEW CONTENT -->
+        <div class="tab-pane" id="reviewtab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttReviewGet">Get Error Review</a>
+            <a class="btn btn-inverse" id="bttReviewSend">Send Error Review</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <table class="table table-hover">  <!-- ERROR REVIEW TABLE -->
+            <thead>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+                <th><input type="checkbox"></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane reviewtab -->
+
+        <!-- STUDENT STAT CONTENT -->
+        <div class="tab-pane" id="studentstattab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="me">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttStudentStatGet">Get Statistics</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <div class="row"><div class="span1">ID:</div>
+            <div class="span3" id="id">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Name:</div>
+            <div class="span3" id="name">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Exams:</div>
+            <div class="span4" id="exams">N/A</div>
+          </div>
+          <p></p>
+          <table class="table table-hover">  <!-- TOPICS STAT TABLE -->
+            <thead>
+              <tr><th colspan="3">Topics statistics</th></tr>
+              <tr>
+                <th>#</th><th width="60%">Topic</th><th>Errors (last,week,month)</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane studentstattab -->
+
+        <!-- ERROR REVIEW CONTENT -->
+        <div class="tab-pane" id="examlisttab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="me">
+            <a class="btn btn-info" id="bttGet">Get Exam List</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <div class="row"><div class="span1">ID:</div>
+            <div class="span3" id="id">N/A</div>
+          </div>
+          <div class="row"><div class="span1">Name:</div>
+            <div class="span3" id="name">N/A</div>
+          </div>
+
+          <table class="table table-hover">  <!-- EXAM LIST TABLE -->
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Num. errors</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane examlisttab -->
+
+        <!-- EXAM INFO CONTENT -->
+        <div class="tab-pane" id="examinfotab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="1">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttGet">Get Info</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <dl class="dl-horizontal" id='exam'>
+          </dl>
+
+          <dl class="dl-horizontal" id='user'>
+          </dl>
+
+          <p></p>
+          <table class="table table-hover">  <!-- TEXAM INFO TABLE -->
+            <thead>
+              <tr><th colspan="3">Exam questions</th></tr>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane examinfotab -->
+
+        <!-- TOPIC ERRORS CONTENT -->
+        <div class="tab-pane" id="topicerrtab">
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">ID:</label>
+            <input type="text" class="input-small" id="id" value="me">
+            <label class="control-label" for="topic">Topic:</label>
+            <input type="text" class="input-small" id="topic" value="1">
+            <label class="control-label" for="lang">Lang:</label>
+            <select id='lang'>
+              <option>it</option>
+              <option>de</option>
+              <option>fr</option>
+            </select>
+            <a class="btn btn-info" id="bttGet">Get Info</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <dl class="dl-horizontal" id='user'>
+          </dl>
+
+          <p></p>
+          <table class="table table-hover">  <!-- TOPIC ERRORS TABLE -->
+            <thead>
+              <tr><th colspan="3">Questions with wrong answers</th></tr>
+              <tr>
+                <th>#</th><th>Question</th><th>Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane examinfotab -->
+
+        <!-- ADMIN CONTENT -->
+        <div class="tab-pane" id="admintab">
+
+          <!-- Message box -->
+          <div class="modal hide" id="admin_add">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3>Add school</h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label class="control-label" for="name">Name</label>
+                  <div class="controls"><input type="text" id="name" placeholder="School name"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Login</label>
+                  <div class="controls"><input type="text" id="login" placeholder="Login"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Password</label>
+                  <div class="controls"><input type="text" id="passwd" placeholder="Password"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-success" data-dismiss="modal">Add</a>
+            </div>
+          </div> <!-- /modal -->
+
+          <form class="well well-small form-inline">
+            <a class="btn btn-info" id="bttAdd">Add school</a>
+            <a class="btn btn-info" id="bttGet">Get school list</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <p></p>
+          <table class="table table-hover">  <!-- ADMIN TABLE -->
+            <thead>
+              <tr><th colspan="3">Schools</th></tr>
+              <tr>
+                <th>#</th><th>Name</th><th>Login</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div> <!-- /tab-pane admintab -->
+
+        <!-- SCHOOL CONTENT -->
+        <div class="tab-pane" id="schooltab">
+
+          <!-- Message box -->
+          <div class="modal hide" id="school_add">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3>Add student</h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label class="control-label" for="name">Name</label>
+                  <div class="controls"><input type="text" id="name" placeholder="Name"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="surname">Surname</label>
+                  <div class="controls"><input type="text" id="surname" placeholder="Surname"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Login</label>
+                  <div class="controls"><input type="text" id="login" placeholder="Login"></div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="login">Password</label>
+                  <div class="controls"><input type="text" id="passwd" placeholder="Password"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-success" data-dismiss="modal">Add</a>
+            </div>
+          </div> <!-- /modal -->
+
+          <form class="well well-small form-inline">
+            <label class="control-label" for="id">School ID:</label>
+            <input type="text" class="input-small" id="school_id" value="me">
+            <a class="btn btn-info" id="bttAdd">Add student</a>
+            <a class="btn btn-info" id="bttGet">Get student list</a>
+            <a class="btn btn-info" id="bttGetStat">Get statistics</a>
+            <span class="label pull-right hide" id="infoLabel">Done</span>
+          </form>
+
+          <p></p>
+          <div id="stat">
+            <div class="row"><div class="span2">Guest visits:</div>
+              <div class="span3" id="guest_visits">N/A</div>
+            </div>
+
+            <div class="row"><div class="span2">Exams:</div>
+              <div class="span3" id="exams">N/A</div>
+            </div>
+
+            <div id="info"></div>
+
+            <table class="table table-hover" id="topics">  <!-- TOPICS STAT TABLE -->
+              <thead>
+                <tr><th colspan="3">Topics statistics</th></tr>
+                <tr>
+                  <th>#</th><th width="60%">Topic</th><th>Errors (last,week,month)</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="students" class="hide">
+            <table class="table table-hover">  <!-- SCHOOL TABLE -->
+              <thead>
+                <tr><th colspan="3">Students</th></tr>
+                <tr>
+                  <th>#</th><th>Name</th><th>Login</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div> <!-- /tab-pane schooltab -->
+
+      </div> <!-- /tab-content -->
+    </div> <!-- /tabbable -->
+
+  </div> <!-- /container -->
+
+  <!-- script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+  <script src="js/md5-min.js"></script>
+  <script src="js/cookie.js"></script>
+  <script src="js/admin.js"></script>
+</body>

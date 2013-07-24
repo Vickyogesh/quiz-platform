@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/new_style.css" />
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/md5-min.js"></script>
+<script type="text/javascript" src="js/parsley.min.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/account.js"></script>
+<script src="js/jquery.infieldlabel.min.js" type="text/javascript"></script>
+<script src="js/jquery.placeholder.min.js" type="text/javascript"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+
+<script>
+	$(document).ready(function() {
+		function delStudent(item) {
+			var id = item.find('#data a').attr("id");
+			var name = item.find('#data a').text();
+			var rc = confirm("Sei sicuro di voler rimuovere questo studente?\n"+name);
+			if (!rc)
+				return;
+
+			aux_postJSON(url("/v1/school/me/student/" + id + "?action=delete"), function (data) {
+				if (data.status != 200) {
+					WaitMsg.hide();
+					aux_showJSONError(data);
+				}
+				else
+					item.remove();
+			});
+
+		}
+
+		function create_student_html(id, name, surname) {
+			var html = '<li style="position: relative"><div id="data">'
+			html += '<a id="' + id + '" href="Statistics.html?id=' + id + '">';
+			html += name + " " + surname;
+			html += '</a></div>';
+			html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
+			return html;
+		}
+		
+		// slide feature
+		$('#stListBut a').click(function(){
+			var checkElement = $(this).next();
+			
+			if(checkElement.is(':visible')) {
+				checkElement.slideUp('normal');
+			}
+			if(!checkElement.is(':visible')) {
+				checkElement.slideDown('normal');
+			}
+		});
+		
+		$('#bttAddStudent').click(function(){
+			$("#school_addstudent #name").val("");
+			$("#school_addstudent #surname").val("");
+			$("#school_addstudent #login").val("");
+			$("#school_addstudent #passwd").val("");
+			$("#school_menu").hide();
+			$("#school_addstudent").show();
+		});
+		
+		$('#bttBack').click(function(){
+			$("#school_addstudent").hide();
+			$("#school_menu").show();
+		});
+
+		$('#addConfirm').click(function(){
+			var name = $("#school_addstudent #name").val();
+			var surname = $("#school_addstudent #surname").val();
+			var login = $("#school_addstudent #login").val();
+			var passwd = $("#school_addstudent #passwd").val();
+
+			var info = {
+				name: name,
+				surname: surname,
+				login: login,
+				passwd: hex_md5(login + ':' + passwd)
+			};
+			
+			if (!$('#studentform').parsley('validate'))
+				return;
+
+			WaitMsg.show();
+			
+			aux_postJSON(url("/v1/school/me/newstudent"), info, function (data) {
+				if (data.status != 200) {
+					WaitMsg.hide();
+					aux_showJSONError(data);
+				}
+				else {
+					$("#school_addstudent #name").val("");
+					$("#school_addstudent #surname").val("");
+					$("#school_addstudent #login").val("");
+					$("#school_addstudent #passwd").val("");
+					var html = create_student_html(data.id, info.name,
+					                               info.surname);
+					$("#school_menu #students").append(html);
+					$('#ctrl:last-child a').click(function() {
+						var item = $(this).parent().parent();
+						delStudent(item);
+					});
+					WaitMsg.hide();
+					alert('Studente aggiunto con successo!');
+				}
+			});
+		});
+		
+		$('#statis').click(function(){
+			window.location = "Statistics_school.html";
+		});
+
+		$("#bttExit").click(function() {
+			doLogout();
+		});
+        $("#bttAccount").click(function() {
+            editAccount();
+        });
+
+
+        function doLoad() {
+            WaitMsg.show();
+            $("#school_menu").hide();
+            $("#school_addstudent").hide();
+            
+            $.getJSON(url("/v1/school/me/students"), function(data) {
+                if (data.status != 200) {
+                    WaitMsg.hide();
+                    aux_showJSONError(data);
+                    return;
+                }
+                
+                $("#school_menu .header .item a").html(window.name);
+                var html = "";
+                var lst = data.students;
+                for (var i = 0; i < lst.length; i++) {
+                    html += create_student_html(lst[i].id, lst[i].name,
+                                                lst[i].surname);
+                }
+
+                $("#school_menu #students").append(html);
+                $('#ctrl a').click(function() {
+                    var item = $(this).parent().parent();
+                    delStudent(item);
+                });
+
+                $("#school_menu").show();
+                WaitMsg.hide();
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+
+        $('input, textarea').placeholder();
+        window.qsid = sessionStorage.getItem('quizqsid');
+
+
+        if (getUrlParameterByName("upd") == "1") {
+            WaitMsg.show();
+            $.getJSON(url("/v1/userinfo"), function(data) {
+                WaitMsg.hide();
+                if (data.status != 200) {
+                    aux_showJSONError(data);
+                    return;
+                }
+
+                var name = data.user.name;
+                console.log(name);
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+                window.location.search = null;
+                //doLoad();
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+
+        else {
+            doLoad();
+        }
+
+	});
+</script>
+</head>
+
+<body>
+	<div id="work_area">
+        <div id="school_menu" class="content-box">
+            <div class="header"><div class="item">
+            	<a href="#" id="bttAccount" class="lustre-button-dark"></a>
+            </div></div>
+        	<ul class="collapsable-list">
+    			<li id="statis">
+					<a href='#' class="lustre-button">STATISTICHE</a>
+				</li>
+				<li id="bttAddStudent">
+					<a href='#' class="lustre-button">AGGIUNGI STUDENTE</a>
+				</li>
+				<li id="stListBut">
+					<a href='#' class="lustre-button">ELENCO STUDENTI</a>
+					<ul id="students">
+					</ul>
+				</li>
+        	</ul>
+            <div class="footer">
+                <div class="item">
+                    <a href="#" id="bttExit" class="lustre-button">
+                    	<span class="btt_inline">ESCI</span>
+                    	<img src="img/esc.png" class="btt_inline"/>
+                    </a>
+                </div>
+            </div>
+        </div>  <!-- /school_menu -->
+        
+        <div id="school_addstudent" class="content-box" style="display:none">
+        	<div class="header"><div class="item">Aggiungi Studente</div></div>
+        	<div class="hline"></div>
+			<form action="" id="studentform" data-validate="parsley">
+				<fieldset>
+					<p><input type="text" name="name" placeholder="Nome" id="name" data-required="true"></p>
+					<p><input type="text" name="surname" placeholder="Cognome" id="surname" data-required="true"></p>
+					<p><input type="password" name="passwd" placeholder="Password" id="passwd" data-required="true"></p>
+					<p><input type="text" name="login" placeholder="Login" id="login" data-required="true"></p>
+				</fieldset>
+			</form>	
+    		<div class="footer">
+    			<div class="item"></div>
+                <div class="item">
+                    <a href="#" id="bttBack" class="lustre-button">
+                        <span class="btt_inline">Indietro</span>
+                        <img src="img/esc.png" class="btt_inline"/>
+                    </a>
+                </div>
+    			<div class="item">
+    				<a href="#" id="addConfirm" class="lustre-button">
+                    	<img src="img/continue.png" class="btt_inline"/>
+    					<span class="btt_inline">Aggiungere</span>
+                    </a>
+    			</div>
+    			<div class="item"></div>
+    		</div>
+        </div>   <!-- /school_addstudent -->
+	</div>
+</body>
+
+</html>
