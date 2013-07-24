@@ -196,12 +196,15 @@ def reflect(mgr):
 
 def create_indices(mgr):
     print("Creating indices... applications")
-    mgr.engine.execute('DROP INDEX ix_app ON applications')
-    mgr.engine.execute('DROP INDEX ix_chid ON topics')
-    mgr.engine.execute('DROP INDEX ix_tp ON questions')
-    mgr.engine.execute('DROP INDEX ix_ch ON questions')
-    mgr.engine.execute('DROP INDEX ix_exams ON exams')
-    mgr.engine.execute('DROP INDEX ix_exam_answers ON exam_answers')
+    try:
+        mgr.engine.execute('DROP INDEX ix_app ON applications')
+        mgr.engine.execute('DROP INDEX ix_chid ON topics')
+        mgr.engine.execute('DROP INDEX ix_tp ON questions')
+        mgr.engine.execute('DROP INDEX ix_ch ON questions')
+        mgr.engine.execute('DROP INDEX ix_exams ON exams')
+        mgr.engine.execute('DROP INDEX ix_exam_answers ON exam_answers')
+    except:
+        pass
     mgr.conn.execute('ALTER TABLE applications ADD UNIQUE ix_app(appkey);')
 
     print("Creating indices... topics")

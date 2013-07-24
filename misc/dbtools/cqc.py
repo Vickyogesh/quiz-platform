@@ -2,6 +2,7 @@
 import os.path
 import sqlite3
 from . import tables
+from . import func
 from . import questions
 from .settings import CQC
 
@@ -14,6 +15,7 @@ def run(mgr):
     _mgr = mgr
 
     tables.reflect(_mgr)
+    func.create(_mgr)
     pre_process()
     do_fill()
     post_process()

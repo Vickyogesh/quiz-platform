@@ -32,13 +32,13 @@ class UserMixin(object):
 
         # NOTE: we skip 'in-progress' exams.
         self.__examstat = self.sql("""SELECT
-        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+        (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type)current,
-        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+        (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
          start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
          AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
-        (SELECT SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100 e
+        (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
          start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
          AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
@@ -117,7 +117,13 @@ class UserMixin(object):
 
     def __getExamStat(self, quiz_type, user_id):
         try:
-            row = self.__examstat.execute(user_id=user_id, quiz_type=quiz_type)
+            if quiz_type == 2:  # For CQC quiz
+                numerr = 6
+            else:               # For B quiz
+                numerr = 4
+            row = self.__examstat.execute(user_id=user_id,
+                                          quiz_type=quiz_type,
+                                          numerr=numerr)
             row = row.fetchone()
         except Exception:
             row = (-1, -1, -1)
@@ -148,13 +154,18 @@ class UserMixin(object):
         }
 
     def _createExamInfo(self, exam_db_row):
+        quiz_type = exam_db_row[1]
         start = exam_db_row[3]
         end = exam_db_row[4]
         errors = exam_db_row[5]
         expired = exam_db_row[6]
 
+        if quiz_type == 2:  # CQC quiz
+            numerr = 6
+        else:               # B quiz
+            numerr = 4
         if end:
-            if errors > 4:
+            if errors > numerr:
                 status = 'failed'
             else:
                 status = 'passed'
