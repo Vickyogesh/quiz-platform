@@ -1,6 +1,6 @@
 import random
 from datetime import datetime
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, between
 #from profilestats import profile
 from .exceptions import QuizCoreError
 
@@ -49,6 +49,16 @@ class ExamMixin(object):
             WHERE id=:exam_id""")
 
     # Create list of exam questions.
+    # quiz_type is defined in the QuizApp (quiz/wsgi.py)
+    # 1 - b2011
+    # 2 - cqc
+    def __generate_idList(self, quiz_type, examType):
+        if quiz_type == 2:
+            return self.__generate_idListCQC(quiz_type, examType)
+        else:
+            return self.__generate_idListB(quiz_type, examType)
+
+    # Create list of exam questions for B quiz.
     # At first, we get info about chapters: chapter priority,
     # min question ID for the chapter and max question ID for the chapter.
     # Example:
@@ -61,7 +71,7 @@ class ExamMixin(object):
     # This means what for row 1 we need select one question in the range
     # [1 - 100] and for row 2 we need select two (random) questions
     # in the range [101 - 200].
-    def __generate_idList(self, quiz_type):
+    def __generate_idListB(self, quiz_type, examType):
         id_norm = []
         id_high = []
         ids = None
@@ -75,6 +85,36 @@ class ExamMixin(object):
             else:
                 id_norm.extend(ids)
         return id_norm, id_high
+
+    # Create list of exam questions for CQC quiz
+    # if examType = generale we use chapters 1 - 10
+    # if examType = persone we use chapters 11 - 13
+    # if examType = merci we use chapters 14 - 16
+    # else throw exception
+    def __generate_idListCQC(self, quiz_type, examType):
+        if examType == 'generale':
+            start = 1
+            end = 10
+        elif examType == 'persone':
+            start = 11
+            end = 13
+        elif examType == 'merci':
+            start = 14
+            end = 16
+        else:
+            raise QuizCoreError('Unknown exam type.')
+
+        t = self.chapters
+        sql_min = select([t.c.min_id]).where(and_(
+            t.c.quiz_type == quiz_type, t.c.id == start)).as_scalar()
+        sql_max = select([t.c.max_id]).where(and_(
+            t.c.quiz_type == quiz_type, t.c.id == end)).as_scalar()
+        sql = select([sql_min, sql_max])
+
+        res = self.engine.execute(sql).fetchone()
+        start = res[0]
+        end = res[1] + 1
+        return random.sample(xrange(start, end), 60), []
 
     #@profile
     def __initExam(self, quiz_type, user_id, questions):
@@ -121,13 +161,14 @@ class ExamMixin(object):
 
     # NOTE: exam_id is always unique so we don't need to specify quiz_type
     # for the __getExamInfo()
-    def createExam(self, quiz_type, user_id, lang):
-        norm, high = self.__generate_idList(quiz_type)
+    def createExam(self, quiz_type, user_id, lang, examType=None):
+        norm, high = self.__generate_idList(quiz_type, examType)
         exam_id = self.__initExam(quiz_type, user_id, norm + high)
 
         questions = []
         self.__getQuestions(quiz_type, norm, lang, questions)
-        self.__getQuestions(quiz_type, high, lang, questions)
+        if high:
+            self.__getQuestions(quiz_type, high, lang, questions)
 
         # YYYY-MM-DDTHH:MM:SS
         expires, _, _ = self.__getExamInfo(exam_id)
@@ -146,7 +187,9 @@ class ExamMixin(object):
             raise QuizCoreError('Exam is expired.')
         elif not isinstance(answers, list):
             raise QuizCoreError('Invalid value.')
-        elif len(answers) != 40:
+        elif quiz_type == 2 and len(answers) != 60:
+            raise QuizCoreError('Wrong number of answers.')
+        elif quiz_type != 2 and len(answers) != 40:
             raise QuizCoreError('Wrong number of answers.')
 
         res = self.__examids.execute(exam_id=exam_id)

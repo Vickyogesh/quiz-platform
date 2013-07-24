@@ -25,7 +25,7 @@
 	var quizData;
 	var id_list = [];
   	var answer_list = [];
-  	var nTime = 1800;
+  	var nTime = 7200;
   	var bTerminated = false;
 
 	$(document).ready(function() {
@@ -39,9 +39,10 @@
 		$("#examreview").hide();
 		
 		WaitMsg.show();
-			
+		
+		var exam_type = getUrlParameterByName("type");
 		var lang = "it";
-		var uri = url("/v1/exam");
+		var uri = url("/v1/exam") + "?exam_type=" + exam_type;
 		var data = {}
 			
 		if (lang != "it")
@@ -54,7 +55,6 @@
 			}
 			else {
 				WaitMsg.hide();
-				
 				$("#testarea").show();
 				curIndex = 0;
 				
@@ -329,7 +329,7 @@
 			//
 			// setting up first row
 			//
-			for (i = 1; i <= 4; i++) {
+			for (i = 1; i <= 5; i++) {
 				id = "#firstrow #fitem" + i;
 				$(id).removeClass('redColor');
 			}			
@@ -352,24 +352,13 @@
 			//
 			// setting up third row
 			//
-			for (i = 1; i <= 40; i++) {
+			for (i = 1; i <= 60; i++) {
 				id = "#thirdrow #titem" + i;
 				$(id).removeClass('redColor');
 			}
 			nItemIndex = curIndex + 1;
 			id = "#thirdrow #titem" + nItemIndex;
 			$(id).addClass('redColor');
-			
-			//
-			// stting up image area
-			//
-			if (quizData.questions[curIndex].image != "")
-			{
-				var image = "/img/" + quizData.questions[curIndex].image + ".jpg";
-				$("#imgarea").css("background-image","url('" + image + "')");
-			}
-			else
-				$("#imgarea").css("background-image","none");
 			
 			//
 			// setting up true false
@@ -399,19 +388,18 @@
 		}
 	}
 </script>
-	
 </head>
 
 <body>
 	<div id="work_area">
-		<div id="testarea" style="width:732px; height:550px; margin:auto; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
+		<div id="testarea" style="width:832px; height:624px; margin:auto; background-image:url('img/exam.png'); background-repeat: no-repeat; position:relative">
 			
-			<div id="logoutarea" style="position:absolute; top:20px; left:600px;">
+			<div id="logoutarea" style="position:absolute; top:20px; left:690px;">
 				<a id="btnlogout" href="#">Esci</a>				
 			</div>
 
 			
-			<div id="firstrow" style="position:absolute; top:65px; left:58px; width:622px; height:38px; cursor:pointer">
+			<div id="firstrow" style="position:absolute; top:72px; left:26px; width:780px; height:42px; cursor:pointer">
 				<div id="fitem1">
 					<p class="firstrowtext">Da 1 a 10</p>
 				</div>
@@ -424,9 +412,15 @@
 				<div id="fitem4">
 					<p class="firstrowtext">Da 31 a 40</p>
 				</div>
+				<div id="fitem5">
+					<p class="firstrowtext">Da 41 a 50</p>
+				</div>
+				<div id="fitem5">
+					<p class="firstrowtext">Da 51 a 60</p>
+				</div>
 			</div>
 			
-			<div id="secondrow" style="position:absolute; top:106px; left:58px; width:622px; height:38px; cursor:pointer">
+			<div id="secondrow" style="position:absolute; top:118px; left:63px; width:707px; height:42px; cursor:pointer">
 				<div id="sitem1">1</div>
 				<div id="sitem2">2</div>
 				<div id="sitem3">3</div>
@@ -439,7 +433,7 @@
 				<div id="sitem10">10</div>				
 			</div>
 						
-			<div id="thirdrow" style="position:absolute; top:151px; left:51px; height:23px; cursor:pointer">
+			<div id="thirdrow" style="position:absolute; top:166px; left:25px; height:23px; cursor:pointer">
 				<div id="titem1">1</div>
 				<div id="titem2">2</div>
 				<div id="titem3">3</div>
@@ -479,39 +473,56 @@
 				<div id="titem37">37</div>				
 				<div id="titem38">38</div>				
 				<div id="titem39">39</div>				
-				<div id="titem40" style="border-right:2px solid #90a699;">40</div>				
+				<div id="titem40">40</div>				
+				<div id="titem41">41</div>				
+				<div id="titem42">42</div>				
+				<div id="titem43">43</div>				
+				<div id="titem44">44</div>				
+				<div id="titem45">45</div>				
+				<div id="titem46">46</div>				
+				<div id="titem47">47</div>				
+				<div id="titem48">48</div>				
+				<div id="titem49">49</div>				
+				<div id="titem50">50</div>				
+				<div id="titem51">51</div>				
+				<div id="titem52">52</div>				
+				<div id="titem53">53</div>				
+				<div id="titem54">54</div>				
+				<div id="titem55">55</div>				
+				<div id="titem56">56</div>				
+				<div id="titem57">57</div>				
+				<div id="titem58">58</div>				
+				<div id="titem59">59</div>				
+				<div id="titem60" style="border-right:2px solid #90a699;">60</div>				
 			</div>
 			
-			<div id="imgarea" style="position:absolute; left:23px; top:176px; width:227px; height:287px;background-position: center; background-repeat: no-repeat; background-size: contain;">
-			</div>
-			
-			<div id="quiznum" style="position:absolute; left:677px; top:180px; width:30px; height:30px; line-height:30px; font-size:17px">
+			<div id="quiznum" style="position:absolute; left:766px; top:192px; width:32px; height:32px; line-height:32px; font-size:17px">
 				1
 			</div>
 			
-			<div id="quizarea" style="position:absolute; left:269px; top:220px; width:410px; height:90px; text-align:left; font-size:15px; padding:10px; border:2px solid #555;">
+			<div id="quizarea" style="position:absolute; left:325px; top:236px; width:452px; height:104px; text-align:left; font-size:15px; padding:10px; border:2px solid #555;">
 				1
 			</div>
 			
-			<img id="tbutton" src="img/exam_true.png" style="position:absolute; left:403px; top:395px; width:52px; cursor:pointer" />
-			<img id="fbutton" src="img/exam_false.png" style="position:absolute; left:493px; top:395px; width:52px; cursor:pointer" />
+			<img id="tbutton" src="img/exam_true.png" style="position:absolute; left:476px; top:410px; width:52px; cursor:pointer" />
+			<img id="fbutton" src="img/exam_false.png" style="position:absolute; left:578px; top:410px; width:52px; cursor:pointer" />
 				
-			<div id="timerarea" style="position:absolute; left:24px; top:484px; width:125px; height:57px; line-height:57px; font-size:25px; ">
+			<div id="timerarea" style="position:absolute; left:32px; top:548px; width:131px; height:61px; line-height:61px; font-size:25px; ">
 			</div>
 			
-			<div id="examidarea" style="position:absolute; left:173px; top:479px; width:106px; height:20px; line-height:20px; font-size:17px; color:#555; text-align:left">
+			<div id="examidarea" style="position:absolute; left:183px; top:545px; width:200px; height:20px; line-height:20px; font-size:17px; color:#555; text-align:left">
 			</div>
 			
-			<div id="namearea" style="position:absolute; left:158px; top:511px; width:271px; height:28px; line-height:28px; font-size:17px; color:#555; ">
+			<div id="namearea" style="position:absolute; left:183px; top:582px; width:271px; height:28px; line-height:28px; font-size:17px; color:#555; ">
 			</div>
 			
-			<div id="endbut" style="position:absolute; left:480px; top:502px; width:64px; height:37px; cursor:pointer">
+			<div id="endbut" style="position:absolute; left:554px; top:558px; width:70px; height:43px; cursor:pointer">
 			</div>
 			
-			<div id="prevbut" style="position:absolute; left:591px; top:502px; width:40px; height:37px; cursor:pointer">
+			<div id="prevbut" style="position:absolute; left:670px; top:560px; width:40px; height:40px; cursor:pointer">
 			</div>
 			
-			<div id="nextbut" style="position:absolute; left:665px; top:502px; width:40px; height:37px; cursor:pointer">
+			<div id="nextbut" style="position:absolute; left:751px; top:560px; width:40px; height:40px; cursor:pointer">
 			</div>
 		</div>
 

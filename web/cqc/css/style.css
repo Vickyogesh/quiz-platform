@@ -295,14 +295,14 @@ a.cssSubmitButton:hover {
 
 /* exam page */
 #thirdrow div {
-	width:14px; 
-	height: 14px; 
+	width:11px; 
+	height: 11px; 
 	float:left;
 	border-top: 2px solid #90a699;
 	border-left: 2px solid #90a699;
 	border-bottom: 2px solid #90a699;
-	line-height: 14px;
-	font-size: 11px;
+	line-height: 11px;
+	font-size: 10px;
 }
 
 .redColor {
@@ -310,7 +310,7 @@ a.cssSubmitButton:hover {
 }
 
 #firstrow div {
-	width:25%; 
+	width:16.6%; 
 	height:100%; 
 	float:left
 }
@@ -513,13 +513,13 @@ a.cssSubmitButton:hover {
 }
 
 #examreview {
-  width: 732px;
-  height: 550px;
+  width:832px;
+  height:624px;
   margin: auto;
   background: #f1d5e0;
 }
 #examreview > #answers {
-  height: 350px;
+  height: 430px;
   background: #f1d5e0;
   overflow-y: auto;
   border: 1px solid #ccc;

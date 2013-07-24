@@ -236,22 +236,22 @@ class CoreDbTest(unittest.TestCase):
         u = self.core.users
 
         # Add user to allow to update progress coef.
-        sql = u.insert().values(id=2, type='student', quiz_type=2, school_id=1)
+        sql = u.insert().values(id=3, type='student', quiz_type=2, school_id=1)
         self.sql(sql)
 
         # We add 3 exams and then for two of them we update
         # end time and num of errors.
         self.sql(e.insert().values([
-            {'quiz_type': 2, 'user_id': 2, 'start_time': dt.utcnow()},
-            {'quiz_type': 2, 'user_id': 2, 'start_time': dt.utcnow()},
-            {'quiz_type': 2, 'user_id': 2, 'start_time': dt.utcnow()}
+            {'quiz_type': 2, 'user_id': 3, 'start_time': dt.utcnow()},
+            {'quiz_type': 2, 'user_id': 3, 'start_time': dt.utcnow()},
+            {'quiz_type': 2, 'user_id': 3, 'start_time': dt.utcnow()}
         ]))
 
         # Exam 1 = 2 errors
         self.sql(e.update().values(end_time=dt.utcnow(), err_count=2)
                  .where(e.c.id == 1))
         # Exam 1 = 5 errors
-        self.sql(e.update().values(end_time=dt.utcnow(), err_count=5)
+        self.sql(e.update().values(end_time=dt.utcnow(), err_count=7)
                  .where(e.c.id == 2))
 
         # At this point we have two exams performed and one in progress.
@@ -261,7 +261,7 @@ class CoreDbTest(unittest.TestCase):
         row = self.sql(u.select()).fetchall()
         self.assertEqual(1, len(row))
         row = row[0]
-        self.assertEqual(2, row[u.c.id])
+        self.assertEqual(3, row[u.c.id])
         self.assertEqual(0.5, row[u.c.progress_coef])
 
     # Test: insert/update guest info

@@ -285,14 +285,22 @@ def exams(mgr):
     # After update exam info we recalculate err percent
     # of performed exams and save it to the user_progress_snapshot.
     # NOTE: we skip 'in-progress' exams.
+    # NOTE: NEW.quiz_type == 1 means quiz B
+    # and NEW.quiz_type == 2 means quiz CQC
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_exams_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_exams_after_upd
         AFTER UPDATE ON exams FOR EACH ROW BEGIN
             DECLARE coef FLOAT DEFAULT -1;
 
-            SELECT SUM(IF(err_count > 4, 1, 0)) / count(end_time)
-            INTO coef FROM exams WHERE user_id=NEW.user_id
-            AND quiz_type=NEW.quiz_type;
+            IF NEW.quiz_type = 2 THEN
+                SELECT SUM(IF(err_count > 6, 1, 0)) / count(end_time)
+                INTO coef FROM exams WHERE user_id=NEW.user_id
+                AND quiz_type=NEW.quiz_type;
+            ELSE
+                SELECT SUM(IF(err_count > 4, 1, 0)) / count(end_time)
+                INTO coef FROM exams WHERE user_id=NEW.user_id
+                AND quiz_type=NEW.quiz_type;
+            END IF;
 
             UPDATE users SET progress_coef=coef WHERE id=NEW.user_id
             AND quiz_type=NEW.quiz_type;

@@ -65,10 +65,10 @@
                 window.location = "ErrorReview_reduced.html";
         });
         
-        $("#exam").click(function(){
-            window.location = "Exam.html";
+        $("#cqcexam td").click(function() {
+            window.location = "Exam.html?type=" + $(this).attr("id");
         });
-        
+
         $("#bttStat").click(function(){
             sessionStorage.setItem('quizfromexam', 0);
             window.location = "Statistics.html";
@@ -99,7 +99,23 @@
                     <img id="quiz" class="ibtn" src="img/QUIZ-ARG.png"></img>
                 </div>
                 <div class="item">
-                    <img id="exam" class="ibtn" src="img/PROVA-ESAME.png"></img>
+                    <div id="cqcexam">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td rowspan="2" id="generale">
+                                    <div class="rotate_box">Generale</div>
+                                </td>
+                                <td id="merci">
+                                    <div class="rotate_box">Merci</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td id="persone">
+                                    <div class="rotate_box">Persone</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 <div class="item">
                     <img id="review" class="ibtn" src="img/RIPASSSO-ERRORI.png"></img>

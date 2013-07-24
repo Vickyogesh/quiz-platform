@@ -125,7 +125,10 @@ def save_error_review():
 def create_exam():
     user_id = app.getUserId()
     lang = app.getLang()
-    exam = app.core.createExam(app.quiz_type, user_id, lang)
+    exam_type = app.request.args.get('exam_type', None)
+    if app.session['quiz_type_name'] == 'cqc' and exam_type is None:
+        raise BadRequest('Invalid exam type.')
+    exam = app.core.createExam(app.quiz_type, user_id, lang, exam_type)
     return JSONResponse(exam)
 
 
