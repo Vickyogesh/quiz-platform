@@ -1,25 +1,13 @@
-var topic_list = [
-    "Capitolo 1.1",
-    "Capitolo 2.1",
-    "Capitolo 3.1",
-    "Capitolo 4.1",
-    "Capitolo 5.1",
-    "Capitolo 6.1",
-    "Capitolo 7.1",
-    "Capitolo 8.1",
-    "Capitolo 9.1",
-    "Capitolo 10.1",
-    "Capitolo 11.1",
-    "Capitolo 12.1",
-    "Capitolo 13.1",
-    "Capitolo 14.1",
-    "Capitolo 15.1",
-    "Capitolo 16.1"
+var groups = [
+    "Parte comune",
+    "Parte specialistica Trasporto di merci",
+    "Parte specialistica Trasporto di persone"
 ];
-var chapter_list = [
-    [1], [2], [3], [4], [5], [6], [7], [8],
-    [9], [10], [11], [12], [13], [14], [15], [16]
+var group_topics = [
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [11, 12, 13], [14, 15, 16]
 ];
+var group_index = 0;
 
 var bAnswerOn = false;
 var bTerminated = false;
@@ -37,14 +25,6 @@ var total_errors = 0;
 var can_ask_more = true;
 
 function saveState() {
-    // for (i = 0; i < quizData.length; i++) {
-    //     if (current_answers[i] != null) {
-    //         if (parseInt(quizData[i].answer) != current_answers[i]) {
-    //             total_errors++;
-    //         }
-    //     }
-    // }
-
     current_ids = [];
     current_answers = [];
 }
@@ -145,7 +125,7 @@ function fillupQuiz(force) {
         WaitMsg.hide();
         $("#topicgroup").hide();
         $("#quizarea").show();
-        $("#quizarea #topic h1").html(topic_list[data.topic-1]);
+        $("#quizarea #topic h1").html(groups[group_index]);
 
         function hasQuestion(id) {
             return idMap[id];
@@ -164,7 +144,7 @@ function fillupQuiz(force) {
         // for (var i = 0; i < quizData.length; i++)
         //     tmp.push(quizData[i].id);
         // console.log(tmp.toString());
-        console.log(data.questions.length);
+        //console.log(data.questions.length);
         setQuizEnv();
     }
 
@@ -386,17 +366,19 @@ $(document).ready(function() {
     var i, j, htmlVal;
     
     $("#topicgroup #chapterarea").empty();
-    for (i = 0; i < chapter_list.length; i++) {
+
+    for (i = 0; i < groups.length; i++) {
         htmlVal = '<div id="chapter' + (i+1)
                 + '" class="slider chap" style="font-size:15px; background-color:#707070; cursor:pointer;">';
         htmlVal += '<p style="padding-left:10px; float:left">';
-        htmlVal += '<a>Capitolo ' + (i+1) + '</a>';
+        htmlVal += '<a>' + groups[i] + '</a>';
         htmlVal += '<div id="expandsign" style="float:right; width:15px; height:15px; margin:7px"></div>';
         htmlVal += '</p></div>';
         htmlVal += '<div id="topiclist' + (i+1) + '" class="slider" style="display:none">';
-        for (j = 0; j < chapter_list[i].length; j++) {
-            htmlVal += '<p id="' + chapter_list[i][j] + '" class="result"><a href="#">'
-            + chapter_list[i][j] + '. ' + topic_list[chapter_list[i][j]-1] + '</a></p>';
+        for (j = 0; j < group_topics[i].length; j++) {
+            htmlVal += '<p id="' + group_topics[i][j] +
+            '" class="result" gid="' + i + '""><a href="#">Capitolo ' + group_topics[i][j] +
+            '</a></p>';
         }           
         htmlVal += '</div>';
         
@@ -415,6 +397,7 @@ $(document).ready(function() {
     
     $(".result").click(function(){          
         topicIndex = $(this).attr("id");
+        group_index = $(this).attr("gid");
         curIndex = 0;
         fillupQuiz(true);           
     });
