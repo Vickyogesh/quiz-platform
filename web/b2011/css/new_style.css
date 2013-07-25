@@ -350,3 +350,7 @@ ul.nav li {
   background: #fff;
   behavior: none; /* IE fix. */
 }
+
+#student_stat li#topic {
+  font-size: 14px;
+}
