@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Platform</title>
+  <meta name="HandheldFriendly" content="true" />
+  <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+</head>
+<body>
+  <div id="page-login" ata-role="page">
+    <div data-role="content"> 
+      <h3>Quiz platform</h3>
+      <div id="login" data-theme="a">
+          <form style="padding:10px 20px;" data-ajax="false">
+              <label for="un" class="ui-hidden-accessible">Username:</label>
+              <input type="text" name="user" id="un" placeholder="username" value="studente"/>
+              <label for="pw" class="ui-hidden-accessible">Password:</label>
+              <input type="password" name="pass" id="pw" placeholder="password" value="studente" />
+              <a href="#" data-role="button" data-theme="b">Accedi</a>
+          </form>
+      </div>
+      <div id="errpopup" data-role="popup" data-position-to="window" data-overlay-theme="a" data-theme="b" class="ui-content">
+        <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+        <span id="errmsg"></span>
+      </div>
+    </div>
+    <style type="text/css">
+      #login {max-width: 400px; margin: auto;}
+      #page-login h3 {text-align: center;}
+    </style>
+    <script src="js/md5-min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+      login_init();
+    </script>
+  </div>
+ <a href="student.html" data-prefetch></a>
+</body>
+</html>
