@@ -49,17 +49,47 @@ function aux_deleteCookie(name, path, domain) {
    }
 }
 
-function aux_showError(msg) {
-  $("#errpopup #errmsg").html("Errore:<br/>" + msg);
-  $("#errpopup").popup('open');
+function aux_showError(msg, title) {
+  $(document).simpledialog2({
+    mode: 'blank',
+    headerText: (title === undefined ? "Errore" : title),
+    headerClose: false,
+    blankContent : 
+      "<p>" + msg + "</p>" +
+      "<a rel='close' data-role='button' href='#'>Close</a>"
+  });
 }
 
-function updateContentSize() {
-  var the_height = ($(window).height()
-    - $('[data-role="header"]').height()
-    - $('[data-role="footer"]').height())
-    - 2 * parseInt($('[data-role="content"]').css("padding-bottom")) - 8;
-  $('[data-role="content"]').height(the_height);
-  $('[data-role="content"]').width($(window).width()
-    - 2 * parseInt($('[data-role="content"]').css("padding-left")));
+function aux_layoutGrid(id) {
+    var p = $(id).parent();
+    var pw = p.width();
+    var ph = p.height();
+    var grid = $(id);
+
+    if (pw >= ph) { // horizontal
+        grid.addClass("ftable ui-grid-b");
+        grid.removeClass("ui-grid-solo");
+
+        $(id + " > div").each(function(index){
+            if (index == 0)
+              $(this).addClass("item");
+            else {
+                $(this).addClass("item ui-block-" + String.fromCharCode(97 + index));
+                $(this).removeClass("ui-block-a");
+            }
+        });
+    }
+    else {
+        grid.addClass("ui-grid-solo");
+        grid.removeClass("ftable ui-grid-b");
+
+        $(id + " > div").each(function(index){
+            if (index == 0)
+              $(this).removeClass("item");
+            else {
+                $(this).addClass("ui-block-a");
+                $(this).removeClass("item ui-block-" + String.fromCharCode(97 + index));
+            }
+        });
+    }
 }

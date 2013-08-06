@@ -1,4 +1,8 @@
-function login_init() {
+$("#page-login").bind("pageinit", function() {
+  $("#page-login").bind('pageshow', function() {
+    aux_busy(false, "#login");
+  });
+
   $("#login a").click(function() {
     aux_busy(true, "#login");
 
@@ -35,9 +39,9 @@ function login_init() {
             sessionStorage.setItem('quizqsid', data.qsid);
             sessionStorage.setItem('quizname', name);
             sessionStorage.setItem('quizutype', data.user.type);
-            $.mobile.changePage("student.html");
+            $.mobile.changePage("#page-student");
           }
       });
     });
   });
-}
+});

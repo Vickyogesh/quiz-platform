@@ -1,0 +1,109 @@
+/* Stretch page and it's content fullscreen. */
+html, body {
+  height: 100%;
+}
+.page-fill {
+  height: 100%;
+}
+.page-fill .ui-header {
+  height: 40px;
+}
+.page-fill .ui-content {
+  position: absolute;
+  top: 0px;
+  right: 0;
+  bottom: 0px;
+  left: 0;
+}
+.page-fill.header .ui-content {
+  top: 40px;
+}
+.page-fill.footer .ui-content {
+  bottom: 30px;
+}
+.page-fill .ui-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+}
+
+.page-fill .ui-footer .ui-navbar a {
+  height: 30px;
+  line-height: 30px;
+}
+
+.page-fill .ui-footer .ui-btn-inner {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.ftable {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.ftable .item {
+  display: table-cell;
+  float: none;
+  vertical-align: middle;
+  text-align: center;
+}
+
+a.ui-link-inherit {
+  white-space: normal !important;
+}
+
+/* Login page. */
+#page-login #login {max-width: 400px; margin: auto;}
+#page-login h3 {text-align: center;}
+
+/* Student menu. */
+#menugrid {
+  text-align: center;
+}
+
+.rect-button {
+  display: block;
+  background: #ccc;
+  margin: 5px;
+  border-radius: 1em 1em 1em 1em;
+  cursor: pointer;
+  text-decoration:none;
+  text-shadow: none;
+}
+
+#bttQuiz {color: #ffffff; background-color: #0469cc;}
+#bttExam {color: #ffffff; background-color: #047aee;}
+#bttReview {color: #ffffff; background-color: #198bfb;}
+
+/* Quiz */
+#page-quiz-chapters .ui-content h3 {
+  text-align: center;
+  color: #0358ab;
+}
+
+#chapters .tp {
+  text-align: center;
+  border: 2px solid #ffffff;
+  background: #2579cf;
+  color: white;
+  text-shadow: 0px 1px 0px #0358ab;
+  cursor: pointer;
+}
+
+#page-quiz #image {
+  background-image: none;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+#page-quiz .ui-btn-active {
+ background-image: none !important;
+ background: none !important;
+ border: none !important;
+ text-shadow: none !important;
+}

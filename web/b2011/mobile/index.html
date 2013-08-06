@@ -6,15 +6,20 @@
   <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+  <link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/common.css" />
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+  <script type="text/javascript" src="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog2.min.js"></script>
+  <script src="js/md5-min.js"></script>
+  <script src="js/common.js"></script>
 </head>
 <body>
-  <div id="page-login" ata-role="page">
+  <div id="page-login" data-role="page">
     <div data-role="content"> 
       <h3>Quiz platform</h3>
       <div id="login" data-theme="a">
-          <form style="padding:10px 20px;" data-ajax="false">
+          <form style="padding:10px 20px;">
               <label for="un" class="ui-hidden-accessible">Username:</label>
               <input type="text" name="user" id="un" placeholder="username" value="studente"/>
               <label for="pw" class="ui-hidden-accessible">Password:</label>
@@ -27,17 +32,79 @@
         <span id="errmsg"></span>
       </div>
     </div>
-    <style type="text/css">
-      #login {max-width: 400px; margin: auto;}
-      #page-login h3 {text-align: center;}
-    </style>
-    <script src="js/md5-min.js"></script>
-    <script src="js/common.js"></script>
-    <script src="js/index.js"></script>
-    <script>
-      login_init();
-    </script>
+  <script src="js/index.js"></script>
+  </div> <!-- /page-login -->
+
+  <div id="page-student" data-role="page" class="page-fill header">
+    <div data-role="header">
+      <h1></h1>
+      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
+    </div>
+    <div data-role="content">
+      <div class="ui-grid-solo ftable" id="menugrid">
+        <div class="ui-block-a">
+          <a href="#page-quiz-chapters" class="rect-button" id="bttQuiz" data-transition="slide">Quiz</a>
+        </div>
+        <div class="ui-block-a">
+          <a href="#" class="rect-button" id="bttExam" data-transition="slide">Exam</a>
+        </div>
+        <div class="ui-block-a">
+          <a href="#" class="rect-button" id="bttReview" data-transition="slide">Error review</a>
+        </div>
+      </div>
+      <script src="js/student.js"></script>
+    </div>
   </div>
- <a href="student.html" data-prefetch></a>
+
+  <div id="page-quiz-chapters" data-role="page" class="page-fill header">
+    <div data-role="header">
+      <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a>
+      <h3>Quiz</h3>
+      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
+    </div>
+    <div data-role="content">
+      <h3>Choose a chapter for quiz</h3>
+      <div id="chapters" class="ui-grid-d"></div>
+    </div>
+    <script src="js/quiz-chapters.js"></script>
+  </div>  <!-- /page-quiz-chapters -->
+
+  <div id="page-quiz-topics" data-role="page">
+    <div data-role="header" data-position="fixed">
+      <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a>
+      <h3>Quiz</h3>
+      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
+    </div>
+    <div data-role="content">
+      <ul id="topics" data-role="listview" data-theme="c">
+      </ul>
+    </div>
+    <script src="js/quiz-topics.js"></script>
+  </div>  <!-- /page-quiz-topics -->
+
+  <div id="page-quiz" data-role="page" class="page-fill header footer">
+    <div data-role="header">
+      <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a>
+      <h3>Quiz <span></span></h3>
+      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
+    </div>
+    <div data-role="content">
+      <div class="ui-grid-solo ftable" id="qgrid" style="text-align: center;">
+        <div class="ui-block-a"><div id="image"></div></div>
+        <div class="ui-block-a"><div id="txt">hello</div></div>
+      </div>
+    </div>
+    <div data-role="footer">
+      <div data-role="navbar">
+        <ul>
+          <li><a id="bttQuizTrue" href="#">Vero</a></li>
+          <li><a id="bttQuizSend" href="#">Send</a></li>
+          <li><a id="bttQuizFalse" href="#">Falso</a></li>
+        </ul>
+      </div>
+    </div>
+    <script src="js/quiz.js"></script>
+  </div>  <!-- /page-quiz -->
+
 </body>
 </html>
