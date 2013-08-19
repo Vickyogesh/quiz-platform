@@ -83,8 +83,7 @@ class ExamStatTest(unittest.TestCase):
         cleanupdb_onSetup(self.engine)
 
     def tearDown(self):
-        pass
-        #cleanupdb_onTearDown(self.engine)
+        cleanupdb_onTearDown(self.engine)
 
     def sql(self, *args, **kwargs):
         return self.engine.execute(*args, **kwargs)
