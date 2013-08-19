@@ -42,20 +42,21 @@
             //data = [data];
             examX.push(0);
             examY.push(0);
-            examY1.push(36);
+            examY1.push(54);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
                     continue;
 
+                console.log(data[i].errors)
                 examX.push(nCount);
-                examY.push(40 - data[i].errors);
-                examY1.push(36);
+                examY.push(60 - data[i].errors);
+                examY1.push(54);
                 nCount++;
             }                           
 
             for (var i = nCount; i < 4; i++) {
                 examX.push(i);
-                examY1.push(36);
+                examY1.push(54);
             };
 
             var r = Raphael(id);
@@ -63,7 +64,7 @@
                 $('#' + id).width() - 12,
                 $('#' + id).height() - 16, 
                 examX, 
-                [examY, examY1, [0, 40]], {
+                [examY, examY1, [0, 60]], {
                     axis: "0 0 1 1",
                     axisxstep: examX.length - 1,
                     colors: ['#2479cc', '#CCC'],
@@ -81,7 +82,7 @@
               }
             }
 
-            // Make line [0, 40] invisible.
+            // Make line [0, 60] invisible.
             // We do so because in IE it shows with black color.
             echart.lines[2].attr("opacity", 0);
 

@@ -9,40 +9,52 @@ function getUrlParameterByName(name) {
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-function createErrorsChart(id, val) {
+// 100% errors = gray pie
+// 0% errors =  blue pie
+// null or -1 = white pie
+// showEmpty - show white pie if error_percent is null or -1
+function createErrorsChart(id, error_percent, showEmpty) {
   var p = Raphael(id);
   var values;
   var colors;
-  var stroke = '#fff';
+  var stroke = "#fff"
 
-  if (val == 100) {
-    values = [100];
+  if (error_percent == 0) {
+    error_percentues = [100];
     colors = ['#fff'];
   }
-  else if (val == 0 || val === null || val === undefined || val == "null") {
-    val = 0;
-    values = [100];
+  else if (error_percent == 100) {
+    error_percentues = [100];
     colors = ['#fff'];
-    stroke = '#ccc'
   }
-  else if (val > 0 ) {
-    values = [100 - val, val];
+  else if (error_percent > 0 ) {
+    error_percentues = [100 - error_percent, error_percent];
     colors = ['#2479cc', '#fff'];
   }
-  else
-    values = []
+  else {
+    error_percent = -1;
+    if (showEmpty) {
+      error_percentues = [100];
+      colors= ["#fff"];
+      stroke = "#ccc";
+    }
+    else {
+      error_percentues = [];
+      colors= [];
+    }
+  }
 
-  p = p.piechart(10, 10, 8, values, {
+  p = p.piechart(10, 10, 8, error_percentues, {
     stroke: stroke,
     strokewidth: 2,
     colors: colors
   });
 
-  if (val == 100)
+  if (error_percent == 0)
+    p.series.items[0].attr({opacity : 100, fill: "#2479cc"});
+  else if (error_percent == 100)
     p.series.items[0].attr({opacity : 100, fill: "#ccc"});
-  else if (val == 0)
-    p.series.items[0].attr({opacity : 100, fill: "#fff"});
-  else if (val > 0)
+  else if (error_percent > 0)
     p.series.items[1].attr({opacity : 100, fill: "#ccc"});
 
   return p;

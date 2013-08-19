@@ -114,7 +114,7 @@
 			// filling exam graph
 			var ids = ['wpgraph', 'mpgraph', 'apgraph'];
 			for (var i = 0; i < 3; i++)
-				createErrorsChart(ids[i], data.exams[i]);
+				createErrorsChart(ids[i], data.exams[i], true);
 			
 			fill_topics(data.topics, "week", "wtgraph");
 			fill_topics(data.topics, "month", "mtgraph");
