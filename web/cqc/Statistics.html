@@ -32,29 +32,20 @@
 	
 	$(document).ready(function() {
 
-        // Create exam graph in the period [start; end]
-        // start & end may be null to use whole data.
-        function drawExamGraph(id, data, start, end) {
+        // Create exam graph from data
+        function drawExamGraph(id, data) {
             var examX = [];
             var examY = [];
             var examY1 = [];
-            var nCount = 0;
+            var nCount = 1;
 
-            if (start !== undefined && end !== undefined) {
-                start = start.hour(0).minute(0).second(0);
-                end = end.hour(0).minute(0).second(0);
-            }
-
+            //data = [data];
+            examX.push(0);
+            examY.push(0);
+            examY1.push(36);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
                     continue;
-
-                var exam_date = moment(data[i].end + ":00 Z").hour(0).minute(0).second(0);
-            
-                if (start !== undefined && end !== undefined) {
-                    if (exam_date.isBefore(start) || exam_date.isAfter(end))
-                        continue;
-                }
 
                 examX.push(nCount);
                 examY.push(40 - data[i].errors);
@@ -96,10 +87,10 @@
 
             // Update x-axis texts
             var xText = echart.axis[0].text.items;  
-            for(i in xText){
-                var nVal = parseInt(xText[i].attr('text')) + 1;
-                xText[i].attr({'text': nVal + ''});
-            }
+            // for(i in xText){
+            //     var nVal = parseInt(xText[i].attr('text')) + 1;
+            //     xText[i].attr({'text': nVal + ''});
+            // }
             var lab = r.label($('#' + id).width() / 2, 8, "Statistiche esami");
             lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
             

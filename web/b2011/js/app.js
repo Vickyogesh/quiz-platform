@@ -25,10 +25,12 @@ function createErrorsChart(id, val) {
     colors = ['#fff'];
     stroke = '#ccc'
   }
-  else {
+  else if (val > 0 ) {
     values = [100 - val, val];
     colors = ['#2479cc', '#fff'];
   }
+  else
+    values = []
 
   p = p.piechart(10, 10, 8, values, {
     stroke: stroke,
