@@ -192,6 +192,7 @@ class UserMixin(object):
             info = self._createExamInfo(row)
             if type == 1:
                 current.append(info)
+                week.append(info)
             elif type == 2:
                 week.append(info)
             else:
