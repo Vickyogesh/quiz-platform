@@ -178,29 +178,33 @@ Student statistics provides learning progress information of the student.
           "name": "Chuck",
           "surname": "Norris"
         },
-        "exams": [
-          {
-            "id": 1,
-            "start": "2013-03-29 07:12:11",
-            "end": "2013-03-29 07:20:00",
-            "errors": 5,
-            "status": "failed"
-          },
-          {
-            "id": 2,
-            "start": "2013-03-29 07:25:11",
-            "end": "None",
-            "errors": 0,
-            "status": "expired"
-          },
-          {
-            "id": 3,
-            "start": "2013-03-29 11:12:42",
-            "end": "None",
-            "errors": 0,
-            "status": "in-progress"
-          }
-        ]
+        "exams": {
+          "current": [
+              {
+                "id": 1,
+                "start": "2013-03-29 07:12:11",
+                "end": "2013-03-29 07:20:00",
+                "errors": 5,
+                "status": "failed"
+              },
+              {
+                "id": 2,
+                "start": "2013-03-29 07:25:11",
+                "end": "None",
+                "errors": 0,
+                "status": "expired"
+              },
+              {
+                "id": 3,
+                "start": "2013-03-29 11:12:42",
+                "end": "None",
+                "errors": 0,
+                "status": "in-progress"
+              }
+            ],
+          "week": [   ],
+          "week3": [   ]
+        }
       }
 
 

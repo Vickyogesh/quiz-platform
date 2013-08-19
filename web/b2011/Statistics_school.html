@@ -77,13 +77,12 @@
 			for (i = 0; i < topics.length; i++) {
 				var id = chart_type + (i+1);
 				var nError = get_err(topics[i], type);
-				if (nError != null && nError > 0)
-					createErrorsChart(id, nError);
+				createErrorsChart(id, nError);
 			}
 		}
 
         function setGuestVisits(sel, value) {
-            if (value < 0)
+            if (value < 0 || value === null || value === undefined || value == "null")
                 value = 0;
             $(sel).html(value);
         }
@@ -114,10 +113,8 @@
 			
 			// filling exam graph
 			var ids = ['wpgraph', 'mpgraph', 'apgraph'];
-			for (var i = 0; i < 3; i++) {
-				if (data.exams[i] != null && data.exams[i])
-					createErrorsChart(ids[i], data.exams[i]);
-			}
+			for (var i = 0; i < 3; i++)
+				createErrorsChart(ids[i], data.exams[i]);
 			
 			fill_topics(data.topics, "week", "wtgraph");
 			fill_topics(data.topics, "month", "mtgraph");
