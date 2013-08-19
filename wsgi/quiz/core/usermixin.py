@@ -33,19 +33,27 @@ class UserMixin(object):
         # NOTE: we skip 'in-progress' exams.
         self.__examstat = self.sql("""SELECT
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
-         FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type)current,
+         FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
+         DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)) current,
+
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         start_time BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-         AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY) week,
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
+         AND DATE(UTC_TIMESTAMP())) week,
+        
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         start_time BETWEEN DATE(UTC_TIMESTAMP()) - interval 29 day
-         AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY) week3;
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - interval 27 day)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)) week3;
         """)
 
         self.__examlist = self.sql("""SELECT
-            exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR
+            exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR,
+            (CASE WHEN DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
+                THEN 1
+            WHEN DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
+                AND DATE(UTC_TIMESTAMP()) THEN 2
+            ELSE 3 END)
             FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type""")
 
         self.__topicerr = self.sql("""SELECT * FROM
@@ -132,17 +140,6 @@ class UserMixin(object):
             'week': self._normErr(row[1]),
             'week3': self._normErr(row[2])
         }
-        # stat = []
-        # for row in rows:
-        #     end = row[2]
-        #     expired = row[3]
-        #     if end:
-        #         stat.append({'id': row[0], 'status': row[1]})
-        #     elif expired:
-        #         stat.append({'id': row[0], 'status': 'expired'})
-        #     else:
-        #         stat.append({'id': row[0], 'status': 'in-progress'})
-        # return stat
 
     def getUserStat(self, quiz_type, user_id, lang):
         user = self._getStudentById(user_id)
@@ -182,9 +179,22 @@ class UserMixin(object):
             'status': status
         }
 
+    # TODO: not sure about performance
     def _getExamList(self, quiz_type, user_id):
         rows = self.__examlist.execute(user_id=user_id, quiz_type=quiz_type)
-        return [self._createExamInfo(row) for row in rows]
+        current, week, week3 = [], [], []
+        for row in rows:
+            type = row[7]
+            info = self._createExamInfo(row)
+            if type == 1:
+                current.append(info)
+            elif type == 2:
+                week.append(info)
+            else:
+                week3.append(info)
+        return {'current': current, 'week': week, 'week3': week3}
+        # rows = [self._createExamInfo(row) for row in rows]
+        # return rows
 
     def getExamList(self, quiz_type, user_id):
         return {
