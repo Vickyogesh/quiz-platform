@@ -13,14 +13,17 @@ function createErrorsChart(id, val) {
   var p = Raphael(id);
   var values;
   var colors;
+  var stroke = '#fff';
 
   if (val == 100) {
     values = [100];
     colors = ['#fff'];
   }
-  else if (val == 0) {
+  else if (val == 0 || val === null || val === undefined || val == "null") {
+    val = 0;
     values = [100];
-    colors = ['#2479cc'];
+    colors = ['#fff'];
+    stroke = '#ccc'
   }
   else {
     values = [100 - val, val];
@@ -28,14 +31,16 @@ function createErrorsChart(id, val) {
   }
 
   p = p.piechart(10, 10, 8, values, {
-    stroke: '#fff',
+    stroke: stroke,
     strokewidth: 2,
     colors: colors
   });
 
   if (val == 100)
     p.series.items[0].attr({opacity : 100, fill: "#ccc"});
-  else if (val != 100)
+  else if (val == 0)
+    p.series.items[0].attr({opacity : 100, fill: "#fff"});
+  else if (val > 0)
     p.series.items[1].attr({opacity : 100, fill: "#ccc"});
 
   return p;

@@ -136,9 +136,7 @@
             for (i = 0; i < topics.length; i++) {
                 var id = chart_type + (i+1);
                 var nError = get_err(topics[i], type);
-                if (nError != null && nError > 0) {
-                    var p = createErrorsChart(id, nError);
-                }
+                var p = createErrorsChart(id, nError);
             }
         }
 
