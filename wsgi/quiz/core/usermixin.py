@@ -13,20 +13,24 @@ class UserMixin(object):
 
         self.__topicstat = self.sql("""SELECT
             t.id, t.text, t.text_fr, t.text_de,
-            IFNULL((SELECT err_count/count*100 FROM topic_err_current WHERE
-                user_id=:user_id AND quiz_type=t.quiz_type AND
-                topic_id=t.id), -1) current,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-               user_id=:user_id AND quiz_type=t.quiz_type AND
-               topic_id = t.id AND
-               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 7 DAY
-               AND DATE(UTC_TIMESTAMP()) - INTERVAL 1 DAY
+               user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
+               AND
+               DATE(now_date) >  DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
+               GROUP BY topic_id), -1) current,
+
+            IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
+               user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
+               AND
+               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
+               AND DATE(UTC_TIMESTAMP())
                GROUP BY topic_id), -1) week,
+
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
-               user_id=:user_id AND quiz_type=t.quiz_type AND
-               topic_id = t.id AND
-               now_date BETWEEN DATE(UTC_TIMESTAMP()) - INTERVAL 29 DAY
-               AND DATE(UTC_TIMESTAMP()) - INTERVAL 8 DAY
+               user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
+               AND
+               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
+               AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
                GROUP BY topic_id), -1) week3
             from topics t WHERE quiz_type=:quiz_type""")
 
