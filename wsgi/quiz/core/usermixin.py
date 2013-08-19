@@ -47,7 +47,7 @@ class UserMixin(object):
         
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - interval 27 day)
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)) week3;
         """)
 
