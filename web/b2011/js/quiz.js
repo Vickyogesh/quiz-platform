@@ -104,7 +104,11 @@ function sendAnswers(callback) {
         callback = function(data) {
             if (data.status != 200) {
                 WaitMsg.hide();
-                aux_showJSONError(data);
+                var user = sessionStorage.getItem('quizutype');
+                if (user == 'guest' && data.status == 403)
+                    showGuestAccessError();
+                else                
+                    aux_showJSONError(data);
                 setQuizEnv();
             }
         }
@@ -158,7 +162,11 @@ function fillupQuiz(force) {
         $.getJSON(p, d, function(info) {
             if (info.status != 200) {
                 WaitMsg.hide();
-                aux_showJSONError(info);
+                var user = sessionStorage.getItem('quizutype');
+                if (user == 'guest' && info.status == 403)
+                    showGuestAccessError();
+                else                
+                    aux_showJSONError(info);
             }
             else
                 on_ok(info);
@@ -498,7 +506,11 @@ $(document).ready(function() {
         sendAnswers(function(data) {
             if (data.status != 200) {
                 WaitMsg.hide();
-                aux_showJSONError(data);
+                var user = sessionStorage.getItem('quizutype');
+                if (user == 'guest' && data.status == 403)
+                    showGuestAccessError();
+                else                
+                    aux_showJSONError(data);
                 setQuizEnv();
             }
             else

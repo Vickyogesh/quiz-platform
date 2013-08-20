@@ -168,8 +168,15 @@
                 // Means: probably no student activity
                 if (data.description == "Unknown student.")
                     no_activity();
-                else
-                    aux_showJSONError(data);
+                else {
+                    var user = sessionStorage.getItem('quizutype');
+                    if (user == 'guest' && data.status == 403) {
+                        showGuestAccessError();
+                        window.location = "student.html";
+                    }
+                    else                    
+                        aux_showJSONError(data);
+                }
                 return;
 			}
 			examData = data;
@@ -187,8 +194,15 @@
                     // Means: probably no student activity
                     if (data.description == "Unknown student.")
                         no_activity();
-                    else
-                        aux_showJSONError(data);
+                    else {
+                        var user = sessionStorage.getItem('quizutype');
+                        if (user == 'guest' && data.status == 403) {
+                            showGuestAccessError();
+                            window.location = "student.html";
+                        }
+                        else                    
+                            aux_showJSONError(data);
+                    }
                     return;
 				}
 				WaitMsg.hide();
@@ -238,7 +252,13 @@
 					$.getJSON(urlstat, data, function(data) {
 						if (data.status != 200) {
 							WaitMsg.hide();
-							aux_showJSONError(data);
+                            var user = sessionStorage.getItem('quizutype');
+                            if (user == 'guest' && data.status == 403) {
+                                showGuestAccessError();
+                                window.location = "student.html";
+                            }
+                            else                    
+                                aux_showJSONError(data);
                             return;
 						}
 						WaitMsg.hide();
@@ -393,7 +413,13 @@
 				$.getJSON(url("/v1/exam/" + $(this).attr('id')), function(data) {
 					if (data.status != 200) {
 						WaitMsg.hide();
-						aux_showJSONError(data);
+                        var user = sessionStorage.getItem('quizutype');
+                        if (user == 'guest' && data.status == 403) {
+                            showGuestAccessError();
+                            window.location = "student.html";
+                        }
+                        else
+                            aux_showJSONError(data);
 					}
 					else {
 						WaitMsg.hide();

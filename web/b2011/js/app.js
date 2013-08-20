@@ -17,26 +17,26 @@ function createErrorsChart(id, error_percent, showEmpty) {
   var p = Raphael(id);
   var values;
   var colors;
-  var stroke = "#fff"
+  var stroke = "#FFF"
 
   if (error_percent == 0) {
     error_percentues = [100];
-    colors = ['#fff'];
+    colors = ['#FFF'];
   }
   else if (error_percent == 100) {
     error_percentues = [100];
-    colors = ['#fff'];
+    colors = ['#FFF'];
   }
   else if (error_percent > 0 ) {
     error_percentues = [100 - error_percent, error_percent];
-    colors = ['#2479cc', '#fff'];
+    colors = ['#2479cc', '#FFF'];
   }
   else {
     error_percent = -1;
     if (showEmpty) {
       error_percentues = [100];
-      colors= ["#fff"];
-      stroke = "#ccc";
+      colors= ["#FFF"];
+      stroke = "#CCC";
     }
     else {
       error_percentues = [];
@@ -51,11 +51,11 @@ function createErrorsChart(id, error_percent, showEmpty) {
   });
 
   if (error_percent == 0)
-    p.series.items[0].attr({opacity : 100, fill: "#2479cc"});
+    p.series.items[0].attr({opacity : 100, fill: "#2479CC"});
   else if (error_percent == 100)
-    p.series.items[0].attr({opacity : 100, fill: "#ccc"});
+    p.series.items[0].attr({opacity : 100, fill: "#CCC"});
   else if (error_percent > 0)
-    p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+    p.series.items[1].attr({opacity : 100, fill: "#CCC"});
 
   return p;
 }
@@ -129,44 +129,14 @@ function aux_showJSONError(data)
 // Show error dialog
 function aux_showError(msg, code)
 {
-//  $("#msg .modal-header h3").html('Error: ' + code);
-//  $("#msg .modal-body").html(msg)
-//  $("#msg").modal('show')
 	alert('Error: ' + code + ', ' + msg);
 }
 //----------------------------------------------------------------------------
 
-
-
-//----------------------------------------------------------------------------
-/*
-function onGetQuiz(nTopicVal)
-{
-//  $("#quiztab table thead input").attr("checked", false);
-
-//	var topic = $("#quiztab #topic").val();
-//  var lang = $("#quiztab #lang").val();
-	var lang = "it";
-	var uri = url("/v1/quiz/" + nTopicVal);
-	var data = {}
-	
-	alert(uri);
-	
-	if (lang != "it")
-		data.lang = lang;
-	
-	$.getJSON(uri, data, function(data) {
-		if (data.status != 200) {
-			aux_showJSONError(data);
-		}
-		else {
-			alert('success: ' + data);
-			aux_fillTable($("#quiztab table"), data.questions);
-		}
-	});
+function showGuestAccessError() {
+  alert("Guest's visits is exceeded. Access will be unlocked within 1 hr.");
 }
 //----------------------------------------------------------------------------
-*/
 
 $(document).ready(function() {
 	var nwidth = $(window).width();
