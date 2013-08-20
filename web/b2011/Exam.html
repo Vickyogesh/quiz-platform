@@ -275,7 +275,7 @@
 			id_list_real.push(quizData.questions[i].id);
 			
 			var nIndex = alreadyAnswered(i);
-			if (nIndex > 0) {
+			if (nIndex >= 0) {
 				answer_list_real.push(answer_list[nIndex]);
 			}
 			else {
@@ -375,7 +375,8 @@
 			//
 			// stting up image area
 			//
-			if (quizData.questions[curIndex].image != "")
+			if (quizData.questions[curIndex].image != ""
+			    && quizData.questions[curIndex].image !== undefined)
 			{
 				var image = "/img/" + quizData.questions[curIndex].image + ".jpg";
 				$("#imgarea").css("background-image","url('" + image + "')");
