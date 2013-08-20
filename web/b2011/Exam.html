@@ -375,7 +375,8 @@
 			//
 			// stting up image area
 			//
-			if (quizData.questions[curIndex].image != "")
+			if (quizData.questions[curIndex].image != ""
+			    && quizData.questions[curIndex].image !== undefined)
 			{
 				var image = "/img/" + quizData.questions[curIndex].image + ".jpg";
 				$("#imgarea").css("background-image","url('" + image + "')");
