@@ -13,14 +13,14 @@ engine = None
 logger = None
 
 
-def process(dbengine, log, clean):
+def process(dbengine, log, clean, force):
     """Update statistics for all active schools."""
     global engine
     global logger
     engine = dbengine
     logger = log
     try:
-        school_list = get_schools_for_update()
+        school_list = get_schools_for_update(force)
         if clean:
             do_clean(school_list)
         else:
@@ -41,13 +41,16 @@ def do_update(school_list):
         time.sleep(1)
 
 
-def get_schools_for_update():
+def get_schools_for_update(force):
     """Return list of schools for which update is needed."""
-    return [{'id': 1, 'quiz_type': 1}]
-    # res = engine.execute("""SELECT school_id, quiz_type FROM school_stat_cache
-    #                      WHERE last_activity > last_update OR last_update = 0
-    #                      """)
-    # return [{'id': row[0], 'quiz_type': row[1]} for row in res]
+    if force:
+        res = engine.execute("""
+            SELECT school_id, quiz_type FROM school_stat_cache""")
+    else:
+        res = engine.execute("""SELECT school_id, quiz_type FROM school_stat_cache
+                             WHERE last_activity > last_update OR last_update = 0
+                             """)
+    return [{'id': row[0], 'quiz_type': row[1]} for row in res]
 
 
 def update_school(school):
@@ -65,7 +68,6 @@ def update_school(school):
 
     stat = get_school_cache(school)
     students = get_active_students(school)
-    print students
     if not students:
         return
     students_str = ','.join(str(user) for user in students)
@@ -131,42 +133,10 @@ def get_guest_stat(school):
 
     return (res[0], res[1], res[2])
 
+# NOTE: progress_coef is an errors percent not a success percent.
 
-# def get_current_student_rating(users_str, quiz_type):
-#     """Return list of best and worst students."""
-#     res = engine.execute("""SELECT id, progress_coef FROM
-#         users WHERE quiz_type=%d AND id IN (%s) GROUP BY id ORDER by progress_coef DESC limit 3;
-#     """ % (quiz_type, users_str))
-#     best = [{
-#         'id': row[0],
-#         'coef': row[1]
-#     } for row in res if row[1] != -1]
-
-#     res = engine.execute("""SELECT id, progress_coef FROM
-#         users WHERE id IN (%s) GROUP BY id ORDER by progress_coef limit 3;
-#     """ % users_str)
-#     worst = [{
-#         'id': row[0],
-#         'coef': row[1]
-#     } for row in res if row[1] != -1]
-
-#     return {'best': best, 'worst': worst}
-
-
-def get_users_info(res, quiz_type):
-    data = {}
-    users = []
-    for row in res:
-        data[row[0]] = row[1]
-        users.append(str(row[0]))
-    if not data:
-        return []
-    users = ','.join(users)
-    res = engine.execute("""SELECT id, progress_coef FROM
-        users WHERE quiz_type=%d AND id IN (%s) ORDER by progress_coef""" % (quiz_type, users))
-    d = [{'id': row[0], 'coef': data[row[0]]}
-         for row in res if data[row[0]] != -1]
-    return d
+def get_users_info(res):
+    return [{'id': row[0], 'coef': row[1]} for row in res]
 
 
 def get_current_student_rating(users_str, quiz_type):
@@ -175,17 +145,17 @@ def get_current_student_rating(users_str, quiz_type):
         FROM user_progress_snapshot WHERE quiz_type=%d AND
         user_id IN (%s) AND
         DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
-        GROUP BY user_id ORDER by c DESC limit 3;
+        GROUP BY user_id ORDER by c ASC limit 3;
     """ % (quiz_type, users_str))
-    best = get_users_info(res, quiz_type)
+    best = get_users_info(res)
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE quiz_type=%d AND
         user_id IN (%s) AND
         DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
-        GROUP BY user_id ORDER by c limit 3;
+        GROUP BY user_id ORDER by c DESC limit 3;
     """ % (quiz_type, users_str))
-    worst = get_users_info(res, quiz_type)
+    worst = get_users_info(res)
 
     return {'best': best, 'worst': worst}
 
@@ -196,17 +166,17 @@ def get_week_student_rating(users_str, quiz_type):
         FROM user_progress_snapshot WHERE quiz_type=%d AND
         user_id IN (%s) AND
         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c DESC limit 3;
+        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c ASC limit 3;
     """ % (quiz_type, users_str))
-    best = get_users_info(res, quiz_type)
+    best = get_users_info(res)
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE quiz_type=%d AND
         user_id IN (%s) AND
         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c limit 3;
+        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c DESC limit 3;
     """ % (quiz_type, users_str))
-    worst = get_users_info(res, quiz_type)
+    worst = get_users_info(res)
 
     return {'best': best, 'worst': worst}
 
@@ -218,36 +188,44 @@ def get_week3_student_rating(users_str, quiz_type):
         user_id IN (%s) AND
         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
-        GROUP BY user_id ORDER by c DESC limit 3;
+        GROUP BY user_id ORDER by c ASC limit 3;
     """ % (quiz_type, users_str))
-    best = get_users_info(res, quiz_type)
+    best = get_users_info(res)
 
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE quiz_type=%d AND
         user_id IN (%s) AND
         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
-        GROUP BY user_id ORDER by c limit 3;
+        GROUP BY user_id ORDER by c DESC limit 3;
     """ % (quiz_type, users_str))
-    worst = get_users_info(res, quiz_type)
+    worst = get_users_info(res)
 
     return {'best': best, 'worst': worst}
 
 
 def get_exams_stat(users_str, quiz_type):
     """Return exams error percent list."""
+    if quiz_type == 2:  # cqc
+        num_err = 6
+    else:
+        num_err = 4
+
     res = engine.execute("""SELECT
-        (SELECT ROUND(SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100) e
-         FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s)) current,
-        (SELECT ROUND(SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100) e
+        (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
+         FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
+         DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)) current,
+
+        (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
          AND DATE(UTC_TIMESTAMP())) week,
-        (SELECT ROUND(SUM(IF(err_count > 4, 1, 0))/COUNT(end_time)*100) e
+    
+        (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)) week3;
-        """ % {'u': users_str, 't': quiz_type}).fetchone()
+        """ % {'u': users_str, 't': quiz_type, 'err': num_err}).fetchone()
     return (res[0], res[1], res[2])
 
 

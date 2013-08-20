@@ -50,6 +50,7 @@ parser.add_argument('-c', '--config', default=None,
                     help="""Configuration file
                     (default: ../test-data/config.ini).""")
 parser.add_argument('--clean', action='store_true', help="Cleanup db.")
+parser.add_argument('--force', action='store_true', help="Force updates.")
 args = parser.parse_args()
 
 # Logging setup
@@ -80,7 +81,7 @@ get_settings(args.config)
 engine = get_engine()
 logger.info('Update started')
 start = time.time()
-update.process(engine, logger, args.clean)
+update.process(engine, logger, args.clean, args.force)
 end = time.time() - start
 logger.info('Update finished in %.3fs', end)
 
