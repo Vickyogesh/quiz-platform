@@ -17,6 +17,12 @@ def get_authorize_status():
     info = app.account.getUserInfo()
     return JSONResponse(info)
 
+
+@app.get('/authorize/logout')
+def get_authorize_logout():
+    app.session.delete()
+    return JSONResponse()
+
 # @app.get('/authorize/status')
 # def get_authorize_status():
 #     try:

@@ -9,34 +9,53 @@ function getUrlParameterByName(name) {
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-function createErrorsChart(id, val) {
+// 100% errors = gray pie
+// 0% errors =  blue pie
+// null or -1 = white pie
+// showEmpty - show white pie if error_percent is null or -1
+function createErrorsChart(id, error_percent, showEmpty) {
   var p = Raphael(id);
   var values;
   var colors;
+  var stroke = "#FFF"
 
-  if (val == 100) {
-    values = [100];
-    colors = ['#fff'];
+  if (error_percent == 0) {
+    error_percentues = [100];
+    colors = ['#FFF'];
   }
-  else if (val == 0) {
-    values = [100];
-    colors = ['#2479cc'];
+  else if (error_percent == 100) {
+    error_percentues = [100];
+    colors = ['#FFF'];
+  }
+  else if (error_percent > 0 ) {
+    error_percentues = [100 - error_percent, error_percent];
+    colors = ['#2479cc', '#FFF'];
   }
   else {
-    values = [100 - val, val];
-    colors = ['#2479cc', '#fff'];
+    error_percent = -1;
+    if (showEmpty) {
+      error_percentues = [100];
+      colors= ["#FFF"];
+      stroke = "#CCC";
+    }
+    else {
+      error_percentues = [];
+      colors= [];
+    }
   }
 
-  p = p.piechart(10, 10, 8, values, {
-    stroke: '#fff',
+  p = p.piechart(10, 10, 8, error_percentues, {
+    stroke: stroke,
     strokewidth: 2,
     colors: colors
   });
 
-  if (val == 100)
-    p.series.items[0].attr({opacity : 100, fill: "#ccc"});
-  else if (val != 100)
-    p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+  if (error_percent == 0)
+    p.series.items[0].attr({opacity : 100, fill: "#2479CC"});
+  else if (error_percent == 100)
+    p.series.items[0].attr({opacity : 100, fill: "#CCC"});
+  else if (error_percent > 0)
+    p.series.items[1].attr({opacity : 100, fill: "#CCC"});
 
   return p;
 }
@@ -110,44 +129,14 @@ function aux_showJSONError(data)
 // Show error dialog
 function aux_showError(msg, code)
 {
-//  $("#msg .modal-header h3").html('Error: ' + code);
-//  $("#msg .modal-body").html(msg)
-//  $("#msg").modal('show')
 	alert('Error: ' + code + ', ' + msg);
 }
 //----------------------------------------------------------------------------
 
-
-
-//----------------------------------------------------------------------------
-/*
-function onGetQuiz(nTopicVal)
-{
-//  $("#quiztab table thead input").attr("checked", false);
-
-//	var topic = $("#quiztab #topic").val();
-//  var lang = $("#quiztab #lang").val();
-	var lang = "it";
-	var uri = url("/v1/quiz/" + nTopicVal);
-	var data = {}
-	
-	alert(uri);
-	
-	if (lang != "it")
-		data.lang = lang;
-	
-	$.getJSON(uri, data, function(data) {
-		if (data.status != 200) {
-			aux_showJSONError(data);
-		}
-		else {
-			alert('success: ' + data);
-			aux_fillTable($("#quiztab table"), data.questions);
-		}
-	});
+function showGuestAccessError() {
+  alert("Guest's visits is exceeded. Access will be unlocked within 1 hr.");
 }
 //----------------------------------------------------------------------------
-*/
 
 $(document).ready(function() {
 	var nwidth = $(window).width();

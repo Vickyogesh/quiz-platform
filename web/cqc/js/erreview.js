@@ -35,7 +35,11 @@ function sendAnswers(callback) {
         callback = function(data) {
             if (data.status != 200) {
                 WaitMsg.hide();
-                aux_showJSONError(data);
+                var user = sessionStorage.getItem('quizutype');
+                if (user == 'guest' && data.status == 403)
+                    showGuestAccessError();
+                else
+                    aux_showJSONError(data);
                 setQuizEnv();
             }
         }
@@ -70,8 +74,16 @@ function fillupReview() {
 
     $.getJSON(uri, data, function(data) {
         if (data.status != 200) {
-            WaitMsg.hide();
-            aux_showJSONError(data);
+            var user = sessionStorage.getItem('quizutype');
+            if (user == 'guest' && data.status == 403) {
+                WaitMsg.hide();
+                showGuestAccessError();
+                window.location = "student.html";
+            }
+            else {
+                WaitMsg.hide();
+                aux_showJSONError(data);
+            }
         }
         else {
             WaitMsg.hide();
@@ -362,7 +374,11 @@ $(document).ready(function() {
         sendAnswers(function(data) {
             if (data.status != 200) {
                 WaitMsg.hide();
-                aux_showJSONError(data);
+                var user = sessionStorage.getItem('quizutype');
+                if (user == 'guest' && data.status == 403)
+                    showGuestAccessError();
+                else
+                    aux_showJSONError(data);
                 setQuizEnv();
             }
             else

@@ -77,13 +77,12 @@
 			for (i = 0; i < topics.length; i++) {
 				var id = chart_type + (i+1);
 				var nError = get_err(topics[i], type);
-				if (nError != null && nError > 0)
-					createErrorsChart(id, nError);
+				createErrorsChart(id, nError);
 			}
 		}
 
         function setGuestVisits(sel, value) {
-            if (value < 0)
+            if (value < 0 || value === null || value === undefined || value == "null")
                 value = 0;
             $(sel).html(value);
         }
@@ -114,10 +113,8 @@
 			
 			// filling exam graph
 			var ids = ['wpgraph', 'mpgraph', 'apgraph'];
-			for (var i = 0; i < 3; i++) {
-				if (data.exams[i] != null && data.exams[i])
-					createErrorsChart(ids[i], data.exams[i]);
-			}
+			for (var i = 0; i < 3; i++)
+				createErrorsChart(ids[i], data.exams[i], true);
 			
 			fill_topics(data.topics, "week", "wtgraph");
 			fill_topics(data.topics, "month", "mtgraph");
@@ -174,87 +171,87 @@
 
             <ul id="week" class="collapsable-list">
     			<li id="bestStListBut">
-					<a href='#' class="lustre-button">Best students</a>
+					<a href='#' class="lustre-button">Studenti Migliori</a>
 					<ul id="bestStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="worstStListBut">
-					<a href='#' class="lustre-button">Worst students</a>
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
 					<ul id="worstStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="guestVisit" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Guest Visits</div>
+    					<div class="item">Visitatori Anonimi</div>
     					<div class="item txt-val">10</div>
     				</div>
 				</li>
     			<li id="exam" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Exam Statistics</div>
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
     					<div class="item"><div id="wpgraph" class="chart txt-val" style="margin: auto;"></div></div>
     				</div>
 				</li>
 				<li id="topic">
-    				<div class="row"><div class="item">Topic Statistics</div></div>
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
 					<ul></ul>
 				</li>
             </ul>  <!-- ul week -->
 
             <ul id="month" class="collapsable-list" style="display:none">
     			<li id="bestStListBut">
-					<a href='#' class="lustre-button">Best students</a>
+					<a href='#' class="lustre-button">Studenti Migliori</a>
 					<ul id="bestStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="worstStListBut">
-					<a href='#' class="lustre-button">Worst students</a>
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
 					<ul id="worstStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="guestVisit" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Guest Visits</div>
+    					<div class="item">Visitatori Anonimi</div>
     					<div class="item txt-val">10</div>
     				</div>
 				</li>
     			<li id="exam" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Exam Statistics</div>
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
     					<div class="item"><div id="mpgraph" class="chart txt-val" style="margin: auto;"></div></div>
     				</div>
 				</li>
 				<li id="topic">
-    				<div class="row"><div class="item">Topic Statistics</div></div>
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
 					<ul></ul>
 				</li>
             </ul>  <!-- ul month -->
 
             <ul id="all" class="collapsable-list" style="display:none">
     			<li id="bestStListBut">
-					<a href='#' class="lustre-button">Best students</a>
+					<a href='#' class="lustre-button">Studenti Migliori</a>
 					<ul id="bestStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="worstStListBut">
-					<a href='#' class="lustre-button">Worst students</a>
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
 					<ul id="worstStList" style="font-size:12px">
 					</ul>
 				</li>
     			<li id="guestVisit" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Guest Visits</div>
+    					<div class="item">Visitatori Anonimi</div>
     					<div class="item txt-val">10</div>
     				</div>
 				</li>
     			<li id="exam" style="padding-right: 20px;">
     				<div class="row">
-    					<div class="item">Exam Statistics</div>
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
     					<div class="item"><div id="apgraph" class="chart txt-val" style="margin: auto;"></div></div>
     				</div>
 				</li>
 				<li id="topic">
-    				<div class="row"><div class="item">Topic Statistics</div></div>
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
 					<ul></ul>
 				</li>
             </ul>  <!-- ul all -->

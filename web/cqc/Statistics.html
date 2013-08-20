@@ -32,39 +32,31 @@
 	
 	$(document).ready(function() {
 
-        // Create exam graph in the period [start; end]
-        // start & end may be null to use whole data.
-        function drawExamGraph(id, data, start, end) {
+        // Create exam graph from data
+        function drawExamGraph(id, data) {
             var examX = [];
             var examY = [];
             var examY1 = [];
-            var nCount = 0;
+            var nCount = 1;
 
-            if (start !== undefined && end !== undefined) {
-                start = start.hour(0).minute(0).second(0);
-                end = end.hour(0).minute(0).second(0);
-            }
-
+            //data = [data];
+            examX.push(0);
+            examY.push(0);
+            examY1.push(54);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
                     continue;
 
-                var exam_date = moment(data[i].end + ":00 Z").hour(0).minute(0).second(0);
-            
-                if (start !== undefined && end !== undefined) {
-                    if (exam_date.isBefore(start) || exam_date.isAfter(end))
-                        continue;
-                }
-
+                console.log(data[i].errors)
                 examX.push(nCount);
-                examY.push(40 - data[i].errors);
-                examY1.push(36);
+                examY.push(60 - data[i].errors);
+                examY1.push(54);
                 nCount++;
             }                           
 
             for (var i = nCount; i < 4; i++) {
                 examX.push(i);
-                examY1.push(36);
+                examY1.push(54);
             };
 
             var r = Raphael(id);
@@ -72,7 +64,7 @@
                 $('#' + id).width() - 12,
                 $('#' + id).height() - 16, 
                 examX, 
-                [examY, examY1, [0, 40]], {
+                [examY, examY1, [0, 60]], {
                     axis: "0 0 1 1",
                     axisxstep: examX.length - 1,
                     colors: ['#2479cc', '#CCC'],
@@ -90,16 +82,16 @@
               }
             }
 
-            // Make line [0, 40] invisible.
+            // Make line [0, 60] invisible.
             // We do so because in IE it shows with black color.
             echart.lines[2].attr("opacity", 0);
 
             // Update x-axis texts
             var xText = echart.axis[0].text.items;  
-            for(i in xText){
-                var nVal = parseInt(xText[i].attr('text')) + 1;
-                xText[i].attr({'text': nVal + ''});
-            }
+            // for(i in xText){
+            //     var nVal = parseInt(xText[i].attr('text')) + 1;
+            //     xText[i].attr({'text': nVal + ''});
+            // }
             var lab = r.label($('#' + id).width() / 2, 8, "Statistiche esami");
             lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
             
@@ -136,9 +128,7 @@
             for (i = 0; i < topics.length; i++) {
                 var id = chart_type + (i+1);
                 var nError = get_err(topics[i], type);
-                if (nError != null && nError > 0) {
-                    var p = createErrorsChart(id, nError);
-                }
+                var p = createErrorsChart(id, nError);
             }
         }
 
@@ -150,7 +140,8 @@
 			idtext = urltext.substring((urltext.indexOf('?')+4),urltext.length);
 			studentId = parseInt(idtext);
 		}
-		
+
+        // WTF?		
 		bFromExam = sessionStorage.getItem('quizfromexam');
 		
 
@@ -177,8 +168,15 @@
                 // Means: probably no student activity
                 if (data.description == "Unknown student.")
                     no_activity();
-                else
-                    aux_showJSONError(data);
+                else {
+                    var user = sessionStorage.getItem('quizutype');
+                    if (user == 'guest' && data.status == 403) {
+                        showGuestAccessError();
+                        window.location = "student.html";
+                    }
+                    else                    
+                        aux_showJSONError(data);
+                }
                 return;
 			}
 			examData = data;
@@ -196,8 +194,15 @@
                     // Means: probably no student activity
                     if (data.description == "Unknown student.")
                         no_activity();
-                    else
-                        aux_showJSONError(data);
+                    else {
+                        var user = sessionStorage.getItem('quizutype');
+                        if (user == 'guest' && data.status == 403) {
+                            showGuestAccessError();
+                            window.location = "student.html";
+                        }
+                        else                    
+                            aux_showJSONError(data);
+                    }
                     return;
 				}
 				WaitMsg.hide();
@@ -206,13 +211,9 @@
 				$("#student_stat .header .item").html(
 				    data.student.name + ' ' + data.student.surname);
 		
-				drawExamGraph("wexamgraph", examData.exams);
-				drawExamGraph("mexamgraph", examData.exams,
-				              moment().subtract('days', 8),
-				              moment().subtract('days', 1));
-				drawExamGraph("aexamgraph", examData.exams,
-				              moment().subtract('days', 29),
-				              moment().subtract('days', 8));
+                drawExamGraph("wexamgraph", examData.exams['current']);
+                drawExamGraph("mexamgraph", examData.exams['week']);
+                drawExamGraph("aexamgraph", examData.exams['week3']);
 
                 fill_topics(data.topics, "week", "wtgraph");
                 fill_topics(data.topics, "month", "mtgraph");
@@ -251,7 +252,13 @@
 					$.getJSON(urlstat, data, function(data) {
 						if (data.status != 200) {
 							WaitMsg.hide();
-							aux_showJSONError(data);
+                            var user = sessionStorage.getItem('quizutype');
+                            if (user == 'guest' && data.status == 403) {
+                                showGuestAccessError();
+                                window.location = "student.html";
+                            }
+                            else                    
+                                aux_showJSONError(data);
                             return;
 						}
 						WaitMsg.hide();
@@ -297,9 +304,10 @@
 					});
 													
 				});
-				
-				if (bFromExam == 1)
-					showExamList(7);
+
+                // WTF?				
+				// if (bFromExam == 1)
+				// 	showExamList(7);
 					
 				$("#student_stat").organicTabs();
 				$("#month").hide();
@@ -319,21 +327,19 @@
 		$("#wexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
 			parentQuizObj.hide();			
-			showExamList();		
+			showExamList("current");		
 		});
 		
 		$("#mexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
 			parentQuizObj.hide();			
-			showExamList(moment().subtract('days', 8),
-                         moment().subtract('days', 1));
+			showExamList("week");
 		});
 		
 		$("#aexamgraph").click(function(){			
 			parentQuizObj = $(this).parent().parent();
 			parentQuizObj.hide();
-            showExamList(moment().subtract('days', 29),
-                         moment().subtract('days', 8));
+            showExamList("week3");
 		});
 		
 		$('#backbut').click(function(){
@@ -350,7 +356,7 @@
 		});
 	});
 	
-	function showExamList(start, end) {
+	function showExamList(period) {
         var html = "";
 		$('#work_area').css('width', '520px');
 		$("#examlist").empty();
@@ -362,25 +368,14 @@
 			html += '</li>';
 			$("#examlist").append(html);
 			
-            if (start !== undefined && end !== undefined) {
-                start = start.hour(0).minute(0).second(0);
-                end = end.hour(0).minute(0).second(0);
-            }
-
             html = "";
 			var correctNum;
-            var exams = examData.exams;
+            var exams = examData.exams[period];
 			for (i = 0; i < exams.length; i++) {
 				if (exams[i].status != "passed" && exams[i].status != "failed")
                     continue;
 					
                 var exam_date = moment(exams[i].end + ":00 Z");
-                if (start !== undefined && end !== undefined) {
-                    var e = exam_date.hour(0).minute(0).second(0);
-                    if (e.isBefore(start) || e.isAfter(end))
-                        continue;
-                }
-				
 				correctNum = 40 - exams[i].errors;
 				
 				html += '<li class="examid">';
@@ -418,7 +413,13 @@
 				$.getJSON(url("/v1/exam/" + $(this).attr('id')), function(data) {
 					if (data.status != 200) {
 						WaitMsg.hide();
-						aux_showJSONError(data);
+                        var user = sessionStorage.getItem('quizutype');
+                        if (user == 'guest' && data.status == 403) {
+                            showGuestAccessError();
+                            window.location = "student.html";
+                        }
+                        else
+                            aux_showJSONError(data);
 					}
 					else {
 						WaitMsg.hide();

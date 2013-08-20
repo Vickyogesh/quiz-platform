@@ -20,8 +20,8 @@ class GuestMixin(object):
         Return True if service allows guest request.
         """
         row = self.__getinfo.execute(id=user_id, quiz_type=quiz_type).fetchone()
-        num_requests = row[1]
-        period_end = row[2]
+        num_requests = row[2]
+        period_end = row[3]
 
         allow = False
 
