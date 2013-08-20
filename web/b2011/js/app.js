@@ -17,26 +17,26 @@ function createErrorsChart(id, error_percent, showEmpty) {
   var p = Raphael(id);
   var values;
   var colors;
-  var stroke = "#fff"
+  var stroke = "#FFF"
 
   if (error_percent == 0) {
     error_percentues = [100];
-    colors = ['#fff'];
+    colors = ['#FFF'];
   }
   else if (error_percent == 100) {
     error_percentues = [100];
-    colors = ['#fff'];
+    colors = ['#FFF'];
   }
   else if (error_percent > 0 ) {
     error_percentues = [100 - error_percent, error_percent];
-    colors = ['#2479cc', '#fff'];
+    colors = ['#2479cc', '#FFF'];
   }
   else {
     error_percent = -1;
     if (showEmpty) {
       error_percentues = [100];
-      colors= ["#fff"];
-      stroke = "#ccc";
+      colors= ["#FFF"];
+      stroke = "#C50026";
     }
     else {
       error_percentues = [];
@@ -51,11 +51,11 @@ function createErrorsChart(id, error_percent, showEmpty) {
   });
 
   if (error_percent == 0)
-    p.series.items[0].attr({opacity : 100, fill: "#2479cc"});
+    p.series.items[0].attr({opacity : 100, fill: "#2479CC"});
   else if (error_percent == 100)
-    p.series.items[0].attr({opacity : 100, fill: "#ccc"});
+    p.series.items[0].attr({opacity : 100, fill: "#C50026"});
   else if (error_percent > 0)
-    p.series.items[1].attr({opacity : 100, fill: "#ccc"});
+    p.series.items[1].attr({opacity : 100, fill: "#C50026"});
 
   return p;
 }
