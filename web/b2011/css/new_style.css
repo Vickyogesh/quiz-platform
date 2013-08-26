@@ -343,9 +343,6 @@ ul.nav li {
   background: #fff;
 }
 
-#school_stat li#topic {
-  font-size: 14px;
-}
 #school_stat li#topic > .row >.item {
   text-align: center;
 }
