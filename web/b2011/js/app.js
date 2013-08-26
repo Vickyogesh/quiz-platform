@@ -129,7 +129,10 @@ function aux_showJSONError(data)
 // Show error dialog
 function aux_showError(msg, code)
 {
-	alert('Error: ' + code + ', ' + msg);
+  if (code !== undefined)
+    alert('Errore: ' + code + ', ' + msg);
+  else
+    alert('Errore: ' + msg);
 }
 //----------------------------------------------------------------------------
 
