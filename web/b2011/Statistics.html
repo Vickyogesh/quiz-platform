@@ -107,10 +107,11 @@
                     return topic.errors.week3;
             }
 
+            var li_style = type == "week" ? 'style="cursor:pointer"' : '';
             // Create list of topics
             var html = "";
             for (i = 0; i < topics.length; i++) {
-                html += '<li style="cursor:pointer" id="' + (i+1) + '"><div class="row">';
+                html += '<li ' + li_style + ' id="' + (i+1) + '"><div class="row">';
 
                 html += '<div class="item" style="width:20px"><div id="' + chart_type + (i + 1)
                      + '" class="chart" style="margin:auto"></div></div>';
@@ -219,7 +220,7 @@
                 fill_topics(data.topics, "all", "atgraph");
 
 				// topic click events
-				$('#topic ul li').click(function(){
+				$('ul#week #topic ul li').click(function(){
 					parentQuizObj = $(this).parent().parent().parent();
 					// showing topic errors								
 					$('#work_area').css('width', '520px');
