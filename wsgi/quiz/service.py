@@ -20,6 +20,7 @@ def get_authorize_status():
 
 @app.get('/authorize/logout')
 def get_authorize_logout():
+    app.account.logout()
     app.session.delete()
     return JSONResponse()
 

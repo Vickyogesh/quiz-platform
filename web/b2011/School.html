@@ -126,7 +126,7 @@
 		});
 
 		$("#bttExit").click(function() {
-			doLogout();
+			$.getJSON(url("/v1/authorize/logout"), doLogout).error(doLogout);
 		});
         $("#bttAccount").click(function() {
             editAccount();
