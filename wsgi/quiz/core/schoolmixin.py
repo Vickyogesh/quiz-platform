@@ -10,22 +10,21 @@ class SchoolMixin(object):
         self.__topics = self.sql("""SELECT t.id, t.text, t.text_fr, t.text_de,
         IFNULL((SELECT avg(err_percent)FROM school_topic_err_snapshot WHERE
            school_id=:school_id AND quiz_type=t.quiz_type AND topic_id = t.id
-           AND
-           DATE(now_date) >  DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)),
+           AND DATE(now_date) = DATE(UTC_TIMESTAMP())),
            -1) current,
 
         IFNULL((SELECT avg(err_percent) FROM school_topic_err_snapshot WHERE
            school_id=:school_id AND quiz_type=t.quiz_type AND topic_id = t.id
            AND
-           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - interval 6 day)
-           AND DATE(UTC_TIMESTAMP())
+           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+           AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)
            GROUP BY topic_id), -1) week,
 
         IFNULL((SELECT avg(err_percent) FROM school_topic_err_snapshot WHERE
            school_id=:school_id AND quiz_type=t.quiz_type AND topic_id = t.id
            AND
-           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - interval 27 day)
-           AND DATE(UTC_TIMESTAMP() - interval 7 day)
+           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+           AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)
            GROUP BY topic_id), -1) week3
         FROM topics t WHERE quiz_type=:quiz_type;""")
 
@@ -33,19 +32,6 @@ class SchoolMixin(object):
             stat_cache FROM school_stat_cache WHERE school_id=:school_id
             AND quiz_type=:quiz_type""")
 
-    # Not used.
-    # def _checkSchoolId(self, school_id):
-    #     try:
-    #         t = self.schools
-    #         sel = t.select(t.c.id == school_id)
-    #         res = self.engine.execute(sel).fetchone()
-    #     except SQLAlchemyError:
-    #         res = None
-
-    #     if res is None:
-    #         raise QuizCoreError('Invalid school ID.')
-
-    # used
     def deleteStudent(self, id):
         t = self.users
         self.engine.execute(t.delete().where(t.c.id == id))

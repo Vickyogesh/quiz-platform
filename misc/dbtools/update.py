@@ -97,11 +97,11 @@ def get_school_cache(school):
 
 
 def get_active_students(school):
-    """Return list of active students (last activity not less than 1 month)."""
+    """Return list of active students (last activity not less than 28 days)."""
     res = engine.execute(text("""SELECT
         id FROM users WHERE
         school_id=:id AND type='student' AND quiz_type=:quiz_type AND
-        last_visit >= UTC_TIMESTAMP() - interval 30 day;
+        last_visit >= UTC_TIMESTAMP() - interval 28 day;
     """), id=school['id'], quiz_type=school['quiz_type'])
     return [int(row[0]) for row in res]
 
@@ -120,15 +120,15 @@ def get_guest_stat(school):
     res = engine.execute(text("""SELECT
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
-         DATE(now_date) >  DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)), -1) c,
+         DATE(now_date) = DATE(UTC_TIMESTAMP())), -1) c,
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
-         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-         AND DATE(UTC_TIMESTAMP())), -1) week,
+         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)), -1) week,
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
          guest_id=:guest_id AND
-         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)), -1) week3;
+         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)), -1) week3;
         """), guest_id=guest_id).fetchone()
 
     return (res[0], res[1], res[2])
@@ -163,17 +163,17 @@ def _get_students_rating(users, quiz_type, date_sql):
 
 
 def get_current_student_rating(users, quiz_type):
-    date = 'DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)'
+    date = 'DATE(now_date) = DATE(UTC_TIMESTAMP())'
     return _get_students_rating(users, quiz_type, date)
 
 def get_week_student_rating(users, quiz_type):
-    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-        AND DATE(UTC_TIMESTAMP())"""
+    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+        AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)"""
     return _get_students_rating(users, quiz_type, date)
 
 def get_week3_student_rating(users, quiz_type):
-    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-        AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)"""
+    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+        AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)"""
     return _get_students_rating(users, quiz_type, date)
 
 
@@ -187,17 +187,17 @@ def get_exams_stat(users_str, quiz_type):
     res = engine.execute("""SELECT
         (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
-         DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)) current,
+         DATE(start_time) = DATE(UTC_TIMESTAMP())) current,
 
         (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-         AND DATE(UTC_TIMESTAMP())) week,
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)) week,
     
         (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)) week3;
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)) week3;
         """ % {'u': users_str, 't': quiz_type, 'err': num_err}).fetchone()
     return (res[0], res[1], res[2])
 
@@ -220,10 +220,10 @@ def do_clean(school_list):
 
 def clean_schools_data():
     engine.execute("""DELETE FROM school_topic_err_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)""")
 
     engine.execute("""DELETE FROM guest_access_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)""")
 
 
 # NONE: this will take long time.
@@ -238,12 +238,12 @@ def clean_users_data(school):
 
     # Delete old progress date
     engine.execute("""DELETE FROM user_progress_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
     # Delete old topic data
     engine.execute("""DELETE FROM topic_err_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
     # Delete in-progress exams
@@ -256,5 +256,5 @@ def clean_users_data(school):
     # Delete old exams
     engine.execute("""DELETE FROM exams
                    WHERE user_id IN (%s) AND quiz_type=%d AND
-                   start_time < DATE(UTC_TIMESTAMP() - interval 30 day)
+                   start_time < DATE(UTC_TIMESTAMP() - interval 28 day)
                    """ % (students, qt))

@@ -32,21 +32,20 @@ def create_exams(tst):
     lst = []
     current, week, week3 = [], [], []
 
-    # recent (2 last days): 4 passed, 2 in progress, 2 failed (total 8).
-    for i in xrange(2):
-        exam_time = start
-        for j in xrange(4):
-            exam_time += timedelta(hours=1)
-            lst.append({'quiz_type': 1, 'user_id': 1,
-                       'start_time': exam_time,
-                       'end_time': None if j == 1 else exam_time,
-                       'err_count': 0 if j == 1 else 2 + j})
-            current.append(start.date().strftime('%Y-%m-%d'))
-        start -= timedelta(days=1)
+    # recent (current day): 2 passed, 1 in progress, 1 failed (total 4).
+    exam_time = start
+    for j in xrange(4):
+        exam_time += timedelta(hours=1)
+        lst.append({'quiz_type': 1, 'user_id': 1,
+                   'start_time': exam_time,
+                   'end_time': None if j == 1 else exam_time,
+                   'err_count': 0 if j == 1 else 2 + j})
+        current.append(start.date().strftime('%Y-%m-%d'))
+    start -= timedelta(days=1)
 
-    # last week data (including recent days):
-    # 7 in progress, 12 failed (total exams 28).
-    for i in xrange(5):  # 7days - 2 recent days
+    # last week data (excluding current day):
+    # 7 passed, 7 in progress, 14 failed (total exams 28).
+    for i in xrange(7):
         exam_time = start
         for j in xrange(4):
             exam_time += timedelta(hours=1)
@@ -89,18 +88,18 @@ class ExamStatTest(unittest.TestCase):
         return self.engine.execute(*args, **kwargs)
 
     # Test: exam statistics for the periods:
-    # last 2 days, last week, 3 weeks (starting from last week).
+    # current day, last week, 3 weeks (starting from last week).
     def test_stat(self):
         create_exams(self)
         info = self.core._UserMixin__getExamStat(1, 1)
 
-        # recent: 4 passed, 2 in progress, 2 failed (total 8).
-        # err = 2 failed / (8 - 2 inprogress) = 2 / 6 = 33%
+        # recent: 2 passed, 1 in progress, 1 failed (total 4)
+        # err = 1 failed / (4 - 1 inprogress) = 1 / 3 = 33%
         self.assertEqual(info['current'], 33)
 
-        # week: 7 in progress, 12 failed (total exams 28).
-        # err = 12 / (20 - 7) = 12 / 21 = 57%
-        self.assertEqual(info['week'], 57)
+        # week: 7 in progress, 14 failed (total exams 28).
+        # err = 14 / (28 - 7) = 14 / 21 = 67% (66.66666%)
+        self.assertEqual(info['week'], 67)
 
         # 3 weeks: 5 errors, 1 in progress, the rest are passed (total 21).
         # err = 5 / (21 - 1) = 5 / 20 = 25%
