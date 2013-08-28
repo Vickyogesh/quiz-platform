@@ -107,15 +107,16 @@
                     return topic.errors.week3;
             }
 
+            var li_style = type == "week" ? 'style="cursor:pointer"' : '';
             // Create list of topics
             var html = "";
             for (i = 0; i < topics.length; i++) {
-                html += '<li style="cursor:pointer" id="' + (i+1) + '"><div class="row">';
+                html += '<li ' + li_style + ' id="' + (i+1) + '"><div class="row">';
 
                 html += '<div class="item" style="width:20px"><div id="' + chart_type + (i + 1)
                      + '" class="chart" style="margin:auto"></div></div>';
 
-                html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0">'
+                html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0" id="text">'
                      + topics[i].text + '</a></div>';
 
                 html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
@@ -219,9 +220,10 @@
                 fill_topics(data.topics, "all", "atgraph");
 
 				// topic click events
-				$('#topic ul li').click(function(){
+				$('ul#week #topic ul li').click(function(){
+                    var title = $(this).find("a#text").text();
 					parentQuizObj = $(this).parent().parent().parent();
-					// showing topic errors								
+					// showing topic errors
 					$('#work_area').css('width', '520px');
 					
 					var html = "";
@@ -236,7 +238,7 @@
 
 					html = '<li>';
 					html += '<a class="lustre-button" id="' + $(this).attr('id') + '" style="cursor:pointer">';
-					html += 'Question List Topic ' + $(this).attr('id') + '</a>';
+					html += title + '</a>';
 					html += '<ul></ul></li>';					
 					$("#topicerrorlist").append(html);
 					
@@ -340,7 +342,14 @@
 			parentQuizObj.hide();
             showExamList("week3");
 		});
-		
+
+        $('#topback').click(function(){
+            var type = sessionStorage.getItem("quizutype");
+            if (type == 'school')
+                window.location = "School.html";
+            else
+                window.location = "student.html";
+        });
 		$('#backbut').click(function(){
 			var type = sessionStorage.getItem("quizutype");
 			if (type == 'school')
@@ -348,7 +357,7 @@
 			else
 				window.location = "student.html";
 		});
-		
+
 		$('.nav li a').click(function(){
 			$('#topicerrorlist').hide();			
 			$('#examlist').hide();
@@ -476,6 +485,10 @@
 	<div id="work_area">
 		<div id="student_stat" class="content-box">
             <div class="header"><div class="item">__</div></div>
+
+            <div class="blueline" style="height:30px; line-height:30px; margin-bottom:10px">
+                <a class="lustre-button" id="topback" style="cursor:pointer; font-size:14px;">&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>
+            </div>
 
             <div class="blueline" style="margin-bottom:10px;">
 	        	<ul class="nav">

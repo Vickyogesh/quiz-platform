@@ -96,10 +96,13 @@
 			WaitMsg.show();
 			
 			aux_postJSON(url("/v1/school/me/newstudent"), info, function (data) {
-				if (data.status != 200) {
-					WaitMsg.hide();
-					aux_showJSONError(data);
-				}
+                if (data.status != 200) {
+                    WaitMsg.hide();
+                    if (data.status == 400 && data.description == "Already exists.")
+                        aux_showError("Nome utente non disponibile, si prega di variarlo");
+                    else
+                       aux_showJSONError(data);
+                }
 				else {
 					$("#school_addstudent #name").val("");
 					$("#school_addstudent #surname").val("");
