@@ -116,7 +116,7 @@
                 html += '<div class="item" style="width:20px"><div id="' + chart_type + (i + 1)
                      + '" class="chart" style="margin:auto"></div></div>';
 
-                html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0">'
+                html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0" id="text">'
                      + topics[i].text + '</a></div>';
 
                 html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
@@ -221,8 +221,9 @@
 
 				// topic click events
 				$('ul#week #topic ul li').click(function(){
+                    var title = $(this).find("a#text").text();
 					parentQuizObj = $(this).parent().parent().parent();
-					// showing topic errors								
+					// showing topic errors
 					$('#work_area').css('width', '520px');
 					
 					var html = "";
@@ -237,7 +238,7 @@
 
 					html = '<li>';
 					html += '<a class="lustre-button" id="' + $(this).attr('id') + '" style="cursor:pointer">';
-					html += 'Question List Topic ' + $(this).attr('id') + '</a>';
+					html += title + '</a>';
 					html += '<ul></ul></li>';					
 					$("#topicerrorlist").append(html);
 					
