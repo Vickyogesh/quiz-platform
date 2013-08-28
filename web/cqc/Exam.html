@@ -341,7 +341,7 @@
 			//
 			// setting up first row
 			//
-			for (i = 1; i <= 5; i++) {
+			for (i = 1; i <= 6; i++) {
 				id = "#firstrow #fitem" + i;
 				$(id).removeClass('redColor');
 			}			
@@ -355,6 +355,7 @@
 			//
 			for (i = 1; i <= 10; i++) {
 				id = "#secondrow #sitem" + i;
+				$(id).text((nItemIndex -1) * 10 + i);
 				$(id).removeClass('redColor');
 			}			
 			nItemIndex = curIndex % 10 + 1;
@@ -427,7 +428,7 @@
 				<div id="fitem5">
 					<p class="firstrowtext">Da 41 a 50</p>
 				</div>
-				<div id="fitem5">
+				<div id="fitem6">
 					<p class="firstrowtext">Da 51 a 60</p>
 				</div>
 			</div>

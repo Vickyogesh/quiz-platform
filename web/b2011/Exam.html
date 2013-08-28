@@ -355,6 +355,7 @@
 			//
 			for (i = 1; i <= 10; i++) {
 				id = "#secondrow #sitem" + i;
+				$(id).text((nItemIndex -1) * 10 + i);
 				$(id).removeClass('redColor');
 			}			
 			nItemIndex = curIndex % 10 + 1;
