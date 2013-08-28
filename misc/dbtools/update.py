@@ -73,9 +73,9 @@ def update_school(school):
     students_str = ','.join(str(user) for user in students)
     qt = school['quiz_type']
     stat['guest_visits'] = get_guest_stat(school)
-    stat['current'] = get_current_student_rating(students_str, qt)
-    stat['week'] = get_week_student_rating(students_str, qt)
-    stat['week3'] = get_week3_student_rating(students_str, qt)
+    stat['current'] = get_current_student_rating(students, qt)
+    stat['week'] = get_week_student_rating(students, qt)
+    stat['week3'] = get_week3_student_rating(students, qt)
     stat['exams'] = get_exams_stat(students_str, qt)
     stat = json.dumps(stat)
     engine.execute(text("""UPDATE school_stat_cache SET
@@ -135,73 +135,46 @@ def get_guest_stat(school):
 
 # NOTE: progress_coef is an errors percent not a success percent.
 
-def get_users_info(res):
+def _get_users_info(res):
     return [{'id': row[0], 'coef': row[1]} for row in res]
 
 
-def get_current_student_rating(users_str, quiz_type):
-    """Return list of best and worst students."""
+def _get_students_rating(users, quiz_type, date_sql):
+    users_str = ','.join(str(x) for x in users)
     res = engine.execute("""SELECT user_id, avg(progress_coef) c
         FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
-        GROUP BY user_id ORDER by c ASC limit 3;
-    """ % (quiz_type, users_str))
-    best = get_users_info(res)
+        user_id IN (%s) AND %s GROUP BY user_id ORDER by c ASC limit 3;
+    """ % (quiz_type, users_str, date_sql))
+    best = _get_users_info(res)
 
-    res = engine.execute("""SELECT user_id, avg(progress_coef) c
-        FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
-        GROUP BY user_id ORDER by c DESC limit 3;
-    """ % (quiz_type, users_str))
-    worst = get_users_info(res)
+    # exclude best users from users list
+    users = set(users) - set([x['id'] for x in best])
+    users_str = ','.join(str(x) for x in users)
 
+    if users_str:
+        res = engine.execute("""SELECT user_id, avg(progress_coef) c
+            FROM user_progress_snapshot WHERE quiz_type=%d AND
+            user_id IN (%s) AND %s GROUP BY user_id ORDER by c DESC limit 3;
+        """ % (quiz_type, users_str, date_sql))
+    else:
+        res = []
+    worst = _get_users_info(res)
     return {'best': best, 'worst': worst}
 
 
-def get_week_student_rating(users_str, quiz_type):
-    """Return list of best and worst students."""
-    res = engine.execute("""SELECT user_id, avg(progress_coef) c
-        FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c ASC limit 3;
-    """ % (quiz_type, users_str))
-    best = get_users_info(res)
+def get_current_student_rating(users, quiz_type):
+    date = 'DATE(now_date) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)'
+    return _get_students_rating(users, quiz_type, date)
 
-    res = engine.execute("""SELECT user_id, avg(progress_coef) c
-        FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-        AND DATE(UTC_TIMESTAMP()) GROUP BY user_id ORDER by c DESC limit 3;
-    """ % (quiz_type, users_str))
-    worst = get_users_info(res)
+def get_week_student_rating(users, quiz_type):
+    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
+        AND DATE(UTC_TIMESTAMP())"""
+    return _get_students_rating(users, quiz_type, date)
 
-    return {'best': best, 'worst': worst}
-
-
-def get_week3_student_rating(users_str, quiz_type):
-    """Return list of best and worst students."""
-    res = engine.execute("""SELECT user_id, avg(progress_coef) c
-        FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-        AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
-        GROUP BY user_id ORDER by c ASC limit 3;
-    """ % (quiz_type, users_str))
-    best = get_users_info(res)
-
-    res = engine.execute("""SELECT user_id, avg(progress_coef) c
-        FROM user_progress_snapshot WHERE quiz_type=%d AND
-        user_id IN (%s) AND
-        DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-        AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
-        GROUP BY user_id ORDER by c DESC limit 3;
-    """ % (quiz_type, users_str))
-    worst = get_users_info(res)
-
-    return {'best': best, 'worst': worst}
+def get_week3_student_rating(users, quiz_type):
+    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
+        AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)"""
+    return _get_students_rating(users, quiz_type, date)
 
 
 def get_exams_stat(users_str, quiz_type):
@@ -235,7 +208,7 @@ def get_exams_stat(users_str, quiz_type):
 
 def do_clean(school_list):
     start = time.time()
-    logger.debug('Cleanup started.')
+    logger.debug('Cleanup started for %d schools.' % len(school_list))
 
     clean_schools_data()
     for school in school_list:
@@ -263,16 +236,25 @@ def clean_users_data(school):
     students = ','.join(str(user) for user in students)
     qt = school['quiz_type']
 
+    # Delete old progress date
     engine.execute("""DELETE FROM user_progress_snapshot
                    WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
+    # Delete old topic data
     engine.execute("""DELETE FROM topic_err_snapshot
                    WHERE now_date < DATE(UTC_TIMESTAMP() - interval 30 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
+    # Delete in-progress exams
     engine.execute("""DELETE FROM exams
                    WHERE user_id IN (%s) AND end_time IS NULL
                    AND start_time < UTC_TIMESTAMP() - INTERVAL 3 HOUR
                    and quiz_type=%d
+                   """ % (students, qt))
+
+    # Delete old exams
+    engine.execute("""DELETE FROM exams
+                   WHERE user_id IN (%s) AND quiz_type=%d AND
+                   start_time < DATE(UTC_TIMESTAMP() - interval 30 day)
                    """ % (students, qt))
