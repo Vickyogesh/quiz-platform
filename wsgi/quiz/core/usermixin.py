@@ -15,22 +15,21 @@ class UserMixin(object):
             t.id, t.text, t.text_fr, t.text_de,
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
-               AND
-               DATE(now_date) >  DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
+               AND DATE(now_date) = DATE(UTC_TIMESTAMP())
                GROUP BY topic_id), -1) current,
 
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
                AND
-               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-               AND DATE(UTC_TIMESTAMP())
+               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+               AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)
                GROUP BY topic_id), -1) week,
 
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
                AND
-               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-               AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+               AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)
                GROUP BY topic_id), -1) week3
             from topics t WHERE quiz_type=:quiz_type""")
 
@@ -38,25 +37,25 @@ class UserMixin(object):
         self.__examstat = self.sql("""SELECT
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)) current,
+         DATE(start_time) = DATE(UTC_TIMESTAMP())) current,
 
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-         AND DATE(UTC_TIMESTAMP())) week,
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)) week,
         
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 27 DAY)
-         AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)) week3;
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)) week3;
         """)
 
         self.__examlist = self.sql("""SELECT
             exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR,
-            (CASE WHEN DATE(start_time) > DATE(UTC_TIMESTAMP() - INTERVAL 2 DAY)
+            (CASE WHEN DATE(start_time) = DATE(UTC_TIMESTAMP())
                 THEN 1
-            WHEN DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 6 DAY)
-                AND DATE(UTC_TIMESTAMP()) THEN 2
+            WHEN DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+                AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY) THEN 2
             ELSE 3 END)
             FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type""")
 
@@ -137,7 +136,8 @@ class UserMixin(object):
                                           quiz_type=quiz_type,
                                           numerr=numerr)
             row = row.fetchone()
-        except Exception:
+        except Exception as e:
+            print e
             row = (-1, -1, -1)
         return {
             'current': self._normErr(row[0]),
@@ -192,7 +192,6 @@ class UserMixin(object):
             info = self._createExamInfo(row)
             if type == 1:
                 current.append(info)
-                week.append(info)
             elif type == 2:
                 week.append(info)
             else:
