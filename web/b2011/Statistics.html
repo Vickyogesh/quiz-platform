@@ -342,7 +342,14 @@
 			parentQuizObj.hide();
             showExamList("week3");
 		});
-		
+
+        $('#topback').click(function(){
+            var type = sessionStorage.getItem("quizutype");
+            if (type == 'school')
+                window.location = "School.html";
+            else
+                window.location = "student.html";
+        });
 		$('#backbut').click(function(){
 			var type = sessionStorage.getItem("quizutype");
 			if (type == 'school')
@@ -350,7 +357,7 @@
 			else
 				window.location = "student.html";
 		});
-		
+
 		$('.nav li a').click(function(){
 			$('#topicerrorlist').hide();			
 			$('#examlist').hide();
@@ -478,6 +485,10 @@
 	<div id="work_area">
 		<div id="student_stat" class="content-box">
             <div class="header"><div class="item">__</div></div>
+
+            <div class="blueline" style="height:30px; line-height:30px; margin-bottom:10px">
+                <a class="lustre-button" id="topback" style="cursor:pointer; font-size:14px;">&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>
+            </div>
 
             <div class="blueline" style="margin-bottom:10px;">
 	        	<ul class="nav">
