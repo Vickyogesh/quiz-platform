@@ -222,7 +222,6 @@
 
 				// topic click events
 				$('ul#week #topic ul li').click(function(){
-                    var title = $(this).find("a#text").text();
 					parentQuizObj = $(this).parent().parent().parent();
 					// showing topic errors								
 					$('#work_area').css('width', '520px');
@@ -239,7 +238,7 @@
 
 					html = '<li>';
 					html += '<a class="lustre-button" id="' + $(this).attr('id') + '" style="cursor:pointer">';
-					html += title + '</a>';
+                    html += "Lista domande per l'argomento selezionato cui non si è ancora risposto correttamente</a>";
 					html += '<ul></ul></li>';					
 					$("#topicerrorlist").append(html);
 					
