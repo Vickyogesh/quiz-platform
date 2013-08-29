@@ -119,7 +119,10 @@
                 html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0" id="text">'
                      + topics[i].text + '</a></div>';
 
-                html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
+                if (type == "week")
+                    html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
+                else
+                    html += '<div class="item" style="width:20px"></div>';
                 html += '</div></li>';
             }
             $("#" + type + " #topic ul").append(html);
