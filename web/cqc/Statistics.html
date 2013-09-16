@@ -89,10 +89,10 @@
 
             // Update x-axis texts
             var xText = echart.axis[0].text.items;  
-            // for(i in xText){
-            //     var nVal = parseInt(xText[i].attr('text')) + 1;
-            //     xText[i].attr({'text': nVal + ''});
-            // }
+            for(i in xText){
+                var nVal = parseInt(xText[i].attr('text')) + 1;
+                xText[i].attr({'text': nVal + ''});
+            }
             var lab = r.label($('#' + id).width() / 2, 8, "Statistiche esami");
             lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
             
