@@ -107,16 +107,28 @@ $("#page-quiz").bind("pageinit", function() {
 
   function setQuestions(questions) {
     if (questions.length == 0) {
+      var msg = "";
+      if (total_errors != 0)
+      {
+        msg += 'Hai commesso ' + total_errors + ' errori.<br/>';
+        total_errors = 0;
+      }
+
+      msg += "Hai risposto a tutte le domande di questo argomento! Continuare comunque?";
+
       $('<div>').simpledialog2({
         mode: 'button',
         headerText: "Quiz",
         headerClose: false,
-        buttonPrompt: "Hai risposto a tutte le domande di questo argomento! Continuare comunque?",
+        buttonPrompt: msg,
         buttons: {
-          'Ok': {'click': function () {
+          'Ok': {'click': function() {
             getQuiz(setQuestions, true);
           }},
-          'Cancel': {'click': function () {}, icon: "delete", theme: "c"}
+          'Cancel': {'click': function() {
+            $.mobile.changePage("#page-quiz-topics",
+              {transition: "slide", reverse: true});
+          }, icon: "delete", theme: "c"}
         }
       });
     }
@@ -185,11 +197,12 @@ $("#page-quiz").bind("pageinit", function() {
     }
   });
   $("#page-quiz #bttQuizSend").click(function() {
-    if (quizData.length > 0)
-      sendQuiz(function(argument) {
+    if (quizData.length > 0) {
+      sendQuiz(function() {
         aux_showError('Fatto! Hai commesso ' + total_errors + ' errori.');
         total_errors = 0;
       });
+    }
   });
 
   $("#page-quiz #bttLogout").click(function() {
