@@ -57,7 +57,8 @@ class UserMixin(object):
             WHEN DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
                 AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY) THEN 2
             ELSE 3 END)
-            FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type""")
+            FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type
+            ORDER BY id""")
 
         self.__topicerr = self.sql("""SELECT * FROM
             (SELECT * FROM questions WHERE topic_id=:topic_id AND
