@@ -39,9 +39,6 @@
             var examY1 = [];
             var nCount = 1;
 
-            //data = [data];
-            examX.push(0);
-            examY.push(0);
             examY1.push(54);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
@@ -65,6 +62,7 @@
                 $('#' + id).height() - 16, 
                 examX, 
                 [examY, examY1, [0, 60]], {
+                    symbol: ["circle", ""],
                     axis: "0 0 1 1",
                     axisxstep: examX.length - 1,
                     colors: ['#2479cc', '#CCC'],
@@ -81,6 +79,9 @@
                  axisItems[ii].attr("fill", "#0459ac");
               }
             }
+
+            // Set exam circle size.
+            echart.symbols[0].attr("r", 4);
 
             // Make line [0, 60] invisible.
             // We do so because in IE it shows with black color.

@@ -37,11 +37,8 @@
             var examX = [];
             var examY = [];
             var examY1 = [];
-            var nCount = 1;
+            var nCount = 0;
 
-            //data = [data];
-            examX.push(0);
-            examY.push(0);
             examY1.push(36);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
@@ -59,11 +56,12 @@
             };
 
             var r = Raphael(id);
-            var echart = r.linechart(10, 8,
+            var echart = r.linechart(10, 10,
                 $('#' + id).width() - 12,
                 $('#' + id).height() - 16, 
-                examX, 
+                examX,
                 [examY, examY1, [0, 40]], {
+                    symbol: ["circle", ""],
                     axis: "0 0 1 1",
                     axisxstep: examX.length - 1,
                     colors: ['#2479cc', '#CCC'],
@@ -81,16 +79,19 @@
               }
             }
 
+            // Set exam circle size.
+            echart.symbols[0].attr("r", 4);
+
             // Make line [0, 40] invisible.
             // We do so because in IE it shows with black color.
             echart.lines[2].attr("opacity", 0);
 
             // Update x-axis texts
             var xText = echart.axis[0].text.items;  
-            // for(i in xText){
-            //     var nVal = parseInt(xText[i].attr('text')) + 1;
-            //     xText[i].attr({'text': nVal + ''});
-            // }
+            for(i in xText){
+                var nVal = parseInt(xText[i].attr('text')) + 1;
+                xText[i].attr({'text': nVal + ''});
+            }
             var lab = r.label($('#' + id).width() / 2, 8, "Statistiche esami");
             lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
             
