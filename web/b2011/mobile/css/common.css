@@ -76,8 +76,17 @@ a.ui-link-inherit {
 }
 
 #bttQuiz {color: #ffffff; background-color: #0469cc;}
+#bttQuiz:hover {background-color: #0460bb;}
+#bttQuiz:active {background-color: #0358ab;}
+
 #bttExam {color: #ffffff; background-color: #047aee;}
+#bttExam:hover {background-color: #0471dd;}
+#bttExam:active {background-color: #0369cd;}
+
 #bttReview {color: #ffffff; background-color: #198bfb;}
+#bttReview:hover {background-color: #0883fb;}
+#bttReview:active {background-color: #047aee;}
+
 
 /* Quiz */
 #page-quiz-chapters .ui-content h3 {
@@ -92,6 +101,14 @@ a.ui-link-inherit {
   color: white;
   text-shadow: 0px 1px 0px #0358ab;
   cursor: pointer;
+}
+
+#chapters .tp:hover {
+  border: 2px solid #1d60a4;
+  font-weight: bold;
+}
+#chapters .tp:active {
+  background: #2068b2;
 }
 
 #page-quiz #image {
