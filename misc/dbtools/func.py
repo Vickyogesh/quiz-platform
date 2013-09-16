@@ -155,7 +155,7 @@ def users(mgr):
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_users_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_users_after_upd
         AFTER UPDATE ON users FOR EACH ROW BEGIN
-            IF NEW.type = 'student' AND NEW.progress_coef != OLD.progress_coef
+            IF NEW.type = 'student'
             THEN
                 INSERT INTO user_progress_snapshot VALUES
                 (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
