@@ -108,11 +108,10 @@
                     return topic.errors.week3;
             }
 
-            var li_style = type == "week" ? 'style="cursor:pointer"' : '';
             // Create list of topics
             var html = "";
             for (i = 0; i < topics.length; i++) {
-                html += '<li ' + li_style + ' id="' + (i+1) + '"><div class="row">';
+                html += '<li style="cursor:pointer" id="' + (i+1) + '"><div class="row">';
 
                 html += '<div class="item" style="width:20px"><div id="' + chart_type + (i + 1)
                      + '" class="chart" style="margin:auto"></div></div>';
@@ -120,10 +119,7 @@
                 html += '<div class="item" style="width:80%;text-align:left"><a style="padding:0" id="text">'
                      + topics[i].text + '</a></div>';
 
-                if (type == "week")
-                    html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
-                else
-                    html += '<div class="item" style="width:20px"></div>';
+                html += '<div class="item" style="width:20px"><div class="chart topicarrow" style="margin:auto"></div></div>';
                 html += '</div></li>';
             }
             $("#" + type + " #topic ul").append(html);
@@ -224,7 +220,7 @@
                 fill_topics(data.topics, "all", "atgraph");
 
 				// topic click events
-				$('ul#week #topic ul li').click(function(){
+				$('ul #topic ul li').click(function(){
 					parentQuizObj = $(this).parent().parent().parent();
 					// showing topic errors								
 					$('#work_area').css('width', '520px');
