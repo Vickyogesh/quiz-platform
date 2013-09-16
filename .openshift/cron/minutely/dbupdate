@@ -8,6 +8,6 @@ else
  if [[ $(find $OPENSHIFT_DATA_DIR/quiz/last_run_dbupdate -mmin +4) ]]; then #run every 5 mins
    rm -f $OPENSHIFT_DATA_DIR/quiz/last_run_dbupdate
    $OPENSHIFT_DATA_DIR/bin/python $OPENSHIFT_REPO_DIR/misc/dbupdate.py -v -l $OPENSHIFT_DIY_LOG_DIR/dbupdate.log -c $OPENSHIFT_REPO_DIR/misc/config.ini    
-   touch $OPENSHIFT_DATA_DIR/last_run_dbupdate
+   touch $OPENSHIFT_DATA_DIR/quiz/last_run_dbupdate
   fi  
 fi
