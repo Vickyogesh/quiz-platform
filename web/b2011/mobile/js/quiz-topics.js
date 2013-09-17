@@ -80,7 +80,7 @@ $("#page-quiz-topics").bind("pageinit", function() {
     });
   });
   $("#page-quiz-topics #bttBack").click(function() {
-    $.mobile.changePage("#page-quiz-chapters",
+    $.mobile.changePage("#page-student",
                         {transition: "slide", reverse: true});
   });
 });

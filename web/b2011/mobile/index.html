@@ -13,6 +13,7 @@
   <script type="text/javascript" src="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog2.min.js"></script>
   <script src="js/md5-min.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/qmanager.js"></script>
 </head>
 <body>
   <div id="page-login" data-role="page">
@@ -43,13 +44,13 @@
     <div data-role="content">
       <div class="ui-grid-solo ftable" id="menugrid">
         <div class="ui-block-a">
-          <a href="#page-quiz-chapters" class="rect-button" id="bttQuiz" data-transition="slide">Quiz</a>
+          <a href="#page-quiz-chapters" class="rect-button" id="bttQuiz" data-transition="slide">Quiz argomenti</a>
         </div>
         <div class="ui-block-a">
-          <a href="#" class="rect-button" id="bttExam" data-transition="slide">Exam</a>
+          <a href="#" class="rect-button" id="bttExam" data-transition="slide">Prova d'esame</a>
         </div>
         <div class="ui-block-a">
-          <a href="#" class="rect-button" id="bttReview" data-transition="slide">Error review</a>
+          <a href="#page-review" class="rect-button" id="bttReview" data-transition="slide">Ripasso errori</a>
         </div>
       </div>
       <script src="js/student.js"></script>
@@ -91,20 +92,44 @@
     <div data-role="content">
       <div class="ui-grid-solo ftable" id="qgrid" style="text-align: center;">
         <div class="ui-block-a"><div id="image"></div></div>
-        <div class="ui-block-a"><div id="txt">hello</div></div>
+        <div class="ui-block-a"><div id="txt"></div></div>
       </div>
     </div>
     <div data-role="footer">
       <div data-role="navbar">
         <ul>
-          <li><a id="bttQuizTrue" href="#">Vero</a></li>
-          <li><a id="bttQuizSend" href="#">Send</a></li>
-          <li><a id="bttQuizFalse" href="#">Falso</a></li>
+          <li><a id="bttTrue" href="#">Vero</a></li>
+          <li><a id="bttSend" href="#">Send</a></li>
+          <li><a id="bttFalse" href="#">Falso</a></li>
         </ul>
       </div>
     </div>
     <script src="js/quiz.js"></script>
   </div>  <!-- /page-quiz -->
+
+  <div id="page-review" data-role="page" class="page-fill header footer">
+    <div data-role="header">
+      <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a>
+      <h3>Ripasso errori <span></span></h3>
+      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
+    </div>
+    <div data-role="content">
+      <div class="ui-grid-solo ftable" id="qgrid" style="text-align: center;">
+        <div class="ui-block-a"><div id="image"></div></div>
+        <div class="ui-block-a"><div id="txt"></div></div>
+      </div>
+    </div>
+    <div data-role="footer">
+      <div data-role="navbar">
+        <ul>
+          <li><a id="bttTrue" href="#">Vero</a></li>
+          <li><a id="bttSend" href="#">Send</a></li>
+          <li><a id="bttFalse" href="#">Falso</a></li>
+        </ul>
+      </div>
+    </div>
+    <script src="js/review.js"></script>
+  </div>  <!-- /page-review -->
 
 </body>
 </html>
