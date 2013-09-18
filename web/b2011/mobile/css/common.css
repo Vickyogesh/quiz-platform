@@ -111,14 +111,14 @@ a.ui-link-inherit {
   background: #2068b2;
 }
 
-#page-quiz #image, #page-review #image {
+.question-page #image {
   background-image: none;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
 }
 
-#page-quiz .ui-btn-active, #page-review .ui-btn-active {
+.question-page .ui-btn-active {
  background-image: none !important;
  background: none !important;
  border: none !important;

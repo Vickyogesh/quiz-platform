@@ -21,12 +21,16 @@ function createQuestionManager(config) {
         image_el: $(pg_id + " #image"),
         txt_el: $(pg_id + " #txt"),
 
+        onLeave: function() {},
+
         // Logout from the app.
         logout: function() {
+            var self = this;
             window.qsid = null;
             window.name = null;
             aux_busy(true);
             $.ajax("/v1/authorize/logout").always(function() {
+                self.onLeave();
                 aux_busy(false);
                 $.mobile.changePage("#page-login");
             });
@@ -35,6 +39,7 @@ function createQuestionManager(config) {
         // Back to main (or previous) screen.
         // By default return to main screen.
         back: function() {
+            this.onLeave();
             $.mobile.changePage("#page-student",
                                 {transition: "slide", reverse: true});
         },
@@ -91,6 +96,7 @@ function createQuestionManager(config) {
 
         // Set list of received questions.
         setQuestions: function(questions) {
+            this.total_errors = 0;
             this.questionData = questions;
             this.num_questions = this.questionData.length;
             this.showNextQuestion();
@@ -179,6 +185,13 @@ function createQuestionManager(config) {
             }
         },
 
+        showNumErrors: function() {
+            aux_showError('Fatto! Hai commesso '
+                          + this.total_errors + ' errori.',
+                          'Info');
+            this.total_errors = 0;
+        },
+
         // Init manager.
         init: function() {
             var self = this;
@@ -206,12 +219,7 @@ function createQuestionManager(config) {
             $(this.pageId + " #bttSend").click(function() {
                 if (self.questionData.length == 0)
                     return;
-                self.sendAnswers(function() {
-                    aux_showError('Fatto! Hai commesso '
-                                  + self.total_errors + ' errori.',
-                                  'Info');
-                    self.total_errors = 0;
-                });
+                self.sendAnswers(self.showNumErrors);
             });
 
             $(this.pageId).bind('pagebeforeshow', function() {
@@ -235,7 +243,6 @@ function createQuestionManager(config) {
                     self.layout();
                 }, 100);
             });
-
         } // init
     } // return
 } // createQuestionManager
