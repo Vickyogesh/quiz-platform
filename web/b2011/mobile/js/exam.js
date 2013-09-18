@@ -16,6 +16,7 @@ $("#page-exam").bind("pageinit", function() {
     // for later use in sendAnswersUrl().
     mgr.getQuestions = function(onOk, force) {
         $.mobile.showPageLoadingMsg("b", "Attendere prego.");
+        $("#page-exam #bttSend").html("#");
         var self = this;
         var url = this.getQuestionsUrl(force);
 
@@ -25,6 +26,7 @@ $("#page-exam").bind("pageinit", function() {
                 aux_showError(info.description);
             else {
                 exam_id = info.exam.id
+                $("#page-exam #bttSend").html("#" + exam_id);
                 onOk.call(self, info.questions);
             }
         });
