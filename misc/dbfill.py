@@ -202,7 +202,7 @@ parser = argparse.ArgumentParser(
 
     Opeshift note: you can found input files in the
     
-        ${OPENSHIFT_DATA_DIR}/quiz/db_sources
+        $OPENSHIFT_DATA_DIR/quiz/db_sources
     ''')
 
 parser.add_argument('-v', '--verbose', action='store_true',
