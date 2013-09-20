@@ -89,7 +89,7 @@ function fillupReview() {
             WaitMsg.hide();
             
             $("#reviewarea").show();                
-            
+
             canAskMore = data.questions.length == 40;
             for (var i = 0; i < data.questions.length; i++) {
                 var q = data.questions[i];
@@ -331,6 +331,12 @@ function setQuizEnv() {
     // set height of the scroll bar
     var nHeight = $("#quizlistarea").height();
     $("#scrollbararea").css('height', nHeight + 'px');
+
+    if (quizIds.length == 0)
+    {
+        alert("Non ci sono errori");
+        window.location = "student.html";
+    }
 }
 
 $(document).ready(function() {

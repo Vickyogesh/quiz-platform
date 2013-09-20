@@ -312,6 +312,12 @@ function setQuizEnv() {
     // set height of the scroll bar
     var nHeight = $("#quizlistarea").height() + 20;
     $("#scrollbararea").css('height', nHeight + 'px');
+
+    if (quizIds.length == 0)
+    {
+        alert("Non ci sono errori");
+        window.location = "student.html";
+    }
 }
 
 $(document).ready(function() {
