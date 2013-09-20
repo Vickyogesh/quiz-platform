@@ -28,7 +28,7 @@ class Db(DbManager):
     def parseArgs(self):
         parser = argparse.ArgumentParser(
             formatter_class=argparse.RawDescriptionHelpFormatter,
-            description='Quiz databse setup tool.', epilog='''
+            description='Quiz database setup tool.', epilog='''
             Examples.
             Recreate tables and fill them with data:
                     dbsetup.py -c config.ini
