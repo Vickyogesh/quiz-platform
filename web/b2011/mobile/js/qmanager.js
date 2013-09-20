@@ -23,6 +23,28 @@ function createQuestionManager(config) {
 
         onLeave: function() {},
 
+        onGuestLimit: function() {
+            var self = this;
+            $('<div>').simpledialog2({
+                mode: 'button',
+                headerText: "Errori",
+                headerClose: false,
+                buttonPrompt: "Guest's visits is exceeded. Access will be unlocked within 1 hr.",
+                buttons: {
+                    'Ok': {'click': function() { self.logout(); }}
+                }
+            });
+
+        },
+
+        processError: function(info) {
+            var user = sessionStorage.getItem('quizutype');
+            if (info.status == 403 && user == "guest")
+                this.onGuestLimit();
+            else
+                aux_showError(info.description);
+        },
+
         // Logout from the app.
         logout: function() {
             var self = this;
@@ -54,7 +76,7 @@ function createQuestionManager(config) {
             $.getJSON(url, function(info) {
                 $.mobile.hidePageLoadingMsg();
                 if (info.status != 200)
-                    aux_showError(info.description);
+                    self.processError(info);
                 else
                     onOk.call(self, info.questions);
             });
@@ -85,9 +107,9 @@ function createQuestionManager(config) {
               $.mobile.hidePageLoadingMsg();
               if (info.status != 200) {
                 if (onError === undefined)
-                  aux_showError(info.description);
+                    self.processError(info);
                 else
-                  onError.call(self, info);
+                    onError.call(self, info);
               }
               else if (onOk !== undefined)
                 onOk.call(self, info);

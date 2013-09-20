@@ -23,7 +23,7 @@ $("#page-exam").bind("pageinit", function() {
         $.getJSON(url, function(info) {
             $.mobile.hidePageLoadingMsg();
             if (info.status != 200)
-                aux_showError(info.description);
+                self.processError(info);
             else {
                 exam_id = info.exam.id
                 $("#page-exam #bttSend").html("#" + exam_id);
