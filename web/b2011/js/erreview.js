@@ -153,7 +153,8 @@ function setQuizEnv() {
             $("#quiz01").append(quizhtml1);
         }           
 
-        $("#imagearea > div").hide();
+        $("#imagearea > div img").hide();
+        $("#imagearea > div span").hide();
         $("#imagearea img").attr("src", "");
 
         for (i = curIndex - 2; i < curIndex + 3; i++, j++) {
@@ -167,7 +168,7 @@ function setQuizEnv() {
                 $(id).empty();
                 continue;
             }
-                            
+
             if (j == 2)
                 id = "#quiz0" + (j+1) + " .maintext p";
             else 
@@ -182,7 +183,8 @@ function setQuizEnv() {
                 var image = "/img/" + q.image + ".jpg";
                 $("#imagearea img").attr("src", image);
                 $("#imagearea span").html("fig. " + q.image);
-                $("#imagearea > div").show();
+                $("#imagearea > div img").show();
+                $("#imagearea > div span").show();
 
                 // preload next image
                 if (i + 1 < quizIds.length && quizMap[quizIds[i + 1]].image != "") {
