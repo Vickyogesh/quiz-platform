@@ -148,8 +148,8 @@ def save_exam(id):
     except KeyError:
         raise BadRequest('Missing parameter.')
 
-    app.core.saveExam(id, questions, answers)
-    return JSONResponse()
+    num_errors = app.core.saveExam(id, questions, answers)
+    return JSONResponse({"num_errors": num_errors})
 
 
 @app.get('/exam/<int:id>', access=['student', 'guest', 'school'])

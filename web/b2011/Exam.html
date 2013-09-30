@@ -259,15 +259,7 @@
 	function terminateExam() {
 //		bTerminated = true;
 			
-		var i, nError = 0;
-		
-		for (i = 0; i < quizData.questions.length; i++) {				
-//			if (answer_list[i] != null) {
-				if (parseInt(quizData.questions[i].answer) != answer_list[i]) {
-					nError++;
-				}
-//			}
-		}
+		var i;
 		
 		var id_list_real = [];
 		var answer_list_real = [];
@@ -309,7 +301,7 @@
 			else {
 				WaitMsg.hide();
 				
-				alert('Number of errors: ' + nError);
+				alert('Numero errori: ' + data.num_errors);
 		
 				window.qsid = null;
 				sessionStorage.setItem('fromexam', 1);

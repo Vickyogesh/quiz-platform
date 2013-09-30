@@ -218,9 +218,11 @@ class ExamMixin(object):
                 'quiz_type': quiz_type,
                 'is_correct': is_correct
             })
+
         with self.engine.begin() as conn:
             conn.execute(self.__upd, ans)
             conn.execute(self.__updexaminfo, exam_id=exam_id, errors=wrong)
+        return wrong
 
     def getExamInfo(self, exam_id, lang):
         res = self.__getexam.execute(exam_id=exam_id).fetchone()
