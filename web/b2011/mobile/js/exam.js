@@ -1,5 +1,4 @@
 $("#page-exam").bind("pageinit", function() {
-    var exam_id;
     var exam_timer;
     var time_limit;
     var exam_time_el = $("#page-exam .ui-header h3 > span#time");
@@ -10,7 +9,9 @@ $("#page-exam").bind("pageinit", function() {
     });
 
     mgr.getQuestionsUrl = function() { return "/v1/exam"; };
-    mgr.sendAnswersUrl = function() { return "/v1/exam/" + exam_id; };
+    mgr.sendAnswersUrl = function() {
+        return "/v1/exam/" + sessionStorage.getItem("examid");
+    };
 
     // Get exam questions. Here is additional action is save exam id
     // for later use in sendAnswersUrl().
@@ -25,8 +26,8 @@ $("#page-exam").bind("pageinit", function() {
             if (info.status != 200)
                 self.processError(info);
             else {
-                exam_id = info.exam.id
-                $("#page-exam #bttSend").html("#" + exam_id);
+                sessionStorage.setItem("examid", info.exam.id);
+                $("#page-exam #bttSend").html("#" + info.exam.id);
                 onOk.call(self, info.questions);
             }
         });
