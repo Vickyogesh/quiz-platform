@@ -117,7 +117,8 @@ class QuizApp(object):
 
     QUIZ_TYPE_ID = {
         'b2011': 1,
-        'cqc': 2
+        'cqc': 2,
+        'b2013': 3
     }
 
     def _getQuizType(self, quiz_name):

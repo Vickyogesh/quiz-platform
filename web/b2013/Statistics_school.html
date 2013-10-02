@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/new_style.css" />
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script src="js/graph/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/graph/g.raphael.js" type="text/javascript"></script>
+<script src="js/graph/g.line.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/graph/g.pie.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="js/organictabs.jquery.js"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+<script>
+	var i, sHtml;
+	var statData;	
+	var bFromExam;
+	var parentQuizObj;
+	
+	$(document).ready(function() {
+		// Fill best/worst students for the time periods.
+		function fill_students(type, data) {
+			function _create_list(info) {
+                if (info === undefined)
+                    return;
+				var html = "";
+				for (i = 0; i < info.length; i++) {
+					html += '<li><a id="' + info[i].id
+						 + '" href="Statistics.html?id=' + info[i].id + '">';
+					html += info[i].name + ' ' + info[i].surname;
+					html += '</a></li>';
+				}
+				return html;
+			}
+
+			var html = _create_list(data.best);
+			$("#" + type + " #bestStList").append(html);
+
+			html = _create_list(data.worst);
+			$("#" + type + " #worstStList").append(html);
+		}
+
+		// Fill topics for the time periods.
+		function fill_topics(topics, type, chart_type) {
+			function get_err(topic, type) {
+				if (type == "week")
+					return topic.errors.current;
+				else if (type == "month")
+					return topic.errors.week;
+				else if (type == "all")
+					return topic.errors.week3;
+			}
+
+			// Create list of topics
+			var html = "";
+			for (i = 0; i < topics.length; i++) {
+				html += '<li><div class="row">';
+				html += '<div class="item"><a id="' + (i+1) + '">'
+					 + topics[i].text + '</a></div>';
+				html += '<div class="item"><div id="' + chart_type + (i + 1)
+				     + '" class="chart" style="margin:auto"></div></div>';
+				html += '</div></li>';
+			}
+			$("#" + type + " #topic ul").append(html);
+
+			// Assign errors chart for each topic.
+			for (i = 0; i < topics.length; i++) {
+				var id = chart_type + (i+1);
+				var nError = get_err(topics[i], type);
+				createErrorsChart(id, nError);
+			}
+		}
+
+        function setGuestVisits(sel, value) {
+            if (value < 0 || value === null || value === undefined || value == "null")
+                value = 0;
+            $(sel).html(value);
+        }
+
+
+		window.qsid = sessionStorage.getItem('quizqsid');
+		window.name = sessionStorage.getItem('quizname');		
+        bFromExam = sessionStorage.getItem('quizfromexam');
+
+		$("#school_stat .header .item").html(window.name);
+		$("#work_area").hide();
+		WaitMsg.show();
+									
+		$.getJSON(url("/v1/school/me"), function(data) {
+			if (data.status != 200) {
+				WaitMsg.hide();
+				aux_showJSONError(data);
+				return;
+			}
+	
+			fill_students("week", data.students.current);
+			fill_students("month", data.students.week);
+			fill_students("all", data.students.week3);
+
+            setGuestVisits("#week #guestVisit .txt-val", data.guest_visits[0]);
+            setGuestVisits("#month #guestVisit .txt-val", data.guest_visits[1]);
+            setGuestVisits("#all #guestVisit .txt-val", data.guest_visits[2]);
+			
+			// filling exam graph
+			var ids = ['wpgraph', 'mpgraph', 'apgraph'];
+			for (var i = 0; i < 3; i++)
+				createErrorsChart(ids[i], data.exams[i], true);
+			
+			fill_topics(data.topics, "week", "wtgraph");
+			fill_topics(data.topics, "month", "mtgraph");
+			fill_topics(data.topics, "all", "atgraph");
+
+			$("#month").hide();
+			$("#all").hide();							
+			$("#school_stat").organicTabs();								
+			$("#work_area").show();
+			WaitMsg.hide();
+		})
+		.error(function(data) {
+			WaitMsg.hide();
+			aux_showError(data.responseText, data.status);
+		});			
+
+        $('#topback').click(function(){
+            window.location = "School.html";
+        });
+		$('#backbut').click(function(){
+			window.location = "School.html";
+		});
+		
+		$('.nav li a').click(function(){
+			$('#topicerrorlist').hide();			
+			$('#examlist').hide();
+		});	
+		
+		$('#bestStListBut a, #worstStListBut a').click(function(){
+			var checkElement = $(this).next();
+			
+			if(checkElement.is(':visible')) {
+				checkElement.slideUp('normal');
+			}
+			if(!checkElement.is(':visible')) {
+				checkElement.slideDown('normal');
+			}
+		});
+	});
+	
+</script>
+	
+</head>
+
+<body>
+	<div id="work_area">
+		<div id="school_stat" class="content-box">
+            <div class="header"><div class="item">__</div></div>
+            <div class="blueline" style="height:30px; line-height:30px; margin-bottom:10px">
+                <a class="lustre-button" id="topback" style="cursor:pointer; font-size:14px;">&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>
+            </div>
+            <div class="blueline" style="line-height:40px; color:#fff;font-size:18px">
+                <div class="row"><div class="item">Statistiche</div></div>
+            </div>
+            <div class="blueline" style="margin-bottom:10px;">
+	        	<ul class="nav">
+	                <li class="nav-one"><a href="#week" class="lustre-button current">PIU' RECENTE</a></li>
+	                <li class="nav-two"><a href="#month" class="lustre-button">ULTIMA SETTIMANA</a></li>
+	                <li class="nav-three"><a href="#all" class="lustre-button">PERIODO PRECEDENTE</a></li>
+	            </ul>
+	        </div>  <!-- /Navigation -->
+
+            <ul id="week" class="collapsable-list">
+    			<li id="bestStListBut">
+					<a href='#' class="lustre-button">Studenti Migliori</a>
+					<ul id="bestStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="worstStListBut">
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
+					<ul id="worstStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="guestVisit" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Visitatori Esterni</div>
+    					<div class="item txt-val">10</div>
+    				</div>
+				</li>
+    			<li id="exam" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
+    					<div class="item"><div id="wpgraph" class="chart txt-val" style="margin: auto;"></div></div>
+    				</div>
+				</li>
+				<li id="topic">
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
+					<ul></ul>
+				</li>
+            </ul>  <!-- ul week -->
+
+            <ul id="month" class="collapsable-list" style="display:none">
+    			<li id="bestStListBut">
+					<a href='#' class="lustre-button">Studenti Migliori</a>
+					<ul id="bestStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="worstStListBut">
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
+					<ul id="worstStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="guestVisit" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Visitatori Esterni</div>
+    					<div class="item txt-val">10</div>
+    				</div>
+				</li>
+    			<li id="exam" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
+    					<div class="item"><div id="mpgraph" class="chart txt-val" style="margin: auto;"></div></div>
+    				</div>
+				</li>
+				<li id="topic">
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
+					<ul></ul>
+				</li>
+            </ul>  <!-- ul month -->
+
+            <ul id="all" class="collapsable-list" style="display:none">
+    			<li id="bestStListBut">
+					<a href='#' class="lustre-button">Studenti Migliori</a>
+					<ul id="bestStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="worstStListBut">
+					<a href='#' class="lustre-button">Studenti Peggiori</a>
+					<ul id="worstStList" style="font-size:12px">
+					</ul>
+				</li>
+    			<li id="guestVisit" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Visitatori Esterni</div>
+    					<div class="item txt-val">10</div>
+    				</div>
+				</li>
+    			<li id="exam" style="padding-right: 20px;">
+    				<div class="row">
+    					<div class="item">Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div>
+    					<div class="item"><div id="apgraph" class="chart txt-val" style="margin: auto;"></div></div>
+    				</div>
+				</li>
+				<li id="topic">
+    				<div class="row"><div class="item">Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde una migliore preparazione</div></div>
+					<ul></ul>
+				</li>
+            </ul>  <!-- ul all -->
+
+			<ul id="examlist" style="display:none" class="collapsable-list"></ul>
+			
+			<ul id="topicerrorlist" style="display:none" class="collapsable-list"></ul>
+
+            <div class="footer">
+                <div class="item">
+                    <a href="#" id="backbut" class="lustre-button">TORNA AL MENU</a>
+                </div>
+            </div>
+		</div>
+
+</body>
+
+</html>

@@ -1,0 +1,601 @@
+@font-face
+{
+	font-family: customMyriadFont;
+	src: url('../font/MyriadPro-Regular.ttf');
+} 
+
+body {
+    font-family: customMyriadFont;
+    font-size:12px;
+    margin:10px;    
+    text-align:center;
+}
+
+.workareanormal {
+	width : 950px; 
+	height:	545px; 
+	margin:	10px auto;
+}
+
+.workareareduced {
+	width : 732px; 
+	height:	550px; 
+	margin:	10px auto;
+}
+        
+#subscribeForm {
+    margin:0 auto;
+    position:relative;
+    text-align:left;
+    width:732px;
+    height:437px;
+    border:1px solid #ccc;
+    background:#fff;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    box-shadow: 0 0 4px #ccc;
+    -webkit-box-shadow: 0 0 4px #ccc;
+    -moz-box-shadow: 0 0 4px #ccc;
+    background-image:url('../img/login_bg.png');
+    background-position: center;
+    background-repeat: no-repeat;
+/*    background-size: contain; */
+}
+        
+#subscribeForm fieldset {
+    overflow:hidden;
+    border:0;
+    height:30px;    
+    margin:3px 0;
+}
+        
+#subscribeForm fieldset label {
+    display:block;
+    float:left;
+    font-weight:100;
+    color:#6086c1;
+    line-height:2.2em;
+    font-size:15px;
+    text-decoration:underline;
+}
+    
+#subscribeForm fieldset input {
+    float:left;
+    border:1px solid #ccc;    
+    height: 20px;
+    padding:3px;
+    width:190px;
+    font-size:12px;
+}
+/* form field */
+.effect {
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;    
+}
+    
+#button {
+    margin-top:10px;
+    padding-right:20px;
+    text-align:right;    
+}
+#button input {
+    margin:0 auto;
+}        
+/* CSS BUTTON START HERE */
+a.cssSubmitButton {            
+    font-size: 15px;
+/*    background: #142f66 no-repeat 4px 5px;*/
+    display: inline-block;
+    padding: 3px 20px 5px;
+    color: #fff;
+/*    border:1px solid #ccc;*/
+    text-decoration: none;
+/*    font-weight: bold;*/
+    line-height: 1.2em;
+    border-radius: 15px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+/*    -moz-box-shadow: 0 1px 3px #999;
+    -webkit-box-shadow: 0 1px 3px #999;
+*/    
+    position: relative;
+    cursor: pointer;
+    outline:none;
+}
+
+
+a.cssSubmitButton:visited {}
+
+/* hightlight the button on mouse over */
+a.cssSubmitButton:hover {
+/*    border:1px solid #333;*/
+}
+
+/* the animation */
+.loading {
+/*    background-image:url('../img/load.gif') !important;*/
+    color:#ccc !important;    
+    -moz-box-shadow: 0 0 0 #fff !important;
+    -webkit-box-shadow: 0 0 0 #fff !important;
+}
+
+.img_btn {
+	float:left;
+	margin:10px;
+	width:200px;
+	cursor: pointer;
+	border-radius: 10px 10px 10px 10px;	
+	box-shadow: 1px 10px 5px #888888;
+}
+
+.button {
+	display: inline-block;
+	line-height: 1;
+	padding: 7px 10px;
+	text-decoration: none;
+/*	font-weight: bold;*/
+	color: rgb(255, 255, 255);
+	background-color: #142f66;
+	border-radius: 5px 5px 5px 5px;
+	cursor: pointer;
+	box-shadow: -3px 15px 20px #111111;
+}
+
+/* quiz page */
+.slider{
+	-moz-box-shadow:inset 0px 0px 10px #555;
+	-webkit-box-shadow:inset 0px 0px 10px #555;
+	background: #999999;
+	text-align: left;
+	margin: auto;
+	width: 500px; 
+/*		height: 300px; */
+/*		overflow: hidden; */
+	position: relative;
+}
+.slider p{
+	border-top:1px solid #555;
+/*border-bottom:1px solid gray;*/
+	padding:4px;
+	padding-left:25px;
+	margin:0;
+	min-height:20px;
+}
+
+.slider p:hover{
+	background: #767575;
+}
+
+.slider p:hover.selected{
+	background: transparent;
+	color: white;
+}
+.slider p.selected{
+	color: white;
+}
+
+.slider p a{
+	display:block;
+	min-height:20px;
+	color:white;
+	text-decoration:none;
+	line-height: 20px;
+}
+
+.slider p.selected a{
+	color: #333;
+	font-weight:bold;
+}
+
+.slider .expand {
+	background-image: url('../img/minus.png');
+	background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.slider .collapse {
+	background-image: url('../img/plus.png');
+	background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+
+#quizarea .topt, #reviewarea .topt {
+	width:25px; 
+	height:25px; 
+	margin-top:2.5px; 
+	margin-left:23px; 
+	float:left;
+	cursor:pointer;
+}
+
+#quizarea .fopt, #reviewarea .fopt {
+	width:25px; 
+	height:25px; 
+	margin-top:2.5px; 
+	margin-left:15px;
+	cursor:pointer;
+}
+
+#quizarea .text, #reviewarea .text {
+	margin: 5px 0px 5px 20px;
+	height:30px;
+	line-height:30px;
+	width:560px; 
+	border-radius: 15px 15px 15px 15px; 
+	background-color:#4c739f; 
+	float:left;
+	overflow:hidden;
+}
+
+#quizarea .maintext, #reviewarea .maintext {
+	margin: 10px 0px 10px 20px; 
+	width:560px; 
+	min-height:50px;
+	border-radius: 15px 15px 15px 15px; 
+	background-color:#ffffff; 
+	float:left;
+	font-size:15px
+}
+
+
+#quizarea .maintext p, #reviewarea .maintext p {
+	width:550px;
+	margin-left:5px;
+}
+
+#quizarea .answer, #reviewarea .answer {
+	margin:5px 10px; 
+	height:30px; 
+	line-height:30px; 
+	width:110px; 
+	border-radius: 15px 15px 15px 15px; 
+	background-color:#4c739f; 
+	float:left; 
+	text-align:left;
+}
+
+#quizarea #imagearea, #reviewarea #imagearea {
+    display: table;
+	width:150px; 
+	height: 250px; 
+	float:left; 
+	margin-left:50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: white;
+    background-size: contain;
+    border-radius: 5px 5px 5px 5px; 
+}
+
+#quizarea #imagearea > div, #reviewarea #imagearea > div{
+    display: table-cell;
+    vertical-align: middle;
+}
+#quizarea #imagearea img, #reviewarea #imagearea img {
+    width: 150px;
+}
+#quizarea #imagearea, #reviewarea #imagearea {
+    font-weight: bold;
+    font-size: 14px;
+    color: #102f68;
+}
+
+.trueAnswer {
+	background-color:#076e12 !important;
+}
+
+.falseAnswer {
+	background-color:#b23829 !important;
+}
+
+
+/* exam page */
+#thirdrow div {
+	width:14px; 
+	height: 14px; 
+	float:left;
+	border-top: 2px solid #90a699;
+	border-left: 2px solid #90a699;
+	border-bottom: 2px solid #90a699;
+	line-height: 14px;
+	font-size: 11px;
+}
+
+.redColor {
+	color: #ff0000;
+}
+
+#firstrow div {
+	width:25%; 
+	height:100%; 
+	float:left
+}
+
+#firstrow .firstrowtext {
+	font-size:17px; 
+	margin-top:15px;	
+}
+
+#secondrow div {
+	width:10%; 
+	height:100%; 
+	float:left; 
+	font-size:17px; 
+	line-height:38px;
+}
+
+/* Specific to statarea */
+
+#statarea * { 
+/*	margin: 0; */
+/*	padding: 0; */
+	text-align: left;
+}
+
+#statarea a { text-decoration: none; }
+
+#statarea h1 {
+	margin: 0 0 20px 0; 
+	text-align:center;
+}
+
+#statarea { 
+	background: #eee; 
+	padding: 10px; 
+	margin: auto; 
+	-moz-box-shadow: 0 0 5px #666; 
+	-webkit-box-shadow: 0 0 5px #666; 
+	width:520px;
+}
+
+#statarea .nav { overflow: hidden; margin: 0 0 10px 0; list-style: none; }
+#statarea .nav li {
+	width: 97px; 
+	float: left; 
+	margin: 0 5px 0 5px; 
+}
+#statarea .nav li.last { margin-right: 0; }
+#statarea .nav li a {
+	display: block; 
+	padding: 5px; 
+	background: #959290; 
+	color: white; 
+	font-size: 15px; 
+	text-align: center; 
+	border: 0; 
+}
+#statarea .nav li a:hover { background-color: #111; }
+#statarea .nav li a.current {
+	background-color: #0575f4;
+}
+#statarea .nav li a:hover {
+	background-color: #0575f4; 
+	color: white;
+}
+
+.list-wrap ul { list-style: none; }
+/*.list-wrap ul li a { display: block; border-bottom: 1px solid #666; padding: 4px; color: #666; }*/
+.list-wrap ul li a:hover { background: #fe4902; color: white; }
+.list-wrap ul li:last-child a { border: none; }
+
+.list-wrap ul.parentitem, ul.parentitem ul {
+  list-style-type:none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-wrap .parentitem a {
+  display: block;
+  text-decoration: none;	
+}
+
+.list-wrap .parentitem li {
+  margin-top: 1px; 
+  background: #777;
+}
+
+.list-wrap .parentitem li a {  
+  color: #fff;	
+  padding: 0.5em;
+}
+
+.list-wrap .parentitem li a:hover {
+  background: #000;
+}
+
+.list-wrap .parentitem li ul li a {
+  background: #ccc;
+  color: #000;
+  padding-left: 20px;
+}
+
+.list-wrap .parentitem li ul li a:hover,ul#menu li ul .current a {
+  background: #aaa;
+  border-left: 5px #000 solid;
+  padding-left: 15px;
+}
+
+.list-wrap .quizresult {
+	width:30px; 
+	height:30px; 
+	float:right; 
+	margin-left:5px; 
+	font-size:20px; 
+	position:relative
+}
+
+.list-wrap .quizresult div {
+	width:30px; 
+	height:30px; 
+	line-height:30px; 
+	position:absolute; 
+	top:50%; 
+	margin-top:-50%; 
+	border-radius:10px; 
+}
+
+
+/* add student form */
+
+#addstudentarea h2 {
+	font-size:25px;
+	text-align:center;
+}
+
+#addstudentarea form {
+	padding: 0 20px 20px 20px;
+}
+
+#addstudentarea form p { position: relative; margin: 10px 0;}
+#addstudentarea form p label { position: absolute; top: 0; left: 0;}
+#addstudentarea form p br {display: none;}
+
+#addstudentarea fieldset {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
+
+#addstudentarea form fieldset p input,
+#addstudentarea form fieldset p textarea {
+	display: block;
+	padding: 4px;
+	width: 450px;
+	margin: 0;
+}
+
+#addstudentarea form fieldset p label {
+	width: 380px;
+	display: block;
+	margin: 5px 5px 5px 6px;
+	padding: 0;
+}
+
+#addstudentarea form fieldset p textarea {
+	padding: 2px;
+	width: 404px;
+}
+
+#addstudentarea form fieldset p textarea,
+#addstudentarea form fieldset p input {
+	border: solid 1px #ccc;
+}
+#addstudentarea form fieldset p label {
+	color: #777;
+}
+
+/* school statistics */
+#guestVisit div {
+	width:30px; 
+	height:25px; 
+	line-height:25px; 
+	float:right; 
+	text-align:center; 
+	font-size:14px; 
+	color:white
+}
+
+
+/** exam review */
+.row {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+.row > .item {
+  padding: 0.5em;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#examreview {
+  width: 732px;
+  height: 550px;
+  margin: auto;
+  background: #f1d5e0;
+}
+#examreview > #answers {
+  height: 350px;
+  background: #f1d5e0;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+#answers > ul {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  list-style: none;
+}
+#answers > ul > li {
+  text-align: left;
+}
+#answers .row > .item {
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+#answers .row > .item.qimg {
+  width: 40px;
+}
+#answers .row > .item.quest {
+  width: 80%;
+}
+#answers .row > .item.quest.ans{
+  background: #fff;
+}
+#answers .row .item.vf {
+  width: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: #ccc;
+  background: #fff;
+}
+#answers .row .item.vf.x {
+  color: #102f68;
+}
+#answers .row > .item .qimg {
+  background-size:contain;
+  background-position:center;
+  background-repeat: no-repeat;
+  height: 40px;
+  width: 40px;
+}
+
+#examreview .examinfo {
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+}
+#examreview .examinfo span {
+  padding-left: 4px;
+  display: block;
+}
+#examreview .examinfo span.label {
+  color: #102f68;
+}
+#examreview .examinfo span.val {
+  width: 200px;
+  color: #ccc;
+  background: #fff;
+  border: 1px solid #000;
+}
+
+#examreview .btt {
+  display: inline-block;
+  width: 150px;
+  padding: 0.5em;
+  cursor: pointer;
+  border: 1px solid #7c7c7c;
+  border-radius: 4px;
+  color: #102f68;
+  background: #aaa;
+  font-size: 12px;
+}
+
+#examreview .btt:hover {
+  background: #ccc;
+}

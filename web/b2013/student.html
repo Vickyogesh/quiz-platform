@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="css/new_style.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/cookie.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/account.js"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
+<script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<!--Please wait-->
+
+<script>
+    $(document).ready(function() {
+        if (getUrlParameterByName("upd") == "1") {
+            WaitMsg.show();
+            $.getJSON(url("/v1/userinfo"), function(data) {
+                WaitMsg.hide();
+                if (data.status != 200) {
+                    aux_showJSONError(data);
+                    return;
+                }
+
+                var name = data.user.name;
+                if (data.user.surname)
+                    name += ' ' + data.user.surname;
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+
+                $(".header .item a").html(window.name);
+                window.location.search = null;
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+        else {
+            window.qsid = sessionStorage.getItem('quizqsid');
+            window.name = sessionStorage.getItem('quizname');
+            $(".header .item a").html(window.name);
+        }
+
+
+        $("#cnt").attr("src", "");
+        var nwidth = $(window).width();
+        
+        $("#quiz").click(function(){
+            if (nwidth >= 950)
+                window.location = "Quiz.html";
+            else
+                window.location = "Quiz_reduced.html";          
+        });
+        
+        $("#review").click(function(){
+            if (nwidth >= 950)
+                window.location = "ErrorReview.html";
+            else
+                window.location = "ErrorReview_reduced.html";
+        });
+        
+        $("#exam").click(function(){
+            window.location = "Exam.html";
+        });
+        
+        $("#bttStat").click(function(){
+            sessionStorage.setItem('quizfromexam', 0);
+            window.location = "Statistics.html";
+        });
+
+        $("#bttExit").click(function() {
+            $.getJSON(url("/v1/authorize/logout"), doLogout).error(doLogout);
+        });
+
+        $("#bttAccount").click(function() {
+            editAccount();
+        });
+    });
+</script>
+</head>
+
+<body>
+    <div id="work_area">
+        <div id="studentmenu" class="content-box" style="width:732px;">
+            <div class="header">
+                <div class="item">
+                    <a href="#" id="bttAccount" class="lustre-button-dark"></a>
+                </div>
+            </div>
+            <div class="hline"></div>
+            <div class="row" style="margin-top:40px; margin-bottom:40px">
+                <div class="item">
+                    <img id="quiz" class="ibtn" src="img/QUIZ-ARG.png"></img>
+                </div>
+                <div class="item">
+                    <img id="exam" class="ibtn" src="img/PROVA-ESAME.png"></img>
+                </div>
+                <div class="item">
+                    <img id="review" class="ibtn" src="img/RIPASSSO-ERRORI.png"></img>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="item"></div>
+                <div class="item">
+                    <a href="#" id="bttStat" class="lustre-button">
+                        <img src="img/statistics.png" class="btt_inline"/>
+                        <span class="btt_inline">STATISTICHE</span>
+                    </a>
+                </div>
+                <div class="item">
+                    <a href="#" id="bttExit" class="lustre-button">
+                        <span class="btt_inline">ESCI</span>
+                        <img src="img/esc.png" class="btt_inline"/>
+                    </a>
+                </div>
+                <div class="item"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
