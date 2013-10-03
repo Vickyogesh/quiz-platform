@@ -415,7 +415,7 @@ class QuizApp(object):
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        user = self.account.send_auth(login, digest, nonce)
+        user = self.account.send_auth(login, digest, nonce, 'quiz')
 
         can_check_date = user['type'] != 'admin'
 

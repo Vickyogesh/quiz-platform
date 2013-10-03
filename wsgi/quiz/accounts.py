@@ -156,22 +156,25 @@ class AccountApi(RequestProxy):
         hdr = parse_dict_header(hdr[6:])
         return hdr
 
-    def send_auth(self, login, passwd_digest, nonce):
+    def send_auth(self, login, passwd_digest, nonce, service=None):
         """Send auth info to the Account Service."""
         hdr = 'QAuth nonce="{0}", username="{1}", response="{2}"'
         hdr = hdr.format(nonce, login, passwd_digest)
         hdr = {'Authenticate': hdr}
 
+        if service is not None:
+            hdr['X-Account-Service'] = service
+
         response = self.post('/login', headers=hdr)
         self._check_response_status(response)
         return response.json()
 
-    def login(self, login, passwd):
+    def login(self, login, passwd, service=None):
         """Login to the Account Service."""
         info = self.get_auth()
         passwd_digest = _create_digest(login, passwd)
         passwd_digest = _create_digest(info['nonce'], passwd_digest)
-        account = self.send_auth(login, passwd_digest, info['nonce'])
+        account = self.send_auth(login, passwd_digest, info['nonce'], service)
         return account
 
     def logout(self):
