@@ -16,7 +16,7 @@ $("#page-login").bind("pageinit", function() {
           nonce: nonce,
           login: login,
           appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
-          'quiz_type': 'b2011',
+          'quiz_type': 'b2013',
           digest: hex_md5(nonce + ':' + digest)
         };
 
