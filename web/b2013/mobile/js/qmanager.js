@@ -21,8 +21,16 @@ function createQuestionManager(config) {
         image_el: $(pg_id + " #image"),
         txt_el: $(pg_id + " #txt"),
 
+        // See cacheNextImages().
+        _imgCache: [new Image(), new Image()],
+
+        // Will be called before switching to another page.
+        // By default do nothing.
+        // See logout(), back().
         onLeave: function() {},
 
+        // Handle guest access error.
+        // See processError().
         onGuestLimit: function() {
             var self = this;
             $('<div>').simpledialog2({
@@ -34,9 +42,9 @@ function createQuestionManager(config) {
                     'Ok': {'click': function() { self.logout(); }}
                 }
             });
-
         },
 
+        // Handle response error.
         processError: function(info) {
             var user = sessionStorage.getItem('quizutype');
             if (info.status == 403 && user == "guest")
@@ -124,6 +132,27 @@ function createQuestionManager(config) {
             this.showNextQuestion();
         },
 
+        // Build result `img` URL.
+        // See showNextQuestion().
+        buildImageUrl: function(img) {
+            if (img != "")
+              return "/img/" + img + ".jpg";
+        },
+
+        // Load images for next question(s) to show them faster.
+        // See showNextQuestion().
+        cacheNextImages: function() {
+            // First item in the `this.questionData` is a current question.
+            // So we try to cache images strating form index 1.            
+            var img;
+            var sz = Math.min(2, this.questionData.length - 1);
+            for (var i = 1; i <= sz; i++) {
+                img = this.buildImageUrl(this.questionData[i].image);
+                if (img !== undefined)
+                    this._imgCache[i - 1].src = img;
+            }
+        },
+
         // Show next question (list of questions was received via getQuestions).
         // If question list is empty then ask more questions.
         showNextQuestion: function() {
@@ -140,12 +169,11 @@ function createQuestionManager(config) {
             this.header_el.html(info);
 
             var q = this.questionData[0];
-            var image;
-            if (q.image != "")
-              image = "/img/" + q.image + ".jpg";
+            var image = this.buildImageUrl(q.image);
 
             this.setQuestion(q.id + ". " + q.text, q.answer, image);
             this.layout();
+            this.cacheNextImages();
         },
 
         // Set question text and optionally image.

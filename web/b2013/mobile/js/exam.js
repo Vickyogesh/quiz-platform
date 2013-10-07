@@ -17,7 +17,7 @@ $("#page-exam").bind("pageinit", function() {
     // for later use in sendAnswersUrl().
     mgr.getQuestions = function(onOk, force) {
         $.mobile.showPageLoadingMsg("b", "Attendere prego.");
-        $("#page-exam #bttSend").html("#");
+        // $("#page-exam #bttSend").html("#");
         var self = this;
         var url = this.getQuestionsUrl(force);
 
@@ -27,7 +27,7 @@ $("#page-exam").bind("pageinit", function() {
                 self.processError(info);
             else {
                 sessionStorage.setItem("examid", info.exam.id);
-                $("#page-exam #bttSend").html("#" + info.exam.id);
+                // $("#page-exam #bttSend").html("#" + info.exam.id);
                 onOk.call(self, info.questions);
             }
         });
