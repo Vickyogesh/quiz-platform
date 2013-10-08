@@ -139,7 +139,12 @@ class QuizApp(object):
         def session_func():
             return self.session
         acc_url = self.settings.main['accounts_url']
-        self.account = AccountsApi(acc_url, session_func=session_func)
+        if 'session.cookie_domain' in self.settings.session:
+            domain = self.settings.session['session.cookie_domain']
+        else:
+            domain = None
+        self.account = AccountsApi(acc_url, session_func=session_func,
+                                   target_cookie_domain=domain)
 
     # Read application settings.
     # There may be two sources:
@@ -448,5 +453,6 @@ class QuizApp(object):
 
         resp = JSONResponse({'user': user})
         resp.headers.add('Set-Cookie', cookie)
+        print cookie, resp.headers
         return resp
         # return JSONResponse({'sid': sid, 'user': user})

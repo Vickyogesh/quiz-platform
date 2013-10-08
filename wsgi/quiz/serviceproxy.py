@@ -23,14 +23,15 @@ class HttpServiceProxy(object):
     # to store target service session data.
     STORAGE_KEY = 'proxyservice.session'
 
-    def __init__(self, target_url, target_cookie_name, session_func={},
-                 call_save=True):
+    def __init__(self, target_url, target_cookie_name,
+                 target_cookie_domain=None, session_func={}, call_save=True):
         """Construct ServiceProxy object.
 
         Args:
             target_url: URL of the target service.
                         It will be used by default for all requests.
             target_cookie_name: Session cookie name of the target service.
+            target_cookie_domain: Session cookie domain of the target service.
             session_func: Function which returns current session object.
                           It used to save data of target service session
                           If you authorize only with one user then leave
@@ -55,6 +56,7 @@ class HttpServiceProxy(object):
 
         # Target service session cookie name.
         self.target_cookie_name = target_cookie_name
+        self.target_cookie_domain = target_cookie_domain
 
         # If session_func is a dict then we wont call save().
         # If session_func is a function then check call_save param.
@@ -94,9 +96,12 @@ class HttpServiceProxy(object):
 
     # Save target service cookie in the current session for later use.
     def _save_session(self, response):
+        print response.cookies
         if self.target_cookie_name in response.cookies:
             c = dump_cookie(self.target_cookie_name,
-                            response.cookies[self.target_cookie_name])
+                            response.cookies[self.target_cookie_name],
+                            domain=self.target_cookie_domain)
+            print c
             self._session[self.STORAGE_KEY] = c
             if self.__call_save:
                 self._session.save()
@@ -229,8 +234,9 @@ def _create_digest(login, passwd):
 class AccountsApi(HttpServiceProxy):
     """This class provides Accounts service API."""
     def __init__(self, target_url, target_cookie_name='tw_acc_session',
-                 session_func={}, call_save=True):
+                 target_cookie_domain=None, session_func={}, call_save=True):
         super(AccountsApi, self).__init__(target_url, target_cookie_name,
+                                          target_cookie_domain,
                                           session_func, call_save)
 
     def get_auth(self):
