@@ -22,7 +22,7 @@ from beaker.middleware import SessionMiddleware
 from .settings import Settings
 from .core.core import QuizCore
 from .core.exceptions import QuizCoreError
-from .accounts import AccountApi
+from .serviceproxy import AccountsApi
 
 
 class QuizWWWAuthenticate(object):
@@ -139,7 +139,7 @@ class QuizApp(object):
         def session_func():
             return self.session
         acc_url = self.settings.main['accounts_url']
-        self.account = AccountApi(acc_url, session_func)
+        self.account = AccountsApi(acc_url, session_func=session_func)
 
     # Read application settings.
     # There may be two sources:
@@ -415,7 +415,7 @@ class QuizApp(object):
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        user = self.account.send_auth(login, digest, nonce, 'quiz')
+        user, cookie = self.account.send_auth(login, digest, nonce, 'quiz')
 
         can_check_date = user['type'] != 'admin'
 
@@ -444,6 +444,9 @@ class QuizApp(object):
         # NOTE: we you want to use 'beaker.session.secret' then use:
         # sid = self.session.__dict__['_headers']['cookie_out']
         # sid = sid[sid.find('=') + 1:sid.find(';')]
-        sid = self.session.id
+        # sid = self.session.id
 
-        return JSONResponse({'sid': sid, 'user': user})
+        resp = JSONResponse({'user': user})
+        resp.headers.add('Set-Cookie', cookie)
+        return resp
+        # return JSONResponse({'sid': sid, 'user': user})

@@ -56,11 +56,11 @@ function createQuestionManager(config) {
         // Logout from the app.
         logout: function() {
             var self = this;
-            window.qsid = null;
             window.name = null;
             aux_busy(true);
             $.ajax("/v1/authorize/logout").always(function() {
                 self.onLeave();
+                aux_deleteServicesCookies();
                 aux_busy(false);
                 $.mobile.changePage("#page-login");
             });

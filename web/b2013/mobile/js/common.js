@@ -34,19 +34,33 @@ function aux_busy(state, forWidget) {
   }
 }
 
-function aux_getCookie(Name) {
-  var re=new RegExp(Name+"=[^;]+", "i");
-  if (document.cookie.match(re))
-    return document.cookie.match(re)[0].split("=")[1];    
-  return "";
-}
+function aux_deleteServicesCookies() {
+    function deleteCookie(name, path, domain) {
+        var i = name.indexOf('=');
+        if (i != -1)
+            name = name.substring(0, i);
 
-function aux_deleteCookie(name, path, domain) {
-   if (aux_getCookie(name)) {
-     document.cookie = name + "=" + ((path) ? "; path=" + path : "")
-     + ((domain) ? "; domain=" + domain : "")
-     + "; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
-   }
+        if (name) {
+            document.cookie = name + "=" +
+                ((path) ? "; path=" + path : "") +
+                ((domain) ? "; domain=" + domain : "") +
+                "; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
+        }
+    }
+
+    if (!String.prototype.trim) {
+        String.prototype.trim = function() {
+            return this.replace(/^\s+|\s+$/g, '');
+        };
+    }
+
+    var theCookies = document.cookie.split(';');
+
+    for (var i = 0; i <theCookies.length; i++) {
+        var c = theCookies[i].trim();
+        if (c.substring(0, 3) == 'tw_')
+        deleteCookie(c, '/');
+    }
 }
 
 function aux_showError(msg, title) {

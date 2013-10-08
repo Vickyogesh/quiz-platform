@@ -13,6 +13,11 @@ tools/  - tools for testing.
 Running tests
 =============
 
+Before testing you have to init DB with test data:
+
+    tests/tools/dbinit.py
+
+
 To run tests you may use tests.py script or run them individually.
 
 Run

@@ -46,10 +46,10 @@ $("#page-quiz-chapters").bind("pageinit", function() {
   });
 
   $("#page-quiz-chapters #bttLogout").click(function() {
-    window.qsid = null;
     window.name = null;
     aux_busy(true);
     $.ajax("/v1/authorize/logout").always(function() {
+        aux_deleteServicesCookies();
         aux_busy(false);
         $.mobile.changePage("#page-login");
     });

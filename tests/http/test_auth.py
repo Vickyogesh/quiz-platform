@@ -102,8 +102,8 @@ class HttpAuthTest(unittest.TestCase):
         data = r.json()
         self.assertEqual(200, r.status_code)
         self.assertEqual(200, data['status'])
-        self.assertIn('sid', data)
-        self.assertIn('QUIZSID', r.cookies)
+        self.assertIn('user', data)
+        self.assertIn('tw_quiz_session', r.cookies)
 
         user = data['user']
         self.assertEqual('Test', user['name'])

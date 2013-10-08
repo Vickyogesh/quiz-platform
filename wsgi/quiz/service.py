@@ -1,4 +1,6 @@
-from werkzeug.exceptions import BadRequest, Forbidden, Unauthorized
+from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.utils import redirect
+from werkzeug.urls import url_encode
 from .core.exceptions import QuizCoreError
 from .wsgi import QuizApp, JSONResponse
 
@@ -7,9 +9,8 @@ app = QuizApp()
 
 @app.get('/accounturl')
 def get_account_url():
-    sender = app.session['quiz_type_name']
-    url = app.account.getAccountRemoteUrl(sender)
-    return JSONResponse({'url': url})
+    url = app.account.getUserAccountPage()
+    return redirect(url + '?' + url_encode(app.request.args))
 
 
 @app.get('/userinfo')

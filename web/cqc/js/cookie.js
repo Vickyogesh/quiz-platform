@@ -1,37 +1,37 @@
+function deleteServicesCookies() {
+    function deleteCookie(name, path, domain) {
+        var i = name.indexOf('=');
+        if (i != -1)
+            name = name.substring(0, i);
 
-function getCookie(Name){ //get cookie value
-	var re=new RegExp(Name+"=[^;]+", "i"); //construct RE to search for target name/value pair
-	if (document.cookie.match(re)) //if cookie found
-		return document.cookie.match(re)[0].split("=")[1]; //return its value
-		
-	return "";
-}
+        if (name) {
+            document.cookie = name + "=" +
+                ((path) ? "; path=" + path : "") +
+                ((domain) ? "; domain=" + domain : "") +
+                "; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
+        }
+    }
 
-function setCookie(name, value, days){ //set cookie value
-	var expireDate = new Date();
-	//set "expstring" to either future or past date, to set or delete cookie, respectively
-	var expstring=expireDate.setDate(expireDate.getDate()+parseInt(days));
-	document.cookie = name+"="+value+"; expires="+expireDate.toGMTString()+"; path=/";
-}
+    if (!String.prototype.trim) {
+        String.prototype.trim = function() {
+            return this.replace(/^\s+|\s+$/g, '');
+        };
+    }
 
-function deleteCookie(name) {
-    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-};
+    var theCookies = document.cookie.split(';');
 
-function deleteCookie(name, path, domain) {
-   if (getCookie(name)) {
-           document.cookie = name + "=" +
-           ((path) ? "; path=" + path : "") +
-           ((domain) ? "; domain=" + domain : "") +
-           "; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
-   }
+    for (var i = 0; i <theCookies.length; i++) {
+        var c = theCookies[i].trim();
+        if (c.substring(0, 3) == 'tw_')
+        deleteCookie(c, '/');
+    }
 }
 
 function doLogout() {
-  window.qsid = null;
-  window.name = null;
-  deleteCookie('QUIZSID', '/');
-  sessionStorage.removeItem("quizqsid");
-  sessionStorage.removeItem("quizname");
-  window.location = "index.html";
+    window.qsid = null;
+    window.name = null;
+    deleteServicesCookies();
+    sessionStorage.removeItem("quizqsid");
+    sessionStorage.removeItem("quizname");
+    window.location = "index.html";
 }

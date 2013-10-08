@@ -81,10 +81,10 @@ $("#page-quiz-topics").bind("pageinit", function() {
   }); // pagebeforeshow
 
   $("#page-quiz-topics #bttLogout").click(function() {
-    window.qsid = null;
     window.name = null;
     aux_busy(true);
     $.ajax("/v1/authorize/logout").always(function() {
+        aux_deleteServicesCookies();
         aux_busy(false);
         $.mobile.changePage("#page-login");
     });

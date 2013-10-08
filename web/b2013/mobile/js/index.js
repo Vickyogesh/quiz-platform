@@ -26,7 +26,7 @@ $("#page-login").bind("pageinit", function() {
             aux_showError("Nome utente o password non validi.");
           }
           else if (data.user.type != 'student' && data.user.type != 'guest') {
-            aux_deleteCookie("QUIZSID");
+            aux_deleteServicesCookies();
             aux_busy(false, "#login");
             aux_showError("Not a student.");
           }
@@ -34,9 +34,7 @@ $("#page-login").bind("pageinit", function() {
             var name = data.user.name;
             if (data.user.surname)
               name += ' ' + data.user.surname;
-            window.qsid = data.qsid;
             window.name = name;
-            sessionStorage.setItem('quizqsid', data.qsid);
             sessionStorage.setItem('quizname', name);
             sessionStorage.setItem('quizutype', data.user.type);
             $.mobile.changePage("#page-student");
