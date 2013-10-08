@@ -453,6 +453,5 @@ class QuizApp(object):
 
         resp = JSONResponse({'user': user})
         resp.headers.add('Set-Cookie', cookie)
-        print cookie, resp.headers
         return resp
         # return JSONResponse({'sid': sid, 'user': user})
