@@ -96,12 +96,10 @@ class HttpServiceProxy(object):
 
     # Save target service cookie in the current session for later use.
     def _save_session(self, response):
-        print response.cookies
         if self.target_cookie_name in response.cookies:
             c = dump_cookie(self.target_cookie_name,
                             response.cookies[self.target_cookie_name],
                             domain=self.target_cookie_domain)
-            print c
             self._session[self.STORAGE_KEY] = c
             if self.__call_save:
                 self._session.save()
