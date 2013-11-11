@@ -5,8 +5,8 @@ $("#page-login").bind("pageinit", function() {
 
   $("#login a").click(function() {
     aux_busy(true, "#login");
-
-    $.getJSON("/v1/authorize", function(data) {
+    var d = new Date().getTime();
+    $.getJSON("/v1/authorize?q=" + d, function(data) {
         var login = $("#login #un").val();
         var passwd = $("#login #pw").val();
         var nonce = data.nonce;
