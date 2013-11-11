@@ -113,7 +113,8 @@ def get_guest_stat(school):
         school_id=:id AND quiz_type=:type AND type='guest'"""),
                          id=school['id'], type=school['quiz_type']).fetchone()
     if res is None:
-        return
+        return (-1, -1, -1)
+
     guest_id = res[0]
 
     # Get visit statistics

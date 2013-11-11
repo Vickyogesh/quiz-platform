@@ -65,6 +65,9 @@ class SchoolMixin(object):
 
         try:
             stat = json.loads(stat[0])
+            guest_visits = stat['guest_visits']
+            if not guest_visits:
+                guest_visits = [-1, -1, -1]
             data = {
                 'topics': topics,
                 'students': {
@@ -72,7 +75,7 @@ class SchoolMixin(object):
                     'week': stat['week'],
                     'week3': stat['week3']
                 },
-                'guest_visits': stat['guest_visits'],
+                'guest_visits': guest_visits,
                 'exams': stat['exams']
             }
         except Exception:
@@ -83,7 +86,7 @@ class SchoolMixin(object):
                     'week': [],
                     'week3': []
                 },
-                'guest_visits': [],
+                'guest_visits': [-1, -1, -1],
                 'exams': []
             }
         return data
