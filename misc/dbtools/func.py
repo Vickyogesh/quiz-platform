@@ -294,7 +294,7 @@ def exams(mgr):
 
             IF coef IS NOT NULL THEN
                 INSERT INTO user_progress_snapshot VALUES
-                (NEW.user_id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), coef)
+                (NEW.user_id, NEW.quiz_type, DATE(NEW.end_time), coef)
                 ON DUPLICATE KEY UPDATE progress_coef = VALUES(progress_coef);
             END IF;
         END;
