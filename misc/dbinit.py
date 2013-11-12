@@ -46,6 +46,8 @@ class Db(DbManager):
                             help="CSV delimiter (default: '%(default)s').")
         parser.add_argument('-cqc', action='store_true',
                             help="Fill with CQC questions.")
+        parser.add_argument('-only-triggers', action='store_true',
+                            help="Recreate only triggers.")
         self.args = parser.parse_args()
 
     def fillChapters(self):
@@ -125,18 +127,24 @@ class Db(DbManager):
         self.fillQuestions()
 
     def _do_run(self):
-        if self.args.b2011:
-            self.recreate = False
-            self.engine.execute('TRUNCATE TABLE applications')
-            self.engine.execute('TRUNCATE TABLE chapters')
-            self.engine.execute('TRUNCATE TABLE topics')
-            self.engine.execute('TRUNCATE TABLE questions')
-
-        if self.args.cqc:
-            from dbtools import cqc
-            cqc.run(self)
+        if self.args.only_triggers:
+            from dbtools import tables, func
+            tables.reflect(self)
+            func.create(self)
+            tables.optimize(self)
         else:
-            DbManager._do_run(self)
+            if self.args.b2011:
+                self.recreate = False
+                self.engine.execute('TRUNCATE TABLE applications')
+                self.engine.execute('TRUNCATE TABLE chapters')
+                self.engine.execute('TRUNCATE TABLE topics')
+                self.engine.execute('TRUNCATE TABLE questions')
+
+            if self.args.cqc:
+                from dbtools import cqc
+                cqc.run(self)
+            else:
+                DbManager._do_run(self)
 
 
 Db().run()
