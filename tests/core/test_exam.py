@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 
 import unittest
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from datetime import datetime, timedelta
 from collections import namedtuple
 from tests_common import db_uri, cleanupdb_onSetup, cleanupdb_onTearDown
@@ -389,49 +389,72 @@ class CoreExamStatTest(unittest.TestCase):
 
     # Check: progress_coef if only one exam is passed (successfully).
     def test_updateCoefOneOk(self):
+        t = self.core.meta.tables['user_progress_snapshot']
+        sel = select([t.c.progress_coef])
+
         # Pass exam with no errors and check progress_coef:
         # Since we made no errors then progress_coef must be 0.
         # This means what there is 0% of errors, ie all exams is passed.
         pass_exam(self, 1, [1] * 40)
-        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        sql = sel.where(and_(t.c.user_id == 4, t.c.quiz_type == 1,
+                        t.c.now_date == datetime.utcnow().date()))
+        # sql = "SELECT progress_coef from user_progress_snapshot where user_id=4 and quiz_type=1"
         row = self.sql(sql).fetchone()
         self.assertEqual(0, row[0])
 
         pass_exam(self, 2, [0] * 60, user_id=3)
-        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        sql = sel.where(and_(t.c.user_id == 3, t.c.quiz_type == 2,
+                        t.c.now_date == datetime.utcnow().date()))
+        # sql = "SELECT progress_coef from user_progress_snapshot where user_id=3 and quiz_type=2"
         row = self.sql(sql).fetchone()
         self.assertEqual(0, row[0])
 
     # Check: progress_coef if only one exam is passed (failed).
     def test_updateCoefOneFail(self):
+        t = self.core.meta.tables['user_progress_snapshot']
+        sel = select([t.c.progress_coef])
+
         pass_exam(self, 1, [1] * 20 + [0] * 20)
-        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        sql = sel.where(and_(t.c.user_id == 4, t.c.quiz_type == 1,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
         self.assertEqual(1, row[0])
 
         pass_exam(self, 2, [1] * 40 + [0] * 20, user_id=3)
-        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        sql = sel.where(and_(t.c.user_id == 3, t.c.quiz_type == 2,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
         self.assertEqual(1, row[0])
 
     # Check: progress_coef with exam which is in progress.
     def test_updateCoefProgressExam(self):
-        # Since 'in-progress' exams are skipped then progress_coef will be -1.
+        t = self.core.meta.tables['user_progress_snapshot']
+        sel = select([t.c.progress_coef])
+
+        # Since 'in-progress' exams are skipped then user_progress_snapshot
+        # will not contain entries for user 4 and 3.
+
         self.core.createExam(1, 4, 'it')
-        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        sql = sel.where(and_(t.c.user_id == 4, t.c.quiz_type == 1,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
-        self.assertEqual(-1, row[0])
+        self.assertIsNone(row)
 
         self.core.createExam(2, 3, 'it', 'merci')
-        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+        sql = sel.where(and_(t.c.user_id == 3, t.c.quiz_type == 2,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
-        self.assertEqual(-1, row[0])
+        self.assertIsNone(row)
 
     # Check: progress_coef if two exams are passed (failed & successfully).
     def test_updateCoefTwoExams(self):
+        t = self.core.meta.tables['user_progress_snapshot']
+        sel = select([t.c.progress_coef])
+
         pass_exam(self, 1, [1] * 40)
         pass_exam(self, 1, [1] * 20 + [0] * 20)
-        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
+        sql = sel.where(and_(t.c.user_id == 4, t.c.quiz_type == 1,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.5, row[0], 1)
 
@@ -439,40 +462,55 @@ class CoreExamStatTest(unittest.TestCase):
         pass_exam(self, 2, [1] * 60, user_id=3)
         pass_exam(self, 2, [1] * 60, user_id=3)
         pass_exam(self, 2, [1] * 60, user_id=3)
-        sql = "SELECT progress_coef from users where id=3 and quiz_type=2"
+
+        sql = sel.where(and_(t.c.user_id == 3, t.c.quiz_type == 2,
+                        t.c.now_date == datetime.utcnow().date()))
         row = self.sql(sql).fetchone()
         self.assertAlmostEqual(0.75, row[0], 2)
 
     # Check: progress_coef for all exam types.
     def test_updateCoef(self):
+        t = self.core.meta.tables['user_progress_snapshot']
+
         # Pass one exam, fail one exam, and create 'in-progress' exam.
         pass_exam(self, 1, [1] * 40)
         pass_exam(self, 1, [1] * 20 + [0] * 20)
         self.core.createExam(1, 4, 'it')
 
+        sql = t.select().where(and_(t.c.user_id == 4, t.c.quiz_type == 1,
+                               t.c.now_date == datetime.utcnow().date()))
+
         # We must have 50% of errors.
-        sql = "SELECT progress_coef from users where id=4 and quiz_type=1"
-        row = self.sql(sql).fetchone()
-        self.assertAlmostEqual(0.5, row[0], 1)
+        row = self.sql(sql).fetchall()
+        self.assertEqual(1, len(row))
+        self.assertAlmostEqual(0.5, row[0][t.c.progress_coef], 1)
 
         # Pass one more exam, so ~33% of errors
         # 1 failed and 2 passed, 3 exams overall (we skip 'in-progress') = 1/3
         pass_exam(self, 1, [1] * 40)
-        row = self.sql(sql).fetchone()
-        self.assertAlmostEqual(0.33, row[0], 2)
+        row = self.sql(sql).fetchall()
+        self.assertEqual(1, len(row))
+        self.assertAlmostEqual(0.33, row[0][t.c.progress_coef], 2)
 
         # Fail exam
         # 2 failed and 2 passed, total 4 = 2/2
         pass_exam(self, 1, [1] * 20 + [0] * 20)
-        row = self.sql(sql).fetchone()
-        self.assertAlmostEqual(0.5, row[0], 1)
+        row = self.sql(sql).fetchall()
+        self.assertEqual(1, len(row))
+        self.assertAlmostEqual(0.5, row[0][t.c.progress_coef], 1)
 
         # 3 failed and 2 passed, total 5 = 3/5
         pass_exam(self, 1, [1] * 20 + [0] * 20)
-        row = self.sql(sql).fetchone()
-        self.assertAlmostEqual(0.6, row[0], 1)
+        row = self.sql(sql).fetchall()
+        self.assertEqual(1, len(row))
+        self.assertAlmostEqual(0.6, row[0][t.c.progress_coef], 1)
 
+    # NOTE: users.progress_coef is not used anymore
+    # and user_progress_snapshot.progress_coef is updated by the
+    # on_exams_after_upd trigger dirrectly not by users table triggers.
+    # See exams() in the dbtools/func.py.
     # Check: exam snapshot update.
+    @unittest.skip('users.progress_coef is not used anymore')
     def test_snapshot(self):
         # update current coef and check snapshot
         sql = "UPDATE users SET progress_coef=0.23 WHERE id=4 and quiz_type=1"

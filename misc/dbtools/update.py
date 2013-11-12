@@ -68,8 +68,11 @@ def update_school(school):
 
     stat = get_school_cache(school)
     students = get_active_students(school)
+
+    logger.debug('Students to update: %s', str(students))
     if not students:
         return
+
     students_str = ','.join(str(user) for user in students)
     qt = school['quiz_type']
     stat['guest_visits'] = get_guest_stat(school)

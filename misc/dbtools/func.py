@@ -133,37 +133,27 @@ def topic_err_current(mgr):
 @add_me
 def users(mgr):
     # If guest is added then we update guest access info.
-    # If new student is added then create snapshot entry.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_users_after_add;")
     mgr.conn.execute(text("""CREATE TRIGGER on_users_after_add
         AFTER INSERT ON users FOR EACH ROW BEGIN
             IF NEW.type = 'guest' THEN
-                INSERT IGNORE INTO guest_access VALUES(NEW.id, NEW.quiz_type,
-                    0, UTC_TIMESTAMP()+ interval 1 hour);
-            ELSE
-                INSERT INTO user_progress_snapshot VALUES
-                (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
-                ON DUPLICATE KEY UPDATE progress_coef=VALUES(progress_coef);
+                INSERT IGNORE INTO guest_access VALUES
+                (NEW.id, NEW.quiz_type, 0, UTC_TIMESTAMP() + interval 1 hour);
             END IF;
         END;
         """))
 
-    # If progress_coef is changed for the student then update snapshot entry.
     # If user activity timestamp is changed and if user is guest
     # then we update number of requests.
     # Also last school activity is updated in the school_stat_cache.
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_users_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_users_after_upd
         AFTER UPDATE ON users FOR EACH ROW BEGIN
-            IF NEW.type = 'student'
-            THEN
-                INSERT INTO user_progress_snapshot VALUES
-                (NEW.id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), NEW.progress_coef)
-                ON DUPLICATE KEY UPDATE progress_coef=VALUES(progress_coef);
-            ELSEIF NEW.type = 'guest' AND NEW.last_visit != OLD.last_visit THEN
+            IF NEW.type = 'guest' AND NEW.last_visit != OLD.last_visit THEN
                 UPDATE guest_access SET num_requests = num_requests + 1
                 WHERE id=NEW.id AND quiz_type=NEW.quiz_type;
             END IF;
+
             INSERT INTO school_stat_cache
             (school_id, quiz_type, last_activity, stat_cache)
             VALUES (NEW.school_id, NEW.quiz_type, UTC_TIMESTAMP(), "")
@@ -302,8 +292,11 @@ def exams(mgr):
                 AND quiz_type=NEW.quiz_type;
             END IF;
 
-            UPDATE users SET progress_coef=coef WHERE id=NEW.user_id
-            AND quiz_type=NEW.quiz_type;
+            IF coef IS NOT NULL THEN
+                INSERT INTO user_progress_snapshot VALUES
+                (NEW.user_id, NEW.quiz_type, DATE(UTC_TIMESTAMP()), coef)
+                ON DUPLICATE KEY UPDATE progress_coef = VALUES(progress_coef);
+            END IF;
         END;
         """))
 

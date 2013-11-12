@@ -52,26 +52,40 @@ class CoreDbTest(unittest.TestCase):
         # check period_end
         tm = dt.utcnow() + timedelta(hours=1)
         delta = tm - row[3]
-        self.assertTrue(delta < timedelta(seconds=10))
+        self.assertLess(delta, timedelta(seconds=10))
+
+        # Check: no entry in the user_progress_snapshot
+        row = self.sql("SELECT * FROM user_progress_snapshot WHERE user_id=1")
+        row = row.fetchall()
+        self.assertEqual(0, len(row))
 
         # Check: add student
+        # There must be no entry in the user_progress_snapshot.
         self.sql("""INSERT INTO users(id, type, quiz_type, school_id)
                      VALUES(2, 'student', 2, 1)""")
         row = self.sql("SELECT * FROM user_progress_snapshot WHERE user_id=2")
         row = row.fetchall()
-        self.assertEqual(1, len(row))
-        row = row[0]
-        self.assertEqual(2, row[0])  # id
-        self.assertEqual(2, row[1])  # quiz_type
-        self.assertEqual(dt.utcnow().date(), row[2])  # now_date
+        self.assertEqual(0, len(row))
 
+    # NOTE: users.progress_coef is not used anymore
+    # and user_progress_snapshot.progress_coef is updated by the
+    # on_exams_after_upd trigger dirrectly not by users table triggers.
+    # See exams() in the dbtools/func.py.
+    # Old behaviour:
+    #   If progress_coef is changed for the student
+    #   then update snapshot entry.
+    # New behaviour: nothing happens.
     # Test: user update trigger.
+    @unittest.skip('users.progress_coef is not used anymore')
     def test_users_update(self):
         # Add guest and stundet.
         self.sql("""INSERT INTO users(id, type, quiz_type, school_id)
                      VALUES(1, 'guest', 2, 1)""")
         self.sql("""INSERT INTO users(id, type, quiz_type, school_id)
                      VALUES(2, 'student', 2, 1)""")
+
+        s = self.sql("SELECT * FROM user_progress_snapshot WHERE user_id=2")
+        print s.fetchall()
 
         # If progress_coef is changed for the student
         # then update snapshot entry.
@@ -97,7 +111,7 @@ class CoreDbTest(unittest.TestCase):
                        WHERE school_id=1 AND quiz_type=2""").fetchall()
         self.assertEqual(1, len(row))
         row = row[0]
-        self.assertTrue(last - row[0] <= timedelta(seconds=2))
+        self.assertLessEqual(last - row[0], timedelta(seconds=2))
 
     # Test: update/insert quiz answers.
     def test_quiz_answers(self):
@@ -254,15 +268,17 @@ class CoreDbTest(unittest.TestCase):
         self.sql(e.update().values(end_time=dt.utcnow(), err_count=7)
                  .where(e.c.id == 2))
 
+        # Check: user_progress_snapshot entry
         # At this point we have two exams performed and one in progress.
         # First exam is passed successfully and second is not passed
         # (since we have 5 errors - 4 is maximum to pass).
         # So result progress coef will be 1/2 = 0.5
-        row = self.sql(u.select()).fetchall()
-        self.assertEqual(1, len(row))
-        row = row[0]
-        self.assertEqual(3, row[u.c.id])
-        self.assertEqual(0.5, row[u.c.progress_coef])
+        res = self.sql('SELECT * FROM user_progress_snapshot WHERE user_id=3')
+        res = res.fetchall()
+
+        self.assertEqual(1, len(res))
+        self.assertEqual(dt.utcnow().date(), res[0][2])
+        self.assertEqual(0.5, res[0][3])
 
     # Test: insert/update guest info
     def test_guest_access(self):
