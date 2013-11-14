@@ -1,14 +1,22 @@
 $("#page-quiz-chapters").bind("pageinit", function() {
   function fill_chapter() {
-      var html = "";
-      for (var i = 0; i < 5; i++) {
-          html += '<div class="tp ui-block-a">' + (5 * i + 1) + '</div>'
-               + '<div class="tp ui-block-b">' + (5 * i + 2) + '</div>'
-               + '<div class="tp ui-block-c">' + (5 * i + 3) + '</div>'
-               + '<div class="tp ui-block-d">' + (5 * i + 4) + '</div>'
-               + '<div class="tp ui-block-e">' + (5 * i + 5) + '</div>';
-      }
-      $("#page-quiz-chapters #chapters").html(html);
+    var chapter_area = [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3,
+                        3, 3, 3, 3, 3, 4, 4, 5, 6, 6, 6, 7, 7];
+    var html = "";
+
+    function chapter_div(ui_block, chapter_id) {
+      var fmt = '<div class="{0} tp area{1}">{2}</div>';
+      return fmt.format(ui_block, chapter_area[chapter_id - 1], chapter_id);
+    }
+
+    for (var i = 0; i < 5; i++) {
+      html += chapter_div("ui-block-a", 5 * i + 1)
+           + chapter_div("ui-block-b", 5 * i + 2)
+           + chapter_div("ui-block-c", 5 * i + 3)
+           + chapter_div("ui-block-d", 5 * i + 4)
+           + chapter_div("ui-block-e", 5 * i + 5);
+    }
+    $("#page-quiz-chapters #chapters").html(html);
   }
 
   function layout() {

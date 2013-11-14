@@ -79,13 +79,13 @@ a.ui-link-inherit {
 #bttQuiz:hover {background-color: #0460bb;}
 #bttQuiz:active {background-color: #0358ab;}
 
-#bttExam {color: #ffffff; background-color: #047aee;}
-#bttExam:hover {background-color: #0471dd;}
-#bttExam:active {background-color: #0369cd;}
+#bttExam {color: #ffffff; background-color: #c6e2d3;}
+#bttExam:hover {background-color: #bbdcca;}
+#bttExam:active {background-color: #afd7c2;}
 
-#bttReview {color: #ffffff; background-color: #198bfb;}
-#bttReview:hover {background-color: #0883fb;}
-#bttReview:active {background-color: #047aee;}
+#bttReview {color: #ffffff; background-color: #858589;}
+#bttReview:hover {background-color: #7c7c81;}
+#bttReview:active {background-color: #747478;}
 
 
 /* Quiz */
@@ -97,19 +97,41 @@ a.ui-link-inherit {
 #chapters .tp {
   text-align: center;
   border: 2px solid #ffffff;
-  background: #2579cf;
   color: white;
   text-shadow: 0px 1px 0px #0358ab;
   cursor: pointer;
 }
 
-#chapters .tp:hover {
-  border: 2px solid #1d60a4;
-  font-weight: bold;
-}
-#chapters .tp:active {
-  background: #2068b2;
-}
+#chapters .tp:hover {font-weight: bold;}
+
+#chapters .tp.area1 {background: #c0c0c0;}
+#chapters .tp.area1:hover {border: 2px solid #afafaf;}
+#chapters .tp.area1:active {background: #b8b8b8;}
+
+#chapters .tp.area2 {background: #00ae00;}
+#chapters .tp.area2:hover {border: 2px solid #008c00;}
+#chapters .tp.area2:active {background: #009d00;}
+
+#chapters .tp.area3 {background: #9966cc;}
+#chapters .tp.area3:hover {border: 2px solid #884dc4;}
+#chapters .tp.area3:active {background: #9159c8;}
+
+#chapters .tp.area4 {background: #ffdd00;}
+#chapters .tp.area4:hover {border: 2px solid #ddc000;}
+#chapters .tp.area4:active {background: #eece00;}
+
+#chapters .tp.area5 {background: #ff6633;}
+#chapters .tp.area5:hover {border: 2px solid #ff4d11;}
+#chapters .tp.area5:active {background: #ff5922;}
+
+#chapters .tp.area6 {background: #004586;}
+#chapters .tp.area6:hover {border: 2px solid #003464;}
+#chapters .tp.area6:active {background: #003c75;}
+
+#chapters .tp.area7 {background: #b84747;}
+#chapters .tp.area7:hover {border: 2px solid #9f3e3e;}
+#chapters .tp.area7:active {background: #ac4242;}
+
 
 .question-page #image {
   background-image: none;
