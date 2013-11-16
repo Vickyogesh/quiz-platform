@@ -198,14 +198,26 @@ function createQuestionManager(config) {
 
         // Set image and text position.
         layout: function() {
+            this.grid_el.css("height", "");
+
             var p = this.grid_el.parent();
             var pw = p.width();
-            var ph = p.height();
+            var ph = p[0].clientHeight; //p.height();
+
+            var ch = p.children();
+            for (var i = 0; i < ch.length; i++) {
+                var el = ch[i];
+                if (el != this.grid_el[0]) {
+                    ph -= el.clientHeight;
+                }
+            }
+
+            var h = ph - 20;
 
             aux_layoutGrid(this.pageId + " #qgrid");
 
             if (pw >= ph) { // horizontal
-                this.image_el.css("height", "");
+                this.image_el.css("height", h + "px");
                 this.txt_el.css("height", "");
 
                 if (this.image_el.css("background-image") == "none") {
@@ -215,14 +227,10 @@ function createQuestionManager(config) {
                 else {
                     this.image_el.parent().css("width", "30%");
                     this.txt_el.parent().css("width", "70%");
-                    this.image_el.css(
-                        "height",
-                        Math.min(200,this.image_el.parent().height())
-                    );
                 }
+                this.grid_el.css('height', h + 'px');
             }
             else { // vertical
-              var h = ph - 30;
               var ih = Math.min(200, h / 3);
               var th = h - ih;
 

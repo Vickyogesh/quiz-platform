@@ -56,6 +56,11 @@ a.ui-link-inherit {
   white-space: normal !important;
 }
 
+div.btt-back, span.btt-back {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 /* Login page. */
 #page-login #login {max-width: 400px; margin: auto;}
 #page-login h3 {text-align: center;}
@@ -135,7 +140,7 @@ a.ui-link-inherit {
 
 .question-page #image {
   background-image: none;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -145,4 +150,29 @@ a.ui-link-inherit {
  background: none !important;
  border: none !important;
  text-shadow: none !important;
+}
+
+
+.image-button {
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  width: 50px !important;
+  height: 50px !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: auto !important;
+}
+
+.image-button.ui-focus {
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.ans-true {
+  background-image: url("../img/true.png");
+}
+.ans-false {
+  background-image: url("../img/false.png");
 }
