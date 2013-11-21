@@ -203,16 +203,15 @@ function createQuestionManager(config) {
             var p = this.grid_el.parent();
             var pw = p.width();
             var ph = p[0].clientHeight; //p.height();
+            var h = ph - 20;
 
             var ch = p.children();
             for (var i = 0; i < ch.length; i++) {
                 var el = ch[i];
                 if (el != this.grid_el[0]) {
-                    ph -= el.clientHeight;
+                    h -= el.clientHeight;
                 }
             }
-
-            var h = ph - 20;
 
             aux_layoutGrid(this.pageId + " #qgrid");
 
