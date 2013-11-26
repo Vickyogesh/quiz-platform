@@ -234,6 +234,7 @@ ul.nav li {
 }
 .collapsable-list #ctrl > a {
   border-left: 0;
+  display: inline-block;
 }
 .collapsable-list #ctrl > a:hover {
   cursor:pointer;

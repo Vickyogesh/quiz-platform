@@ -39,15 +39,20 @@
 				else
 					item.remove();
 			});
-
 		}
+
+        function editStudent(item) {
+            var id = item.find('#data a').attr("id");
+            editAccount(id)
+        }
 
 		function create_student_html(id, name, surname) {
 			var html = '<li style="position: relative"><div id="data">'
 			html += '<a id="' + id + '" href="Statistics.html?id=' + id + '">';
 			html += name + " " + surname;
 			html += '</a></div>';
-			html += '<div id="ctrl"><a href="#">PROMOSSO</a></div></li>';
+			html += '<div id="ctrl"><a href="#" id="del">PROMOSSO</a>'
+                  + '<a href="#" id="pass">EDIT</a></div></li>';
 			return html;
 		}
 		
@@ -111,10 +116,14 @@
 					var html = create_student_html(data.id, info.name,
 					                               info.surname);
 					$("#school_menu #students").append(html);
-					$('#ctrl:last-child a').click(function() {
+					$('#ctrl:last-child a#del').click(function() {
 						var item = $(this).parent().parent();
 						delStudent(item);
 					});
+                    $('#ctrl:last-child a#pass').click(function() {
+                        var item = $(this).parent().parent();
+                        editStudent(item);
+                    });
 					WaitMsg.hide();
 					alert('Studente aggiunto con successo!');
 				}
@@ -154,9 +163,13 @@
                 }
 
                 $("#school_menu #students").append(html);
-                $('#ctrl a').click(function() {
+                $('#ctrl a#del').click(function() {
                     var item = $(this).parent().parent();
                     delStudent(item);
+                });
+                $('#ctrl a#pass').click(function() {
+                    var item = $(this).parent().parent();
+                    editStudent(item);
                 });
 
                 $("#school_menu").show();
