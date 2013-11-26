@@ -36,7 +36,9 @@
 				var html = "";
 				for (i = 0; i < info.length; i++) {
 					html += '<li><a id="' + info[i].id
-						 + '" href="Statistics.html?id=' + info[i].id + '">';
+						 + '" href="Statistics.html?id=' + info[i].id
+                         + '&back=school_stat'
+                         + '">';
 					html += info[i].name + ' ' + info[i].surname;
 					html += '</a></li>';
 				}
@@ -114,7 +116,7 @@
 			// filling exam graph
 			var ids = ['wpgraph', 'mpgraph', 'apgraph'];
 			for (var i = 0; i < 3; i++)
-				createErrorsChart(ids[i], data.exams[i], true);
+				createErrorsChart(ids[i], data.exams[i]);
 			
 			fill_topics(data.topics, "week", "wtgraph");
 			fill_topics(data.topics, "month", "mtgraph");
