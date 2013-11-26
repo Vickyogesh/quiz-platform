@@ -36,7 +36,9 @@
 				var html = "";
 				for (i = 0; i < info.length; i++) {
 					html += '<li><a id="' + info[i].id
-						 + '" href="Statistics.html?id=' + info[i].id + '">';
+						 + '" href="Statistics.html?id=' + info[i].id
+                         + '&back=school_stat'
+                         + '">';
 					html += info[i].name + ' ' + info[i].surname;
 					html += '</a></li>';
 				}

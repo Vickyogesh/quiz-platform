@@ -344,8 +344,13 @@
 
         $('#topback').click(function(){
             var type = sessionStorage.getItem("quizutype");
-            if (type == 'school')
-                window.location = "School.html";
+            if (type == 'school') {
+                var back = getUrlParameterByName('back');
+                if (back == 'school_stat')
+                    window.location = "Statistics_school.html";
+                else
+                    window.location = "School.html";
+            }
             else
                 window.location = "student.html";
         });
