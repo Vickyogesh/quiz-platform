@@ -62,8 +62,10 @@ function onAuth(butObj)
 
     		if (data.user.type == 'student' || data.user.type == 'guest')
     			window.location = "student.html";
-    		else if (data.user.type == 'school')
-    			window.location = "School.html";
+    		else if (data.user.type == 'school') {
+          sessionStorage.setItem('quizname_school', window.name);
+          window.location = "School.html";
+        }
         else if (data.user.type == 'admin')
           window.location = "admin.html";
       }

@@ -52,7 +52,7 @@
 			html += name + " " + surname;
 			html += '</a></div>';
 			html += '<div id="ctrl"><a href="#" id="del">PROMOSSO</a>'
-                  + '<a href="#" id="pass">EDIT</a></div></li>';
+                  + '<a href="#" id="pass">CAMBIA</a></div></li>';
 			return html;
 		}
 		
@@ -154,7 +154,9 @@
                     return;
                 }
                 
-                $("#school_menu .header .item a").html(window.name);
+                var name = sessionStorage.getItem('quizname_school');
+                $("#school_menu .header .item a").html(name);
+
                 var html = "";
                 var lst = data.students;
                 for (var i = 0; i < lst.length; i++) {
@@ -195,9 +197,9 @@
                 }
 
                 var name = data.user.name;
-                console.log(name);
-                window.name = name;
-                sessionStorage.setItem('quizname', name);
+                // console.log(name);
+                // window.name = name;
+                sessionStorage.setItem('quizname_school', name);
                 window.location.search = null;
                 //doLoad();
             })
