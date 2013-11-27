@@ -91,10 +91,12 @@
 
 
 		window.qsid = sessionStorage.getItem('quizqsid');
-		window.name = sessionStorage.getItem('quizname');		
+		// window.name = sessionStorage.getItem('quizname');		
         bFromExam = sessionStorage.getItem('quizfromexam');
 
-		$("#school_stat .header .item").html(window.name);
+        var name = sessionStorage.getItem('quizname_school');
+        $("#school_stat .header .item").html(name);
+
 		$("#work_area").hide();
 		WaitMsg.show();
 									

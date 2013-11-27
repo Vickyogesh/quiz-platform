@@ -1,17 +1,20 @@
-function editAccount() {
-    $.getJSON(url("/v1/accounturl"), function(data) {
-        if (data.status != 200) {
-            aux_showJSONError(data);
-            return;
-        }
+function editAccount(student_id) {
+    var loc = window.location
 
-        var url = data.url;
-        if (url == "")
-            return;
+    var search = loc.search;
+    if (search.indexOf("upd=1") == -1) {
+        if (search == "")
+            search += "?";
+        else
+            search += "&";
+        search += "upd=1";
+    }
 
-        var loc = window.location
-        var path = loc.protocol + "//" + loc.host + loc.pathname + "?upd=1"
-        url += '&next=' + encodeURIComponent(path)
-        window.location=url;
-    });
+    var path = loc.protocol + "//" + loc.host + loc.pathname + search
+    var param = "?next=" + encodeURIComponent(path);
+
+    if (student_id != undefined)
+        param += "&uid=" + student_id;
+
+    window.location = url("/v1/accounturl") + param;
 }

@@ -10,6 +10,7 @@
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/account.js"></script>
 <script src="js/graph/raphael-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/graph/g.raphael.js" type="text/javascript"></script>
 <script src="js/graph/g.line.js" type="text/javascript" charset="utf-8"></script>
@@ -44,7 +45,7 @@
                 if (data[i].status != "passed" && data[i].status != "failed")
                     continue;
 
-                console.log(data[i].errors)
+                // console.log(data[i].errors)
                 examX.push(nCount);
                 examY.push(60 - data[i].errors);
                 examY1.push(54);
@@ -209,8 +210,12 @@
 				WaitMsg.hide();
 				$("#work_area").show();
 				
-				$("#student_stat .header .item").html(
-				    data.student.name + ' ' + data.student.surname);
+                var name = data.student.name;
+                if (data.student.surname)
+                    name += ' ' + data.student.surname;
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+                $("#student_stat .header .item a").html(name);
 		
                 drawExamGraph("wexamgraph", examData.exams['current']);
                 drawExamGraph("mexamgraph", examData.exams['week']);
@@ -219,6 +224,13 @@
                 fill_topics(data.topics, "week", "wtgraph");
                 fill_topics(data.topics, "month", "mtgraph");
                 fill_topics(data.topics, "all", "atgraph");
+
+                $("#bttAccount").click(function() {
+                    if (studentId > 0)
+                        editAccount(studentId);
+                    else
+                        editAccount();
+                });
 
 				// topic click events
 				$('ul #topic ul li').click(function(){
@@ -489,7 +501,11 @@
 <body>
 	<div id="work_area">
 		<div id="student_stat" class="content-box">
-            <div class="header"><div class="item">__</div></div>
+            <div class="header">
+                <div class="item">
+                    <a href="#" id="bttAccount" class="lustre-button-dark"></a>
+                </div>
+            </div>
 
             <div class="blueline" style="height:30px; line-height:30px; margin-bottom:10px">
                 <a class="lustre-button" id="topback" style="cursor:pointer; font-size:14px;">&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>
