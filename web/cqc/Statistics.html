@@ -38,14 +38,13 @@
             var examX = [];
             var examY = [];
             var examY1 = [];
-            var nCount = 1;
+            var nCount = 0;
 
             examY1.push(54);
             for (i = 0; i < data.length; i++) {
                 if (data[i].status != "passed" && data[i].status != "failed")
                     continue;
 
-                // console.log(data[i].errors)
                 examX.push(nCount);
                 examY.push(60 - data[i].errors);
                 examY1.push(54);
@@ -58,7 +57,7 @@
             };
 
             var r = Raphael(id);
-            var echart = r.linechart(10, 8,
+            var echart = r.linechart(10, 10,
                 $('#' + id).width() - 12,
                 $('#' + id).height() - 16, 
                 examX, 
