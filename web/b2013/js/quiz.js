@@ -55,13 +55,6 @@ var topic_list = [
     "Comportamenti e cautele di guida"
 ];
 
-var chapter_list = [
-    [1, 2, 3, 4], [5], [6], [7], [8], [9], [10, 11], [12], [13, 14], [15],
-    [16, 17], [18], [19, 20, 21, 22, 23, 24, 25], [26], [27], [28],
-    [29, 30, 31, 32, 33, 34, 35], [36, 37], [38, 39], [40, 41, 42, 43],
-    [44, 45, 46], [47, 48], [49, 50], [51], [52, 53, 54]
-];
-
 var bAnswerOn = false;
 var bTerminated = false;
 var topicIndex;
@@ -229,6 +222,8 @@ function fillupQuiz(force) {
                 "\nContinuare comunque?");
             if (b)
                 do_get(data, true, do_show);
+            else
+                window.location = "quiztopics.html";
         }
         else
             do_show(info);
@@ -452,24 +447,6 @@ function setQuizEnv() {
 $(document).ready(function() {
     var i, j, htmlVal;
     
-    $("#topicgroup #chapterarea").empty();
-    for (i = 0; i < chapter_list.length; i++) {
-        htmlVal = '<div id="chapter' + (i+1)
-                + '" class="slider chap" style="font-size:15px; background-color:#707070; cursor:pointer;">';
-        htmlVal += '<p style="padding-left:10px; float:left">';
-        htmlVal += '<a>Capitolo ' + (i+1) + '</a>';
-        htmlVal += '<div id="expandsign" style="float:right; width:15px; height:15px; margin:7px"></div>';
-        htmlVal += '</p></div>';
-        htmlVal += '<div id="topiclist' + (i+1) + '" class="slider" style="display:none">';
-        for (j = 0; j < chapter_list[i].length; j++) {
-            htmlVal += '<p id="' + chapter_list[i][j] + '" class="result"><a href="#">'
-            + chapter_list[i][j] + '. ' + topic_list[chapter_list[i][j]-1] + '</a></p>';
-        }           
-        htmlVal += '</div>';
-        
-        $("#topicgroup #chapterarea").append(htmlVal);
-    }   
-
     window.qsid = sessionStorage.getItem('quizqsid');       
     
     // Image preload
@@ -479,12 +456,6 @@ $(document).ready(function() {
     img2.src = "img/false_selected.png";
 
     $("#quizarea").hide();
-    
-    $(".result").click(function(){          
-        topicIndex = $(this).attr("id");
-        curIndex = 0;
-        fillupQuiz(true);           
-    });
     
     $("#tbutton").click(function(){
         if (alreadyAnswered(curIndex) == false) {
@@ -608,4 +579,8 @@ $(document).ready(function() {
             $(esignid).addClass('expand');
         }
     });
+
+    topicIndex = getUrlParameterByName("topic");
+    curIndex = 0;
+    fillupQuiz(true);
 });
