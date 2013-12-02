@@ -29,7 +29,6 @@
   	var bTerminated = false;
 
 	$(document).ready(function() {
-		//return;
 		var i, htmlVal;
 
 		window.qsid = sessionStorage.getItem('quizqsid');	
@@ -39,11 +38,14 @@
 		$("#examreview").hide();
 		
 		WaitMsg.show();
-			
-		var lang = "it";
+		
+		var lang = getUrlParameterByName("lang");
+		if (lang == "")
+			lang = "it";
+
 		var uri = url("/v1/exam");
 		var data = {}
-			
+
 		if (lang != "it")
 			data.lang = lang;
 			
@@ -205,7 +207,7 @@
 		});
 	});
 	
-	// TODO: not wery good - we always recreate list of questions;
+	// TODO: not very good - we always recreate list of questions;
 	// here we may create the list once (when exam is received)
 	// and then just change 'X' column.
 	function fillAnswers() {
@@ -401,7 +403,10 @@
 			//
 			// setting up text area
 			//
-			$("#quizarea").html(quizData.questions[curIndex].text);
+			var q = quizData.questions[curIndex];
+			$("#quizarea #q_it").html(q.text);
+			if (q.text_extra !== undefined)
+				$("#quizarea #q_extra").html(q.text_extra);
 		}
 	}
 </script>
@@ -495,8 +500,9 @@
 				1
 			</div>
 			
-			<div id="quizarea" style="position:absolute; left:269px; top:220px; width:410px; height:90px; text-align:left; font-size:15px; padding:10px; border:2px solid #555;">
-				1
+			<div id="quizarea" style="position:absolute; left:263px; top:220px; width:421px; height:112px; text-align:left; font-size:15px; padding:10px; border:2px solid #555;">
+				<div id="q_it"></div>
+				<div id="q_extra"></div>
 			</div>
 			
 			<img id="tbutton" src="img/exam_true.png" style="position:absolute; left:403px; top:395px; width:52px; cursor:pointer" />

@@ -22,10 +22,8 @@ DbData = namedtuple('DbData', ['engine', 'meta', 'conn',
 
 def create_db_data(config_path, verbose):
     if config_path is None:
-        config_path = os.path.join(os.path.dirname(__file__),
-                            '..',
-                            'test-data',
-                            'config.ini')
+        config_path = os.path.join(os.path.dirname(__file__), '..',
+                                   'test-data', 'config.ini')
         paths = os.path.split(os.path.abspath(config_path))
     else:
         paths = os.path.split(config_path)
@@ -131,7 +129,6 @@ def fill(db, quiz_type, infile):
     if not os.path.exists(infile):
         raise IOError('File not found: %s' % infile)
 
-
     conn = sqlite3.connect(infile)
     c = conn.cursor()
 
@@ -150,8 +147,8 @@ def fill_chapters(db, quiz_type, cur):
             'id': row.rowid,
             'quiz_type': quiz_type,
             'priority': row.priority,
-            'text': row.title
-    } for row in map(Row._make, cur)]
+            'text': row.title}
+            for row in map(Row._make, cur)]
 
     db.conn.execute(db.chapters.insert(), vals)
 
@@ -166,8 +163,8 @@ def fill_topics(db, quiz_type, cur):
             'id': row.rowid,
             'quiz_type': quiz_type,
             'text': row.title,
-            'chapter_id': row.chapter_id
-    } for row in map(Row._make, cur)]
+            'chapter_id': row.chapter_id}
+            for row in map(Row._make, cur)]
 
     db.conn.execute(db.topics.insert(), vals)
 
@@ -176,19 +173,22 @@ def fill_questions(db, quiz_type, cur):
     print('--> questions')
 
     Row = namedtuple('Row', ['rowid', 'chapter_id', 'topic_id',
-                     'text', 'answer', 'image', 'image_part'])
+                     'text', 'text_fr', 'text_de', 'answer', 'image',
+                     'image_part'])
     cur.execute('SELECT %s FROM questions' % ','.join(Row._fields))
 
     vals = [{
             'id': row.rowid,
             'quiz_type': quiz_type,
             'text': row.text,
+            'text_fr': row.text_fr,
+            'text_de': row.text_de,
             'answer': row.answer,
             'image': row.image,
             'image_part': row.image_part,
             'chapter_id': row.chapter_id,
-            'topic_id': row.topic_id
-    } for row in map(Row._make, cur)]
+            'topic_id': row.topic_id}
+            for row in map(Row._make, cur)]
 
     db.conn.execute(db.questions.insert(), vals)
 
@@ -197,11 +197,11 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description='Quiz database populate tool.', epilog='''
     Example:
-    
+
         dbfill.py -t 3 -i dbdata/some.sqlite
 
     Opeshift note: you can found input files in the
-    
+
         $OPENSHIFT_DATA_DIR/quiz/db_sources
     ''')
 

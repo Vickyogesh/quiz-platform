@@ -136,28 +136,40 @@ class ExamMixin(object):
     def __getQuestions(self, quiz_type, questions, lang, dest):
         q = self.questions
 
-        if lang == 'de':
-            txt_lang = q.c.text_de
-        elif lang == 'fr':
-            txt_lang = q.c.text_fr
-        else:
-            txt_lang = q.c.text
-
         s = q.select().where(and_(
             q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
         res = self.engine.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
-        for row in res:
-            d = {
-                'id': row[q.c.id],
-                'text': row[txt_lang],
-                'answer': row[q.c.answer],
-                'image': row[q.c.image],
-                'image_bis': row[q.c.image_part]
-            }
-            self._aux_question_delOptionalField(d)
-            dest.append(d)
+        if lang == 'it':
+            for row in res:
+                d = {
+                    'id': row[q.c.id],
+                    'text': row[q.c.text],
+                    'answer': row[q.c.answer],
+                    'image': row[q.c.image],
+                    'image_bis': row[q.c.image_part]
+                }
+                self._aux_question_delOptionalField(d)
+                dest.append(d)
+        else:
+            if lang == 'de':
+                txt_lang = q.c.text_de
+            elif lang == 'fr':
+                txt_lang = q.c.text_fr
+            else:
+                raise QuizCoreError('Invalid language.')
+            for row in res:
+                d = {
+                    'id': row[q.c.id],
+                    'text': row[q.c.text],
+                    'text_extra': row[txt_lang],
+                    'answer': row[q.c.answer],
+                    'image': row[q.c.image],
+                    'image_bis': row[q.c.image_part]
+                }
+                self._aux_question_delOptionalField(d)
+                dest.append(d)
 
     # NOTE: exam_id is always unique so we don't need to specify quiz_type
     # for the __getExamInfo()
