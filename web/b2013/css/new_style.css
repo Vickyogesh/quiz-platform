@@ -263,6 +263,7 @@ ul.nav li {
   background-image: url(../img/flag_fr.png);
   background-position: center;
   background-repeat: no-repeat;
+  background-size: contain;
 }
 .bttexam #de {
   margin: auto;
@@ -271,6 +272,7 @@ ul.nav li {
   background-image: url(../img/flag_de.png);
   background-position: center;
   background-repeat: no-repeat;
+  background-size: contain;
 }
 
 /** school.html */
