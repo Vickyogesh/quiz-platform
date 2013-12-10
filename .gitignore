@@ -1,6 +1,6 @@
 *.pyc
 *.pyo
 *.sublime-*
-.ropeproject/
+.virtualenv/
 test-data/
 doc/html/
