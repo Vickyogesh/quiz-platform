@@ -47,9 +47,9 @@ def get_schools_for_update(force):
         res = engine.execute("""
             SELECT school_id, quiz_type FROM school_stat_cache""")
     else:
-        res = engine.execute("""SELECT school_id, quiz_type FROM school_stat_cache
-                             WHERE last_activity > last_update OR last_update = 0
-                             """)
+        res = engine.execute("""SELECT
+            school_id, quiz_type FROM school_stat_cache
+            WHERE last_activity > last_update OR last_update = 0""")
     return [{'id': row[0], 'quiz_type': row[1]} for row in res]
 
 
@@ -67,7 +67,7 @@ def update_school(school):
                    id=school['id'], type=school['quiz_type'])
 
     stat = get_school_cache(school)
-    students = get_active_students(school)
+    students = get_school_students(school)
 
     logger.debug('Students to update: %s', str(students))
     if not students:
@@ -99,13 +99,16 @@ def get_school_cache(school):
     return data
 
 
-def get_active_students(school):
-    """Return list of active students (last activity not less than 28 days)."""
-    res = engine.execute(text("""SELECT
-        id FROM users WHERE
-        school_id=:id AND type='student' AND quiz_type=:quiz_type AND
-        last_visit >= UTC_TIMESTAMP() - interval 28 day;
-    """), id=school['id'], quiz_type=school['quiz_type'])
+def get_school_students(school, include_guest=False):
+    """Return list of students for the given school."""
+    if include_guest:
+        sql = text("""SELECT id FROM users WHERE school_id=:id
+                   AND quiz_type=:quiz_type""")
+    else:
+        sql = text("""SELECT id FROM users WHERE school_id=:id
+                   AND quiz_type=:quiz_type AND type='student'""")
+
+    res = engine.execute(sql, id=school['id'], quiz_type=school['quiz_type'])
     return [int(row[0]) for row in res]
 
 
@@ -122,20 +125,21 @@ def get_guest_stat(school):
 
     # Get visit statistics
     res = engine.execute(text("""SELECT
-        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
-         guest_id=:guest_id AND
+        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot
+        WHERE guest_id=:guest_id AND
          DATE(now_date) = DATE(UTC_TIMESTAMP())), -1) c,
-        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
-         guest_id=:guest_id AND
+        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot
+        WHERE guest_id=:guest_id AND
          DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)), -1) week,
-        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot WHERE
-         guest_id=:guest_id AND
+        IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot
+        WHERE guest_id=:guest_id AND
          DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)), -1) week3;
         """), guest_id=guest_id).fetchone()
 
     return (res[0], res[1], res[2])
+
 
 # NOTE: progress_coef is an errors percent not a success percent.
 
@@ -170,10 +174,12 @@ def get_current_student_rating(users, quiz_type):
     date = 'DATE(now_date) = DATE(UTC_TIMESTAMP())'
     return _get_students_rating(users, quiz_type, date)
 
+
 def get_week_student_rating(users, quiz_type):
     date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
         AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)"""
     return _get_students_rating(users, quiz_type, date)
+
 
 def get_week3_student_rating(users, quiz_type):
     date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
@@ -197,7 +203,7 @@ def get_exams_stat(users_str, quiz_type):
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)) week,
-    
+
         (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
@@ -234,7 +240,7 @@ def clean_schools_data():
 # For 5000 users if takes ~4 min.
 def clean_users_data(school):
     """Remove old history (older than 30 days)."""
-    students = get_active_students(school)
+    students = get_school_students(school, True)
     if not students:
         return
     students = ','.join(str(user) for user in students)
