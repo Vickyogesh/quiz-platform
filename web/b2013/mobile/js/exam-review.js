@@ -6,7 +6,7 @@ $("#page-exam-review").bind("pageinit", function() {
                 mode: 'button',
                 headerText: "Errori",
                 headerClose: false,
-                buttonPrompt: "Guest's visits is exceeded. Access will be unlocked within 1 hr.",
+                buttonPrompt: "Numero di sessioni per utenti esterni esaurite. Si prega di ritornare tra un'ora.",
                 buttons: {
                     'Ok': {'click': function() { aux_logout(); }}
                 }
@@ -24,8 +24,8 @@ $("#page-exam-review").bind("pageinit", function() {
         var row =
             '<div class="row">' +
             '<div class="cell">{0}</div>' +
-            '<div class="cell">{1}. {2}</div>' +
-            '<div class="cell"><div class="result {3}">{4}</div></div>' +
+            '<div class="cell">{1}</div>' +
+            '<div class="cell"><div class="result {2}">{3}</div></div>' +
             '</div>';
 
         var ans_type, ans, image;
@@ -40,7 +40,7 @@ $("#page-exam-review").bind("pageinit", function() {
             else
                 image = "";
 
-            html += row.format(image, q.id, q.text, ans_type, ans);
+            html += row.format(image, q.text, ans_type, ans);
         }
 
         answers_el.html(html);

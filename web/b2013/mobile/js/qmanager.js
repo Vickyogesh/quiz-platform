@@ -37,7 +37,8 @@ function createQuestionManager(config) {
                 mode: 'button',
                 headerText: "Errori",
                 headerClose: false,
-                buttonPrompt: "Guest's visits is exceeded. Access will be unlocked within 1 hr.",
+                // Guest's visits is exceeded. Access will be unlocked within 1 hr.
+                buttonPrompt: "Numero di sessioni per utenti esterni esaurite. Si prega di ritornare tra un'ora.",
                 buttons: {
                     'Ok': {'click': function() { self.logout(); }}
                 }
