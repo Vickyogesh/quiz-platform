@@ -76,7 +76,7 @@ $("#page-exam").bind("pageinit", function() {
     // Send exam actions.
 
     // After exam sending we show number of errors and
-    // then return to main menu.
+    // then navigate to exam review page.
     function afterSendExam() {
         var msg = 'Hai commesso ' + this.total_errors + ' errori.<br/>';
 
@@ -86,7 +86,9 @@ $("#page-exam").bind("pageinit", function() {
             headerClose: false,
             buttonPrompt: msg,
             buttons: {
-                'Ok': {'click': function() { mgr.back(); }}
+                'Ok': {'click': function() {
+                    $.mobile.changePage("#page-exam-review");
+                }}
             }
         });
     }

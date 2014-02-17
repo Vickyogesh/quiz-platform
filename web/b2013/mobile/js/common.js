@@ -86,6 +86,16 @@ function aux_showError(msg, title) {
   });
 }
 
+function aux_logout() {
+    window.name = null;
+    aux_busy(true);
+    $.ajax("/v1/authorize/logout").always(function() {
+        aux_deleteServicesCookies();
+        aux_busy(false);
+        $.mobile.changePage("#page-login");
+    });
+}
+
 function aux_layoutGrid(id) {
     var p = $(id).parent();
     var pw = p.width();

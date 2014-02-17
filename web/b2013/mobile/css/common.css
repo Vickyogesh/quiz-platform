@@ -176,3 +176,43 @@ div.btt-back, span.btt-back {
 .ans-false {
   background-image: url("../img/false.png");
 }
+
+
+/* Exam review */
+
+.answers-table {
+  margin-left: -15px;
+  margin-right: -15px;
+  display: table;
+}
+
+.answers-table .row {
+  display: table-row;
+}
+
+.answers-table .cell {
+  display: table-cell;
+  vertical-align: middle;
+  border-bottom:1px solid #ccc;
+}
+
+.answers-table .cell img {
+  width: 64px;
+  margin-right: 2px;
+}
+
+.answers-table .cell .result {
+  text-align: center;
+  color: white;
+  width: 14px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.answers-table .cell .result.good {
+  background-color: #468847;
+}
+
+.answers-table .cell .result.bad {
+  background-color: #b94a48;
+}
