@@ -1,4 +1,3 @@
-from sqlalchemy import select, text, bindparam, and_
 from sqlalchemy.exc import SQLAlchemyError
 from .exceptions import QuizCoreError
 
@@ -9,7 +8,8 @@ class UserMixin(object):
         self.__appid = self.sql("""SELECT id FROM applications
                                 WHERE appkey=:appkey""")
 
-        self.__user_by_id = self.sql("SELECT * FROM users WHERE id=:id LIMIT 1")
+        self.__user_by_id = \
+            self.sql("SELECT * FROM users WHERE id=:id LIMIT 1")
 
         self.__topicstat = self.sql("""SELECT
             t.id, t.text, t.text_fr, t.text_de,
@@ -31,7 +31,7 @@ class UserMixin(object):
                DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
                AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)
                GROUP BY topic_id), -1) week3
-            from topics t WHERE quiz_type=:quiz_type""")
+            from topics t WHERE quiz_type=:quiz_type order by t.id""")
 
         # NOTE: we skip 'in-progress' exams.
         self.__examstat = self.sql("""SELECT
@@ -43,7 +43,7 @@ class UserMixin(object):
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY)) week,
-        
+
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
          DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
@@ -53,8 +53,8 @@ class UserMixin(object):
         self.__examlist = self.sql("""SELECT
             exams.*, UTC_TIMESTAMP() > start_time + INTERVAL 3 HOUR,
             (CASE WHEN DATE(start_time) = DATE(UTC_TIMESTAMP())
-                THEN 1
-            WHEN DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
+            THEN 1 WHEN
+                DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)
                 AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY) THEN 2
             ELSE 3 END)
             FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type
