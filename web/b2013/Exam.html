@@ -287,18 +287,11 @@
 			answers: answer_list_real
 		}
 		
-		window.qsid = null;
-		sessionStorage.setItem('fromexam', 1);
-		var lang = getUrlParameterByName("lang");
-		if (lang == "")
-			lang = "it";
-		window.location = "ExamStat.html?exam_id=" + quizData.exam.id + "&lang=" + lang;
-
 		WaitMsg.show();
 
 		aux_postJSON(url("/v1/exam/" + quizData.exam.id), data, function (data) {
+			WaitMsg.hide();
 			if (data.status != 200) {
-				WaitMsg.hide();
                 var user = sessionStorage.getItem('quizutype');
                 if (user == 'guest' && data.status == 403) {
                     showGuestAccessError();
@@ -308,8 +301,6 @@
 					aux_showJSONError(data);
 			}
 			else {
-				WaitMsg.hide();
-				
 				window.qsid = null;
 				sessionStorage.setItem('fromexam', 1);
 
