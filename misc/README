@@ -12,3 +12,6 @@ img.zip     - Images for the questions.
 lrotate.sh  - Script for rotating nginx logs and creating logs snapshots.
 nginx.conf  - uWSGI server configuration.
 uwsgi.ini   - uWSGI server configuration.
+
+NOTE: $OPENSHIFT_DATA_DIR/quiz/db_sources contains several db files
+for the dbfill.py tool.
