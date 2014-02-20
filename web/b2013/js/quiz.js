@@ -205,7 +205,7 @@ function fillupQuiz(force) {
         // for (var i = 0; i < quizData.length; i++)
         //     tmp.push(quizData[i].id);
         // console.log(tmp.toString());
-        console.log(data.questions.length);
+        // console.log(data.questions.length);
         setQuizEnv();
     }
 
@@ -447,7 +447,7 @@ function setQuizEnv() {
 $(document).ready(function() {
     var i, j, htmlVal;
     
-    window.qsid = sessionStorage.getItem('quizqsid');       
+    window.qsid = sessionStorage.getItem('quizqsid');
     
     // Image preload
     var img1 = new Image();

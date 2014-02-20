@@ -373,27 +373,7 @@ function setQuizEnv() {
 $(document).ready(function() {
     var i, j, htmlVal;
     
-    $("#topicgroup #chapterarea").empty();
-
-    for (i = 0; i < groups.length; i++) {
-        htmlVal = '<div id="chapter' + (i+1)
-                + '" class="slider chap" style="font-size:15px; background-color:#707070; cursor:pointer;">';
-        htmlVal += '<p style="padding-left:10px; float:left">';
-        htmlVal += '<a>' + groups[i] + '</a>';
-        htmlVal += '<div id="expandsign" style="float:right; width:15px; height:15px; margin:7px"></div>';
-        htmlVal += '</p></div>';
-        htmlVal += '<div id="topiclist' + (i+1) + '" class="slider" style="display:none">';
-        for (j = 0; j < group_topics[i].length; j++) {
-            htmlVal += '<p id="' + group_topics[i][j] +
-            '" class="result" gid="' + i + '""><a href="#">Capitolo ' + group_topics[i][j] +
-            '</a></p>';
-        }           
-        htmlVal += '</div>';
-        
-        $("#topicgroup #chapterarea").append(htmlVal);
-    }   
-
-    window.qsid = sessionStorage.getItem('quizqsid');       
+    window.qsid = sessionStorage.getItem('quizqsid');
     
     // Image preload
     var img1 = new Image();
@@ -532,4 +512,7 @@ $(document).ready(function() {
             $(esignid).addClass('expand');
         }
     });
+    topicIndex = getUrlParameterByName("topic");
+    curIndex = 0;
+    fillupQuiz(true);
 });

@@ -52,10 +52,7 @@
         var nwidth = $(window).width();
         
         $("#quiz").click(function(){
-            if (nwidth >= 950)
-                window.location = "Quiz.html";
-            else
-                window.location = "Quiz_reduced.html";          
+            window.location = "quiztopics.html"
         });
         
         $("#review").click(function(){
@@ -102,15 +99,15 @@
                     <div id="cqcexam">
                         <table cellpadding="0" cellspacing="0">
                             <tr>
-                                <td rowspan="2" id="generale">
+                                <td rowspan="2" id="generale" class="generale hoverbg">
                                     <div class="rotate_box">Generale</div>
                                 </td>
-                                <td id="merci">
+                                <td id="merci"  class="merci hoverbg">
                                     <div class="rotate_box">Merci</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td id="persone">
+                                <td id="persone"  class="persone hoverbg">
                                     <div class="rotate_box">Persone</div>
                                 </td>
                             </tr>
