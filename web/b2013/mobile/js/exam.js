@@ -16,7 +16,6 @@ $("#page-exam").bind("pageinit", function() {
     // Exam time counting.
 
     function timeCounter() {
-        return; // TODO: remove me!!
         --time_limit;
 
         var nMin = Math.floor(time_limit / 60);
