@@ -3,7 +3,7 @@ $("#page-exam").bind("pageinit", function() {
     var time_limit;
     var exam_time_el = $("#page-exam .ui-header h3 > span#time");
 
-    var mgr = createQuestionManager({
+    var mgr = createExamQuestionManager({
         pageId: "#page-exam",
         headerId: "#page-exam .ui-header h3 > span#count"
     });
@@ -13,29 +13,10 @@ $("#page-exam").bind("pageinit", function() {
         return "/v1/exam/" + sessionStorage.getItem("examid");
     };
 
-    // Get exam questions. Here is additional action is save exam id
-    // for later use in sendAnswersUrl().
-    mgr.getQuestions = function(onOk, force) {
-        $.mobile.showPageLoadingMsg("b", "Attendere prego.");
-        // $("#page-exam #bttSend").html("#");
-        var self = this;
-        var url = this.getQuestionsUrl(force);
-
-        $.getJSON(url, function(info) {
-            $.mobile.hidePageLoadingMsg();
-            if (info.status != 200)
-                self.processError(info);
-            else {
-                sessionStorage.setItem("examid", info.exam.id);
-                // $("#page-exam #bttSend").html("#" + info.exam.id);
-                onOk.call(self, info.questions);
-            }
-        });
-    };
-
     // Exam time counting.
 
     function timeCounter() {
+        return; // TODO: remove me!!
         --time_limit;
 
         var nMin = Math.floor(time_limit / 60);
@@ -106,19 +87,6 @@ $("#page-exam").bind("pageinit", function() {
 
         $.mobile.showPageLoadingMsg("b", "Attendere prego.");
         clearInterval(exam_timer);
-
-        // If there are unanswered questions then
-        // we decide what all of them are answered wrongly.
-        if (this.current_answers.length != 40) {
-            var num = this.questionData.length;
-            for (var i = 0; i < num; i++) {
-                this.current_ids.push(this.questionData[0].id);
-                this.current_answers.push(this.questionData[0].answer == 0 ? 1 : 0);
-                this.questionData.shift();
-                ++this.total_errors;
-            }
-        }
-
         func.call(this, afterSendExam);
     };
 

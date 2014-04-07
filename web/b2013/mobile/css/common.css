@@ -164,17 +164,41 @@ div.btt-back, span.btt-back {
   background-size: auto !important;
 }
 
+.image-button .ui-icon {
+  font-size: 30px !important;
+  float: none !important;
+  margin-top: 16px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 .image-button.ui-focus {
   -moz-box-shadow: none !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
 
+.image-button.active {
+  background-color: #DFDFDF;
+}
+
+.q-left {
+  float: left;
+}
+
+.q-right {
+  float: right;
+}
+
 .ans-true {
   background-image: url("../img/true.png");
+  float: right;
+  right: 10px;
 }
 .ans-false {
   background-image: url("../img/false.png");
+  float: left;
+  left: 10px;
 }
 
 
