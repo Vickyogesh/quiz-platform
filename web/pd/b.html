@@ -36,6 +36,8 @@ var diagonal_p = Math.sqrt(sw + sh);
 var diagonal_inches = parseInt(diagonal_p / ppi);
 
 console.log(diagonal_inches, w, h);
+var newContent = document.createTextNode(diagonal_inches + " " + w + " " + h);
+document.body.appendChild(newContent);
 </script>
 </body>
 </html>
