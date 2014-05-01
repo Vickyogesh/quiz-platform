@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<script type="text/javascript">
+// http://stackoverflow.com/questions/8456455/mobile-web-how-to-get-physical-pixel-size
+function getPPI(){
+    var win = window;
+    if (document.defaultView != undefined)
+        win = document.defaultView;
+    
+    var func = win.getComputedStyle;
+    if (func == null || func == undefined)
+        return 96;
+
+    var div = document.createElement("div");
+    div.style.width="1cm";
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(div);
+    var ppi = window.getComputedStyle(div, null).getPropertyValue('width');
+    body.removeChild(div);
+    return parseInt(parseFloat(ppi) * 2.54);
+}
+
+// https://developer.motorolasolutions.com/thread/4074
+var w = window.screen.width;
+var h = window.screen.height;
+var ppi = getPPI();
+
+var sw = w * w;
+var sh = h * h;
+
+var diagonal_p = Math.sqrt(sw + sh);
+var diagonal_inches = parseInt(diagonal_p / ppi);
+
+console.log(diagonal_inches, w, h);
+</script>
+</body>
+</html>
