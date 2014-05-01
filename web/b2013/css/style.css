@@ -113,6 +113,18 @@ a.cssSubmitButton:hover {
 /*    border:1px solid #333;*/
 }
 
+#mobileversion {
+    font-size: 15px;
+    display: inline-block;
+    padding: 3px 20px 5px;
+    color: #fff;
+    text-decoration: none;
+    line-height: 1.2em;
+    position: relative;
+    cursor: pointer;
+    outline:none;
+}
+
 /* the animation */
 .loading {
 /*    background-image:url('../img/load.gif') !important;*/
