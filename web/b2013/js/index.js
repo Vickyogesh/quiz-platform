@@ -1,5 +1,8 @@
 $(document).ready(function () {
 	
+  if (aux_getCookie("mobile") != "no")
+    $("#mobileversion").hide();
+
 	$(document).ajaxError(function() {
 		alert('Unexpected server response.');
 		

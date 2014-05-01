@@ -64,6 +64,10 @@ div.btt-back, span.btt-back {
 /* Login page. */
 #page-login #login {max-width: 400px; margin: auto;}
 #page-login h3 {text-align: center;}
+#page-login #fullversion {
+  text-align: center;
+  display: block;
+}
 
 /* Student menu. */
 #menugrid {
