@@ -5,9 +5,10 @@ $("#page-login").bind("pageinit", function() {
 
   $.ajaxSetup({cache: false});
 
-  $("#login a").click(function() {
+$("#loginForm").submit(function (event) {
+    event.preventDefault();
     aux_busy(true, "#login");
-    
+    console.log(111);
     $.getJSON("/v1/authorize", function(data) {
         var login = $("#login #un").val();
         var passwd = $("#login #pw").val();

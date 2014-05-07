@@ -84,7 +84,7 @@ body {
     margin:0 auto;
 }        
 /* CSS BUTTON START HERE */
-a.cssSubmitButton {            
+.cssSubmitButton {            
     font-size: 15px;
 /*    background: #142f66 no-repeat 4px 5px;*/
     display: inline-block;
@@ -103,13 +103,14 @@ a.cssSubmitButton {
     position: relative;
     cursor: pointer;
     outline:none;
+    background: transparent;
 }
 
 
-a.cssSubmitButton:visited {}
+.cssSubmitButton:visited {}
 
 /* hightlight the button on mouse over */
-a.cssSubmitButton:hover {
+.cssSubmitButton:hover {
 /*    border:1px solid #333;*/
 }
 

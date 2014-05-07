@@ -6,10 +6,10 @@ $(document).ready(function () {
 	});
 	
 	doQuit();
-    
-    $('#button a').click(function () {
-        
-		var link = $(this);
+
+  $("#subscribeForm").submit(function (event) {
+    event.preventDefault();
+		var link = $("#subscribeForm .cssSubmitButton");
 		onAuth(link);
 	});
 	

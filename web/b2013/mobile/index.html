@@ -20,12 +20,12 @@
     <div data-role="content"> 
       <h3>Quiz Online Patente <br/> A1 A2 A B1 B BE</h3>
       <div id="login" data-theme="a">
-          <form style="padding:10px 20px;">
+          <form style="padding:10px 20px;" id="loginForm" data-ajax="false">
               <label for="un" class="ui-hidden-accessible">Username:</label>
               <input type="text" name="user" id="un" placeholder="username" />
               <label for="pw" class="ui-hidden-accessible">Password:</label>
               <input type="password" name="pass" id="pw" placeholder="password" />
-              <a href="#" data-role="button" data-theme="b">Accedi</a>
+              <input type="submit" name="submit" id="submit" value="Accedi" data-theme="b"/>
           </form>
           <a href="/b2013/" rel="external" id="fullversion">Versione completa</a>
       </div>
