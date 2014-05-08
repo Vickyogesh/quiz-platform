@@ -351,11 +351,12 @@
                 // WTF?				
 				// if (bFromExam == 1)
 				// 	showExamList(7);
-					
+
 				$("#student_stat").organicTabs();
-				$("#month").hide();
-                $("#all").hide();                           
-                $("#total").hide();                           
+                $("#week").hide();
+                $("#month").hide();
+                $("#all").hide();
+                // $("#total").hide();
 			})
 			.error(function(data) {
 				WaitMsg.hide();
@@ -555,13 +556,17 @@
             <div class="blueline" style="height:30px; line-height:30px; margin-bottom:10px">
                 <a class="lustre-button" id="topback" style="cursor:pointer; font-size:14px;">&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>
             </div>
-
+            <div class="blueline" style="">
+                <ul class="nav">
+                    <li class="nav-one"><a href="#total" class="lustre-button current">TUTTO</a></li>
+                </ul>
+            </div>
             <div class="blueline" style="margin-bottom:10px;">
 	        	<ul class="nav">
-                    <li class="nav-one"><a href="#week" class="lustre-button current">PIU' RECENTE</a></li>
+                    <li class="nav-one"><a href="#week" class="lustre-button">PIU' RECENTE</a></li>
                     <li class="nav-two"><a href="#month" class="lustre-button">ULTIMA SETTIMANA</a></li>
                     <li class="nav-three"><a href="#all" class="lustre-button">PERIODO PRECEDENTE</a></li>
-                    <li class="nav-four"><a href="#total" class="lustre-button current">TUTTO</a></li>
+                    <!-- <li class="nav-four"><a href="#total" class="lustre-button current">TUTTO</a></li> -->
 	            </ul>
 	        </div>  <!-- /Navigation -->
 
