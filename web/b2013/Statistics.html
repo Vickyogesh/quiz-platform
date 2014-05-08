@@ -108,8 +108,28 @@
                 else if (type == "all")
                     return topic.errors.week3;
                 else {
-                    return (topic.errors.current + topic.errors.week
-                            + topic.errors.week3) / 3;
+                    var num = 0;
+                    var err = 0;
+
+                    if (topic.errors.current != -1)
+                    {
+                        err += topic.errors.current;
+                        num += 1;
+                    }
+                    if (topic.errors.week != -1)
+                    {
+                        err += topic.errors.week;
+                        num += 1;
+                    }
+                    if (topic.errors.week3 != -1)
+                    {
+                        err += topic.errors.week3;
+                        num += 1;
+                    }
+                    if (num != 0)
+                        return err / num;
+                    else
+                        return -1;
                 }
             }
 
