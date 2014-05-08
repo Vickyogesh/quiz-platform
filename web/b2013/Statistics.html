@@ -107,6 +107,10 @@
                     return topic.errors.week;
                 else if (type == "all")
                     return topic.errors.week3;
+                else {
+                    return (topic.errors.current + topic.errors.week
+                            + topic.errors.week3) / 3;
+                }
             }
 
             // Create list of topics
@@ -152,6 +156,7 @@
             $("#week").hide();
             $("#month").hide();
             $("#all").hide();
+            $("#total").hide();
             $("#work_area").show();                           
         }
 
@@ -216,13 +221,19 @@
                 sessionStorage.setItem('quizname', name);
 				$("#student_stat .header .item a").html(name);
 		
+                var all_exams = [].concat(examData.exams['current'], 
+                                          examData.exams['week'],
+                                          examData.exams['week3']);
+
                 drawExamGraph("wexamgraph", examData.exams['current']);
                 drawExamGraph("mexamgraph", examData.exams['week']);
-				drawExamGraph("aexamgraph", examData.exams['week3']);
+                drawExamGraph("aexamgraph", examData.exams['week3']);
+                drawExamGraph("totexamgraph", all_exams);
 
                 fill_topics(data.topics, "week", "wtgraph");
                 fill_topics(data.topics, "month", "mtgraph");
                 fill_topics(data.topics, "all", "atgraph");
+                fill_topics(data.topics, "total", "ttgraph");
 
                 $("#bttAccount").click(function() {
                     if (studentId > 0)
@@ -323,7 +334,8 @@
 					
 				$("#student_stat").organicTabs();
 				$("#month").hide();
-				$("#all").hide();							
+                $("#all").hide();                           
+                $("#total").hide();                           
 			})
 			.error(function(data) {
 				WaitMsg.hide();
@@ -353,6 +365,11 @@
 			parentQuizObj.hide();
             showExamList("week3");
 		});
+        $("#totexamgraph").click(function(){          
+            parentQuizObj = $(this).parent().parent();
+            parentQuizObj.hide();
+            showExamList();
+        });
 
         $('#topback').click(function(){
             var type = sessionStorage.getItem("quizutype");
@@ -394,7 +411,16 @@
 			
             html = "";
 			var correctNum;
-            var exams = examData.exams[period];
+            var exams;
+
+            if (period == null) {
+                exams = [].concat(examData.exams["current"],
+                                  examData.exams["week"],
+                                  examData.exams["week3"]);
+            }
+            else
+                exams = examData.exams[period];
+
 			for (i = 0; i < exams.length; i++) {
 				if (exams[i].status != "passed" && exams[i].status != "failed")
                     continue;
@@ -512,9 +538,10 @@
 
             <div class="blueline" style="margin-bottom:10px;">
 	        	<ul class="nav">
-	                <li class="nav-one"><a href="#week" class="lustre-button current">PIU' RECENTE</a></li>
-	                <li class="nav-two"><a href="#month" class="lustre-button">ULTIMA SETTIMANA</a></li>
-	                <li class="nav-three"><a href="#all" class="lustre-button">PERIODO PRECEDENTE</a></li>
+                    <li class="nav-one"><a href="#week" class="lustre-button current">PIU' RECENTE</a></li>
+                    <li class="nav-two"><a href="#month" class="lustre-button">ULTIMA SETTIMANA</a></li>
+                    <li class="nav-three"><a href="#all" class="lustre-button">PERIODO PRECEDENTE</a></li>
+                    <li class="nav-four"><a href="#total" class="lustre-button current">TUTTO</a></li>
 	            </ul>
 	        </div>  <!-- /Navigation -->
 
@@ -536,15 +563,24 @@
 					<ul></ul>
 				</li>
 	        </ul>
-	        <ul id="all" class="collapsable-list">
-	        	<li id="exam" class="iefix">
-		            <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
-	        	</li>
-				<li id="topic">
-					<a href='#' class="lustre-button">Statistiche argomenti: a una maggior porzione blu del grafico corrisponde una migliore preparazione.</a>
-					<ul></ul>
-				</li>
-	        </ul>
+            <ul id="all" class="collapsable-list">
+                <li id="exam" class="iefix">
+                    <div id="aexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
+                </li>
+                <li id="topic">
+                    <a href='#' class="lustre-button">Statistiche argomenti: a una maggior porzione blu del grafico corrisponde una migliore preparazione.</a>
+                    <ul></ul>
+                </li>
+            </ul>
+            <ul id="total" class="collapsable-list">
+                <li id="exam" class="iefix">
+                    <div id="totexamgraph" style="margin:auto; width:300px; height:150px; background-color:#fff; padding:20px; padding-top:0; cursor:pointer"></div>
+                </li>
+                <li id="topic">
+                    <a href='#' class="lustre-button">Statistiche argomenti: a una maggior porzione blu del grafico corrisponde una migliore preparazione.</a>
+                    <ul></ul>
+                </li>
+            </ul>
 
 			<ul id="examlist" style="display:none" class="collapsable-list"></ul>
 			<ul id="topicerrorlist" style="display:none" class="collapsable-list"></ul>
