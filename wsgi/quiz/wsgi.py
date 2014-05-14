@@ -404,9 +404,7 @@ class QuizApp(object):
         else:
             return d
 
-    def onDoAuth(self):
-        """Handle authorization."""
-        data = self.request.json
+    def _doPlainLogin(self, data):
         try:
             nonce = data["nonce"]
             login = data["login"]
@@ -420,7 +418,32 @@ class QuizApp(object):
         except QuizCoreError:
             raise BadRequest('Authorization is invalid.')
 
-        user, cookie = self.account.send_auth(login, digest, nonce, 'quiz')
+        return appid, self.account.send_auth(login, digest, nonce, 'quiz')
+
+    def _doFacebookLogin(self, data):
+        try:
+            fb_id = data['fb']['id']
+            fb_token = data['fb']['token']
+            appkey = data['appid']
+        except KeyError:
+            raise BadRequest('Invalid parameters.')
+
+        try:
+            appid = self.core.getAppId(appkey)
+        except QuizCoreError:
+            raise BadRequest('Authorization is invalid.')
+
+        return appid, self.account.send_fb_auth(fb_id, fb_token, 'quiz')
+
+    def onDoAuth(self):
+        """Handle authorization."""
+        data = self.request.json
+
+        # handle facebook login
+        if 'fb' in data:
+            appid, (user, cookie) = self._doFacebookLogin(data)
+        else:
+            appid, (user, cookie) = self._doPlainLogin(data)
 
         can_check_date = user['type'] != 'admin'
 
@@ -454,4 +477,3 @@ class QuizApp(object):
         resp = JSONResponse({'user': user})
         resp.headers.add('Set-Cookie', cookie)
         return resp
-        # return JSONResponse({'sid': sid, 'user': user})

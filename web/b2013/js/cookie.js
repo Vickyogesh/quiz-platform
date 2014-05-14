@@ -33,5 +33,15 @@ function doLogout() {
     deleteServicesCookies();
     sessionStorage.removeItem("quizqsid");
     sessionStorage.removeItem("quizname");
-    window.location = "index.html";
+    sessionStorage.removeItem("quiz_fbid");
+    sessionStorage.removeItem("school");
+    sessionStorage.removeItem("school_url");
+    sessionStorage.removeItem("school_logo_url");
+
+    var index_url = sessionStorage.getItem('index_url');
+
+    if (index_url === null)
+        index_url = "index.html";
+
+    window.location = index_url;
 }

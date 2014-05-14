@@ -37,6 +37,17 @@
 </head>
 
 <body>
+	<div id="fb-root"></div>
+	<script>
+	(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/it_IT/sdk.js#xfbml=1&appId=306969962800273&version=v2.0";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	</script>
+
 	<div id="work_area">
 	    <form method="post" action="" name="subscribeForm" id="subscribeForm">
 	        <fieldset style="position:absolute; top:382px; left:143px;">
@@ -48,6 +59,7 @@
 
 			<input class="cssSubmitButton" type="submit" value="OK" style="position:absolute; top:393px; left:545px">
 			<a href="/b2013/mobile/" rel="external" data-ajax="false" id="mobileversion" style="position:absolute; top:413px; left:645px">Mobile</a>
+			<div class="fb-login-button" onlogin="onFbLogin" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false" style="position:absolute; top:394px; left:22px"></div>
 	    </form>
 	</div>
 </body>
