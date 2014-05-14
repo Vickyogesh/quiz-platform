@@ -1,7 +1,9 @@
 function fb_feed_post(message, link, title, description, pic_url, callback) {
     var fb_id = sessionStorage.getItem('quiz_fbid');
-    if (!fb_id || 0 === fb_id.length)
+    if (!fb_id || 0 === fb_id.length) {
+        callback(null);
         return;
+    }
 
     FB.getLoginStatus(function(response) {
         console.log(response.status);
