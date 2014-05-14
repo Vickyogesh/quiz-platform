@@ -269,12 +269,34 @@ class AccountsApi(HttpServiceProxy):
         del data['status']
         return data, self._session_cookie
 
+    def send_fb_auth(self, id, token, caller_service):
+        """Send auth info to the Accounts Service.
+
+        Args: accounts service auth args.
+
+        Returns: tuple with account info and session cookie.
+
+        Raises: werkzeug's exception respective to status code.
+        """
+        hdr = 'QAuth fbid="{0}", fbtoken="{1}"'
+        hdr = hdr.format(id, token)
+        hdr = {'Authenticate': hdr}
+
+        if caller_service is not None:
+            hdr['X-Account-Service'] = caller_service
+
+        response = self.post('/login', headers=hdr)
+        _check_json_response_status(response)
+        data = response.json()
+        del data['status']
+        return data, self._session_cookie
+
     def login(self, login, passwd, caller_service):
         """Login to the Accounts Service."""
         info = self.get_auth()
         passwd_digest = _create_digest(login, passwd)
         passwd_digest = _create_digest(info['nonce'], passwd_digest)
-        
+
         account = self.send_auth(login, passwd_digest, info['nonce'],
                                  caller_service)
         return account
@@ -428,3 +450,8 @@ class AccountsApi(HttpServiceProxy):
 
     def getUserAccountPage(self):
         return self._url('/user', use_root=True)
+
+    def linkFacebookAccount(self, user_id):
+        response = self.post('/link_facebook', data={'userId': user_id})
+        _check_json_response_status(response)
+        return response.json()

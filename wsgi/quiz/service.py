@@ -25,15 +25,19 @@ def get_authorize_logout():
     app.session.delete()
     return JSONResponse()
 
-# @app.get('/authorize/status')
-# def get_authorize_status():
-#     try:
-#         login = app.session['user_login']
-#         user = app.core.getUserInfo(login)
-#     except KeyError:
-#         raise Unauthorized('Unauthorized.')
-#     del user['login']
-#     return JSONResponse({'user': user})
+
+@app.post('/link_facebook', access=['student'])
+def link_facebook():
+    user_id = app.getUserId()
+    data = app.request.json
+
+    try:
+        user_id = data['userId']
+    except KeyError:
+        raise BadRequest('Missing parameter.')
+
+    res = app.account.linkFacebookAccount(user_id)
+    return JSONResponse(res)
 
 
 @app.get('/quiz/<int:topic>', access=['student', 'guest'])

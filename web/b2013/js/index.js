@@ -14,7 +14,6 @@ $(document).ready(function () {
 	});
 	
 	$('input').css('border','0px');
-        
 });
 
 /*********************************************************
@@ -42,34 +41,59 @@ function onAuth(butObj)
     };
 
     // Now we can send authorization data
-    aux_postJSON(url("/v1/authorize"), auth, function (data) {
-      if (data.status != 200) {
-        doQuit();
-  		  alert("Nome utente o password non validi.");
-      }
-      else {      	
-      	var name = data.user.name;
-        if (data.user.surname)
-          name += ' ' + data.user.surname;
-        
-        window.qsid = data.sid;
-        window.name = name;
-//        aux_showFeatures();
-    		sessionStorage.setItem('quizqsid', window.qsid);
-        sessionStorage.setItem('quizname', window.name);
-        sessionStorage.setItem('quizutype', data.user.type);
-
-    		if (data.user.type == 'student' || data.user.type == 'guest')
-    			window.location = "student.html";
-    		else if (data.user.type == 'school') {
-          sessionStorage.setItem('quizname_school', window.name);
-          window.location = "School.html";
-        }
-        else if (data.user.type == 'admin')
-          window.location = "admin.html";
-      }
-    });
+    WaitMsg.show();
+    aux_postJSON(url("/v1/authorize"), auth, do_auth);
   }); // GET
   
 //  alert('ed');
+}
+
+function onFbLogin() {
+  FB.getLoginStatus(function(response) {
+    if (response.status !== 'connected') {
+      alert('Facebook account is not linked!');
+    }
+    else {
+      var auth = {
+        fb: {
+          id: response.authResponse.userID,
+          token: response.authResponse.accessToken
+        },
+        appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+        'quiz_type': 'b2013'
+      };
+
+      WaitMsg.show();
+      aux_postJSON(url("/v1/authorize"), auth, do_auth);
+    }
+  });
+}
+
+function do_auth(data) {
+  WaitMsg.hide();
+  if (data.status != 200) {
+    doQuit();
+    alert("Nome utente o password non validi.");
+  }
+  else {        
+    var name = data.user.name;
+    if (data.user.surname)
+      name += ' ' + data.user.surname;
+    
+    window.qsid = data.sid;
+    window.name = name;
+    sessionStorage.setItem('quizqsid', window.qsid);
+    sessionStorage.setItem('quizname', window.name);
+    sessionStorage.setItem('quizutype', data.user.type);
+    sessionStorage.setItem('quiz_fbid', data.user.fb_id);
+
+    if (data.user.type == 'student' || data.user.type == 'guest')
+      window.location = "student.html";
+    else if (data.user.type == 'school') {
+      sessionStorage.setItem('quizname_school', window.name);
+      window.location = "School.html";
+    }
+    else if (data.user.type == 'admin')
+      window.location = "admin.html";
+  }
 }
