@@ -85,7 +85,10 @@ function do_auth(data) {
     sessionStorage.setItem('quizqsid', window.qsid);
     sessionStorage.setItem('quizname', window.name);
     sessionStorage.setItem('quizutype', data.user.type);
-    sessionStorage.setItem('quiz_fbid', data.user.fb_id);
+    if (data.user.fb_id !== undefined && data.user.fb_id !== null)
+      sessionStorage.setItem('quiz_fbid', data.user.fb_id);
+    else
+      sessionStorage.removeItem("quiz_fbid");
 
     if (data.user.type == 'student' || data.user.type == 'guest')
       window.location = "student.html";
