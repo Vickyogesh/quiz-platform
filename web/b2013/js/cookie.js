@@ -34,5 +34,14 @@ function doLogout() {
     sessionStorage.removeItem("quizqsid");
     sessionStorage.removeItem("quizname");
     sessionStorage.removeItem("quiz_fbid");
-    window.location = "index.html";
+    sessionStorage.removeItem("school");
+    sessionStorage.removeItem("school_url");
+    sessionStorage.removeItem("school_logo_url");
+
+    var index_url = sessionStorage.getItem('index_url');
+
+    if (index_url === null)
+        index_url = "index.html";
+
+    window.location = index_url;
 }

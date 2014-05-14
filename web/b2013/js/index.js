@@ -90,6 +90,14 @@ function do_auth(data) {
     else
       sessionStorage.removeItem("quiz_fbid");
 
+    var school = getUrlParameterByName("n");
+    var school_url = getUrlParameterByName("nu");
+    var school_logo_url = getUrlParameterByName("nl");
+    sessionStorage.setItem('school', school);
+    sessionStorage.setItem('school_url', school_url);
+    sessionStorage.setItem('school_logo_url', school_logo_url);
+    sessionStorage.setItem('index_url', window.location.href);
+
     if (data.user.type == 'student' || data.user.type == 'guest')
       window.location = "student.html";
     else if (data.user.type == 'school') {

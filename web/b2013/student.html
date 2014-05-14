@@ -126,6 +126,21 @@
         var fb_id = sessionStorage.getItem('quiz_fbid');
         if (!fb_id || 0 === fb_id.length)
             applyFb();
+
+        var school = sessionStorage.getItem('school');
+        var school_url = sessionStorage.getItem('school_url');
+        var school_logo_url = sessionStorage.getItem('school_logo_url');
+
+        if (school.length > 0)
+            school = "Quiz Patente - " + school
+        else
+            school = "Quiz Patente"
+
+        if (school_url.length > 0 && school_logo_url.length == 0) {
+            school_logo_url = school_url + "/logo";
+        }
+
+        console.log(school, school_url, school_logo_url);        
     });
 </script>
 </head>

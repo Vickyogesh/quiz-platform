@@ -17,6 +17,7 @@
 <!--Please wait-->
 <link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
 <script type="text/javascript" src="js/please_wait/pleasewait.js"></script>
+<script type="text/javascript" src="js/fbsupport.js"></script>
 <!--Please wait-->
 
 <script>
@@ -29,6 +30,15 @@
   	var bTerminated = false;
 
 	$(document).ready(function() {
+
+        $.getScript('//connect.facebook.net/en_UK/all.js', function() {
+            FB.init({
+                appId: '306969962800273',
+                version: "v2.0",
+                status: true
+            });
+        });        
+
 		var i, htmlVal;
 
 		window.qsid = sessionStorage.getItem('quizqsid');	
@@ -290,8 +300,8 @@
 		WaitMsg.show();
 
 		aux_postJSON(url("/v1/exam/" + quizData.exam.id), data, function (data) {
-			WaitMsg.hide();
 			if (data.status != 200) {
+				WaitMsg.hide();
                 var user = sessionStorage.getItem('quizutype');
                 if (user == 'guest' && data.status == 403) {
                     showGuestAccessError();
@@ -300,7 +310,38 @@
                 else
 					aux_showJSONError(data);
 			}
-			else {
+			else
+				finishExam(data);
+		});		
+	}
+
+	function finishExam(data) {
+	    var school = sessionStorage.getItem('school');
+	    var school_url = sessionStorage.getItem('school_url');
+	    var school_logo_url = sessionStorage.getItem('school_logo_url');
+
+	    if (school.length > 0)
+	    	school = "Quiz Patente - " + school
+	    else
+	    	school = "Quiz Patente"
+
+	    if (school_url.length > 0 && school_logo_url.length == 0) {
+	    	school_logo_url = school_url + "/logo";
+	    }
+
+		// Facebook post 
+	    fb_feed_post(
+	        /** message*/     "Numero errori: " + data.num_errors,
+	        /** link*/        school_url,
+	        /** title*/       school,
+	        /** description*/ "Quiz Patente",
+	        /** pic_url*/     school_logo_url,
+	        function(response) {
+		        // if (!response || response.error)
+		        //     alert('Posting error occured');
+		        // else
+		        //     alert('Success - Post ID: ' + response.id);
+
 				window.qsid = null;
 				sessionStorage.setItem('fromexam', 1);
 
@@ -309,8 +350,8 @@
 					lang = "it";
 				window.location = "ExamStat.html?exam_id="
 					+ quizData.exam.id + "&lang=" + lang;
-			}
-		});		
+	        }
+	    );
 	}
 
 	function alreadyAnswered(nIndex) {
@@ -415,6 +456,7 @@
 </head>
 
 <body>
+	<div id="fb-root"></div>
 	<div id="work_area">
 		<div id="testarea" style="width:732px; height:550px; margin:auto; background-image:url('img/exam_bg.jpg'); background-repeat: no-repeat; position:relative">
 			
