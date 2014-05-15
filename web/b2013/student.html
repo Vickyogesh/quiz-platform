@@ -52,12 +52,15 @@
         aux_postJSON(url("/v1/link_facebook"), data, function (data) {
             WaitMsg.hide();
             if (data.status != 200) {
-                alert("Can't link Facebook account.");
+                // Can't link Facebook account
+                alert("Impossibile collegare l'account Facebook");
             }
             else {
+                sessionStorage.setItem('quiz_fbid', userId);
                 fb_set_user_pic("#bttAccount img");
                 $("#bttLinkFb").hide();
-                alert("Facebook account is linked successfully.");
+                // acc linked.
+                alert("Il tuo account Facebook è stato collegato con successo!");
             }
         });
     }
@@ -201,7 +204,7 @@
                 </div>
                 <div class="item">
                     <a href="#" id="bttLinkFb" class="lustre-button">
-                        <span class="btt_inline">Link account</span>
+                        <span class="btt_inline">Collegati con l'account di Facebook</span>
                         <img src="img/sbf.png" class="btt_inline"/>
                     </a>
                 </div>
