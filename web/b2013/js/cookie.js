@@ -37,6 +37,7 @@ function doLogout() {
     sessionStorage.removeItem("school");
     sessionStorage.removeItem("school_url");
     sessionStorage.removeItem("school_logo_url");
+    sessionStorage.removeItem("fbuser_pic");
 
     var index_url = sessionStorage.getItem('index_url');
 

@@ -10,6 +10,7 @@
 <script type="text/javascript" src="js/cookie.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/account.js"></script>
+<script type="text/javascript" src="js/fbsupport.js"></script>
 
 <!--Please wait-->
 <link rel="stylesheet" type="text/css" href="js/please_wait/pleasewait.css">
@@ -18,7 +19,6 @@
 
 <script>
     function applyFb() {
-        console.log("applyFb()");
         $.getScript('//connect.facebook.net/en_UK/all.js', function() {
             FB.init({
                 appId: '306969962800273',
@@ -36,11 +36,11 @@
                 console.log("connected");
                 saveFbId(response.authResponse.userID);
             } else if (response.status === 'not_authorized') {
-                // The person is logged into Facebook, but not your app.
+                // The person is logged into Facebook, but not our app.
+                // So we do nothing.
                 console.log("not connected");
             } else {
-                // The person is not logged into Facebook, so we're not sure if
-                // they are logged into this app or not.
+                // The person is not logged into Facebook, do nothing.
                 console.log("not login");
             }
         }, {scope: 'publish_actions'});
@@ -55,7 +55,9 @@
                 alert("Can't link Facebook account.");
             }
             else {
+                fb_set_user_pic("#bttAccount img");
                 $("#bttLinkFb").hide();
+                alert("Facebook account is linked successfully.");
             }
         });
     }
@@ -76,7 +78,7 @@
                 window.name = name;
                 sessionStorage.setItem('quizname', name);
 
-                $(".header .item a").html(window.name);
+                $(".header .item a span").html(window.name);
                 window.location.search = null;
             })
             .error(function(data) {
@@ -86,7 +88,7 @@
         }
         else {
             window.name = sessionStorage.getItem('quizname');
-            $(".header .item a").html(window.name);
+            $(".header .item a span").html(window.name);
         }
 
 
@@ -124,9 +126,14 @@
 
         $("#bttLinkFb").hide();
         var fb_id = sessionStorage.getItem('quiz_fbid');
+
         if (!fb_id || 0 === fb_id.length)
             applyFb();
+        else
+            fb_set_user_pic("#bttAccount img", true);
 
+
+        // For testing only
         var school = sessionStorage.getItem('school');
         var school_url = sessionStorage.getItem('school_url');
         var school_logo_url = sessionStorage.getItem('school_logo_url');
@@ -151,7 +158,10 @@
         <div id="studentmenu" class="content-box" style="width:732px;">
             <div class="header">
                 <div class="item">
-                    <a href="#" id="bttAccount" class="lustre-button-dark"></a>
+                    <a href="#" id="bttAccount" class="lustre-button-dark">
+                        <img src="" class="btt_inline" style="display:none"/>
+                        <span class="btt_inline"></span>
+                    </a>
                 </div>
             </div>
             <div class="hline"></div>
