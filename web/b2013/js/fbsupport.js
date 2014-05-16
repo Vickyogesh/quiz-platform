@@ -24,6 +24,7 @@ function fb_do_feed_post(message, link, title, description, pic_url, callback) {
         picture : pic_url
     };
 
+    console.log("FB post", pic_url);
     FB.api('/me/feed', 'post', opts, callback);
 }
 

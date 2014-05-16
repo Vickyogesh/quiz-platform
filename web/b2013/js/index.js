@@ -51,7 +51,8 @@ function onAuth(butObj)
 function onFbLogin() {
   FB.getLoginStatus(function(response) {
     if (response.status !== 'connected') {
-      alert('Facebook account is not linked!');
+      //Facebook account is not linked
+      alert('Collegamento non riuscito!');
     }
     else {
       var auth = {
