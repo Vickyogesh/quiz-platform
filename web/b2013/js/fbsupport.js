@@ -10,6 +10,8 @@ function fb_feed_post(message, link, title, description, pic_url, callback) {
         if (response.status === 'connected')
             fb_do_feed_post(message, link, title, description, pic_url,
                             callback);
+        else
+            callback(null);
     });
 }
 
