@@ -10,6 +10,13 @@ if (!String.prototype.format) {
   };
 }
 
+function getUrlParameterByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 function aux_postJSON(url, data, success)
 {
   if (success === undefined) {
@@ -73,6 +80,8 @@ function aux_deleteServicesCookies() {
         if (c.substring(0, 3) == 'tw_')
         deleteCookie(c, '/');
     }
+    sessionStorage.removeItem('quiz_fbid');
+    sessionStorage.removeItem("fbuser_pic");
 }
 
 function aux_showError(msg, title) {

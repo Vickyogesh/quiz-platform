@@ -5,29 +5,56 @@
   <meta name="HandheldFriendly" content="true" />
   <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+  <!--link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" /-->
+  <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
   <link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog.min.css" />
   <link rel="stylesheet" type="text/css" href="css/common.css" />
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <!--script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script-->
   <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
   <script type="text/javascript" src="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog2.min.js"></script>
   <script src="js/md5-min.js"></script>
   <script src="js/common.js"></script>
   <script src="js/qmanager.js"></script>
+  <script src="js/fbsupport.js"></script>
 </head>
 <body>
+  <div id="fb-root"></div>
+  <script type="text/javascript">
+    function onFbLogin(response) {
+      FB.getLoginStatus(function(response) {
+        if (response.status !== 'connected') {
+          alert('Facebook account is not linked!');
+        }
+        else {
+          var auth = {
+            fb: {
+              id: response.authResponse.userID,
+              token: response.authResponse.accessToken
+            },
+            appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+            'quiz_type': 'b2013'
+          };
+
+          aux_busy(true, "#login");
+          aux_postJSON("/v1/authorize", auth, do_auth);
+        }
+      });
+    }
+  </script>
   <div id="page-login" data-role="page">
     <div data-role="content"> 
       <h3>Quiz Online Patente <br/> A1 A2 A B1 B BE</h3>
       <div id="login" data-theme="a">
           <form style="padding:10px 20px;" id="loginForm" data-ajax="false">
               <label for="un" class="ui-hidden-accessible">Username:</label>
-              <input type="text" name="user" id="un" placeholder="username" />
+              <input type="text" name="user" id="un" placeholder="username" value="studente"/>
               <label for="pw" class="ui-hidden-accessible">Password:</label>
-              <input type="password" name="pass" id="pw" placeholder="password" />
+              <input type="password" name="pass" id="pw" placeholder="password" value="studente"/>
               <input type="submit" name="submit" id="submit" value="Accedi" data-theme="b"/>
           </form>
           <a href="/b2013/" rel="external" id="fullversion">Versione completa</a>
+          <div class="fb-login-button" onlogin="onFbLogin" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false"></div>
       </div>
       <div id="errpopup" data-role="popup" data-position-to="window" data-overlay-theme="a" data-theme="b" class="ui-content">
         <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
@@ -39,6 +66,7 @@
 
   <div id="page-student" data-role="page" class="page-fill header">
     <div data-role="header">
+      <img id="fbpic" style="width:30px;display:none" class="ui-btn-left" src="">
       <h1></h1>
       <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
     </div>
@@ -54,6 +82,15 @@
           <a href="#page-review" class="rect-button" id="bttReview" data-transition="slide">Ripasso errori</a>
         </div>
       </div>
+
+      <div id="footer" data-role="footer">
+        <div data-role="navbar">
+          <ul>
+            <li><a id="bttFbLink" href="#">Collegati con Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+
       <script src="js/student.js"></script>
     </div>
   </div>

@@ -58,7 +58,8 @@ $("#page-exam").bind("pageinit", function() {
     // After exam sending we show number of errors and
     // then navigate to exam review page.
     function afterSendExam() {
-        var msg = 'Hai commesso ' + this.total_errors + ' errori.<br/>';
+        var num_err = this.total_errors;
+        var msg = 'Hai commesso ' + num_err + ' errori.<br/>';
 
         $('<div>').simpledialog2({
             mode: 'button',
@@ -67,7 +68,36 @@ $("#page-exam").bind("pageinit", function() {
             buttonPrompt: msg,
             buttons: {
                 'Ok': {'click': function() {
-                    $.mobile.changePage("#page-exam-review");
+                    $.mobile.loading("show");
+
+                    var school = sessionStorage.getItem('school');
+                    var school_url = sessionStorage.getItem('school_url');
+                    var school_logo_url = sessionStorage.getItem('school_logo_url');
+
+                    if (school.length > 0)
+                        school = "Quiz Patente - " + school
+                    else
+                        school = "Quiz Patente"
+
+                    if (school_url.length > 0 && school_logo_url.length == 0) {
+                        school_logo_url = school_url + "/logo";
+                    }
+
+                    // Facebook post 
+                    fb_feed_post(
+                        /** message*/     "Numero errori: " + num_err,
+                        /** link*/        school_url,
+                        /** title*/       school,
+                        /** description*/ "Quiz Patente",
+                        /** pic_url*/     school_logo_url,
+                        function(response) {
+                            // if (!response || response.error)
+                            //     alert('Posting error occured');
+                            // else
+                            //     alert('Success - Post ID: ' + response.id);
+                            $.mobile.changePage("#page-exam-review");
+                        }
+                    );
                 }}
             }
         });

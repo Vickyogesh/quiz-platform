@@ -62,13 +62,21 @@ div.btt-back, span.btt-back {
 }
 
 /* Login page. */
-#page-login #login {max-width: 400px; margin: auto;}
+#page-login #login {
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+}
+
 #page-login h3 {text-align: center;}
 #page-login #fullversion {
   text-align: center;
   display: block;
 }
 
+.fb-login-button {
+  margin-top: 20px;
+}
 /* Student menu. */
 #menugrid {
   text-align: center;
@@ -96,6 +104,16 @@ div.btt-back, span.btt-back {
 #bttReview:hover {background-color: #7c7c81;}
 #bttReview:active {background-color: #747478;}
 
+#page-student #footer {
+  display: none;
+}
+
+#bttFbLink.ui-btn-active {
+  background-image: none !important;
+  background: none !important;
+  border: none !important;
+  text-shadow: none !important;
+}
 
 /* Quiz */
 #page-quiz-chapters .ui-content h3 {
