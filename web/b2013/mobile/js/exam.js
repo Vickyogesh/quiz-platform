@@ -57,8 +57,8 @@ $("#page-exam").bind("pageinit", function() {
 
     // After exam sending we show number of errors and
     // then navigate to exam review page.
-    function afterSendExam() {
-        var num_err = this.total_errors;
+    function afterSendExam(info) {
+        var num_err = info.num_errors;
         var msg = 'Hai commesso ' + num_err + ' errori.<br/>';
 
         $('<div>').simpledialog2({
