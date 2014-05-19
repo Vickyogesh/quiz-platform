@@ -116,49 +116,63 @@ div.btt-back, span.btt-back {
 }
 
 /* Quiz */
-#page-quiz-chapters .ui-content h3 {
-  text-align: center;
-  color: #0358ab;
+
+#topics .area1 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#c8c8c8),to(#a7a7a7));
+  background-image:-webkit-linear-gradient(#c8c8c8,#a7a7a7);
+  background-image:-moz-linear-gradient(#c8c8c8,#a7a7a7);
+  background-image:-ms-linear-gradient(#c8c8c8,#a7a7a7);
+  background-image:-o-linear-gradient(#c8c8c8,#a7a7a7);
+  background-image:linear-gradient(#c8c8c8,#a7a7a7);
 }
-
-#chapters .tp {
-  text-align: center;
-  border: 2px solid #ffffff;
-  color: white;
-  text-shadow: 0px 1px 0px #0358ab;
-  cursor: pointer;
+#topics .area2 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#00bf00),to(#008c00));
+  background-image:-webkit-linear-gradient(#00bf00,#008c00);
+  background-image:-moz-linear-gradient(#00bf00,#008c00);
+  background-image:-ms-linear-gradient(#00bf00,#008c00);
+  background-image:-o-linear-gradient(#00bf00,#008c00);
+  background-image:linear-gradient(#00bf00,#008c00);
 }
-
-#chapters .tp:hover {font-weight: bold;}
-
-#chapters .tp.area1 {background: #c0c0c0;}
-#chapters .tp.area1:hover {border: 2px solid #afafaf;}
-#chapters .tp.area1:active {background: #b8b8b8;}
-
-#chapters .tp.area2 {background: #00ae00;}
-#chapters .tp.area2:hover {border: 2px solid #008c00;}
-#chapters .tp.area2:active {background: #009d00;}
-
-#chapters .tp.area3 {background: #9966cc;}
-#chapters .tp.area3:hover {border: 2px solid #884dc4;}
-#chapters .tp.area3:active {background: #9159c8;}
-
-#chapters .tp.area4 {background: #ffdd00;}
-#chapters .tp.area4:hover {border: 2px solid #ddc000;}
-#chapters .tp.area4:active {background: #eece00;}
-
-#chapters .tp.area5 {background: #ff6633;}
-#chapters .tp.area5:hover {border: 2px solid #ff4d11;}
-#chapters .tp.area5:active {background: #ff5922;}
-
-#chapters .tp.area6 {background: #004586;}
-#chapters .tp.area6:hover {border: 2px solid #003464;}
-#chapters .tp.area6:active {background: #003c75;}
-
-#chapters .tp.area7 {background: #b84747;}
-#chapters .tp.area7:hover {border: 2px solid #9f3e3e;}
-#chapters .tp.area7:active {background: #ac4242;}
-
+#topics .area3 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#a173d0),to(#884dc4));
+  background-image:-webkit-linear-gradient(#a173d0,#884dc4);
+  background-image:-moz-linear-gradient(#a173d0,#884dc4);
+  background-image:-ms-linear-gradient(#a173d0,#884dc4);
+  background-image:-o-linear-gradient(#a173d0,#884dc4);
+  background-image:linear-gradient(#a173d0,#884dc4);
+}
+#topics .area4 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#ffdf11),to(#ccb100));
+  background-image:-webkit-linear-gradient(#ffdf11,#ccb100);
+  background-image:-moz-linear-gradient(#ffdf11,#ccb100);
+  background-image:-ms-linear-gradient(#ffdf11,#ccb100);
+  background-image:-o-linear-gradient(#ffdf11,#ccb100);
+  background-image:linear-gradient(#ffdf11,#ccb100);
+}
+#topics .area5 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#ff7344),to(#ff4d11));
+  background-image:-webkit-linear-gradient(#ff7344,#ff4d11);
+  background-image:-moz-linear-gradient(#ff7344,#ff4d11);
+  background-image:-ms-linear-gradient(#ff7344,#ff4d11);
+  background-image:-o-linear-gradient(#ff7344,#ff4d11);
+  background-image:linear-gradient(#ff7344,#ff4d11);
+}
+#topics .area6 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#004e97),to(#003464));
+  background-image:-webkit-linear-gradient(#004e97,#003464);
+  background-image:-moz-linear-gradient(#004e97,#003464);
+  background-image:-ms-linear-gradient(#004e97,#003464);
+  background-image:-o-linear-gradient(#004e97,#003464);
+  background-image:linear-gradient(#004e97,#003464);
+}
+#topics .area7 {
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#bd5353),to(#9f3e3e));
+  background-image:-webkit-linear-gradient(#bd5353,#9f3e3e);
+  background-image:-moz-linear-gradient(#bd5353,#9f3e3e);
+  background-image:-ms-linear-gradient(#bd5353,#9f3e3e);
+  background-image:-o-linear-gradient(#bd5353,#9f3e3e);
+  background-image:linear-gradient(#bd5353,#9f3e3e);
+}
 
 .question-page #image {
   background-image: none;

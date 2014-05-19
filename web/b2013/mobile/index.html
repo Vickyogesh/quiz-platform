@@ -73,7 +73,7 @@
     <div data-role="content">
       <div class="ui-grid-solo ftable" id="menugrid">
         <div class="ui-block-a">
-          <a href="#page-quiz-chapters" class="rect-button" id="bttQuiz" data-transition="slide">Quiz argomenti</a>
+          <a href="#page-quiz-list" class="rect-button" id="bttQuiz" data-transition="slide">Quiz argomenti</a>
         </div>
         <div class="ui-block-a">
           <a href="#page-exam" class="rect-button" id="bttExam" data-transition="slide">Prova d'esame</a>
@@ -95,52 +95,27 @@
     </div>
   </div>
 
-  <div id="page-quiz-chapters" data-role="page" class="page-fill header">
-    <div data-role="header">
-      <!-- <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a> -->
-      <h3>Quiz</h3>
-      <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
-    </div>
-    <div data-role="content">
-
-      <!-- back button -->
-      <ul data-role="listview" data-theme="a" style="margin-bottom: 0">
-        <li data-icon="false">
-          <a href="#" style="padding:5px;" id="bttBack">
-            <div class="ui-icon ui-icon-arrow-l btt-back"></div>
-            <span class="btt-back">Indietro</span>
-          </a>
-        </li>
-      </ul>
-
-      <h3>Seleziona capitolo</h3>
-      <div id="chapters" class="ui-grid-d"></div>
-    </div>
-    <script src="js/quiz-chapters.js"></script>
-  </div>  <!-- /page-quiz-chapters -->
-
-  <div id="page-quiz-topics" data-role="page">
+  <div id="page-quiz-list" data-role="page">
     <div data-role="header" data-position="fixed">
-      <!-- <a href="#" id="bttBack" data-role="button" data-icon="arrow-l" data-iconpos="notext">Back</a> -->
       <h3>Quiz</h3>
       <a href="#" id="bttLogout" data-role="button" class="ui-btn-right" data-icon="delete" data-iconpos="notext">Logout</a>
     </div>
-    <div data-role="content">
-      <!-- back button -->
-      <ul data-role="listview" data-theme="a" style="margin-bottom: 0">
-        <li data-icon="false">
-          <a href="#" style="padding:5px;" id="bttBack">
-            <div class="ui-icon ui-icon-arrow-l btt-back"></div>
-            <span class="btt-back">Indietro</span>
-          </a>
-        </li>
-      </ul>
-
+    <div data-role="content" style="padding-top:0">
       <ul id="topics" data-role="listview" data-theme="c" style="margin-top: 0">
       </ul>
     </div>
-    <script src="js/quiz-topics.js"></script>
-  </div>  <!-- /page-quiz-topics -->
+    <div data-role="footer" data-position="fixed">
+      <div data-role="navbar">
+        <ul>
+          <li><a id="bttBack" href="#">
+            <div class="ui-icon ui-icon-arrow-l btt-back"></div>
+            <span class="btt-back">Indietro</span>
+          </a></li>
+        </ul>
+      </div>
+    </div>
+    <script src="js/quiz-list.js"></script>
+  </div>  <!-- /page-quiz-list -->
 
   <div id="page-quiz" data-role="page" class="page-fill header footer question-page">
     <div data-role="header">
