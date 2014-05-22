@@ -449,7 +449,10 @@ class AccountsApi(HttpServiceProxy):
         return response.json()
 
     def getUserAccountPage(self):
-        return self._url('/user', use_root=True)
+        s = self._session_cookie.find('=')
+        e = self._session_cookie.find(';')
+        cid = self._session_cookie[s + 1:e]
+        return self._url('/user', use_root=True), cid
 
     def linkFacebookAccount(self, user_id):
         response = self.post('/link_facebook', data={'userId': user_id})

@@ -9,8 +9,10 @@ app = QuizApp()
 
 @app.get('/accounturl')
 def get_account_url():
-    url = app.account.getUserAccountPage()
-    return redirect(url + '?' + url_encode(app.request.args))
+    url, cid = app.account.getUserAccountPage()
+    args = app.request.args.copy()
+    args['cid'] = cid
+    return redirect(url + '?' + url_encode(args))
 
 
 @app.get('/userinfo')
