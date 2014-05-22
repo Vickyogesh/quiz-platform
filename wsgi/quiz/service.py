@@ -1,6 +1,6 @@
 from werkzeug.exceptions import BadRequest, Forbidden
 from werkzeug.utils import redirect
-from werkzeug.urls import url_encode
+from werkzeug.urls import url_encode, Href
 from .core.exceptions import QuizCoreError
 from .wsgi import QuizApp, JSONResponse
 
@@ -24,6 +24,12 @@ def get_authorize_logout():
     app.account.logout()
     app.session.delete()
     return JSONResponse()
+
+
+@app.route('/fbcanvas/<path>/', methods=['GET', 'POST'])
+def fb_canvas(path):
+    hr = Href(app.request.host_url + path + '/')
+    return redirect(hr(app.request.args))
 
 
 @app.post('/link_facebook', access=['student'])
