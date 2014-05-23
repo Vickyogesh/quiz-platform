@@ -108,7 +108,7 @@ function do_auth(data) {
   if (data.status != 200) {
     doQuit();
     var fblogin = getUrlParameterByName("fblogin");
-    if (fblogin == "1")
+    if (fblogin != "1")
       alert("Nome utente o password non validi.");
   }
   else {        
