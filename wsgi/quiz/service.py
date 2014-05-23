@@ -31,6 +31,8 @@ def get_authorize_logout():
 @app.route('/fbcanvas/<path>/', methods=['GET', 'POST'])
 def fb_canvas(path):
     hr = Href(app.request.host_url + path + '/')
+    args = app.request.args.copy()
+    args['fblogin'] = 1
     return redirect(hr(app.request.args))
 
 
