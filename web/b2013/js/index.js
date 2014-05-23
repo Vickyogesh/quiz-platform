@@ -23,8 +23,8 @@ $(document).ready(function () {
         status: true
     });
 
-    var fb_source = getUrlParameterByName("fb_source");
-    if (fb_source !== "") {
+    var fblogin = getUrlParameterByName("fblogin");
+    if (fblogin == "1") {
       WaitMsg.show();
       FB.getLoginStatus(function(response) {
         if (response.status !== 'connected') {
@@ -107,8 +107,8 @@ function do_auth(data) {
   WaitMsg.hide();
   if (data.status != 200) {
     doQuit();
-    var fb_source = getUrlParameterByName("fb_source");
-    if (fb_source === "")
+    var fblogin = getUrlParameterByName("fblogin");
+    if (fblogin == "1")
       alert("Nome utente o password non validi.");
   }
   else {        
