@@ -14,6 +14,39 @@ $(document).ready(function () {
 	});
 	
 	$('input').css('border','0px');
+
+  $.getScript('//connect.facebook.net/it_IT/sdk.js', function() {
+    FB.init({
+        appId: '306969962800273',
+        version: "v2.0",
+        xfbml: true,
+        status: true
+    });
+
+    var fb_source = getUrlParameterByName("fb_source");
+    if (fb_source !== "") {
+      WaitMsg.show();
+      FB.getLoginStatus(function(response) {
+        if (response.status !== 'connected') {
+          WaitMsg.hide();
+          console.log('Collegamento non riuscito!');
+        }
+        else {
+          var auth = {
+            fb: {
+              id: response.authResponse.userID,
+              token: response.authResponse.accessToken
+            },
+            appid: "32bfe1c505d4a2a042bafd53993f10ece3ccddca",
+            'quiz_type': 'b2013'
+          };
+
+          WaitMsg.show();
+          aux_postJSON(url("/v1/authorize"), auth, do_auth);
+        }
+      });
+    }
+  });
 });
 
 /*********************************************************
@@ -74,7 +107,9 @@ function do_auth(data) {
   WaitMsg.hide();
   if (data.status != 200) {
     doQuit();
-    alert("Nome utente o password non validi.");
+    var fb_source = getUrlParameterByName("fb_source");
+    if (fb_source === "")
+      alert("Nome utente o password non validi.");
   }
   else {        
     var name = data.user.name;
