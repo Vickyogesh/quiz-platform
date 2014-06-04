@@ -243,9 +243,9 @@
 				$("#student_stat .header .item a span").html(name);
                 fb_set_user_pic("#bttAccount img", true);
 		
-                var all_exams = [].concat(examData.exams['current'], 
+                var all_exams = [].concat(examData.exams['week3'], 
                                           examData.exams['week'],
-                                          examData.exams['week3']);
+                                          examData.exams['current']);
 
                 drawExamGraph("wexamgraph", examData.exams['current']);
                 drawExamGraph("mexamgraph", examData.exams['week']);
@@ -437,9 +437,9 @@
             var exams;
 
             if (period == null) {
-                exams = [].concat(examData.exams["current"],
+                exams = [].concat(examData.exams["week3"],
                                   examData.exams["week"],
-                                  examData.exams["week3"]);
+                                  examData.exams["current"]);
             }
             else
                 exams = examData.exams[period];
