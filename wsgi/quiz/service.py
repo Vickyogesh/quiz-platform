@@ -1,10 +1,33 @@
 from werkzeug.exceptions import BadRequest, Forbidden
 from werkzeug.utils import redirect
 from werkzeug.urls import url_encode, Href
+from werkzeug.wrappers import Response
 from .core.exceptions import QuizCoreError
 from .wsgi import QuizApp, JSONResponse
 
 app = QuizApp()
+
+_ifix_html = """<!DOCTYPE html>
+<html>
+<body>
+<script>top.location = "{0}"</script>
+</body>
+</html>
+"""
+
+
+# Workaround to solve Safari 3rd party cookie blocking for iframe:
+# http://kb.imakewebsites.ca/2013/04/30/safari-3rd-party-cookies-and-facebook-apps/
+# NOTE: beaker sessions dependent solution!
+@app.get('/ifix')
+def iframe_fix():
+    next_url = app.request.args.get('next')
+    app.session['ensure_session'] = True  # to have 'cookie_out' in session.
+    if next_url is None:
+        raise BadRequest('Missing argument.')
+    r = Response(_ifix_html.format(next_url), mimetype='text/html')
+    r.headers['Set-Cookie'] = app.session._headers['cookie_out']
+    return r
 
 
 @app.get('/accounturl')

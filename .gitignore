@@ -4,3 +4,4 @@
 .virtualenv/
 test-data/
 doc/html/
+.idea/
