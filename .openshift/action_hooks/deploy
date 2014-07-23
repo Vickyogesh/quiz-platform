@@ -5,11 +5,6 @@
 # ruby, etc.
 
 echo "Pre-processing nginx config..."
-if [ -n "${OPENSHIFT_INTERNAL_IP}" ]; then
-export OPENSHIFT_INTERNAL_IP=${OPENSHIFT_DIY_IP}
-export OPENSHIFT_INTERNAL_PORT=${OPENSHIFT_DIY_PORT}
-fi
-
 env | sed 's/[\%]/\\&/g;s/\([^=]*\)=\(.*\)/s%${\1}%\2%/' > $OPENSHIFT_TMP_DIR/sed.script
 cat $OPENSHIFT_REPO_DIR/misc/nginx.conf | sed -f $OPENSHIFT_TMP_DIR/sed.script > $OPENSHIFT_DATA_DIR/nginx/conf/nginx.conf
 
