@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('frontend.static', filename='css/new_style.css') }}" />
+
+<!-- <script type="text/javascript" src="js/sprintf.min.js"></script> -->
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/cookie.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/app.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/account.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/topicslider.js') }}"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="{{ url_for('frontend.static', filename='js/please_wait/pleasewait.css') }}">
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/please_wait/pleasewait.js') }}"></script>
+<!--Please wait-->
+<style type="text/css">
+.topictab ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.topictab ul > li > div .item {
+    text-align: left;
+    width: 100%;
+    height: 3em;
+    margin: 0;
+    padding: 6px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.area1 {background: #c0c0c0;}
+li.area1:hover {background: #b8b8b8;}
+
+.area2 {background: #00ae00;}
+li.area2:hover {background: #009d00;}
+
+.area3 {background: #9966cc;}
+li.area3:hover {background: #9159c8;}
+
+.area4 {background: #ffdd00;}
+li.area4:hover {background: #eece00;}
+
+.area5 {background: #ff6633;}
+li.area5:hover {background: #ff5922;}
+
+.area6 {background: #004586;}
+li.area6:hover {background: #003c75;}
+
+.area7 {background: #b84747;}
+li.area7:hover {background: #ac4242;}
+
+.topictab {
+    margin: 10px 20px 10px 20px;
+    font-size: 14px;
+}
+
+.topictab #content {
+    position: relative;
+    overflow: hidden;
+    vertical-align: top;
+}
+.topictab #content .slide {
+    position: relative;
+}
+
+.topictab .page {
+    position: absolute;
+    overflow-y: auto;
+}
+
+
+.topictab .page > table {
+    width: 100%;
+    text-align: left;
+    color: #fff;
+    padding: 6px;
+}
+
+.topictab .page > table td {
+    vertical-align: top;
+}
+
+.topictab .page > table a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.topictab .page > table a:hover {
+    text-decoration: underline;
+}
+
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var b = $("#work_area").hasClass("workareareduced");
+        var tab = TopicSlider("#topics", b, "{{ url_for('frontend.quiz_topics', quiz_name=quiz_name) }}");
+    });
+
+</script>
+</head>
+
+<body>
+    <div id="work_area">
+        <div id="topiclist" class="content-box" style="width:732px;">
+            <div class="header"><div class="item">Quiz</div></div>
+            <div class="hline"></div>
+
+            <!-- TAB WIDGET -->
+            <div id="topics" class="topictab">
+            <div class="row">
+                <div class="item" style="width: 230px;">
+                    <ul>
+                        <li class="area1" data-id="1">
+                            <div class="row"><div class="item">
+                                <span>La strada, i veicoli, le persone</span>
+                            </div></div>
+                        </li>
+                        <li class="area2" data-id="2">
+                            <div class="row"><div class="item">
+                                <span>La segnaletica stradale</span>
+                            </div></div>
+                        </li>
+                        <li class="area3" data-id="3">
+                            <div class="row"><div class="item">
+                                <span>Norme di comportamento</span>
+                            </div></div>
+                        </li>
+                        <li class="area4" data-id="4">
+                            <div class="row"><div class="item">
+                                <span>Equipaggiamento dei veicoli</span>
+                            </div></div>
+                        </li>
+                        <li class="area5" data-id="5">
+                            <div class="row"><div class="item">
+                                <span>Documenti</span>
+                            </div></div>
+                        </li>
+                        <li class="area6" data-id="6">
+                            <div class="row"><div class="item">
+                                <span>La sicurezza sulla strada e la prevenzione degli incidenti</span>
+                            </div></div>
+                        </li>
+                        <li class="area7" data-id="7">
+                            <div class="row"><div class="item">
+                                <span>L'ambiente, la tecnica del veicolo, la correttezza di guida</span>
+                            </div></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="item" id="content">
+                    <div class="slide">
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="footer">
+                <div class="item">
+                    <a href="{{ url_for('frontend.student', quiz_name=quiz_name) }}" id="backbut" class="lustre-button">TORNA AL MENU</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -3,5 +3,6 @@
 *.sublime-*
 .virtualenv/
 test-data/
+local/
 doc/html/
 .idea/

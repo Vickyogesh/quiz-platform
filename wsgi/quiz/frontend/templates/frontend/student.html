@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Quiz Platform</title>
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('frontend.static', filename='css/new_style.css') }}" />
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/cookie.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/app.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/account.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/fbsupport.js') }}"></script>
+
+<!--Please wait-->
+<link rel="stylesheet" type="text/css" href="{{ url_for('frontend.static', filename='js/please_wait/pleasewait.css') }}">
+<script type="text/javascript" src="{{ url_for('frontend.static', filename='js/please_wait/pleasewait.js') }}"></script>
+<!--Please wait-->
+
+<script>
+    function applyFb() {
+        $.getScript('//connect.facebook.net/en_UK/all.js', function() {
+            FB.init({
+                appId: '306969962800273',
+                version: "v2.0",
+                status: true
+            });
+            $("#bttLinkFb").click(linkFbAccount);
+            $("#bttLinkFb").show();
+        });
+    }
+
+    function linkFbAccount() {
+        FB.login(function(response) {
+            if (response.status === 'connected') {
+                console.log("connected");
+                saveFbId(response.authResponse.userID);
+            } else if (response.status === 'not_authorized') {
+                // The person is logged into Facebook, but not our app.
+                // So we do nothing.
+                console.log("not connected");
+            } else {
+                // The person is not logged into Facebook, do nothing.
+                console.log("not login");
+            }
+        }, {scope: 'publish_actions'});
+    }
+
+    function saveFbId(userId) {
+        var data = {userId: userId};
+        WaitMsg.show();
+        aux_postJSON(url("/v1/link_facebook"), data, function (data) {
+            WaitMsg.hide();
+            if (data.status != 200) {
+                // Can't link Facebook account
+                alert("Impossibile collegare l'account Facebook");
+            }
+            else {
+                sessionStorage.setItem('quiz_fbid', userId);
+                fb_set_user_pic("#bttAccount img");
+                $("#bttLinkFb").hide();
+                // acc linked.
+                alert("Il tuo account Facebook è stato collegato con successo!");
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        if (getUrlParameterByName("upd") == "1") {
+            WaitMsg.show();
+            $.getJSON(url("/v1/userinfo"), function(data) {
+                WaitMsg.hide();
+                if (data.status != 200) {
+                    aux_showJSONError(data);
+                    return;
+                }
+
+                var name = data.user.name;
+                if (data.user.surname)
+                    name += ' ' + data.user.surname;
+                window.name = name;
+                sessionStorage.setItem('quizname', name);
+
+                $(".header .item a span").html(window.name);
+                window.location.search = null;
+            })
+            .error(function(data) {
+                WaitMsg.hide();
+                aux_showError(data.responseText, data.status);
+            });
+        }
+        else {
+            window.name = sessionStorage.getItem('quizname');
+            $(".header .item a span").html(window.name);
+        }
+
+
+        $("#cnt").attr("src", "");
+        var nwidth = $(window).width();
+
+        $("#quiz").click(function(){
+            window.location = "{{ url_for('frontend.quiz_topics', quiz_name=quiz_name) }}"
+        });
+
+        $("#review").click(function(){
+            window.location = "{{ url_for('frontend.review', quiz_name=quiz_name) }}"
+            // if (nwidth >= 950)
+            //    window.location = "ErrorReview.html";
+            //else
+            //    window.location = "ErrorReview_reduced.html";
+        });
+
+        $(".bttexam td").click(function(){
+            var lang = $(this).attr("id");
+            window.location = "{{ url_for('frontend.exam', quiz_name=quiz_name) }}?lang=" + lang
+            //window.location = "Exam.html?lang=" + lang;
+        });
+
+        $("#bttStat").click(function(){
+            sessionStorage.setItem('quizfromexam', 0);
+            window.location = "{{ url_for('frontend.statistics', quiz_name=quiz_name) }}"
+            //window.location = "Statistics.html";
+        });
+
+        $("#bttExit").click(function() {
+            $.getJSON(url("/v1/authorize/logout"), doLogout).error(doLogout);
+        });
+
+        $("#bttAccount").click(function() {
+            editAccount();
+        });
+
+        $("#bttLinkFb").hide();
+        var fb_id = sessionStorage.getItem('quiz_fbid');
+
+        if (!fb_id || 0 === fb_id.length)
+            applyFb();
+        else
+            fb_set_user_pic("#bttAccount img", true);
+
+
+        // For testing only
+        var school = sessionStorage.getItem('school');
+        var school_url = sessionStorage.getItem('school_url');
+        var school_logo_url = sessionStorage.getItem('school_logo_url');
+
+        if (school.length > 0)
+            school = "Quiz Patente - " + school
+        else
+            school = "Quiz Patente"
+
+        if (school_url.length > 0 && school_logo_url.length == 0) {
+            school_logo_url = school_url + "/logo";
+        }
+
+        console.log(school, school_url, school_logo_url);
+    });
+</script>
+</head>
+
+<body>
+    <div id="fb-root"></div>
+    <div id="work_area">
+        <div id="studentmenu" class="content-box" style="width:732px;">
+            <div class="header">
+                <div class="item">
+                    <a href="#" id="bttAccount" class="lustre-button-dark">
+                        <img src="" class="btt_inline" style="display:none"/>
+                        <span class="btt_inline"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="hline"></div>
+            <div class="row" style="margin-top:40px; margin-bottom:40px">
+                <div class="item">
+                    <img id="quiz" class="ibtn" src="{{ url_for('frontend.static', filename='img/QUIZ-ARG.png') }}"></img>
+                </div>
+                <div class="item">
+                    <div class="bttexam">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td colspan="2" id="it"></td></tr>
+                            <tr style="height:30px">
+                                <td id="fr"></td>
+                                <td id="de"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- <img id="exam" class="ibtn" src="img/PROVA-ESAME.png"></img> -->
+                </div>
+                <div class="item">
+                    <img id="review" class="ibtn" src="{{ url_for('frontend.static', filename='img/RIPASSSO-ERRORI.png') }}"></img>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="item"></div>
+                <div class="item">
+                    <a href="#" id="bttStat" class="lustre-button">
+                        <img src="{{ url_for('frontend.static', filename='img/statistics.png') }}" class="btt_inline"/>
+                        <span class="btt_inline">STATISTICHE</span>
+                    </a>
+                </div>
+                <div class="item">
+                    <a href="#" id="bttExit" class="lustre-button">
+                        <span class="btt_inline">ESCI</span>
+                        <img src="{{ url_for('frontend.static', filename='img/esc.png') }}" class="btt_inline"/>
+                    </a>
+                </div>
+                <div class="item">
+                    <a href="#" id="bttLinkFb" class="lustre-button">
+                        <span class="btt_inline">Collegati con Facebook</span>
+                        <img src="{{ url_for('frontend.static', filename='img/sbf.png') }}" class="btt_inline"/>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
