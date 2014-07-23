@@ -54,7 +54,7 @@ fi
 if [ ! -d $OPENSHIFT_DATA_DIR/nginx ]; then
 cd $OPENSHIFT_TMP_DIR
 
-wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.32.tar.bz2
+wget http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-8.32.tar.bz2
 wget http://zlib.net/zlib-1.2.8.tar.bz2
 wget http://nginx.org/download/nginx-1.2.8.tar.gz
 
