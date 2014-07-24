@@ -1,3 +1,4 @@
+from functools import wraps
 from werkzeug.exceptions import BadRequest, Forbidden
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
@@ -17,6 +18,25 @@ _ifix_html = """<!DOCTYPE html>
 </body>
 </html>
 """
+
+
+def count_user_access(handle_guest=True):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            user = current_user
+            if not user.is_anonymous() and user.is_school_member:
+                quiz_type = session['quiz_type']
+                sid = user.account['school_id']
+                uid = user.account_id
+                user_type = user.user_type
+                app.core.updateUserLastVisit(quiz_type, uid, user_type, sid)
+                if handle_guest and user.is_guest:
+                    if not app.core.processGuestAccess(quiz_type, uid):
+                        abort(403)
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def get_user_id(uid=None):
@@ -64,9 +84,9 @@ def fb_canvas(path):
     return redirect(hr(args))
 
 
-# @api.post('/link_facebook', access=['student'])
 @api.route('/link_facebook', methods=['POST'])
 @access.be_client.require()
+@count_user_access()
 def link_facebook():
     data = request.get_json(force=True)
     try:
@@ -77,9 +97,9 @@ def link_facebook():
     return dict_to_json_response(res)
 
 
-#@app.get('/quiz/<int:topic>', access=['student', 'guest'])
 @api.route('/quiz/<int:topic>')
 @access.be_client_or_guest.require()
+@count_user_access()
 def create_quiz(topic):
     """ Get 40 questions from the DB and return them to the client."""
     user_id = get_user_id()
@@ -97,9 +117,9 @@ def create_quiz(topic):
     return dict_to_json_response(quiz)
 
 
-#@app.post('/quiz/<int:topic>', access=['student', 'guest'])
 @api.route('/quiz/<int:topic>', methods=['POST'])
 @access.be_client_or_guest.require()
+@count_user_access()
 def save_quiz(topic):
     """ Save quiz results."""
     user_id = get_user_id()
@@ -113,11 +133,10 @@ def save_quiz(topic):
     return json_response()
 
 
-# @app.get('/student', access=['student', 'school', 'guest'])
-# @app.get('/student/<uid:user>', access=['student', 'school', 'guest'])
 @api.route('/student', defaults={'user': 'me'})
 @api.route('/student/<uid:user>')
 @access.be_user.require()
+@count_user_access()
 def get_student_stat(user):
     user_id = get_user_id(user) # requested user
     lang = request.args.get('lang', 'it')
@@ -138,9 +157,9 @@ def get_student_stat(user):
     return dict_to_json_response(stat)
 
 
-#@app.get('/errorreview', access=['student', 'guest'])
 @api.route('/errorreview')
 @access.be_client_or_guest.require()
+@count_user_access()
 def get_error_review():
     user_id = get_user_id()
     lang = request.args.get('lang', 'it')
@@ -155,9 +174,9 @@ def get_error_review():
     return dict_to_json_response(res)
 
 
-#@app.post('/errorreview', access=['student', 'guest'])
 @api.route('/errorreview', methods=['POST'])
 @access.be_client_or_guest.require()
+@count_user_access()
 def save_error_review():
     user_id = get_user_id()
     data = request.get_json(force=True)
@@ -170,9 +189,9 @@ def save_error_review():
     return json_response()
 
 
-#@app.get('/exam', access=['student', 'guest'])
 @api.route('/exam')
 @access.be_client_or_guest.require()
+@count_user_access()
 def create_exam():
     user_id = get_user_id()
     lang = request.args.get('lang', 'it')
@@ -183,9 +202,9 @@ def create_exam():
     return dict_to_json_response(exam)
 
 
-# @app.post('/exam/<int:id>', access=['student', 'guest'])
 @api.route('/exam/<int:id>', methods=['POST'])
 @access.be_client_or_guest.require()
+@count_user_access()
 def save_exam(id):
     data = request.get_json(force=True)
     try:
@@ -197,9 +216,9 @@ def save_exam(id):
     return json_response(num_errors=num_errors)
 
 
-# @app.get('/exam/<int:id>', access=['student', 'guest', 'school'])
 @api.route('/exam/<int:id>')
 @access.be_user.require()
+@count_user_access()
 def get_exam_info(id):
     lang = request.args.get('lang', 'it')
     info = app.core.getExamInfo(id, lang)
@@ -216,9 +235,9 @@ def get_exam_info(id):
     return dict_to_json_response(info)
 
 
-# @app.get('/student/<uid:user>/exam', access=['student', 'guest', 'school'])
 @api.route('/student/<uid:user>/exam')
 @access.be_user.require()
+@count_user_access()
 def get_student_exams(user):
     user_id = get_user_id(user)
 
@@ -238,10 +257,9 @@ def get_student_exams(user):
     return dict_to_json_response(exams)
 
 
-# @app.get('/student/<uid:user>/topicerrors/<int:id>',
-#          access=['student', 'guest', 'school'])
 @api.route('/student/<uid:user>/topicerrors/<int:id>')
 @access.be_user.require()
+@count_user_access()
 def get_topic_error(user, id):
     user_id = get_user_id(user)
     lang = request.args.get('lang', 'it')
@@ -264,7 +282,6 @@ def get_topic_error(user, id):
 
 
 # TODO: do we need this call?
-#@app.get('/admin/schools', access=['admin'])
 @api.route('/admin/schools')
 @access.be_admin.require()
 def school_list():
@@ -273,7 +290,6 @@ def school_list():
 
 
 # TODO: do we need this call?
-# @app.post('/admin/newschool', access=['admin'])
 @api.route('/admin/newschool', methods=['POST'])
 @access.be_admin.require()
 def add_school():
@@ -282,8 +298,6 @@ def add_school():
 
 
 # TODO: do we need this call?
-# @app.post('/admin/school/<int:id>', access=['admin'])
-# @app.delete('/admin/school/<int:id>', access=['admin'])
 @api.route('/admin/school/<int:id>', methods=['POST', 'DELETE'])
 @access.be_admin.require()
 def delete_school(id):
@@ -301,7 +315,6 @@ def delete_school(id):
     return dict_to_json_response(res)
 
 
-# @app.get('/school/<uid:id>/students', access=['school', 'admin'])
 # Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/students')
 @access.be_admin_or_school.require()
@@ -311,7 +324,6 @@ def student_list(id):
     return dict_to_json_response(res)
 
 
-# @app.post('/school/<uid:id>/newstudent', access=['school', 'admin'])
 # Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/newstudent', methods=['POST'])
 @access.be_admin_or_school.require()
@@ -321,8 +333,6 @@ def add_student(id):
     return dict_to_json_response(res)
 
 
-# @app.post('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
-# @app.delete('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
 # Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/student/<int:student>', methods=['POST', 'DELETE'])
 @access.be_admin_or_school.require()
@@ -344,7 +354,6 @@ def delete_student(id, student):
     return dict_to_json_response(res)
 
 
-# @app.get('/school/<uid:id>', access=['school', 'admin'])
 @api.route('/school/<uid:id>')
 @access.be_admin_or_school.require()
 def school_stat(id):
@@ -361,8 +370,9 @@ def school_stat(id):
 
     school_id = get_user_id(id)
 
-    if current_user.is_school and not OwnerPermission(school_id).can():
-        abort(403)
+    if current_user.is_school:
+        if not OwnerPermission(school_id).can():
+            abort(403)
     elif id == 'me':
         abort(403)
 
