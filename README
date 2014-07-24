@@ -129,3 +129,8 @@ This section provides steps to setup such DIY cartridge.
 Note: if you want to build API docs at deployment then create
       $OPENSHIFT_DATA_DIR/quiz/apidoc dir, and on next deployment
       the docs will be built.
+
+Note: DB backup
+mysqldump -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENSHIFT_MYSQL_DB_USERNAME:-'admin'} --password="$OPENSHIFT_MYSQL_DB_PASSWORD" [db]  > dump.sql
+mysql -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENSHIFT_MYSQL_DB_USERNAME:-'admin'} --password="$OPENSHIFT_MYSQL_DB_PASSWORD" [db] < dump.sql
+
