@@ -70,8 +70,6 @@ class Application(Flask):
         for code in default_exceptions.iterkeys():
             if code != 404:
                 self.error_handler_spec[None][code] = Application.__json_error
-        # self.errorhandler(CoreError)(Application.__core_error_handler)
-        # self.errorhandler(PermissionDenied)(Application.__denied_handler)
 
     @staticmethod
     def __json_error(e):

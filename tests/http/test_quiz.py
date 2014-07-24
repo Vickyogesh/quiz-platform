@@ -38,7 +38,7 @@ class HttpQuizTest(unittest.TestCase):
 
     # Check: get quiz with invalid URL
     def test_getBad(self):
-        r = self.req.get(url('/quiz'))
+        r = self.req.get(url('/quizd'))
         self.assertEqual(404, r.status_code)
 
         r = self.req.get(url('/quiz/1/fr'))
@@ -94,14 +94,14 @@ class HttpQuizTest(unittest.TestCase):
         # Check: not a json
         r = self.req.post(url('/quiz/1'))
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Not a JSON.', data['description'])
 
         # Check: empty json
         r = self.req.post(url('/quiz/1'), data='{}', headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -109,7 +109,7 @@ class HttpQuizTest(unittest.TestCase):
         data = json.dumps({'questions': 0})
         r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -117,7 +117,7 @@ class HttpQuizTest(unittest.TestCase):
         data = json.dumps({'answers': 0})
         r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -127,21 +127,21 @@ class HttpQuizTest(unittest.TestCase):
         data = json.dumps({'questions': 0, 'answers': 0})
         r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid value.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': [1]})
         r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Parameters length mismatch.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': []})
         r = self.req.post(url('/quiz/1'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Empty list.', data['description'])
 

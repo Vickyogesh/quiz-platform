@@ -4,7 +4,7 @@ from flask import current_app as app
 from flask import request, session, Blueprint
 from .core.exceptions import QuizCoreError
 from .appcore import json_response
-
+from . import access
 
 QUIZ_TYPE_ID = {
     'b2011': 1,
@@ -75,7 +75,7 @@ def _facebook_login(data):
 @login_api.route('/authorize', methods=['GET'])
 def ask_login():
     data = app.account.get_auth()
-    return json_response(nonce=data['nonce'])
+    return json_response(status=401, nonce=data['nonce'])
 
 
 @login_api.route('/authorize', methods=['POST'])
@@ -102,14 +102,14 @@ def login():
     if can_check_date:
         end_date = _validate_quiz_access(quiz_type, quiz_type_id, user)
 
-    session['user'] = user
-    session['user_id'] = user['id']
-    session['user_type'] = user['type']
+    # Used by API to detect current quiz.
     session['quiz_type'] = quiz_type_id
     session['quiz_type_name'] = quiz_type
+
     if can_check_date:
         session['access_end_date'] = end_date
     session['app_id'] = appid
+    access.login(user)
 
     # NOTE: we you want to use 'beaker.session.secret' then use:
     # sid = self.session.__dict__['_headers']['cookie_out']
@@ -120,7 +120,7 @@ def login():
 
 
 @login_api.route('/authorize/logout', methods=['GET', 'POST'])
+@access.login_required
 def logout():
-    app.account.logout()
-    session.delete()
+    access.logout()
     return json_response()

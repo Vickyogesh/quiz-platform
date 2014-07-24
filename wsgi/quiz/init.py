@@ -1,5 +1,6 @@
 from werkzeug.routing import BaseConverter
-from flask import session, g
+from flask import session
+from flask_principal import PermissionDenied
 from .appcore import json_response
 from .core.exceptions import QuizCoreError
 from .serviceproxy import AccountsApi
@@ -35,6 +36,9 @@ def init_app(app):
     def core_error_handler(error):
         return json_response(status=400, description=error.message)
 
+    def permission_denied_handler(error):
+        return json_response(status=403, description='Forbidden.')
+
     def sess():
         return session
 
@@ -42,6 +46,7 @@ def init_app(app):
     app.url_map.converters['word'] = WordConverter
 
     app.errorhandler(QuizCoreError)(core_error_handler)
+    app.errorhandler(PermissionDenied)(permission_denied_handler)
 
     # Accounts proxy setup.
     url = app.config['ACCOUNTS_URL']
@@ -61,6 +66,7 @@ def init_app(app):
     from .core.core import QuizCore
     app.core = QuizCore(app)
 
+    from . import access
     from . import login
     from .api import api
     from .frontend import views

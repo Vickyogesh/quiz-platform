@@ -74,7 +74,6 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
     def _setupDb(self, app):
         verbose = app.config.get('SQLALCHEMY_ECHO', False)
         uri = app.config['SQLALCHEMY_DATABASE_URI']
-        print('DB connect with', uri)
         self.engine = create_engine(uri, echo=verbose, pool_recycle=3600)
 
         self.meta = MetaData()

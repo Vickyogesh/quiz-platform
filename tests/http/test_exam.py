@@ -56,7 +56,7 @@ class HttpExamTest(unittest.TestCase):
     # Check: get exam with lang
     # TODO: how to check the language?
     def test_getLang(self):
-        for lang in ['fr', 'de', 'it', 'ru']:
+        for lang in ['fr', 'de', 'it']:
             r = self.req.get(url('/exam'), params={'lang': lang})
             self.assertEqual(200, r.status_code)
             data = r.json()
@@ -101,14 +101,14 @@ class HttpExamTest(unittest.TestCase):
         # Check: not a json
         r = self.req.post(url('/exam/%d' % eid))
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Not a JSON.', data['description'])
 
         # Check: empty json
         r = self.req.post(url('/exam/%d' % eid), data='{}', headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -116,7 +116,7 @@ class HttpExamTest(unittest.TestCase):
         data = json.dumps({'questions': 0})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -124,7 +124,7 @@ class HttpExamTest(unittest.TestCase):
         data = json.dumps({'answers': 0})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Missing parameter.', data['description'])
 
@@ -134,21 +134,21 @@ class HttpExamTest(unittest.TestCase):
         data = json.dumps({'questions': 0, 'answers': 0})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid value.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': [1]*40})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Parameters length mismatch.', data['description'])
 
         data = json.dumps({'questions': [], 'answers': []})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Wrong number of answers.', data['description'])
 
@@ -156,7 +156,7 @@ class HttpExamTest(unittest.TestCase):
         data = json.dumps({'questions': [1]*40, 'answers': [1]*40})
         r = self.req.post(url('/exam/100'), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid exam ID.', data['description'])
 
@@ -164,7 +164,7 @@ class HttpExamTest(unittest.TestCase):
         data = json.dumps({'questions': [1]*40, 'answers': [1]*40})
         r = self.req.post(url('/exam/%d' % eid), data=data, headers=self.headers)
         data = r.json()
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid question ID.', data['description'])
 

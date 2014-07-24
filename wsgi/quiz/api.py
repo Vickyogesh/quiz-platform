@@ -1,9 +1,11 @@
 from werkzeug.exceptions import BadRequest, Forbidden
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
-from flask import Blueprint, request, session, Response, redirect
+from flask import Blueprint, request, session, Response, redirect, abort
 from .appcore import json_response, dict_to_json_response
 from .core.exceptions import QuizCoreError
+from . import access
+from .access import current_user, OwnerPermission
 
 api = Blueprint('api', __name__)
 
@@ -23,7 +25,7 @@ def get_user_id(uid=None):
     If uid is None or 'me' then session's user ID will be returned,
     otherwise uid itself will be returned.
     """
-    return session['user_id'] if uid is None or uid == 'me' else long(uid)
+    return current_user.account_id if uid is None or uid == 'me' else long(uid)
 
 
 # Workaround to solve Safari 3rd party cookie blocking for iframe:
@@ -64,6 +66,7 @@ def fb_canvas(path):
 
 # @api.post('/link_facebook', access=['student'])
 @api.route('/link_facebook', methods=['POST'])
+@access.be_client.require()
 def link_facebook():
     data = request.get_json(force=True)
     try:
@@ -74,9 +77,9 @@ def link_facebook():
     return dict_to_json_response(res)
 
 
-
 #@app.get('/quiz/<int:topic>', access=['student', 'guest'])
 @api.route('/quiz/<int:topic>')
+@access.be_client_or_guest.require()
 def create_quiz(topic):
     """ Get 40 questions from the DB and return them to the client."""
     user_id = get_user_id()
@@ -89,13 +92,14 @@ def create_quiz(topic):
             exclude = [int(x) for x in exclude]
         except ValueError:
             raise QuizCoreError('Invalid parameters.')
-
-    quiz = app.core.getQuiz(session['quiz_type'], user_id, topic, lang, force, exclude)
+    quiz = app.core.getQuiz(session['quiz_type'], user_id, topic, lang, force,
+                            exclude)
     return dict_to_json_response(quiz)
 
 
 #@app.post('/quiz/<int:topic>', access=['student', 'guest'])
 @api.route('/quiz/<int:topic>', methods=['POST'])
+@access.be_client_or_guest.require()
 def save_quiz(topic):
     """ Save quiz results."""
     user_id = get_user_id()
@@ -113,21 +117,19 @@ def save_quiz(topic):
 # @app.get('/student/<uid:user>', access=['student', 'school', 'guest'])
 @api.route('/student', defaults={'user': 'me'})
 @api.route('/student/<uid:user>')
+@access.be_user.require()
 def get_student_stat(user):
-    user_id = get_user_id(user)
-    uid = get_user_id()
+    user_id = get_user_id(user) # requested user
     lang = request.args.get('lang', 'it')
-    utype = session['user_type']
-
     stat = app.core.getUserStat(session['quiz_type'], user_id, lang)
 
     # School can access to it's students only.
-    if utype == 'school' and (user == 'me' or uid != stat['student']['school_id']):
-        raise Forbidden('Forbidden.')
-
+    if (current_user.is_school and (user == 'me' or
+       not OwnerPermission(stat['student']['school_id']).can())):
+        raise abort(403)
     # Students can access only to their own exams.
-    elif utype != 'school' and uid != stat['student']['id']:
-        raise Forbidden('Forbidden.')
+    elif current_user.is_school_member and not OwnerPermission(user_id).can():
+        raise abort(403)
 
     data = app.account.getStudent(user_id)['account']
     info = stat['student']
@@ -138,6 +140,7 @@ def get_student_stat(user):
 
 #@app.get('/errorreview', access=['student', 'guest'])
 @api.route('/errorreview')
+@access.be_client_or_guest.require()
 def get_error_review():
     user_id = get_user_id()
     lang = request.args.get('lang', 'it')
@@ -148,13 +151,13 @@ def get_error_review():
             exclude = [int(x) for x in exclude]
         except ValueError:
             raise QuizCoreError('Invalid parameters.')
-
     res = app.core.getErrorReview(session['quiz_type'], user_id, lang, exclude)
     return dict_to_json_response(res)
 
 
 #@app.post('/errorreview', access=['student', 'guest'])
 @api.route('/errorreview', methods=['POST'])
+@access.be_client_or_guest.require()
 def save_error_review():
     user_id = get_user_id()
     data = request.get_json(force=True)
@@ -169,6 +172,7 @@ def save_error_review():
 
 #@app.get('/exam', access=['student', 'guest'])
 @api.route('/exam')
+@access.be_client_or_guest.require()
 def create_exam():
     user_id = get_user_id()
     lang = request.args.get('lang', 'it')
@@ -181,6 +185,7 @@ def create_exam():
 
 # @app.post('/exam/<int:id>', access=['student', 'guest'])
 @api.route('/exam/<int:id>', methods=['POST'])
+@access.be_client_or_guest.require()
 def save_exam(id):
     data = request.get_json(force=True)
     try:
@@ -194,66 +199,74 @@ def save_exam(id):
 
 # @app.get('/exam/<int:id>', access=['student', 'guest', 'school'])
 @api.route('/exam/<int:id>')
+@access.be_user.require()
 def get_exam_info(id):
     lang = request.args.get('lang', 'it')
-    uid = get_user_id()
     info = app.core.getExamInfo(id, lang)
-    utype = session['user_type']
+    user_id = info['student']['id']
+    school_id = info['student']['school_id']
 
     # School can access to exams of it's students only.
-    if utype == 'school' and uid != info['student']['school_id']:
-        raise Forbidden('Forbidden.')
+    if current_user.is_school and not OwnerPermission(school_id).can():
+        abort(403)
     # Students can access only to their own exams.
-    elif utype != 'school' and uid != info['student']['id']:
-        raise Forbidden('Forbidden.')
+    elif current_user.is_school_member and not OwnerPermission(user_id).can():
+        abort(403)
 
     return dict_to_json_response(info)
 
 
 # @app.get('/student/<uid:user>/exam', access=['student', 'guest', 'school'])
 @api.route('/student/<uid:user>/exam')
+@access.be_user.require()
 def get_student_exams(user):
     user_id = get_user_id(user)
-    # Students can access only to their own data.
-    uid = get_user_id()
-    utype = session['user_type']
 
-    if utype == 'school' and user == 'me':
-        raise Forbidden('Forbidden.')
-    elif utype != 'school' and uid != user_id:
-        raise Forbidden('Forbidden.')
+    # Fast check to prevent extra query if access is denied.
+    # For school we check if it doesn't ask with 'me' ID
+    # and for student we check if he has the same ID.
+    if ((current_user.is_school and user == 'me') or
+        (current_user.is_school_member and not OwnerPermission(user_id))):
+        abort(403)
 
     exams = app.core.getExamList(session['quiz_type'], user_id)
+    school_id = exams['student']['school_id']
 
     # School can access to exams of it's students only.
-    if utype == 'school' and uid != exams['student']['school_id']:
-        raise Forbidden('Forbidden.')
+    if current_user.is_school and not OwnerPermission(school_id).can():
+        abort(403)
     return dict_to_json_response(exams)
 
 
 # @app.get('/student/<uid:user>/topicerrors/<int:id>',
 #          access=['student', 'guest', 'school'])
 @api.route('/student/<uid:user>/topicerrors/<int:id>')
+@access.be_user.require()
 def get_topic_error(user, id):
     user_id = get_user_id(user)
     lang = request.args.get('lang', 'it')
-    # Students can access only to their own data.
-    utype = session['user_type']
-    uid = session['user_id']
-    if utype != 'school' and uid != user_id:
-        raise Forbidden('Forbidden.')
+
+    # Fast check to prevent extra query if access is denied.
+    # For school we check if it doesn't ask with 'me' ID
+    # and for student we check if he has the same ID.
+    if ((current_user.is_school and user == 'me') or
+        (current_user.is_school_member and not OwnerPermission(user_id))):
+        abort(403)
 
     info = app.core.getTopicErrors(session['quiz_type'], user_id, id, lang)
+    school_id = info['student']['school_id']
 
-    # School can access to exams of it's students only.
-    if utype == 'school' and uid != info['student']['school_id']:
-        raise Forbidden('Forbidden.')
+    # School can access to info of it's students only.
+    if current_user.is_school and not OwnerPermission(school_id).can():
+        abort(403)
+
     return dict_to_json_response(info)
 
 
 # TODO: do we need this call?
 #@app.get('/admin/schools', access=['admin'])
 @api.route('/admin/schools')
+@access.be_admin.require()
 def school_list():
     res = app.account.getSchools()
     return dict_to_json_response(res)
@@ -262,14 +275,17 @@ def school_list():
 # TODO: do we need this call?
 # @app.post('/admin/newschool', access=['admin'])
 @api.route('/admin/newschool', methods=['POST'])
+@access.be_admin.require()
 def add_school():
     res = app.account.addSchool(raw=request.data)
     return dict_to_json_response(res)
+
 
 # TODO: do we need this call?
 # @app.post('/admin/school/<int:id>', access=['admin'])
 # @app.delete('/admin/school/<int:id>', access=['admin'])
 @api.route('/admin/school/<int:id>', methods=['POST', 'DELETE'])
+@access.be_admin.require()
 def delete_school(id):
     if request.method == 'POST':
         action = request.args.get('action', None)
@@ -286,7 +302,9 @@ def delete_school(id):
 
 
 # @app.get('/school/<uid:id>/students', access=['school', 'admin'])
+# Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/students')
+@access.be_admin_or_school.require()
 def student_list(id):
     school_id = get_user_id(id)
     res = app.account.getSchoolStudents(school_id)
@@ -294,7 +312,9 @@ def student_list(id):
 
 
 # @app.post('/school/<uid:id>/newstudent', access=['school', 'admin'])
+# Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/newstudent', methods=['POST'])
+@access.be_admin_or_school.require()
 def add_student(id):
     school_id = get_user_id(id)
     res = app.account.addStudent(school_id, raw=request.data)
@@ -303,7 +323,9 @@ def add_student(id):
 
 # @app.post('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
 # @app.delete('/school/<uid:id>/student/<int:student>', access=['school', 'admin'])
+# Note: we don't check school permissions since accounts service will do it.
 @api.route('/school/<uid:id>/student/<int:student>', methods=['POST', 'DELETE'])
+@access.be_admin_or_school.require()
 def delete_student(id, student):
     if request.method == 'POST':
         action = request.args.get('action', None)
@@ -322,30 +344,27 @@ def delete_student(id, student):
     return dict_to_json_response(res)
 
 
-def _get_ids(data):
-    if 'best' not in data or 'worst' not in data:
-        return []
-    return [x['id'] for x in data['best']] + [x['id'] for x in data['worst']]
-
-
-def _update_names(users, data):
-    for x in data:
-        user = users[x['id']]
-        x['name'] = user['name']
-        x['surname'] = user['surname']
-
-
 # @app.get('/school/<uid:id>', access=['school', 'admin'])
 @api.route('/school/<uid:id>')
+@access.be_admin_or_school.require()
 def school_stat(id):
+    def _get_ids(data):
+        if 'best' not in data or 'worst' not in data:
+            return []
+        return [x['id'] for x in data['best']] + [x['id'] for x in data['worst']]
+
+    def _update_names(users, data):
+        for x in data:
+            user = users[x['id']]
+            x['name'] = user['name']
+            x['surname'] = user['surname']
+
     school_id = get_user_id(id)
 
-    if session['user_type'] != 'admin':
-        uid = session['user_id']
-        if uid != school_id:
-            raise Forbidden('Forbidden.')
+    if current_user.is_school and not OwnerPermission(school_id).can():
+        abort(403)
     elif id == 'me':
-        raise Forbidden('Forbidden.')
+        abort(403)
 
     lang = request.args.get('lang', 'it')
     res = app.core.getSchoolStat(session['quiz_type'], school_id, lang)
