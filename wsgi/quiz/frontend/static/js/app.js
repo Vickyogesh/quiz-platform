@@ -120,7 +120,7 @@ function aux_postJSON(url, data, success)
       url: url,
       type: "POST",
       contentType: "application/json; charset=UTF-8",
-      data: null ? JSON.stringify(data): null,
+      data: data != null ? JSON.stringify(data): null,
       dataType: "json",
       success: success
     });
