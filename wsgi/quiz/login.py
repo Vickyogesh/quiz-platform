@@ -1,7 +1,7 @@
 from datetime import datetime
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest
 from flask import current_app as app
-from flask import request, session, Blueprint
+from flask import request, session, Blueprint, abort
 from .core.exceptions import QuizCoreError
 from .appcore import json_response
 from . import access
@@ -24,8 +24,7 @@ def _validate_quiz_access(quiz_type, quiz_type_id, user):
     access = user['access']
     date_str = access.get(quiz_type, None)
     if not date_str:
-        raise Forbidden('Forbidden.')
-
+        abort(403)
     # Convert string to date.
     try:
         d = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -34,7 +33,7 @@ def _validate_quiz_access(quiz_type, quiz_type_id, user):
 
     now = datetime.utcnow().date()
     if d < now:
-        raise Forbidden('Forbidden.')
+        abort(403)
     else:
         return d
 

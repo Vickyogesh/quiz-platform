@@ -43,7 +43,7 @@ function sendAnswers(callback) {
                 setQuizEnv();
             }
         }
-    aux_postJSON(url("/v1/errorreview"), data, callback);
+    aux_postJSON(url("/v1/errorreview"), data, null).always(callback);
 }
 
 function alreadyAnswered(nIndex) {
@@ -72,13 +72,12 @@ function fillupReview() {
     if (exclude.length != 0)
         uri += "?exclude=" + exclude.toString();
 
-    $.getJSON(uri, data, function(data) {
+    $.getJSON(uri, data).always(function(data) {
         if (data.status != 200) {
             var user = sessionStorage.getItem('quizutype');
             if (user == 'guest' && data.status == 403) {
                 WaitMsg.hide();
                 showGuestAccessError();
-                window.location = "student.html";
             }
             else {
                 WaitMsg.hide();

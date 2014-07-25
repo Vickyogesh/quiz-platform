@@ -1,7 +1,6 @@
 $(document).ready(function () {
 	$(document).ajaxError(function() {
-		alert('Unexpected server response.');
-		
+	
 		$('.cssSubmitButton').removeClass('loading');
 	});
 	
@@ -42,7 +41,7 @@ $(document).ready(function () {
           };
 
           WaitMsg.show();
-          aux_postJSON(url("/v1/authorize"), auth, do_auth);
+          aux_postJSON(url("/v1/authorize"), auth, null).always(do_auth);
         }
       });
     }
@@ -57,8 +56,9 @@ function onAuth(butObj)
 {
 	butObj.addClass('loading');
 	
-  $.getJSON(url("/v1/authorize"), function(data) {
+  $.getJSON(url("/v1/authorize")).always(function(data) {
   	
+    data = JSON.parse(data.responseText);
     // Calculate digest
     var login = $("#subscribeForm #username").val();
     var passwd = $("#subscribeForm #password").val();
@@ -75,7 +75,7 @@ function onAuth(butObj)
 
     // Now we can send authorization data
     WaitMsg.show();
-    aux_postJSON(url("/v1/authorize"), auth, do_auth);
+    aux_postJSON(url("/v1/authorize"), auth, null).always(do_auth);
   }); // GET
   
 //  alert('ed');
@@ -98,7 +98,7 @@ function onFbLogin() {
       };
 
       WaitMsg.show();
-      aux_postJSON(url("/v1/authorize"), auth, do_auth);
+      aux_postJSON(url("/v1/authorize"), auth, null).always(do_auth);
     }
   });
 }

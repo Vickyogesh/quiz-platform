@@ -101,7 +101,7 @@
 		$("#work_area").hide();
 		WaitMsg.show();
 
-		$.getJSON(url("/v1/school/me"), function(data) {
+		$.getJSON(url("/v1/school/me")).always(function(data) {
 			if (data.status != 200) {
 				WaitMsg.hide();
 				aux_showJSONError(data);
@@ -130,10 +130,6 @@
 			$("#school_stat").organicTabs();
 			$("#work_area").show();
 			WaitMsg.hide();
-		})
-		.error(function(data) {
-			WaitMsg.hide();
-			aux_showError(data.responseText, data.status);
 		});
 
         $('#topback').click(function(){

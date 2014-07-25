@@ -1,5 +1,5 @@
 from functools import wraps
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
 from flask import Blueprint, request, session, Response, redirect, abort
@@ -49,7 +49,7 @@ def get_user_id(uid=None):
 
 
 # Workaround to solve Safari 3rd party cookie blocking for iframe:
-# http://kb.imakewebsites.ca/2013/04/30/safari-3rd-party-cookies-and-facebook-apps/
+# kb.imakewebsites.ca/2013/04/30/safari-3rd-party-cookies-and-facebook-apps/
 # NOTE: beaker sessions dependent solution!
 @api.route('/ifix')
 def iframe_fix():
@@ -138,7 +138,7 @@ def save_quiz(topic):
 @access.be_user.require()
 @count_user_access()
 def get_student_stat(user):
-    user_id = get_user_id(user) # requested user
+    user_id = get_user_id(user)  # requested user
     lang = request.args.get('lang', 'it')
     stat = app.core.getUserStat(session['quiz_type'], user_id, lang)
 

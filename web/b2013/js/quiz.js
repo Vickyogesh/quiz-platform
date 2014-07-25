@@ -115,7 +115,7 @@ function sendAnswers(callback) {
                 setQuizEnv();
             }
         }
-    aux_postJSON(url("/v1/quiz/" + topicIndex), data, callback);
+    aux_postJSON(url("/v1/quiz/" + topicIndex), data, null).always(callback);
 }
 
 // TODO: really?
@@ -162,7 +162,7 @@ function fillupQuiz(force) {
                 p += '?';
             p += "force=true";
         }
-        $.getJSON(p, d, function(info) {
+        $.getJSON(p, d).always(function(info) {
             if (info.status != 200) {
                 WaitMsg.hide();
                 var user = sessionStorage.getItem('quizutype');

@@ -56,10 +56,14 @@ def init_app(app):
 
     # for testing
     if app.config.get('DEBUG', False) is True:
+        import os.path
         from werkzeug import SharedDataMiddleware
+        here = os.path.dirname(__file__)
+        b2013 = os.path.join(here, '../..', 'web', 'b2013')
         app.add_url_rule('/img/<filename>', 'img_file', build_only=True)
         app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-            '/img':  app.config['DATA_DIR'] + '/img'
+            '/img':  app.config['DATA_DIR'] + '/img',
+            '/b2013': b2013
         })
 
     # Logic setup

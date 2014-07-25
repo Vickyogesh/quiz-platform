@@ -58,8 +58,8 @@
 
 		if (lang != "it")
 			data.lang = lang;
-			
-		$.getJSON(uri, data, function(data) {
+
+		$.getJSON(uri, data).always(function(data) {	
 			if (data.status != 200) {
 				WaitMsg.hide();
                 var user = sessionStorage.getItem('quizutype');
@@ -299,8 +299,7 @@
 		
 		function do_send() {
 			WaitMsg.show();
-
-			aux_postJSON(url("/v1/exam/" + quizData.exam.id), exam_data, function (data) {
+			aux_postJSON(url("/v1/exam/" + quizData.exam.id), exam_data, null).always(function (data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
 	                var user = sessionStorage.getItem('quizutype');
@@ -309,6 +308,8 @@
 	                    window.location = "student.html";
 	                }
 	                else {
+	                	if (data.responseText !== undefined)
+						    data = JSON.parse(data.responseText);
 	                	var msg;
 						  if (data.code !== undefined)
 						    msg = 'Errore: ' + data.status + ', ' + data.description;

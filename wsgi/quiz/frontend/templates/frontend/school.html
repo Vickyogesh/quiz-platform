@@ -31,7 +31,7 @@
 			if (!rc)
 				return;
 
-			aux_postJSON(url("/v1/school/me/student/" + id + "?action=delete"), function (data) {
+			aux_postJSON(url("/v1/school/me/student/" + id + "?action=delete"), null, null).always(function (data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
 					aux_showJSONError(data);
@@ -101,7 +101,7 @@
 
 			WaitMsg.show();
 
-			aux_postJSON(url("/v1/school/me/newstudent"), info, function (data) {
+			aux_postJSON(url("/v1/school/me/newstudent"), info, null).always(function (data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
                     if (data.status == 400 && data.description == "Already exists.")
@@ -149,7 +149,7 @@
             $("#school_menu").hide();
             $("#school_addstudent").hide();
 
-            $.getJSON(url("/v1/school/me/students"), function(data) {
+            $.getJSON(url("/v1/school/me/students")).always(function(data) {
                 if (data.status != 200) {
                     WaitMsg.hide();
                     aux_showJSONError(data);
@@ -178,10 +178,6 @@
 
                 $("#school_menu").show();
                 WaitMsg.hide();
-            })
-            .error(function(data) {
-                WaitMsg.hide();
-                aux_showError(data.responseText, data.status);
             });
         }
 
@@ -191,7 +187,7 @@
 
         if (getUrlParameterByName("upd") == "1") {
             WaitMsg.show();
-            $.getJSON(url("/v1/userinfo"), function(data) {
+            $.getJSON(url("/v1/userinfo")).always(function(data) {
                 WaitMsg.hide();
                 if (data.status != 200) {
                     aux_showJSONError(data);
@@ -204,10 +200,6 @@
                 sessionStorage.setItem('quizname_school', name);
                 window.location.search = null;
                 //doLoad();
-            })
-            .error(function(data) {
-                WaitMsg.hide();
-                aux_showError(data.responseText, data.status);
             });
         }
 

@@ -30,6 +30,7 @@
   	var bTerminated = false;
 
 	$(document).ready(function() {
+		window.back_url = "{{ url_for('frontend.student', quiz_name=quiz_name) }}";
 
         $.getScript('//connect.facebook.net/en_UK/all.js', function() {
             FB.init({
@@ -38,7 +39,6 @@
                 status: true
             });
         });
-
 		var i, htmlVal;
 
 		window.qsid = sessionStorage.getItem('quizqsid');
@@ -59,13 +59,12 @@
 		if (lang != "it")
 			data.lang = lang;
 
-		$.getJSON(uri, data, function(data) {
+		$.getJSON(uri, data).always(function(data) {
 			if (data.status != 200) {
 				WaitMsg.hide();
                 var user = sessionStorage.getItem('quizutype');
                 if (user == 'guest' && data.status == 403) {
                     showGuestAccessError();
-                    window.location = "student.html";
                 }
                 else
 					aux_showJSONError(data);
@@ -300,7 +299,7 @@
 		function do_send() {
 			WaitMsg.show();
 
-			aux_postJSON(url("/v1/exam/" + quizData.exam.id), exam_data, function (data) {
+			aux_postJSON(url("/v1/exam/" + quizData.exam.id), exam_data, null).always(function (data) {
 				if (data.status != 200) {
 					WaitMsg.hide();
 	                var user = sessionStorage.getItem('quizutype');
@@ -309,6 +308,8 @@
 	                    window.location = "{{ url_for('frontend.student', quiz_name=quiz_name) }}";
 	                }
 	                else {
+						if (data.responseText !== undefined)
+						    data = JSON.parse(data.responseText);
 	                	var msg;
 						  if (data.code !== undefined)
 						    msg = 'Errore: ' + data.status + ', ' + data.description;
