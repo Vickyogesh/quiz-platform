@@ -71,16 +71,7 @@ def _facebook_login(data):
     return appid, app.account.send_fb_auth(fb_id, fb_token, 'quiz')
 
 
-@login_api.route('/authorize', methods=['GET'])
-def ask_login():
-    data = app.account.get_auth()
-    return json_response(status=401, nonce=data['nonce'])
-
-
-@login_api.route('/authorize', methods=['POST'])
-def login():
-    data = request.get_json(force=True)
-
+def do_login(data):
     # handle facebook login
     if 'fb' in data:
         appid, (user, cookie) = _facebook_login(data)
@@ -109,12 +100,23 @@ def login():
         session['access_end_date'] = end_date
     session['app_id'] = appid
     access.login(user)
-
     # NOTE: we you want to use 'beaker.session.secret' then use:
     # sid = self.session.__dict__['_headers']['cookie_out']
     # sid = sid[sid.find('=') + 1:sid.find(';')]
     # sid = self.session.id
+    return user
 
+
+@login_api.route('/authorize', methods=['GET'])
+def ask_login():
+    data = app.account.get_auth()
+    return json_response(status=401, nonce=data['nonce'])
+
+
+@login_api.route('/authorize', methods=['POST'])
+def login():
+    data = request.get_json(force=True)
+    user = do_login(data)
     return json_response(user=user)
 
 
