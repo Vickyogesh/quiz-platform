@@ -1,11 +1,12 @@
 import traceback
+import re
 from datetime import date
 from werkzeug.exceptions import HTTPException, BadRequest, default_exceptions
 from flask import Flask, json, current_app, request, Request
 from flask.ext.babelex import Babel, get_locale
 from flask.ext.assets import Environment
 from flask_beaker import BeakerSession
-from flask_bootstrap import Bootstrap
+import flask_bootstrap
 
 
 ###########################################################
@@ -67,12 +68,6 @@ class Application(Flask):
         super(Application, self).__init__(*args, **kwargs)
         self.__setup()
 
-    # Make all errors in JSON format except HTTP 404.
-    def __setup(self):
-        for code in default_exceptions.iterkeys():
-            if code != 404:
-                self.error_handler_spec[None][code] = Application.__json_error
-
     @staticmethod
     def __json_error(e):
         if hasattr(e, "description"):
@@ -89,6 +84,18 @@ class Application(Flask):
         else:
             traceback.print_exc()
             return json_response(500)
+
+    # Make all errors in JSON format except HTTP 404.
+    def __setup(self):
+        for code in default_exceptions.iterkeys():
+            if code != 404:
+                self.error_handler_spec[None][code] = Application.__json_error
+
+    def __setup_bootstrap(self):
+        flask_bootstrap.Bootstrap(self)
+        ver = re.sub(r'^(\d+\.\d+\.\d+).*', r'\1', flask_bootstrap.__version__)
+        cdn = self.extensions['bootstrap']['cdns']['bootstrap']
+        cdn.fallback.baseurl = '//maxcdn.bootstrapcdn.com/bootstrap/%s/' % ver
 
     def load_config(self, config_path, extra_configs=None, env_var=None):
         """Load application configurations.
@@ -128,7 +135,7 @@ class Application(Flask):
         BeakerSession(self)
         self.babel = Babel(self)
         self.assets = Environment(self)
-        Bootstrap(self)
+        self.__setup_bootstrap()
 
         # Inject current language to the template context.
         @self.context_processor
