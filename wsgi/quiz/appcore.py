@@ -4,6 +4,7 @@ from werkzeug.exceptions import HTTPException, BadRequest, default_exceptions
 from flask import Flask, json, current_app, request, Request
 from flask.ext.babelex import Babel, get_locale
 from flask_beaker import BeakerSession
+from flask_bootstrap import Bootstrap
 
 
 ###########################################################
@@ -125,6 +126,7 @@ class Application(Flask):
         """
         BeakerSession(self)
         self.babel = Babel(self)
+        Bootstrap(self)
 
         # Inject current language to the template context.
         @self.context_processor

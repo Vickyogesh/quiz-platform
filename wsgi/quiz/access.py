@@ -1,7 +1,7 @@
 from functools import partial
 from werkzeug.utils import cached_property
 from flask import session, current_app
-from flask.ext.login import (
+from flask_login import (
     LoginManager,
     UserMixin,
     current_user,

@@ -136,3 +136,28 @@ mysql -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENS
 UPDATE proc SET DEFINER = "newUser@host" WHERE DEFINER = "oldUser@localhost";
 UPDATE quiz.proc SET DEFINER = "adminGafibX9@127.7.200.130" WHERE DEFINER = "adminASAJxDv@127.12.159.129";
 
+
+Translations
+------------
+
+Translations support is provided via `Flask-BabelEx` packcage.
+
+Here is article with more info:
+http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xiv-i18n-and-l10n
+
+
+Commands:
+
+    pybabel extract -F misc/babel.cfg -k lazy_gettext -o wsgi/quiz/ui/translations/ui.pot wsgi/quiz/ui
+    pybabel init -i wsgi/quiz/ui/translations/ui.pot -d wsgi/quiz/ui/translations -D ui -l it
+    pybabel compile -d wsgi/quiz/ui/translations -D ui
+
+Update translations:
+
+    pybabel extract -F misc/babel.cfg -k lazy_gettext -o wsgi/quiz/ui/translations/ui.pot wsgi/quiz/ui
+    pybabel update -i wsgi/quiz/ui/translations/ui.pot -d wsgi/quiz/ui/translations -D ui
+
+
+TODOs:
+* [menu] center facebook image vertically
+* [menu] fix exam hover borders
