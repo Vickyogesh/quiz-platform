@@ -16,6 +16,7 @@
   display: block !important;
   width: 100% !important;
   height: auto !important;
+  max-height: 220px;
 }
 
 #login-form .row {
