@@ -26,7 +26,7 @@
 
 {% block scripts %}
   {{ super() }}
-  {% assets "libs.js" %}
+  {% assets "base_libs.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
   {% assets "ui.js" %}
