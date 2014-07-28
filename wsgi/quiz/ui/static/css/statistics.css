@@ -42,19 +42,12 @@
 }
 .nav li > a:hover {
   color: #fff;
-  background-color: #539be1;
+  background-color: #539BE1;
 }
 
 .row {
   margin-left: 0px;
   margin-right: 0px;
-}
-
-.row .vcenter {
-  float: none;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: -4px;
 }
 
 .separator {
@@ -100,13 +93,13 @@
 .tablerow:hover {
   color: #fff;
   border-bottom: 1px solid transparent;
-  background: #2479cc;
-  background: -moz-linear-gradient(top, #2479cc, #0459ac);
-  background: -webkit-linear-gradient(top, #2479cc, #0459ac);
-  background: -o-linear-gradient(top, #2479cc, #0459ac);
-  background: linear-gradient(top, #2479cc, #0459ac);
-  -pie-background: linear-gradient(top, #2579cf, #0358ab);
-  behavior: url(css/PIE.htc); /* IE fix. */
+  background: #2479CC;
+  background: -moz-linear-gradient(top, #2479CC, #0459AC);
+  background: -webkit-linear-gradient(top, #2479CC, #0459AC);
+  background: -o-linear-gradient(top, #2479CC, #0459AC);
+  background: linear-gradient(top, #2479CC, #0459AC);
+  -pie-background: linear-gradient(top, #2579CF, #0358AB);
+  behavior: url(../PIE.htc); /* IE fix. */
 }
 
 .tablerow:hover .cell .glyphicon {
@@ -124,4 +117,9 @@
 
 #exams {
   text-align: center;
+}
+
+#exam_chart {
+  height: 150px;
+  padding: 6px;
 }

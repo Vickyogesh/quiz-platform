@@ -23,7 +23,7 @@
   border: 1px solid #fff;
   border-radius: 10px;
   box-shadow: 1px 3px 5px #888888;
-  behavior: url(PIE.htc); /* IE fix. */
+  behavior: url(../PIE.htc); /* IE fix. */
 }
 .btn-menu:hover {
   border: 1px solid #ccc;
@@ -38,7 +38,7 @@
   border: 1px solid #fff;
   border-radius: 10px;
   box-shadow: 1px 3px 5px #888888;
-  behavior: url(PIE.htc); /* IE fix. */
+  behavior: url(../PIE.htc); /* IE fix. */
   background-image: url(../i/menu-exam.png);
 }
 .btn-exam table {
@@ -50,13 +50,13 @@
   color: #fff;
   cursor: pointer;
   border: 1px solid transparent;
-  behavior: url(PIE.htc); /* IE fix. */
+  behavior: url(../PIE.htc); /* IE fix. */
   vertical-align: middle;
 }
 .btn-exam td:hover {
   border: 1px solid #fff;
   border-radius: 10px;
-  behavior: url(PIE.htc); /* IE fix. */
+  behavior: url(../PIE.htc); /* IE fix. */
 }
 .btn-exam #fr {
   margin: auto;

@@ -12,11 +12,10 @@ body {
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 10px;
-  /*border: 1px solid #e5e5e5;*/
   box-shadow: 0 0 5px #666;
   -moz-box-shadow: 0 0 5px #666;
   -webkit-box-shadow: 0 0 5px #666;
-  behavior: url(PIE.htc); /* IE fix. */
+  behavior: url(../PIE.htc); /* IE fix. */
 }
 .container .header {
   text-align: center;
@@ -24,7 +23,7 @@ body {
 .container .hline {
   margin-right: 20px;
   margin-left: 20px;
-  border-top: 1px solid #e8ecef;
+  border-top: 1px solid #E8ECEF;
 }
 
 .footer {
@@ -36,17 +35,17 @@ body {
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
   margin-top: 1px;
-  background: #2579cf;
-  background: -moz-linear-gradient(top, #2579cf, #0358ab);
-  background: -webkit-linear-gradient(top, #2579cf, #0358ab);
-  background: -o-linear-gradient(top, #2579cf, #0358ab);
-  background: linear-gradient(top, #2579cf, #0358ab);
-  -pie-background: linear-gradient(top, #2579cf, #0358ab);
-  behavior: url(css/PIE.htc); /* IE fix. */
+  background: #2579CF;
+  background: -moz-linear-gradient(top, #2579CF, #0358AB);
+  background: -webkit-linear-gradient(top, #2579CF, #0358AB);
+  background: -o-linear-gradient(top, #2579CF, #0358AB);
+  background: linear-gradient(top, #2579CF, #0358AB);
+  -pie-background: linear-gradient(top, #2579CF, #0358AB);
+  behavior: url(../PIE.htc); /* IE fix. */
   padding: 18px;
 }
 .footer a.button {
-  color: #fff;
+  color: #FFF;
   text-decoration: none;
 }
 .footer a.button.current {
@@ -62,7 +61,7 @@ body {
   z-index: 999;
   display: none;
   background-color: rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #CCC;
 }
 .express-bar a {
   margin-top: 10px;

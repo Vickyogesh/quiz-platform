@@ -3,11 +3,13 @@ import os.path
 from .appcore import Application
 
 app = None
+assets = None
 
 
 def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
     # Default initialization
     global app
+    global assets
     app = Application(__name__)
 
     # Load configuration
@@ -18,6 +20,7 @@ def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
 
     # Core initialization
     app.init()
+    assets = app.assets
 
     # Force Italian translations.
     # Also may be configured via BABEL_DEFAULT_LOCALE.

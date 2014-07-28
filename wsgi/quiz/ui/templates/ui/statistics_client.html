@@ -1,11 +1,6 @@
 {% extends "ui/base.html" %}
 {% block subtitle %}{{ _('Statistics') }}{% endblock %}
 
-{%- block styles %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{url_for('.static', filename='css/statistics.css')}}">
-{% endblock %}
-
 {% block content_class %}statistics client{% endblock %}
 {% block container -%}
   <div class="contentpanel">
@@ -73,128 +68,14 @@
 {% endblock %}
 {% block scripts %}
 {{super()}}
-<script src="{{url_for('.static', filename='js/raphael-min.js')}}"></script>
-<script src="{{url_for('.static', filename='js/g.raphael-min.js')}}"></script>
-<script src="{{url_for('.static', filename='js/g.line.js')}}"></script>
-<script src="{{url_for('.static', filename='js/g.pie-min.js')}}"></script>
-<script src="{{url_for('.static', filename='js/chart.js')}}"></script>
-<script src="{{url_for('.static', filename='js/expressbar.js')}}"></script>
 <script>
-  function update_topics(range) {
-    $(".tablerow .cell .chart").each(function() {
-      $(this).html("");
-      var value;
-      if (range == "data-e-all") {
-        value = 0;
-        var lst = [parseInt($(this).attr("data-e-current")),
-                   parseInt($(this).attr("data-e-week")),
-                   parseInt($(this).attr("data-e-week3"))];
-        var count = 0;
-        for (var i in lst) {
-          if (lst[i] >= 0) {
-            ++count;
-            value += lst[i];
-          }
-        }
-
-        if (!count)
-          value = -1;
-        else
-          value /= count;
-      }
-      else
-        value = parseInt($(this).attr(range));
-      draw_pie(this, value);
-    });
-  }
-
-  function update_stat(range) {
-    $("#exam_chart").html("");
-    update_topics(range);
-    draw_exams("exam_chart", range, 300, 150);
-  }
-
-  function draw_exams(id, range, w, h) {
-    var key = range.substring(7);
-    var data;
-    var examX = [];
-    var examY = [];
-    var count = 0;
-
-    if (key == "all") {
-      data = [].concat(window.exams['week3'], window.exams['week'],
-        window.exams['current']);
-    }
-    else
-      data = window.exams[key];
-
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].status != "passed" && data[i].status != "failed")
-        continue;
-      examX.push(count);
-      examY.push(40 - data[i].errors);
-      count++;
-    }
-
-    for (; count < 3; count++) {
-        examX.push(count);
-    };
-
-    var p = Raphael(id, w, h);
-    var p = p.linechart(10, 10, w - 12, h - 16,
-      [examX, [0, count]],
-      [examY, [36, 36], [0, 40]], {
-      symbol: ["circle"],
-      axis: "0 0 1 1",
-      axisxstep: examX.length || 2,
-      colors: ['#2479cc', '#CCC', 'transparent'],
-      dash: ["", "-"]
-    });
-
-    for( var i = 0, l = p.axis.length; i < l; i++ ) {
-      // change the axis and tick-marks
-      p.axis[i].attr("stroke", "#0459ac");
-
-      // change the axis labels
-      var axisItems = p.axis[i].text.items
-      for( var ii = 0, ll = axisItems.length; ii < ll; ii++ ) {
-         axisItems[ii].attr("fill", "#0459ac");
-      }
-    }
-
-    // Set exam circle size.
-    p.symbols[0].attr("r", 4);
-
-    // Update x-axis texts
-    var xText = p.axis[0].text.items;
-    for(i in xText){
-        var nVal = parseInt(xText[i].attr('text')) + 1;
-        xText[i].attr({'text': nVal + ''});
-    }
-    var lab = p.label($('#' + id).width() / 2, 8, "Statistiche esami");
-    lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
-  }
-
   $(document).ready(function() {
     init_express_bar("#fixedbar", ".contentpanel", "#topic-header");
-    var current_range = "data-e-all";
-    window.exams = {{ exams.exams|tojson }};
-
-    update_stat(current_range);
-
-    $(".navbar-nav li").click(function() {
-      var new_range = $(this).find("a").attr("data-e-range");
-      if (current_range == new_range)
-        return;
-      current_range = new_range;
-      $(".navbar-nav li").removeClass("active");
-      $(this).addClass("active");
-      update_stat(current_range);
-    });
-
     $("#gotop").click(function() {
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
+
+    UserStat.init({{ exams.exams|tojson }});
   });
 </script>
 {% endblock %}
