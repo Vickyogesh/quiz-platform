@@ -1,81 +1,44 @@
-{% extends "ui/base.html" %}
-{% block subtitle %}{{ _('Statistics') }}{% endblock %}
+{% extends "ui/statistics_base.html" %}
 
-{% block content_class %}statistics client{% endblock %}
-{% block container -%}
-  <div class="contentpanel">
-    <div class="express-bar" id="fixedbar">
-      <a href="{{ url_for('.menu', quiz_name=quiz_name) }}" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
-      <a href="#" class="btn btn-default" id="gotop"><span class="glyphicon glyphicon-arrow-up"></span> <span>{{ _('Top') }}</span></a>
-    </div>
-    <div class="header row">
-      <div class="col-md-12">
-        <h4><a href="#">
-          {{ user.account.name }} {{ user.account.surname }}
-        </a></h4>
-      </div>
-    </div>
-    <div class="hline"></div>
-    <nav class="navbar" role="navigation">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-            <span class="sr-only">{{ _('Toggle navigation') }}</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="{{ url_for('.menu', quiz_name=quiz_name) }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="navbar">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="#" data-e-range="data-e-all">{{ _('All') }}</a></li>
-            <li><a href="#" data-e-range="data-e-current">{{ _('Recent') }}</a></li>
-            <li><a href="#" data-e-range="data-e-week">{{ _('Last week') }}</a></li>
-            <li><a href="#" data-e-range="data-e-week3">{{ _('Previous') }}</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+{% block top_menu %}
+  <li class="active"><a href="#" data-e-range="data-e-all">{{ _('All') }}</a></li>
+  <li><a href="#" data-e-range="data-e-current">{{ _('Recent') }}</a></li>
+  <li><a href="#" data-e-range="data-e-week">{{ _('Last week') }}</a></li>
+  <li><a href="#" data-e-range="data-e-week3">{{ _('Previous') }}</a></li>
+{% endblock %}
 
-    <div id="stat">
-      <div id="exams">
+{% block stat_content %}
+  <div id="stat">
+    <div id="exams">
       <div class="row separator">
         <div class="col-md-12">{{ _('Exam statistics') }}</div>
       </div>
+      <a href="#">
         <div class="chart" id="exam_chart"></div>
-      </div>
-      <div class="row separator" id="topic-header">
-        <div class="col-md-12">{{ _('Statistics topics in greater blue portion of the graph corresponds to a better preparation.') }}</div>
-      </div>
-      {% for topic in client_stat.topics %}
-      <div class="tablerow">
-        <div class="content">
-          <div class="cell"><div class="chart" id="{{ topic.id }}"
-                                 data-e-current="{{topic.errors.current}}"
-                                 data-e-week="{{topic.errors.week}}"
-                                 data-e-week3="{{topic.errors.week3}}"></div></div>
-          <div class="cell">{{ topic.text }}</div>
-          <div class="cell"><span class="glyphicon glyphicon-chevron-right"></span></div>
-        </div>
-      </div>
-      {% endfor %}
+      </a>
     </div>
-    <div id="footer"></div>
+    <div class="row separator" id="topic-header">
+      <div class="col-md-12">{{ _('Statistics topics in greater blue portion of the graph corresponds to a better preparation.') }}</div>
+    </div>
+    {% for topic in client_stat.topics %}
+    <a class="tablerow" href="{{ url_for('.statistics_topic', quiz_name=quiz_name, topic_id=topic.id) }}">
+      <div class="content">
+        <div class="cell">
+          <div class="chart" id="{{ topic.id }}"
+                             data-e-current="{{topic.errors.current}}"
+                             data-e-week="{{topic.errors.week}}"
+                             data-e-week3="{{topic.errors.week3}}"></div>
+        </div>
+        <div class="cell">{{ topic.text }}</div>
+        <div class="cell"><span class="glyphicon glyphicon-chevron-right"></span></div>
+      </div>
+    </a>
+    {% endfor %}
   </div>
 {% endblock %}
-{% block scripts %}
-{{super()}}
-<script>
-  $(document).ready(function() {
-    init_express_bar("#fixedbar", ".contentpanel", "#topic-header");
-    $("#gotop").click(function() {
-      $("html, body").animate({scrollTop: 0}, 500, "swing");
-    });
 
-    UserStat.init({{ exams.exams|tojson }});
-  });
-</script>
-{% endblock %}
+{% block express_bar_anchor %}#topic-header{% endblock %}
+{% block stat_script %}
+  window.g.exam_url = "{{ url_for('.statistics_exams', quiz_name=quiz_name, range='') }}";
+  UserStat({{ exams.exams|tojson }});
+{% endblock%}

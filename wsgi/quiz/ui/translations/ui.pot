@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-28 10:33+0700\n"
+"POT-Creation-Date: 2014-07-30 01:33+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,20 @@ msgstr ""
 msgid "Quiz Platform"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/index.html:31
+#: wsgi/quiz/ui/templates/ui/base.html:19
+msgid "Please wait ..."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/base.html:29
+#: wsgi/quiz/ui/templates/ui/base.html:35
+msgid "Close"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/base.html:30
+msgid "Error"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/index.html:26
 msgid "Sign In"
 msgstr ""
 
@@ -43,7 +56,7 @@ msgid "Menu"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/menu_client.html:37
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:2
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:2
 msgid "Statistics"
 msgstr ""
 
@@ -55,42 +68,55 @@ msgstr ""
 msgid "Connect with"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:14
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:35
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:8
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:29
 msgid "Back"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:15
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:9
 msgid "Top"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:30
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:24
 msgid "Toggle navigation"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:40
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:4
 msgid "All"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:41
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:5
 msgid "Recent"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:42
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:6
 msgid "Last week"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:43
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:7
 msgid "Previous"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:52
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:14
 msgid "Exam statistics"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:57
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:21
 msgid ""
 "Statistics topics in greater blue portion of the graph corresponds to a "
 "better preparation."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/statistics_client_exams.html:8
+msgid "Exam list"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/statistics_client_exams.html:21
+#, python-format
+msgid "Exam %(num)d (%(err)d/%(total)d)"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/statistics_client_topic.html:8
+msgid "List of questions for which has not yet been answered correctly."
 msgstr ""
 

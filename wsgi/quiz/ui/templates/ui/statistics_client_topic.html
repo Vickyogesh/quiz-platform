@@ -1,0 +1,33 @@
+{% extends "ui/statistics_base.html" %}
+
+{% block navbar_header_class %}no-button{% endblock %}
+
+{% block stat_content %}
+  <div id="topicstat">
+    <div class="row separator" id="header">
+      <div class="col-md-12">{{ _("List of questions for which has not yet been answered correctly.") }}</div>
+    </div>
+    {%- for question in errors.questions %}
+    <div class="tablerow">
+      <div class="content">
+        <div class="cell">
+          {%- if question.image %}
+          <img src="{{ url_for('img_file', filename='%s.jpg' % question.image) }}">
+          {% endif -%}
+        </div>
+        <div class="cell">
+          <span class="question-id">{{ question.id }}</span>
+          {{ question.text }}
+        </div>
+        <div class="cell"><span class="question-answer">
+          {%- if question.answer == 1 %} V {% else %} F {% endif -%}
+        </span></div>
+      </div>
+    </div>
+    {% else %}
+    <p class="bg-success footer-space">{{ _('There are no questions with wrong answers.') }} </p>
+    {%- endfor -%}
+  </div>
+{% endblock %}
+
+{% block express_bar_anchor %}#header{% endblock %}
