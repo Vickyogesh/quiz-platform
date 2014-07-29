@@ -37,7 +37,7 @@ def check_access(f):
 
         # In all other cases jump to index page which will redirect
         # to the requested page on success login.
-        next_url = url_for('.%s' % f.__name__, quiz_name=name)
+        next_url = url_for('.%s' % f.__name__, **kwargs)
         return redirect(url_for('.index', quiz_name=name, next=next_url))
     return wrapper
 
