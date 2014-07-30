@@ -127,4 +127,4 @@
             window.location = window.g.exam_url + range;
         });
     }
-})();
+})(this);

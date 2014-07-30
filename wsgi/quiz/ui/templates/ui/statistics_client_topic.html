@@ -12,7 +12,8 @@
       <div class="content">
         <div class="cell">
           {%- if question.image %}
-          <img src="{{ url_for('img_file', filename='%s.jpg' % question.image) }}">
+            {%- set url =  url_for('img_file', filename='%s.jpg' % question.image) %}
+            <a href="{{ url }}" data-lightbox="image"><img src="{{ url }}"></a>
           {% endif -%}
         </div>
         <div class="cell">

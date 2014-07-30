@@ -25,8 +25,9 @@
 
     function set_exam(content, data) {
         var questions = data.questions;
+        var exam_id = data.exam.id;
         var html = [];
-        var fmt_img = '<img src="%s.jpg">';
+        var fmt_img = '<a href="%2$s.jpg" data-lightbox="image-%1$s"><img src="%2$s.jpg"></a>';
         var fmt_ans = '<span class="question-answer %s">%s</span>';
         var fmt =
             '<div class="tablerow">' +
@@ -41,7 +42,7 @@
             var opt = {id: q.id, text: q.text, img: "", ans: ""};
 
             if (q.image != "")
-                opt.img = sprintf(fmt_img, window.g.image_url + q.image);
+                opt.img = sprintf(fmt_img, exam_id, window.g.image_url + q.image);
 
             var type = q.is_correct ? "correct" : "wrong";
             var answer = q.answer == 1 ? "V" : "F";
@@ -70,4 +71,4 @@
         });
     }
 
-})();
+})(this);

@@ -43,6 +43,13 @@
     $("#gotop").click(function() {
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
+
+    var options  = new LightboxOptions();
+    var lightbox = new Lightbox(options);
+    lightbox.options.albumLabel = function(curImageNum, albumSize) {
+      return curImageNum + "/" + albumSize;
+    };
+
     window.g = {};
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;
