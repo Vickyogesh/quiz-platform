@@ -74,10 +74,8 @@ def init_app(app):
     from . import access
     from . import login
     from .api import api
-    from .frontend import views
     from .ui import ui
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
-    app.register_blueprint(views.frontend)
     app.register_blueprint(ui, url_prefix='/ui')
