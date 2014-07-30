@@ -106,7 +106,9 @@
 
     var current_range = "data-e-all";
     function on_history_range() {
-        var new_range = $(this).find("a").attr("data-e-range");
+        var a = $(this).find("a");
+        a.blur();
+        var new_range = a.attr("data-e-range");
         if (current_range == new_range)
             return;
         current_range = new_range;

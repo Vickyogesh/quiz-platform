@@ -23,6 +23,7 @@ function init_express_bar(bar_id, parent_id, control_el_id) {
             do_resize();
             bar_el.show();
         } else if (top >= 0 && !bar_hidden) {
+            bar_el.find("a, button").blur();
             bar_el.hide();
             bar_hidden = true;
         }
