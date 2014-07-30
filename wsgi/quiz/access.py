@@ -83,6 +83,10 @@ class User(UserMixin):
     def get_id(self):
         return self.account['login']
 
+    def set_account(self, account):
+        self.__dict__.clear()
+        self.account = account
+
     @cached_property
     def account_id(self):
         return self.account['id']

@@ -11,7 +11,7 @@
   <div class="contentpanel">
     <div class="header row">
       <div class="col-md-12">
-        <h4><a href="#">
+        <h4><a href="{{ account_url }}">
           {{ user.account.name }} {{ user.account.surname }}
         </a></h4>
       </div>
@@ -39,4 +39,14 @@
       <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
     </div>
   </div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+  $(document).ready(function() {
+    if (Aux.getUrlParameterByName("upd") == "1")
+      window.location.search = null;
+  });
+</script>
 {% endblock %}

@@ -10,7 +10,7 @@
     </div>
     <div class="header row">
       <div class="col-md-12">
-        <h4><a href="#">
+        <h4><a href="{{ account_url }}">
           {{ user.account.name }} {{ user.account.surname }}
         </a></h4>
       </div>
@@ -49,6 +49,8 @@
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
     window.g = {};
+    if (Aux.getUrlParameterByName("upd") == "1")
+      window.location.search = null;
     {% block stat_script %} {% endblock%}
   });
 </script>

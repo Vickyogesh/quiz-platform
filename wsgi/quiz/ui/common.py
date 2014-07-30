@@ -1,8 +1,11 @@
 from functools import wraps
-from flask import abort, redirect, url_for, session
+from werkzeug.urls import Href
+from flask import abort, redirect, url_for, session, request
 from flask import render_template as flask_render_template
 from flask_principal import PermissionDenied
 from .babel import gettext, ngettext
+from .. import app
+from ..access import current_user
 from ..login import QUIZ_TYPE_ID
 
 
@@ -48,3 +51,22 @@ def render_template(*args, **kwargs):
     kwargs['_gettext'] = gettext
     kwargs['_ngettext'] = ngettext
     return flask_render_template(*args, **kwargs)
+
+
+def account_url():
+    next_url = Href(request.url)
+    url, cid = app.account.getUserAccountPage()
+    args = {
+        'cid': cid,
+        'uid': current_user.account_id,
+        'next': next_url({'upd': 1})
+    }
+    hr = Href(url)
+    return hr(args)
+
+
+def update_account_data():
+    info = app.account.getUserInfo()
+    account = info['user']
+    session['user'] = account
+    current_user.set_account(account)
