@@ -8,7 +8,12 @@
   {{fixes.ie8()}}
 {% endblock %}
 
-{% block title %} {% block subtitle %}{% endblock%} &mdash; {{ _('Quiz Platform') }}{% endblock %}
+{% block title %}{% block subtitle %}{% endblock%} &mdash;
+  {%- if quiz_title is defined -%}
+    {{ quiz_title }} &mdash;
+  {%- endif %}
+  {{ _('Quiz Platform') }}
+{%- endblock %}
 
 {% block body %}
   <div id="busy_layer">

@@ -12,7 +12,7 @@ from .. import app, access
 from ..login import QUIZ_TYPE_ID, do_login
 
 
-def after_login(quiz_name):
+def after_login():
     """Redirect to menu page or to the page specified in the URL query
     parameter 'next'.
     """
@@ -20,7 +20,7 @@ def after_login(quiz_name):
     if next_url is not None:
         return redirect(next_url)
     else:
-        return redirect(url_for('.menu', quiz_name=quiz_name))
+        return redirect(url_for('.menu'))
 
 
 class LoginFrom(Form):
@@ -38,7 +38,7 @@ def index(quiz_name):
     if current_user.is_authenticated() and (current_user.is_school
                                             or current_user.is_school_member):
         if session['quiz_type_name'] == quiz_name:
-            return after_login(quiz_name)
+            return after_login()
 
     form = LoginFrom()
     if form.validate_on_submit():
@@ -61,7 +61,7 @@ def index(quiz_name):
             else:
                 flash(e.description)
         else:
-            return after_login(quiz_name)
+            return after_login()
     return render_template('ui/index.html', quiz_name=quiz_name, form=form)
 
 
