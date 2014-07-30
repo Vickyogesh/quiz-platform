@@ -17,3 +17,8 @@ fi
 if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
 $OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
 fi
+
+# Generate translations
+source $OPENSHIFT_DATA_DIR/venv/bin/activate
+$OPENSHIFT_DATA_DIR/venv/bin/pybabel compile -d $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/translations -D ui
+

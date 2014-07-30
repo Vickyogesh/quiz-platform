@@ -1,5 +1,6 @@
 *.pyc
 *.pyo
+*.mo
 *.sublime-*
 .virtualenv/
 test-data/
