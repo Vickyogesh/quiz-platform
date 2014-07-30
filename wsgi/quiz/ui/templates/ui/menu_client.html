@@ -1,52 +1,42 @@
-{% extends "ui/base.html" %}
+{% extends "ui/base_page.html" %}
 {% block subtitle %}{{ _('Menu') }}{% endblock %}
 
-{%- block styles %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{url_for('.static', filename='css/menu.css')}}">
+{% block navbar_class %}hidden{% endblock %}
+{% block content_class %}menu{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>
+    <a href="{{ account_url }}">
+    {{ user.account.name }} {{ user.account.surname }}
+    </a>
+  </h4>
+</div>
 {% endblock %}
 
-{% block content_class %}menu{% endblock %}
-{% block container -%}
-  <div class="contentpanel">
-    <div class="header row">
-      <div class="col-md-12">
-        <h4><a href="{{ account_url }}">
-          {{ user.account.name }} {{ user.account.surname }}
-        </a></h4>
-      </div>
-    </div>
-    <div class="hline"></div>
-    <div class="content row">
-      <div class="col-sm-4"><img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}"></div>
-      <div class="col-sm-4">
-        <div class="btn-exam">
-          <table cellpadding="0" cellspacing="0">
-            <tr><td colspan="2" id="it"></td></tr>
-            <tr style="height:30px">
-              <td id="fr"></td>
-              <td id="de"></td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      <div class="col-sm-4"><img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}"></div>
-    </div>
-    <div class="footer row">
-      <div class="col-sm-3"></div>
-      <div class="col-sm-3"><a href="{{ url_for('.statistics', quiz_name=quiz_name) }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
-      <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
-      <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
+{% block panel_content %}
+<div class="content row">
+  <div class="col-sm-4"><img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}"></div>
+  <div class="col-sm-4">
+    <div class="btn-exam">
+      <table cellpadding="0" cellspacing="0">
+        <tr><td colspan="2" id="it"></td></tr>
+        <tr style="height:30px">
+          <td id="fr"></td>
+          <td id="de"></td>
+        </tr>
+      </table>
     </div>
   </div>
+  <div class="col-sm-4"><img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}"></div>
+</div>
 {% endblock %}
 
-{% block scripts %}
-{{super()}}
-<script>
-  $(document).ready(function() {
-    if (Aux.getUrlParameterByName("upd") == "1")
-      window.location.search = null;
-  });
-</script>
+{% block footer %}
+<div class="footer row">
+  <div class="col-sm-3"></div>
+  <div class="col-sm-3"><a href="{{ url_for('.statistics', quiz_name=quiz_name) }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
+  <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
+  <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
+</div>
 {% endblock %}

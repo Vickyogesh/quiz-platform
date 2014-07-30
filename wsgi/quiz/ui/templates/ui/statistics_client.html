@@ -7,7 +7,7 @@
   <li><a href="#" data-e-range="data-e-week3">{{ _('Previous') }}</a></li>
 {% endblock %}
 
-{% block stat_content %}
+{% block panel_content %}
   <div id="stat">
     <div id="exams">
       <div class="row separator">
@@ -38,7 +38,7 @@
 {% endblock %}
 
 {% block express_bar_anchor %}#topic-header{% endblock %}
-{% block stat_script %}
+{% block page_script %}
   window.g.exam_url = "{{ url_for('.statistics_exams', quiz_name=quiz_name, range='') }}";
   UserStat({{ exams.exams|tojson }});
 {% endblock%}

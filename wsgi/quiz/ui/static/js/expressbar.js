@@ -5,6 +5,9 @@ function init_express_bar(bar_id, parent_id, control_el_id) {
     var parent_el_width = 0;
     var control_el = $(control_el_id);
 
+    if (!control_el.length)
+        return;
+
     function do_resize() {
         if (!bar_hidden) {
             var w = parent_el.outerWidth();

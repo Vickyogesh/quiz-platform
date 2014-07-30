@@ -2,7 +2,7 @@
 
 {% block navbar_header_class %}no-button{% endblock %}
 
-{% block stat_content %}
+{% block panel_content %}
   <div id="examstat">
     <div class="row separator" id="header">
       <div class="col-md-12">{{ _('Exam list') }}</div>
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block express_bar_anchor %}#header{% endblock %}
-{% block stat_script %}
+{% block page_script %}
   window.g.exam_url = "{{ exam_url }}";
   window.g.image_url = "{{ image_url }}";
   var exam_stat = new ExamStat;

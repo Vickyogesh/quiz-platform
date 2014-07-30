@@ -30,6 +30,11 @@ def check_access(f):
         # If user is logged in for the same quiz as requested then
         # call view function.
         elif session.get('quiz_type_name') == name:
+            # If 'upd' query parameter is set then this means account data
+            # was changed and we have to sync it.
+            upd = request.args.get('upd')
+            if upd == '1':
+                update_account_data()
             try:
                 response = f(*args, **kwargs)
             except PermissionDenied:

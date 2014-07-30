@@ -44,8 +44,8 @@
 {% block content -%}
   <div class="container {% block content_class %}{% endblock %}">
     {% block container -%}
-    {%- endblock %}
-    </div>
+    {%- endblock -%}
+  </div>  <!-- /container -->
 {%- endblock %}
 
 {% block styles %}
@@ -55,7 +55,7 @@
   {% endassets %}
 {%- endblock %}
 
-{% block scripts %}
+{%- block scripts %}
   {{ super() }}
   {% assets "base_libs.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
@@ -63,4 +63,4 @@
   {% assets "ui.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
-{%- endblock %}
+{%- endblock -%}

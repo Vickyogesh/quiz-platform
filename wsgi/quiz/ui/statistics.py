@@ -1,11 +1,6 @@
 from flask import session, request, url_for
 from . import ui
-from .common import (
-    render_template,
-    check_access,
-    account_url,
-    update_account_data
-)
+from .common import render_template, check_access, account_url
 from .. import app
 from ..access import be_client_or_guest, current_user
 
@@ -29,10 +24,6 @@ def client_stat(quiz_name, uid):
 @check_access
 @be_client_or_guest.require()
 def statistics(quiz_name):
-    upd = request.args.get('upd')
-    if upd == '1':
-        update_account_data()
-
     if current_user.is_school:
         return render_template('ui/statistics_school.html', quiz_name=quiz_name)
     else:
@@ -43,10 +34,6 @@ def statistics(quiz_name):
 @check_access
 @be_client_or_guest.require()
 def statistics_topic(quiz_name, topic_id):
-    upd = request.args.get('upd')
-    if upd == '1':
-        update_account_data()
-
     quiz_type = session['quiz_type']
     lang = request.args.get('lang', 'it')
     uid = current_user.account_id
@@ -63,10 +50,6 @@ def statistics_topic(quiz_name, topic_id):
 @check_access
 @be_client_or_guest.require()
 def statistics_exams(quiz_name, range):
-    upd = request.args.get('upd')
-    if upd == '1':
-        update_account_data()
-
     quiz_type = session['quiz_type']
     uid = current_user.account_id
     exams = app.core.getExamList(quiz_type, uid)['exams']

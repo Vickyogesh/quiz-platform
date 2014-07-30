@@ -1,57 +1,77 @@
-{% extends "ui/base.html" %}
-{% block subtitle %}{{ _('Statistics') }}{% endblock %}
+{% extends "ui/base_page.html" %}
 
+{% block subtitle %}{{ _('Statistics') }}{% endblock %}
 {% block content_class %}statistics client{% endblock %}
-{% block container -%}
-  <div class="contentpanel">
-    <div class="express-bar" id="fixedbar">
-      <a href="{{ back_url }}" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
-      <a href="#" class="btn btn-default" id="gotop"><span class="glyphicon glyphicon-arrow-up"></span> <span>{{ _('Top') }}</span></a>
-    </div>
-    <div class="header row">
-      <div class="col-md-12">
-        <h4><a href="{{ account_url }}">
-          {{ user.account.name }} {{ user.account.surname }}
-        </a></h4>
-      </div>
-    </div>
-    <div class="hline"></div>
-    <nav class="navbar" role="navigation">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header {% block navbar_header_class %}{% endblock %}">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-            <span class="sr-only">{{ _('Toggle navigation') }}</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="navbar">
-          <ul class="nav navbar-nav navbar-right">
-            {% block top_menu %}{% endblock %}
-          </ul>
-        </div>
-      </div>
-    </nav>
-    {% block stat_content %}{% endblock %}
-    <div class="footer-space"></div>
-  </div>
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>
+    <a href="{{ account_url }}">
+    {{ user.account.name }} {{ user.account.surname }}
+    </a>
+  </h4>
+</div>
 {% endblock %}
-{% block scripts %}
-{{super()}}
-<script>
-  $(document).ready(function() {
-    init_express_bar("#fixedbar", ".contentpanel", "{% block express_bar_anchor %}{% endblock %}");
-    $("#gotop").click(function() {
-      $("html, body").animate({scrollTop: 0}, 500, "swing");
-    });
-    window.g = {};
-    if (Aux.getUrlParameterByName("upd") == "1")
-      window.location.search = null;
-    {% block stat_script %} {% endblock%}
-  });
-</script>
+
+{% block nav_brand %}
+  <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
 {% endblock %}
+
+
+
+{#{% block subtitle %}{{ _('Statistics') }}{% endblock %}#}
+{##}
+{#{% block content_class %}statistics client{% endblock %}#}
+{#{% block container -%}#}
+{#  <div class="contentpanel">#}
+{#    <div class="express-bar" id="fixedbar">#}
+{#      <a href="{{ back_url }}" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>#}
+{#      <a href="#" class="btn btn-default" id="gotop"><span class="glyphicon glyphicon-arrow-up"></span> <span>{{ _('Top') }}</span></a>#}
+{#    </div>#}
+{#    <div class="header row">#}
+{#      <div class="col-md-12">#}
+{#        <h4><a href="{{ account_url }}">#}
+{#          {{ user.account.name }} {{ user.account.surname }}#}
+{#        </a></h4>#}
+{#      </div>#}
+{#    </div>#}
+{#    <div class="hline"></div>#}
+{#    <nav class="navbar" role="navigation">#}
+{#      <div class="container-fluid">#}
+{#        <!-- Brand and toggle get grouped for better mobile display -->#}
+{#        <div class="navbar-header {% block navbar_header_class %}{% endblock %}">#}
+{#          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">#}
+{#            <span class="sr-only">{{ _('Toggle navigation') }}</span>#}
+{#            <span class="icon-bar"></span>#}
+{#            <span class="icon-bar"></span>#}
+{#            <span class="icon-bar"></span>#}
+{#          </button>#}
+{#          <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>#}
+{#        </div>#}
+{#        <!-- Collect the nav links, forms, and other content for toggling -->#}
+{#        <div class="collapse navbar-collapse" id="navbar">#}
+{#          <ul class="nav navbar-nav navbar-right">#}
+{#            {% block top_menu %}{% endblock %}#}
+{#          </ul>#}
+{#        </div>#}
+{#      </div>#}
+{#    </nav>#}
+{#    {% block stat_content %}{% endblock %}#}
+{#    <div class="footer-space"></div>#}
+{#  </div>#}
+{#{% endblock %}#}
+{#{% block scripts %}#}
+{#{{super()}}#}
+{#<script>#}
+{#  $(document).ready(function() {#}
+{#    init_express_bar("#fixedbar", ".contentpanel", "{% block express_bar_anchor %}{% endblock %}");#}
+{#    $("#gotop").click(function() {#}
+{#      $("html, body").animate({scrollTop: 0}, 500, "swing");#}
+{#    });#}
+{#    window.g = {};#}
+{#    if (Aux.getUrlParameterByName("upd") == "1")#}
+{#      window.location.search = null;#}
+{#    {% block stat_script %} {% endblock%}#}
+{#  });#}
+{#</script>#}
+{#{% endblock %}#}
