@@ -1,11 +1,14 @@
-@font-face
-{
-  font-family: customMyriadFont;
-  src: url('../font/MyriadPro-Regular.ttf');
-} 
+@font-face {
+  font-family: 'MyriadProRegular';
+  src: url('../font/myriadpro-regular-webfont.eot'); /* IE9 Compat Modes */
+  src: url('../font/myriadpro-regular-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../font/myriadpro-regular-webfont.woff') format('woff'), /* Modern Browsers */
+       url('../font/myriadpro-regular-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../font/myriadpro-regular-webfont.svg#svgMyriadProRegular') format('svg'); /* Legacy iOS */
+}
 
 body {
-  font-family: customMyriadFont,serif;
+  font-family: 'MyriadProRegular', serif;
 }
 
 /* Busy layer. */
