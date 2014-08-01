@@ -128,6 +128,7 @@ class QuizMixin(object):
         questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
                                            lang, exclude)
 
+        # FIXME: bug! it resets quizzes for all topics!
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions and force:
@@ -138,7 +139,16 @@ class QuizMixin(object):
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
                                                lang, exclude)
 
-        return {'topic': topic_id, 'questions': questions}
+        t = self.topics
+        if lang == 'de':
+            col = t.c.text_de
+        elif lang == 'fr':
+            col = t.c.text_fr
+        else:
+            col = t.c.text
+        s = select([col], t.c.id == topic_id)
+        row = self.engine.execute(s).fetchone()
+        return {'topic': topic_id, 'questions': questions, 'title': row[col]}
 
     def saveQuiz(self, quiz_type, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.

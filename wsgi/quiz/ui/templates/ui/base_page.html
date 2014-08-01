@@ -22,9 +22,11 @@
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="navbar">
+        {% block navbar_collapse %}
           <ul class="nav navbar-nav navbar-right">
             {% block top_menu %}{% endblock %}
           </ul>
+        {% endblock %}
         </div>
       </div>
     </nav>

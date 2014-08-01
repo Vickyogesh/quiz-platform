@@ -1,0 +1,47 @@
+{% extends "ui/base_page.html" %}
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+
+{% block navbar_class %}hidden{% endblock %}
+{% block content_class %}quiz-menu{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4> {{ quiz_title }} </h4>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+  <div class="topics row" id="topics">
+    <div class="col-xs-4 areas">
+      <ul>
+        <li class="area1" data-id="1">
+          <span>La strada, i veicoli, le persone</span>
+        </li>
+        <li class="area2" data-id="2">
+          <span>La segnaletica stradale</span>
+        </li>
+        <li class="area3" data-id="3">
+          <span>Norme di comportamento</span>
+        </li>
+        <li class="area4" data-id="4">
+          <span>Equipaggiamento dei veicoli</span>
+        </li>
+        <li class="area5" data-id="5">
+          <span>Documenti</span>
+        </li>
+        <li class="area6" data-id="6">
+          <span>La sicurezza sulla strada e la prevenzione degli incidenti</span>
+        </li>
+        <li class="area7" data-id="7">
+          <span>L'ambiente, la tecnica del veicolo, la correttezza di guida</span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-xs-8 slides"></div>
+  </div>
+{% endblock %}
+
+{% block page_script %}
+  window.g.quiz_url = "{{ quiz_url }}";
+  TopicSlider("#topics");
+{% endblock%}

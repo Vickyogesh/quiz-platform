@@ -41,6 +41,7 @@ It provides the following blocks:
 * navbar_header_class - additional class for the navigation bar header.
   Typical usage is to add class *no-button* to hide navigation bar toggle button.
 * nav_brand - left side navigation bar block. Typical usage is add back button.
+* navbar_collapse - block with whole navigation bar (which contains top_menu).
 * top_menu - header menu block.
 * panel_content - panel content block.
 * footer - footer block (by default contains div with class *footer-space*).
