@@ -1,33 +1,37 @@
 {% extends "ui/base_page.html" %}
-{% block subtitle %}{{ _('Quiz') }}{% endblock %}
 
 {% block content_class %}quiz{% endblock %}
 
 {% block header_row %}
 <div class="col-md-12">
-  <h4> {{ quiz.title }}</h4>
+  <h4>{% block quiz_title %}{% endblock %}</h4>
 </div>
 {% endblock %}
 
-{% block nav_brand %}
-  <button type="button" class="btn btn-primary navbar-btn" id="btt-done">
-    <span class="glyphicon glyphicon-ok"></span>
-    {{  _('Finish') }}
-  </button>
-{% endblock %}
-
-{% block navbar_collapse %}
-  <form class="navbar-form navbar-right" role="search">
-    <div class="form-group">
-      <label>{{ _('Show answers:') }}</label>
-      <div class="btn-group btn-group-sm" data-toggle="buttons">
-        <label class="btn btn-default">
-          <input type="radio" name="options" id="opt_yes">{{ _('Yes') }}</label>
-        <label class="btn btn-default active">
-          <input type="radio" name="options" id="opt_no" checked>{{ _('No') }}</label>
-      </div>
+{% block nav %}
+<nav class="navbar" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header pull-right">
+      <button type="button" class="btn btn-primary navbar-btn" id="btt-done">
+        <span class="glyphicon glyphicon-ok"></span>
+        {{  _('Finish') }}
+      </button>
     </div>
-  </form>
+    <div class="navbar-nocollapse" id="navbar">
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <label>{{ _('Show answers:') }}</label>
+          <div class="btn-group btn-group-sm" data-toggle="buttons">
+            <label class="btn btn-default">
+              <input type="radio" name="options" id="opt_yes">{{ _('Yes') }}</label>
+            <label class="btn btn-default active">
+              <input type="radio" name="options" id="opt_no" checked>{{ _('No') }}</label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</nav>
 {% endblock %}
 
 
@@ -35,7 +39,9 @@
   <div id="quiz-content" class="row">
     <div class="col-sm-2 vcenter">
       <div class="img-wrapper">
-        <a id="question_image" data-lightbox="image"><img></a>
+        <a id="question_image" data-lightbox="image">
+{#          <img src="">#}
+        </a>
       </div>
     </div><!--
     --><div id="questions" class="col-sm-10 vcenter">
@@ -51,8 +57,8 @@
         <div class="qcell">
           <div class="qrect tbl ansbox">
             <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
             </div>
           </div>
         </div>
@@ -69,8 +75,8 @@
         <div class="qcell">
           <div class="qrect tbl ansbox">
             <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
             </div>
           </div>
         </div>
@@ -85,8 +91,8 @@
         <div class="qcell">
           <div class="qrect tbl ansbox">
             <div>
-                <a href="#"><img class="img-ans true"></a>
-                <a href="#"><img class="img-ans false"></a>
+                <a href="#"><div class="img-ans true"></a></div>
+                <a href="#"><div class="img-ans false"></a></div>
             </div>
           </div>
         </div>
@@ -103,8 +109,8 @@
         <div class="qcell">
           <div class="qrect tbl ansbox">
             <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
             </div>
           </div>
         </div>
@@ -121,22 +127,17 @@
         <div class="qcell">
           <div class="qrect tbl ansbox">
             <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
             </div>
           </div>
         </div>
       </div> <!-- row -->
     </div> <!-- /questions -->
 
-    <div class="message-layer" id="msgbox-1"></div>
+    <div class="message-box" id="msgbox"></div>
   </div>
 {% endblock %}
-
-{% block styles %}
-  {{super()}}
-{#  <link rel="stylesheet" href="{{ url_for('.static', filename='css/quiz-bb.css') }}" type="text/css" />#}
-{%- endblock %}
 
 {%- block scripts %}
   {{ super() }}
@@ -146,27 +147,4 @@
   <script type="text/javascript" src="{{ url_for('.static', filename='js/msgbox.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('.static', filename='js/quiz-model.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('.static', filename='js/quiz-view.js') }}"></script>
-{% endblock %}
-
-{% block page_script %}
-  var quiz = new QuizView({
-    el: $(".contentpanel").first(),
-    back_url: "{{ back_url }}",
-    image_url: "{{ image_url }}",
-    quiz_url: "{{ quiz_url }}",
-    msgbox_el: $("#msgbox-1"),
-    labels: {
-      error_send: "{{ _('Error sending answers.') }}",
-      error_get: "{{ _('Error getting questions.') }}",
-      done: "{{ _('You have answered all the questions!') }}",
-      done_info: "{{ _('In this quiz you made errors: %%(errors)s')|safe}}",
-      btt_close: "{{ _('Close') }}",
-      btt_back: "{{ _('Back to menu') }}",
-      btt_quiz_back: "{{ _('Back to quiz') }}",
-      btt_restart: "{{ _('Restart') }}",
-      btt_try_again: "{{ _('Try again') }}",
-      btt_review: "{{ _('Review answers') }}"
-    },
-    data: {{ quiz|tojson }}
-  });
 {% endblock %}

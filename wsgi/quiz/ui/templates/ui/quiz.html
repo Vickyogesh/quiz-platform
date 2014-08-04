@@ -1,153 +1,26 @@
-{% extends "ui/base_page.html" %}
-{% block subtitle %}{{ _('Quiz') }}{% endblock %}
-
-{% block content_class %}quiz{% endblock %}
-
-{% block header_row %}
-<div class="col-md-12">
-  <h4> {{ quiz.title }}</h4>
-</div>
-{% endblock %}
-
-{% block nav_brand %}
-  <button type="button" class="btn btn-primary navbar-btn" id="btt-done">
-    <span class="glyphicon glyphicon-ok"></span>
-    {{  _('Finish') }}
-  </button>
-{% endblock %}
-
-{% block navbar_collapse %}
-  <form class="navbar-form navbar-right" role="search">
-    <div class="form-group">
-      <label>{{ _('Show answers:') }}</label>
-      <div class="btn-group btn-group-sm" data-toggle="buttons">
-        <label class="btn btn-default">
-          <input type="radio" name="options" id="opt_yes">{{ _('Yes') }}</label>
-        <label class="btn btn-default active">
-          <input type="radio" name="options" id="opt_no" checked>{{ _('No') }}</label>
-      </div>
-    </div>
-  </form>
-  </p>
-{% endblock %}
-
-{% block panel_content %}
-  <div id="quiz-content" class="row">
-    <div class="col-sm-2 vcenter">
-      <div class="img-wrapper">
-        <a id="question_image" data-lightbox="image"><img></a>
-      </div>
-    </div><!--
-    --><div id="questions" class="col-sm-10 vcenter">
-
-      <div class="qrow pos2" id="row0">
-        <div class="qcell">
-          <div class="qrect tbl">
-            <div class="hidelong">
-              <div id="text"></div>
-            </div>
-          </div>
-        </div>
-        <div class="qcell">
-          <div class="qrect tbl ansbox">
-            <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
-            </div>
-          </div>
-        </div>
-      </div> <!-- row -->
-
-      <div class="qrow pos1"  id="row1">
-        <div class="qcell">
-          <div class="qrect tbl">
-            <div class="hidelong">
-              <div id="text"></div>
-            </div>
-          </div>
-        </div>
-        <div class="qcell">
-          <div class="qrect tbl ansbox">
-            <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
-            </div>
-          </div>
-        </div>
-      </div> <!-- row -->
-
-      <div class="qrow pos0"  id="row2">
-        <div class="qcell">
-          <div class="qrect tbl">
-            <div id="text"></div>
-          </div>
-        </div>
-        <div class="qcell">
-          <div class="qrect tbl ansbox">
-            <div>
-                <a href="#"><img class="img-ans true"></a>
-                <a href="#"><img class="img-ans false"></a>
-            </div>
-          </div>
-        </div>
-      </div> <!-- row -->
-
-      <div class="qrow pos1" id="row3">
-        <div class="qcell">
-          <div class="qrect tbl">
-            <div class="hidelong">
-              <div id="text"></div>
-            </div>
-          </div>
-        </div>
-        <div class="qcell">
-          <div class="qrect tbl ansbox">
-            <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
-            </div>
-          </div>
-        </div>
-      </div> <!-- row -->
-
-      <div class="qrow pos2" id="row4">
-        <div class="qcell">
-          <div class="qrect tbl">
-            <div class="hidelong">
-              <div id="text"></div>
-            </div>
-          </div>
-        </div>
-        <div class="qcell">
-          <div class="qrect tbl ansbox">
-            <div>
-                <img class="img-ans true">
-                <img class="img-ans false">
-            </div>
-          </div>
-        </div>
-      </div> <!-- row -->
-    </div> <!-- /questions -->
-
-  </div>
-{% endblock %}
+{% extends "ui/quiz_base.html" %}
+{% block subtitle %} {{ _('Quiz') }} {% endblock %}
+{% block quiz_title %} {{ quiz.title }} {% endblock %}
 
 {% block page_script %}
-  window.g.image_url = "{{ image_url }}";
-  window.g.back_url = "{{ back_url }}";
-  window.g.quiz_url = "{{ quiz_url }}";
-  window.g.error_msg_send = "{{ _('Error sending answers.') }}";
-  window.g.error_msg_get = "{{ _('Error getting questions.') }}";
-
-  window.g.msg_done = "{{ _('You have answered all the questions!') }}";
-  window.g.msg_done_info = "{{ _('In this quiz you made errors: %%(errors)s')|safe}}";
-  window.g.msg_btt_close = "{{ _('Close') }}";
-  window.g.msg_btt_back = "{{ _('Back to menu') }}";
-  window.g.msg_btt_quiz_back = "{{ _('Back to quiz') }}";
-  window.g.msg_btt_restart = "{{ _('Restart') }}";
-  window.g.msg_btt_try_again = "{{ _('Try again') }}";
-  window.g.msg_btt_review = "{{ _('Review answers') }}";
-
-  var quiz = new Quiz;
-  quiz.init({{ quiz|tojson }});
-{% endblock%}
+  var quiz = new QuizView({
+    el: $(".contentpanel").first(),
+    back_url: "{{ back_url }}",
+    image_url: "{{ image_url }}",
+    quiz_url: "{{ quiz_url }}",
+    msgbox_el: $("#msgbox"),
+    labels: {
+      error_send: "{{ _('Error sending answers.') }}",
+      error_get: "{{ _('Error getting questions.') }}",
+      done: "{{ _('You have answered all the questions!') }}",
+      done_info: "{{ _('In this quiz you made errors: %%(errors)s')|safe }}",
+      btt_close: "{{ _('Close') }}",
+      btt_back: "{{ _('Back to menu') }}",
+      btt_quiz_back: "{{ _('Back to quiz') }}",
+      btt_restart: "{{ _('Restart') }}",
+      btt_try_again: "{{ _('Try again') }}",
+      btt_review: "{{ _('Review answers') }}"
+    },
+    data: {{ quiz|tojson }}
+  });
+{% endblock %}

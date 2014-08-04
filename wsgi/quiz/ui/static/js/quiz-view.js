@@ -175,11 +175,11 @@
         },
 
         _setImage: function(url) {
-            if (url === undefined)
+            if (url === undefined || url === null)
                 this.question_image_a_el.hide();
             else {
-                this.question_image_el.attr("src", url);
                 this.question_image_a_el.attr("href", url);
+                this.question_image_a_el.css("background-image", "url(" + url + ")");
                 this.question_image_a_el.show();
             }
         },

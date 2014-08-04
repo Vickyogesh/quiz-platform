@@ -8,6 +8,7 @@
     </div>
     <div class="header row">{% block header_row %}{% endblock %}</div>
     <div class="hline"></div>
+    {% block nav %}
     <nav class="navbar {% block navbar_class %}{% endblock %}" role="navigation">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -20,7 +21,6 @@
           </button>
           {% block nav_brand %}{% endblock %}
         </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="navbar">
         {% block navbar_collapse %}
           <ul class="nav navbar-nav navbar-right">
@@ -30,6 +30,7 @@
         </div>
       </div>
     </nav>
+    {% endblock %}
     {% block panel_content %}{% endblock %}
     {% block footer %}
     <div class="footer-space"></div>

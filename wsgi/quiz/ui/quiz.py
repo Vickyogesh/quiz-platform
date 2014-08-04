@@ -25,7 +25,7 @@ def quiz(topic):
     image_url = url_for('img_file', filename='')
     quiz_url = url_for('api.create_quiz', topic=0)[:-1]
 
-    return render_template('ui/quiz-bb.html', quiz_name=quiz_name,
+    return render_template('ui/quiz.html', quiz_name=quiz_name,
                            back_url=url_for('.menu'),
                            image_url=image_url,
                            quiz_url=quiz_url,

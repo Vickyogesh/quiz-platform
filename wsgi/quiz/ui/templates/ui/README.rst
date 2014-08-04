@@ -40,6 +40,7 @@ It provides the following blocks:
   Typical usage is to hide it with *hidden* calss.
 * navbar_header_class - additional class for the navigation bar header.
   Typical usage is to add class *no-button* to hide navigation bar toggle button.
+* nav - parent block of the nav.
 * nav_brand - left side navigation bar block. Typical usage is add back button.
 * navbar_collapse - block with whole navigation bar (which contains top_menu).
 * top_menu - header menu block.
