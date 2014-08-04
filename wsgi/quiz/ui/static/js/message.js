@@ -13,7 +13,6 @@
         this.icon_el_class = '';
         this.text_el = this.el.find("#text");
         this.buttons_el = this.el.find("#buttons");
-        this.buttons_count = 0;
         this.button_fmt = "<button type=\"button\" class=\"btn %s\" id=\"%s\"><span class=\"glyphicon %s\"></span> %s</button>";
         this.on_hide = null;
         this.on_show = null;
@@ -45,7 +44,6 @@
 
         this.clear_buttons = function() {
             this.buttons_el.empty();
-            this.buttons_count = 0;
         };
 
         this.add_button = function(btn_class, icon_class, id, text, callback) {

@@ -32,7 +32,11 @@
       </table>
     </div>
   </div>
-  <div class="col-sm-4"><img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}"></div>
+  <div class="col-sm-4">
+    <a href="{{ url_for('.review') }}">
+      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
+    </a>
+  </div>
 </div>
 {% endblock %}
 
