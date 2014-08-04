@@ -9,29 +9,40 @@ ui = Blueprint('ui', __name__,
                static_url_path='/static/ui')
 
 # Other filters 'yui_js', 'rjsmin'.
-js_base = Bundle('ui/js/libs/raphael-min.js', 'ui/js/libs/g.raphael-min.js',
-                 'ui/js/libs/g.line.js', 'ui/js/libs/g.pie.js',
-                 'ui/js/libs/moment.min.js', 'ui/js/libs/sprintf.min.js',
-                 'ui/js/libs/lightbox.js',
+js_filter = 'jsmin'
+css_filter = 'cssmin'
+
+base = ['ui/js/libs/sprintf.min.js', 'ui/js/libs/lightbox.js',
+        'ui/js/common.js', 'ui/js/expressbar.js']
+
+base_js = Bundle(*base, filters=js_filter, output='ui/gen/base.js')
+
+statistics_js = Bundle('ui/js/libs/raphael-min.js',
+                       'ui/js/libs/g.raphael-min.js',
+                       'ui/js/libs/g.line.js', 'ui/js/libs/g.pie.js',
+                       'ui/js/libs/moment.min.js',
+                       # ours
+                       'ui/js/chart.js', 'ui/js/stat-user.js',
+                       'ui/js/stat-exam.js',
+                       *base, filters=js_filter, output='ui/gen/stat.js')
+
+quiz_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
+                 'ui/js/libs/backbone-min.js',
                  'ui/js/libs/jquery.mousewheel.min.js',
-                 filters='jsmin', output='ui/gen/base_libs.js')
-
-js_bb = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
-               'ui/js/libs/backbone-min.js',
-               filters='jsmin', output='ui/gen/bb.js')
-
-js_ui = Bundle('ui/js/common.js', 'ui/js/chart.js', 'ui/js/expressbar.js',
-               'ui/js/userstat.js', 'ui/js/examstat.js', 'ui/js/topicslider.js',
-               filters='jsmin', output='ui/gen/ui.js')
+                 # ours
+                 'ui/js/msgbox.js', 'ui/js/quiz-model.js',
+                 'ui/js/quiz-topicslider.js',
+                 'ui/js/quiz-view.js', 'ui/js/quiz-review.js',
+                 *base, filters=js_filter, output='ui/gen/quiz.js')
 
 css_ui = Bundle('ui/css/lightbox.css', 'ui/css/style.css', 'ui/css/startup.css',
                 'ui/css/menu.css', 'ui/css/statistics.css',
                 'ui/css/quiz.css', 'ui/css/msgbox.css',
-                filters='cssmin', output='ui/gen/ui.css')
+                filters=css_filter, output='ui/gen/ui.css')
 
-assets.register('base_libs.js', js_base)
-assets.register('bb.js', js_bb)
-assets.register('ui.js', js_ui)
+assets.register('base.js', base_js)
+assets.register('stat.js', statistics_js)
+assets.register('quiz.js', quiz_js)
 assets.register('ui.css', css_ui)
 
 from . import babel

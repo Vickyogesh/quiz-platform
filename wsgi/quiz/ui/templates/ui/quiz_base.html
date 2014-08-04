@@ -139,12 +139,8 @@
   </div>
 {% endblock %}
 
-{%- block scripts %}
-  {{ super() }}
-  {% assets "bb.js" %}
+{% block script_include %}
+  {% assets "quiz.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
-  <script type="text/javascript" src="{{ url_for('.static', filename='js/msgbox.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('.static', filename='js/quiz-model.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('.static', filename='js/quiz-view.js') }}"></script>
 {% endblock %}

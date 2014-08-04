@@ -41,6 +41,12 @@
   </div>
 {% endblock %}
 
+{% block script_include %}
+  {% assets "quiz.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
+
 {% block page_script %}
   window.g.quiz_url = "{{ quiz_url }}";
   TopicSlider("#topics");

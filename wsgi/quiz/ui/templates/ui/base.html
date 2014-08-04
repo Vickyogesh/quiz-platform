@@ -60,12 +60,11 @@
   {% endassets %}
 {%- endblock %}
 
-{%- block scripts %}
-  {{ super() }}
-  {% assets "base_libs.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
-  {% assets "ui.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
-{%- endblock -%}
+{% block scripts %}
+{{super()}}
+  {% block script_include %}
+    {% assets "base.js" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+  {% endblock %}
+{% endblock %}

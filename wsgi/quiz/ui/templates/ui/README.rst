@@ -48,6 +48,7 @@ It provides the following blocks:
 * footer - footer block (by default contains div with class *footer-space*).
 * page_script - page scripts inside *$(document).ready()* block.
 * express_bar_anchor - id of the element on which show express bar.
+* script_include - to include js links.
 
 Needs the following vars:
 
