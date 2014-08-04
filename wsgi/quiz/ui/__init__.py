@@ -9,7 +9,7 @@ ui = Blueprint('ui', __name__,
                static_url_path='/static/ui')
 
 # Other filters 'yui_js', 'rjsmin'.
-js_filter = 'jsmin'
+js_filter = 'yui_js'  # 'jsmin'
 css_filter = 'cssmin'
 
 base = ['ui/js/libs/sprintf.min.js', 'ui/js/libs/lightbox.js',
