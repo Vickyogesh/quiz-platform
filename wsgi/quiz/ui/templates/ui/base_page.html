@@ -42,17 +42,22 @@
 {{super()}}
 <script>
   $(document).ready(function() {
+    {# TODO: translate with flask-babelx #}
+    jQuery.extend(jQuery.colorbox.settings, {
+      current: "Immagine {current} di {total}",
+      previous: "Precedente",
+      next: "Successiva",
+      close: "Chiudi",
+      xhrError: "Errore nel caricamento del contenuto.",
+      imgError: "Errore nel caricamento dell'immagine.",
+      slideshowStart: "Inizia la presentazione",
+      slideshowStop: "Termina la presentazione"
+    });
+
     init_express_bar("#fixedbar", ".contentpanel", "{% block express_bar_anchor %}{% endblock %}");
     $("#gotop").click(function() {
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
-
-    var options  = new LightboxOptions();
-    var lightbox = new Lightbox(options);
-    lightbox.options.albumLabel = function(curImageNum, albumSize) {
-      return curImageNum + "/" + albumSize;
-    };
-
     window.g = {};
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;

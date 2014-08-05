@@ -13,7 +13,7 @@
         <div class="cell">
           {%- if question.image %}
             {%- set url =  url_for('img_file', filename='%s.jpg' % question.image) %}
-            <a href="{{ url }}" data-lightbox="image"><img src="{{ url }}"></a>
+            <a href="{{ url }}" class="cbox" rel="gallery"><img src="{{ url }}"></a>
           {% endif -%}
         </div>
         <div class="cell">
@@ -32,3 +32,6 @@
 {% endblock %}
 
 {% block express_bar_anchor %}#header{% endblock %}
+{%- block page_script %}
+  $("a.cbox").colorbox();
+{% endblock %}

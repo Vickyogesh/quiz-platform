@@ -166,6 +166,8 @@
                 this.showDone();
             else
                 this.model.set("index", 0);
+
+            this.$("a.cbox").colorbox();
         },
 
         _setQuestions: function(questions, rows) {

@@ -27,7 +27,7 @@
         var questions = data.questions;
         var exam_id = data.exam.id;
         var html = [];
-        var fmt_img = '<a href="%2$s.jpg" data-lightbox="image-%1$s"><img src="%2$s.jpg"></a>';
+        var fmt_img = '<a href="%2$s.jpg" rel="image-%1$s" class="cbox"><img src="%2$s.jpg"></a>';
         var fmt_ans = '<span class="question-answer %s">%s</span>';
         var fmt =
             '<div class="tablerow">' +
@@ -52,6 +52,7 @@
         }
         html = html.join('');
         content.html(html);
+        content.find("a.cbox").colorbox();
     }
 
     ExamStat = function () {

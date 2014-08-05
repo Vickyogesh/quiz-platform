@@ -2,18 +2,18 @@ from flask import Blueprint
 from flask.ext.assets import Bundle
 from .. import assets
 
-#NOTE: lightbox.js is changed to have translated label.
 #NOTE: g.line.js has some changes/fixes.
 ui = Blueprint('ui', __name__,
                template_folder='templates', static_folder='static',
                static_url_path='/static/ui')
 
-# Other filters 'yui_js', 'rjsmin'.
-js_filter = 'yui_js'  # 'jsmin'
-css_filter = 'cssmin'
+# filters: yui_js, rjsmin, jsmin, cssmin, yui_css
+js_filter = 'yui_js'
+css_filter = 'yui_css'
 
-base = ['ui/js/libs/sprintf.min.js', 'ui/js/libs/lightbox.js',
-        'ui/js/common.js', 'ui/js/expressbar.js']
+base = ['ui/js/libs/sprintf.min.js', 'ui/js/libs/jquery.colorbox-min.js',
+        'ui/js/libs/jquery.mousewheel.min.js', 'ui/js/common.js',
+        'ui/js/expressbar.js']
 
 base_js = Bundle(*base, filters=js_filter, output='ui/gen/base.js')
 
@@ -28,14 +28,13 @@ statistics_js = Bundle('ui/js/libs/raphael-min.js',
 
 quiz_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
                  'ui/js/libs/backbone-min.js',
-                 'ui/js/libs/jquery.mousewheel.min.js',
                  # ours
                  'ui/js/msgbox.js', 'ui/js/quiz-model.js',
                  'ui/js/quiz-topicslider.js',
                  'ui/js/quiz-view.js', 'ui/js/quiz-review.js',
                  filters=js_filter, output='ui/gen/quiz.js')
 
-css_ui = Bundle('ui/css/lightbox.css', 'ui/css/style.css', 'ui/css/startup.css',
+css_ui = Bundle('ui/css/colorbox.css', 'ui/css/style.css', 'ui/css/startup.css',
                 'ui/css/menu.css', 'ui/css/statistics.css',
                 'ui/css/quiz.css', 'ui/css/msgbox.css',
                 filters=css_filter, output='ui/gen/ui.css')
