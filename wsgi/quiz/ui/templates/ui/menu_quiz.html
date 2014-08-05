@@ -42,6 +42,7 @@
 {% endblock %}
 
 {% block script_include %}
+  {{ super() }}
   {% assets "quiz.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}

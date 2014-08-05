@@ -18,6 +18,7 @@
 {% endblock %}
 
 {% block script_include %}
+  {{ super() }}
   {% assets "stat.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}

@@ -24,7 +24,7 @@ statistics_js = Bundle('ui/js/libs/raphael-min.js',
                        # ours
                        'ui/js/chart.js', 'ui/js/stat-user.js',
                        'ui/js/stat-exam.js',
-                       *base, filters=js_filter, output='ui/gen/stat.js')
+                       filters=js_filter, output='ui/gen/stat.js')
 
 quiz_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
                  'ui/js/libs/backbone-min.js',
@@ -33,7 +33,7 @@ quiz_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
                  'ui/js/msgbox.js', 'ui/js/quiz-model.js',
                  'ui/js/quiz-topicslider.js',
                  'ui/js/quiz-view.js', 'ui/js/quiz-review.js',
-                 *base, filters=js_filter, output='ui/gen/quiz.js')
+                 filters=js_filter, output='ui/gen/quiz.js')
 
 css_ui = Bundle('ui/css/lightbox.css', 'ui/css/style.css', 'ui/css/startup.css',
                 'ui/css/menu.css', 'ui/css/statistics.css',
