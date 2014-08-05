@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-30 01:33+0700\n"
-"PO-Revision-Date: 2014-07-30 01:36+0700\n"
+"POT-Creation-Date: 2014-08-05 01:18+0700\n"
+"PO-Revision-Date: 2014-08-05 11:23+0700\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -17,6 +17,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "X-Generator: Poedit 1.5.7\n"
+
+#: wsgi/quiz/ui/common.py:12
+msgid "B 2011"
+msgstr "B 2011"
+
+#: wsgi/quiz/ui/common.py:13
+msgid "CQC"
+msgstr "CQC"
+
+#: wsgi/quiz/ui/common.py:14
+msgid "B 2013"
+msgstr "B 2013"
+
+#: wsgi/quiz/ui/common.py:15
+msgid "Scooter"
+msgstr "Scooter"
 
 #: wsgi/quiz/ui/index.py:27
 msgid "Login"
@@ -30,57 +46,143 @@ msgstr "Password"
 msgid "Forbidden."
 msgstr "Vietato."
 
-#: wsgi/quiz/ui/templates/ui/base.html:11
+#: wsgi/quiz/ui/templates/ui/base.html:15
 #: wsgi/quiz/ui/templates/ui/index.html:2
 msgid "Quiz Platform"
 msgstr "Quiz Platform"
 
-#: wsgi/quiz/ui/templates/ui/base.html:19
+#: wsgi/quiz/ui/templates/ui/base.html:24
 msgid "Please wait ..."
 msgstr "Attendere prego ..."
 
-#: wsgi/quiz/ui/templates/ui/base.html:29
-#: wsgi/quiz/ui/templates/ui/base.html:35
+#: wsgi/quiz/ui/templates/ui/base.html:34
+#: wsgi/quiz/ui/templates/ui/base.html:40
+#: wsgi/quiz/ui/templates/ui/quiz.html:17
+#: wsgi/quiz/ui/templates/ui/review.html:23
 msgid "Close"
 msgstr "Fine"
 
-#: wsgi/quiz/ui/templates/ui/base.html:30
+#: wsgi/quiz/ui/templates/ui/base.html:35
 msgid "Error"
 msgstr "Errore"
+
+#: wsgi/quiz/ui/templates/ui/base_page.html:6
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:17
+msgid "Back"
+msgstr "Indietro"
+
+#: wsgi/quiz/ui/templates/ui/base_page.html:7
+msgid "Top"
+msgstr "Superiore"
+
+#: wsgi/quiz/ui/templates/ui/base_page.html:17
+msgid "Toggle navigation"
+msgstr "Navigazione toggle"
 
 #: wsgi/quiz/ui/templates/ui/index.html:26
 msgid "Sign In"
 msgstr "Registrati"
 
 #: wsgi/quiz/ui/templates/ui/menu_client.html:2
+#: wsgi/quiz/ui/templates/ui/menu_quiz.html:2
 msgid "Menu"
 msgstr "Menu"
 
-#: wsgi/quiz/ui/templates/ui/menu_client.html:37
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:2
+#: wsgi/quiz/ui/templates/ui/menu_client.html:46
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:3
 msgid "Statistics"
 msgstr "Statistiche"
 
-#: wsgi/quiz/ui/templates/ui/menu_client.html:38
+#: wsgi/quiz/ui/templates/ui/menu_client.html:47
 msgid "Log out"
 msgstr "Esci"
 
-#: wsgi/quiz/ui/templates/ui/menu_client.html:39
+#: wsgi/quiz/ui/templates/ui/menu_client.html:48
 msgid "Connect with"
 msgstr "Collegati con"
 
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:8
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:29
-msgid "Back"
-msgstr "Indietro"
+#: wsgi/quiz/ui/templates/ui/quiz.html:2
+msgid "Quiz"
+msgstr "Quiz"
 
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:9
-msgid "Top"
-msgstr "Superiore"
+#: wsgi/quiz/ui/templates/ui/quiz.html:13
+#: wsgi/quiz/ui/templates/ui/review.html:19
+msgid "Error sending answers."
+msgstr "Errore nell'invio delle risposte."
 
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:24
-msgid "Toggle navigation"
-msgstr "Navigazione toggle"
+#: wsgi/quiz/ui/templates/ui/quiz.html:14
+#: wsgi/quiz/ui/templates/ui/review.html:20
+msgid "Error getting questions."
+msgstr "Errore nella ricezione delle domande."
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:15
+msgid "You have answered all the questions!"
+msgstr "Hai già risposto a tutte le domande!"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:16
+#, python-format
+msgid "In this quiz you made errors: %%(errors)s"
+msgstr "Errori commessi in questa sessione: %%(errors)s"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:18
+#: wsgi/quiz/ui/templates/ui/review.html:24
+msgid "Back to menu"
+msgstr "Torna al menu principale"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:19
+msgid "Back to quiz"
+msgstr "Torna all'esercizio"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:20
+msgid "Restart"
+msgstr "Ricomincia"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:21
+#: wsgi/quiz/ui/templates/ui/review.html:26
+msgid "Try again"
+msgstr "Riprova"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:22
+msgid "Review answers"
+msgstr "Controllo risposte"
+
+#: wsgi/quiz/ui/templates/ui/quiz_base.html:17
+msgid "Finish"
+msgstr "Correggi"
+
+#: wsgi/quiz/ui/templates/ui/quiz_base.html:23
+msgid "Show answers:"
+msgstr "Mostra soluzioni:"
+
+#: wsgi/quiz/ui/templates/ui/quiz_base.html:26
+msgid "Yes"
+msgstr "Sì"
+
+#: wsgi/quiz/ui/templates/ui/quiz_base.html:28
+msgid "No"
+msgstr "No"
+
+#: wsgi/quiz/ui/templates/ui/review.html:2
+msgid "Error Review"
+msgstr "Ripasso Errori"
+
+#: wsgi/quiz/ui/templates/ui/review.html:4
+msgid "Error review"
+msgstr "Ripasso errori"
+
+#: wsgi/quiz/ui/templates/ui/review.html:21
+msgid "You have no questions with wrong answers!"
+msgstr "Nessun errore! "
+
+#: wsgi/quiz/ui/templates/ui/review.html:22
+#, python-format
+msgid "You made errors: %%(errors)s"
+msgstr "Errori commessi: %%(errors)s"
+
+#: wsgi/quiz/ui/templates/ui/review.html:25
+#: wsgi/quiz/ui/templates/ui/review.html:27
+msgid "Back to review"
+msgstr "RItorna all'esercizio"
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:4
 msgid "All"
@@ -119,8 +221,16 @@ msgstr "Elenco esami"
 msgid "Exam %(num)d (%(err)d/%(total)d)"
 msgstr "Esame %(num)d (%(err)d/%(total)d)"
 
+#: wsgi/quiz/ui/templates/ui/statistics_client_exams.html:26
+msgid "There are no exams."
+msgstr "Nessun esame effettuato."
+
 #: wsgi/quiz/ui/templates/ui/statistics_client_topic.html:8
 msgid "List of questions for which has not yet been answered correctly."
 msgstr ""
 "Lista domande per l'argomento selezionato cui non si è ancora risposto "
 "correttamente."
+
+#: wsgi/quiz/ui/templates/ui/statistics_client_topic.html:29
+msgid "There are no questions with wrong answers."
+msgstr "Nessun errore."
