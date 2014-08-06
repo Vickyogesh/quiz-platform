@@ -48,3 +48,10 @@
   <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
 </div>
 {% endblock %}
+
+{%- block page_script %}
+  $(".btn-exam td").click(function(){
+  var lang = $(this).attr("id");
+  window.location = "{{ url_for('.exam') }}?lang=" + lang;
+  });
+{% endblock %}

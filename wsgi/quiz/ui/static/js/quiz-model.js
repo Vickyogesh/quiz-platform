@@ -20,11 +20,9 @@
         }
     });
 
-
     QuestionList = Backbone.Collection.extend({
        model: Question
     });
-
 
     QuizModel = Backbone.Model.extend({
         defaults: {
@@ -106,28 +104,35 @@
             }
         },
 
-        sendCurrentAnswers: function(ok_callback) {
+        getDataToSend: function(data, questions_to_mark) {
             var ids = [];
             var answers = [];
-            var questions_to_mark = [];
 
             this.questions.each(function(question, index) {
                 if (question.isAnswered() && !question.isSaved()) {
                     ids.push(question.get("id"));
-                    answers.push(question.get("user_answer"))
+                    answers.push(question.get("user_answer"));
                     questions_to_mark.push(index);
                 }
             });
 
+            data.questions = ids;
+            data.answers = answers;
+        },
+
+        sendCurrentAnswers: function(ok_callback) {
+            var data = {};
+            var questions_to_mark = [];
+            this.getDataToSend(data, questions_to_mark);
+
             // Nothing to send...
-            if (ids.length == 0) {
+            if (data.questions.length == 0) {
                 ok_callback();
                 return;
             }
 
             var self = this;
             var url = this.getQuizUrl();
-            var data = {questions:ids, answers:answers};
 
             Aux.postJson(url, data, function() {
                 _.each(questions_to_mark, function(index) {

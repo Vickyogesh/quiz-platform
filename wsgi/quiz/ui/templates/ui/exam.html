@@ -1,0 +1,148 @@
+{% extends "ui/base_page.html" %}
+{% block subtitle %} {{ _('Exam') }} {% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>{{ _('Exam') }}</h4>
+</div>
+{% endblock %}
+
+{% block content_class %}exam{% endblock %}
+{% block navbar_class %}hidden{% endblock %}
+
+{% block panel_content %}
+  <div id="exam-content">
+    <img src="{{ url_for('.static', filename='i/exam_header.jpg') }}" class="header hidden-xs">
+    <div class="exam-nav">
+      <div class="exam-row top-nav hidden-xs">
+        {% for i in range(4) -%}
+        <div class="cell" id="rect{{ loop.index0 }}">
+          <div class="head">{{ _('Questions') }}</div>
+{#          <div class="text">{{ _('From %(from)s to %(to)s', from=1 + loop.index0 * 10, to=loop.index * 10) }}</div>#}
+        </div>
+        {%- endfor %}
+      </div>
+
+      <div class="exam-row center-nav hidden-xs">
+        {% for i in range(10) -%}
+        <div class="cell" id="rect{{ loop.index0 }}">{{ loop.index }}</div>
+        {%- endfor %}
+      </div>
+
+      <div class="bottom-nav">
+        {% for i in range(40) -%}
+        <div id="rect{{ loop.index0 }}">{{ loop.index }}</div>
+        {%- endfor %}
+      </div>
+    </div> <!-- /exam-nav -->
+
+    <div class="exam-data">
+      <div class="row question">
+        <div class="col-sm-4">
+          <div class="image">
+            <div><a id="image" class="cbox" href="#"></a></div>
+          </div>
+        </div><!--
+    --><div class="col-sm-8">
+          <div class="data">
+            <div id="number">
+              <span>{{ _('Question number') }}</span>
+              <span id="val">40</span>
+            </div>
+
+            <div class="text-rect">
+              <table>
+                <tr><td id="text">dsads</td></tr>
+                <tr><td id="text-lang">dsdsd</td></tr>
+              </table>
+            </div>
+          </div> <!-- /text -->
+
+          <div class="answer-rect">
+            <div>
+              <div>
+                <div>{{ _('True') }}</div><div class="img-ans true-big" id="true"></div>
+              </div>
+              <div>
+                <div>{{ _('False') }}</div><div class="img-ans false-big" id="false"></div>
+              </div>
+            </div>
+          </div> <!-- /answer-rect -->
+        </div> <!-- /col-sm-8 -->
+      </div> <!-- /question -->
+    </div> <!-- /exam-data -->
+
+    <div class="control">
+      <div class="exam-row">
+        <div class="cell time">
+          <div>
+            <span class="title">{{  _('Time available') }}</span>
+            <span id="time"></span>
+          </div>
+        </div>
+        <div class="cell info hidden-xs">
+          <div class="field">
+            <div class="title">{{ _('Exam number') }}</div>
+            <div class="val">{{ exam.exam.id }}</div>
+          </div>
+          <div class="field">
+            <div class="title">{{ _('Name and surname') }}</div>
+            <div class="val">{{ user.account.name }} {{ user.account.surname }}</div>
+          </div>
+        </div>
+        <div class="cell summary">
+          <span>{{ _('Summary') }}</span>
+          <div class="btt-summary"></div>
+        </div>
+        <div class="cell buttons">
+          <div id="prev">
+            <span>{{ _('Previous question') }}</span>
+            <div class="btt-prev"></div>
+          </div>
+          <div id="next">
+            <span>{{ _('Next question') }}</span>
+            <div class="btt-next"></div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /control -->
+
+    <div class="summarypanel">
+    </div>
+
+    <div class="message-box" id="msgbox"></div>
+  </div>
+{% endblock %}
+
+{% block script_include %}
+  {{ super() }}
+  {% assets "bb.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% assets "exam.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
+
+{% block page_script %}
+  var exam = new ExamView({
+    el: $(".contentpanel").first(),
+    back_url: "{{ back_url }}",
+    image_url: "{{ image_url }}",
+    exam_url: "{{ exam_url }}",
+    msgbox_el: $("#msgbox"),
+    labels: {
+      error_send: "{{ _('Error saving exam.') }}",
+      error_get: "{{ _('Error getting questions.') }}",
+      done: "{{ _('You have answered all the questions!') }}",
+      done_info: "{{ _('In this quiz you made errors: %%(errors)s')|safe }}",
+      btt_close: "{{ _('Close') }}",
+      btt_back: "{{ _('Back to menu') }}",
+      btt_quiz_back: "{{ _('Back to quiz') }}",
+      btt_restart: "{{ _('Restart') }}",
+      btt_try_again: "{{ _('Try again') }}",
+      btt_review: "{{ _('Review answers') }}"
+    },
+    exam: {{ exam|tojson }}
+  });
+{% endblock %}
