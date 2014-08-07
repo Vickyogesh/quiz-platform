@@ -1,3 +1,8 @@
+body:after {
+  content: url(../i/true_big.png) url(../i/true_selected_big.png) url(../i/false_big.png) url(../i/false_selected_big.png);
+  display: none;
+}
+
 .container.exam, .container.exam-review {
   max-width: 750px;
 }
