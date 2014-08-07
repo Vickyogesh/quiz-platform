@@ -1,9 +1,13 @@
 (function() {
     ExamModel = QuizModel.extend({
-//        initialize: function() {
-//            Backbone.Model.prototype.initialize.apply(this, arguments);
-//            this.is_can_load_more = false;
-//        },
+        defaults: _.extend({}, QuizModel.prototype.defaults,{
+            max_errors: 4
+        }),
+
+        initialize: function() {
+            QuizModel.prototype.initialize.apply(this, arguments);
+            this.is_can_load_more = false;
+        },
 
         getQuizUrl: function() {
             return this.get("exam_url") + this.get("exam_id");
@@ -55,6 +59,5 @@
             data.questions = ids;
             data.answers = answers;
         }
-
     });
 })();

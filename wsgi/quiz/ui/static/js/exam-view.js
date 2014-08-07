@@ -7,6 +7,7 @@
         },
 
         initialize: function() {
+            this.listenTo(this.model, "change:can_answer", this.stop);
             this.timer = setInterval(this.onTimer.bind(this), 1000);
             this.render();
         },
@@ -17,6 +18,10 @@
                 this.trigger("elapsed");
             }
             this.render();
+        },
+
+        stop: function() {
+            clearTimeout(this.timer);
         },
 
         render: function() {
@@ -147,10 +152,44 @@
 
     ExamSummaryView = Backbone.View.extend({
         events: {
-          "click": "hide"
+          "click #back": "hide",
+          "click #finish": "finish"
         },
-        initialize: function() {
 
+        li_template: _.template($("#summary-li-tmpl").html()),
+        img_template: _.template($("#summary-img-tmpl").html()),
+
+        initialize: function() {
+            this.listenTo(this.model, "answer", this.onAnswer);
+            var lst = [];
+            this.model.questions.each(function(q, index, list) {
+                var empty_img = "<div></div>";
+                var img;
+                if (q.has("image"))
+                    img = this.img_template({url: this.model.getImageUrl(q.get("image"))});
+                else
+                    img = empty_img;
+
+                lst.push(this.li_template({
+                    index: index, num: index + 1, img_tag: img, text: q.get("text")
+                }));
+            }.bind(this));
+
+            this.$("#answers > ul").html(lst.join("\n"));
+        },
+
+        onAnswer: function(index) {
+            var q = this.model.getCurrentQuestion();
+            var row = this.$("li#q" + index + " .q");
+
+            if (q.get("user_answer") == 1) {
+                row.find("#true").html("X");
+                row.find("#false").empty();
+            }
+            else {
+                row.find("#true").empty();
+                row.find("#false").html("X");
+            }
         },
 
         show: function() {
@@ -159,6 +198,10 @@
 
         hide: function() {
             this.$el.hide();
+        },
+
+        finish: function() {
+            this.trigger("finish");
         }
     });
 
@@ -182,6 +225,7 @@
             this.msgbox = new MessageBox({el: params.msgbox_el});
             this.labels = params.labels;
             this.back_url = params.back_url;
+            this.review_url = params.review_url;
 
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
@@ -199,7 +243,8 @@
 
             this.timer = new ExamTimerView({
                 el: this.$(".control .time #time"),
-                total: 5 // total time in seconds
+                model: this.model,
+                total: 1800 // total time in seconds
             });
 
             this.summary = new ExamSummaryView({
@@ -207,12 +252,17 @@
                 model: this.model
             });
 
-            this.listenTo(this.timer, "elapsed", this.onTimer);
             this.listenTo(this.model, "done", this.onDone);
             this.listenTo(this.model, "error:save", this.onModelSaveError);
+            this.listenTo(this.timer, "elapsed", this.onTimer);
+            this.listenTo(this.summary, "finish", this.onSend);
 
             this.model.set("index", 0);
             this.$("a.cbox").colorbox();
+        },
+
+        backToMenu: function() {
+            window.location = this.back_url;
         },
 
         onModelSaveError: function(response, ok_callback) {
@@ -224,25 +274,66 @@
                 "icon": "glyphicon-remove-circle",
                 "buttons": [
                     {
+                        text: this.labels.btt_back, type: "btn-default",
+                        icon: "glyphicon-arrow-left",
+                        callback: this.backToMenu.bind(this)
+                    },
+                    {
                         text: this.labels.btt_close, type: "btn-danger",
                         callback: close.bind(this)
                     },
                     {
                         text: this.labels.btt_try_again, type: "btn-primary",
                         icon: "glyphicon-repeat",
-                        callback: this.onSummary.bind(this)
+                        callback: this.onSend.bind(this)
                     }
                 ]
             });
         },
 
-        onSummary: function() {
-            this.model.set("can_answer", false);
-            var self = this;
-            this.model.sendCurrentAnswers(function() {
-                window.location = self.back_url;
+        showAfterSave: function(response) {
+            var max = this.model.get("max_errors");
+            var icon = "";
+            var text = "";
+
+            if (response !== undefined && response.num_errors !== undefined) {
+                if (max >= response.num_errors)
+                    icon = "glyphicon-ok-circle";
+                else
+                    icon = "glyphicon-remove-circle";
+
+                text = sprintf(this.labels.done_info, {errors: response.num_errors});
+            }
+
+            function to_review() {
+                window.location = this.review_url + this.model.get("exam_id");
+            }
+
+            this.msgbox.show({
+                "text": text,
+                "icon": icon,
+                "buttons": [
+                    {
+                        text: this.labels.btt_back, type: "btn-success",
+                        icon: "glyphicon-arrow-left",
+                        callback: this.backToMenu.bind(this)
+                    },
+                    {
+                        text: this.labels.btt_try_again, type: "btn-default",
+                        icon: "glyphicon-eye-open",
+                        callback: to_review.bind(this)
+                    }
+                ]
             });
-//            this.summary.show();
+        },
+
+        onSend: function() {
+            this.model.set("can_answer", false);
+            this.model.sendCurrentAnswers(this.showAfterSave.bind(this));
+        },
+
+        onSummary: function() {
+            this.summary.show();
         },
         onPrev: function() {
             this.model.showPrevious();
@@ -252,11 +343,11 @@
         },
 
         onTimer: function() {
-//            this.model.set("can_answer", false);
-//            this.summary.show();
+            this.model.set("can_answer", false);
+            this.summary.show();
         },
         onDone: function() {
-//            this.summary.show();
+            this.summary.show();
         }
     });
 })();

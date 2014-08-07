@@ -1,4 +1,4 @@
-.container.exam {
+.container.exam, .container.exam-review {
   max-width: 750px;
 }
 
@@ -267,13 +267,13 @@
   padding-right: 6px;
 }
 
-.exam .control .field .title {
+.exam .field .title {
   font-size: 12px;
   line-height: 12px;
   font-weight: bold;
 }
 
-.exam .control .field .val {
+.exam .field .val {
   border: 2px solid #62A079;
   background-color: #fff;
   text-align: center;
@@ -350,6 +350,66 @@
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.exam .summarypanel #answers {
+  height: 70%;
+  overflow-y: auto;
+  border: 1px solid #CCC;
+}
+
+.exam .summarypanel #answers > ul {
+  list-style: none;
+  padding: 0;
+}
+
+.exam .summarypanel #answers > ul > li .cell {
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+}
+
+.exam .summarypanel #answers > ul > li .img {
+  width: 60px;
+  min-height: 50px;
+}
+
+.exam .summarypanel #answers > ul > li .img div {
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 50px;
+  height: 50px;
+}
+.exam .summarypanel #answers > ul > li .hdr {
+  color: #102F68;
+  font-weight: bold;
+}
+
+.exam .summarypanel #answers > ul > li .q .text {
+  background-color: #fff;
+}
+
+.exam .summarypanel #answers > ul > li .vf {
+  width: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: #ccc;
+  background-color: #fff;
+}
+
+.exam .summarypanel #answers > ul > li .q .vf {
+  color: #102F68;
+}
+
+.exam .summarypanel #buttons {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.exam .summarypanel .field {
+  margin-top: 10px;
 }
 
 @media (max-width: 768px) {

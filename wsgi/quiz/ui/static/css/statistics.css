@@ -46,13 +46,3 @@
 .exam-answers {
   display: none;
 }
-.exam-answers .question-answer {
-  color: #fff;
-  padding: 4px 20px;
-}
-.exam-answers .question-answer.correct {
-  background-color: #6a9077;
-}
-.exam-answers .question-answer.wrong {
-  background-color: #c9463e;
-}

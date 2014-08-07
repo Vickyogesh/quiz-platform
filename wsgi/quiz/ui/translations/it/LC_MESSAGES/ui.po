@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-06 19:32+0700\n"
-"PO-Revision-Date: 2014-08-06 19:32+0700\n"
+"POT-Creation-Date: 2014-08-07 16:03+0700\n"
+"PO-Revision-Date: 2014-08-07 16:08+0700\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -57,7 +57,7 @@ msgstr "Attendere prego ..."
 
 #: wsgi/quiz/ui/templates/ui/base.html:34
 #: wsgi/quiz/ui/templates/ui/base.html:40
-#: wsgi/quiz/ui/templates/ui/exam.html:135
+#: wsgi/quiz/ui/templates/ui/exam.html:187
 #: wsgi/quiz/ui/templates/ui/quiz.html:17
 #: wsgi/quiz/ui/templates/ui/review.html:23
 msgid "Close"
@@ -68,6 +68,7 @@ msgid "Error"
 msgstr "Errore"
 
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
+#: wsgi/quiz/ui/templates/ui/exam_review.html:11
 #: wsgi/quiz/ui/templates/ui/menu_quiz.html:6
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:17
 msgid "Back"
@@ -111,10 +112,12 @@ msgid "Time available"
 msgstr "TEMPO A DISPOSIZIONE"
 
 #: wsgi/quiz/ui/templates/ui/exam.html:85
+#: wsgi/quiz/ui/templates/ui/exam.html:129
 msgid "Exam number"
 msgstr "Scheda Esame N."
 
 #: wsgi/quiz/ui/templates/ui/exam.html:89
+#: wsgi/quiz/ui/templates/ui/exam.html:133
 msgid "Name and surname"
 msgstr "Cognome e Nome del Candidato"
 
@@ -130,55 +133,61 @@ msgstr "Domanda Precedente"
 msgid "Next question"
 msgstr "Domanda Successiva"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:131
-#: wsgi/quiz/ui/templates/ui/quiz.html:13
-#: wsgi/quiz/ui/templates/ui/review.html:19
-msgid "Error sending answers."
-msgstr "Errore nell'invio delle risposte."
+#: wsgi/quiz/ui/templates/ui/exam.html:117
+msgid "Back to questions"
+msgstr "Ritorna alle domande"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:132
-#: wsgi/quiz/ui/templates/ui/quiz.html:14
-#: wsgi/quiz/ui/templates/ui/review.html:20
-msgid "Error getting questions."
-msgstr "Errore nella ricezione delle domande."
+#: wsgi/quiz/ui/templates/ui/exam.html:123
+msgid "Finish exam"
+msgstr "Chiudi esame"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:133
-#: wsgi/quiz/ui/templates/ui/quiz.html:15
-msgid "You have answered all the questions!"
-msgstr "Hai già risposto a tutte le domande!"
+#: wsgi/quiz/ui/templates/ui/exam.html:146
+msgid "Question text"
+msgstr "Testo della domanda"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:134
-#: wsgi/quiz/ui/templates/ui/quiz.html:16
-#, python-format
-msgid "In this quiz you made errors: %%(errors)s"
+#: wsgi/quiz/ui/templates/ui/exam.html:147
+msgid "T"
+msgstr "V"
+
+#: wsgi/quiz/ui/templates/ui/exam.html:148
+msgid "F"
+msgstr "F"
+
+#: wsgi/quiz/ui/templates/ui/exam.html:185
+msgid "Error saving exam."
+msgstr "Risparmio esame errore."
+
+#: wsgi/quiz/ui/templates/ui/exam.html:186
+#, fuzzy, python-format
+msgid "In this exam you made errors: %%(errors)s"
 msgstr "Errori commessi in questa sessione: %%(errors)s"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:136
+#: wsgi/quiz/ui/templates/ui/exam.html:188
 #: wsgi/quiz/ui/templates/ui/quiz.html:18
 #: wsgi/quiz/ui/templates/ui/review.html:24
 msgid "Back to menu"
 msgstr "Torna al menu principale"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:137
-#: wsgi/quiz/ui/templates/ui/quiz.html:19
-msgid "Back to quiz"
-msgstr "Torna all'esercizio"
-
-#: wsgi/quiz/ui/templates/ui/exam.html:138
-#: wsgi/quiz/ui/templates/ui/quiz.html:20
-msgid "Restart"
-msgstr "Ricomincia"
-
-#: wsgi/quiz/ui/templates/ui/exam.html:139
+#: wsgi/quiz/ui/templates/ui/exam.html:189
 #: wsgi/quiz/ui/templates/ui/quiz.html:21
 #: wsgi/quiz/ui/templates/ui/review.html:26
 msgid "Try again"
 msgstr "Riprova"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:140
+#: wsgi/quiz/ui/templates/ui/exam.html:190
 #: wsgi/quiz/ui/templates/ui/quiz.html:22
 msgid "Review answers"
 msgstr "Controllo risposte"
+
+#: wsgi/quiz/ui/templates/ui/exam_review.html:3
+#: wsgi/quiz/ui/templates/ui/exam_review.html:7
+msgid "Exam review"
+msgstr "Statistiche esami"
+
+#: wsgi/quiz/ui/templates/ui/exam_review.html:17
+#, python-format
+msgid "List of exam %(id)s answers."
+msgstr "Elenco di esame %(id)s risposte."
 
 #: wsgi/quiz/ui/templates/ui/index.html:26
 msgid "Sign In"
@@ -205,6 +214,33 @@ msgstr "Collegati con"
 #: wsgi/quiz/ui/templates/ui/quiz.html:2
 msgid "Quiz"
 msgstr "Quiz"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:13
+#: wsgi/quiz/ui/templates/ui/review.html:19
+msgid "Error sending answers."
+msgstr "Errore nell'invio delle risposte."
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:14
+#: wsgi/quiz/ui/templates/ui/review.html:20
+msgid "Error getting questions."
+msgstr "Errore nella ricezione delle domande."
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:15
+msgid "You have answered all the questions!"
+msgstr "Hai già risposto a tutte le domande!"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:16
+#, python-format
+msgid "In this quiz you made errors: %%(errors)s"
+msgstr "Errori commessi in questa sessione: %%(errors)s"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:19
+msgid "Back to quiz"
+msgstr "Torna all'esercizio"
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:20
+msgid "Restart"
+msgstr "Ricomincia"
 
 #: wsgi/quiz/ui/templates/ui/quiz_base.html:17
 msgid "Finish"
@@ -242,7 +278,7 @@ msgstr "Errori commessi: %%(errors)s"
 #: wsgi/quiz/ui/templates/ui/review.html:25
 #: wsgi/quiz/ui/templates/ui/review.html:27
 msgid "Back to review"
-msgstr "RItorna all'esercizio"
+msgstr "Ritorna all'esercizio"
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:4
 msgid "All"

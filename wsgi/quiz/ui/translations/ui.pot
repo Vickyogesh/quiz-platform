@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-06 19:32+0700\n"
+"POT-Creation-Date: 2014-08-07 16:03+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base.html:34
 #: wsgi/quiz/ui/templates/ui/base.html:40
-#: wsgi/quiz/ui/templates/ui/exam.html:135
+#: wsgi/quiz/ui/templates/ui/exam.html:187
 #: wsgi/quiz/ui/templates/ui/quiz.html:17
 #: wsgi/quiz/ui/templates/ui/review.html:23
 msgid "Close"
@@ -67,6 +67,7 @@ msgid "Error"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
+#: wsgi/quiz/ui/templates/ui/exam_review.html:11
 #: wsgi/quiz/ui/templates/ui/menu_quiz.html:6
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:17
 msgid "Back"
@@ -110,10 +111,12 @@ msgid "Time available"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/exam.html:85
+#: wsgi/quiz/ui/templates/ui/exam.html:129
 msgid "Exam number"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/exam.html:89
+#: wsgi/quiz/ui/templates/ui/exam.html:133
 msgid "Name and surname"
 msgstr ""
 
@@ -129,54 +132,60 @@ msgstr ""
 msgid "Next question"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:131
-#: wsgi/quiz/ui/templates/ui/quiz.html:13
-#: wsgi/quiz/ui/templates/ui/review.html:19
-msgid "Error sending answers."
+#: wsgi/quiz/ui/templates/ui/exam.html:117
+msgid "Back to questions"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:132
-#: wsgi/quiz/ui/templates/ui/quiz.html:14
-#: wsgi/quiz/ui/templates/ui/review.html:20
-msgid "Error getting questions."
+#: wsgi/quiz/ui/templates/ui/exam.html:123
+msgid "Finish exam"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:133
-#: wsgi/quiz/ui/templates/ui/quiz.html:15
-msgid "You have answered all the questions!"
+#: wsgi/quiz/ui/templates/ui/exam.html:146
+msgid "Question text"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:134
-#: wsgi/quiz/ui/templates/ui/quiz.html:16
+#: wsgi/quiz/ui/templates/ui/exam.html:147
+msgid "T"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/exam.html:148
+msgid "F"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/exam.html:185
+msgid "Error saving exam."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/exam.html:186
 #, python-format
-msgid "In this quiz you made errors: %%(errors)s"
+msgid "In this exam you made errors: %%(errors)s"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:136
+#: wsgi/quiz/ui/templates/ui/exam.html:188
 #: wsgi/quiz/ui/templates/ui/quiz.html:18
 #: wsgi/quiz/ui/templates/ui/review.html:24
 msgid "Back to menu"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:137
-#: wsgi/quiz/ui/templates/ui/quiz.html:19
-msgid "Back to quiz"
-msgstr ""
-
-#: wsgi/quiz/ui/templates/ui/exam.html:138
-#: wsgi/quiz/ui/templates/ui/quiz.html:20
-msgid "Restart"
-msgstr ""
-
-#: wsgi/quiz/ui/templates/ui/exam.html:139
+#: wsgi/quiz/ui/templates/ui/exam.html:189
 #: wsgi/quiz/ui/templates/ui/quiz.html:21
 #: wsgi/quiz/ui/templates/ui/review.html:26
 msgid "Try again"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:140
+#: wsgi/quiz/ui/templates/ui/exam.html:190
 #: wsgi/quiz/ui/templates/ui/quiz.html:22
 msgid "Review answers"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/exam_review.html:3
+#: wsgi/quiz/ui/templates/ui/exam_review.html:7
+msgid "Exam review"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/exam_review.html:17
+#, python-format
+msgid "List of exam %(id)s answers."
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/index.html:26
@@ -203,6 +212,33 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/quiz.html:2
 msgid "Quiz"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:13
+#: wsgi/quiz/ui/templates/ui/review.html:19
+msgid "Error sending answers."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:14
+#: wsgi/quiz/ui/templates/ui/review.html:20
+msgid "Error getting questions."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:15
+msgid "You have answered all the questions!"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:16
+#, python-format
+msgid "In this quiz you made errors: %%(errors)s"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:19
+msgid "Back to quiz"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/quiz.html:20
+msgid "Restart"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/quiz_base.html:17

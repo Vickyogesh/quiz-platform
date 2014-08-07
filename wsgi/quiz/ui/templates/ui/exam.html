@@ -18,7 +18,7 @@
         {% for i in range(4) -%}
         <div class="cell" id="rect{{ loop.index0 }}">
           <div class="head">{{ _('Questions') }}</div>
-{#          <div class="text">{{ _('From %(from)s to %(to)s', from=1 + loop.index0 * 10, to=loop.index * 10) }}</div>#}
+          <div class="text">{{ _('From %(from)s to %(to)s', from=1 + loop.index0 * 10, to=loop.index * 10) }}</div>
         </div>
         {%- endfor %}
       </div>
@@ -108,10 +108,59 @@
     </div> <!-- /control -->
 
     <div class="summarypanel">
-    </div>
+      <div id="answers"><ul></ul></div>
+
+      <div id="buttons" class="row">
+        <div class="col-sm-3 col-sm-offset-3">
+          <button type="button" class="btn btn-default" id="back">
+            <span class="glyphicon icon glyphicon-arrow-left"></span>
+            {{ _('Back to questions') }}
+          </button>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-default" id="finish">
+            <span class="glyphicon icon glyphicon-ok"></span>
+            {{ _('Finish exam') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="field col-sm-4 col-sm-offset-4">
+        <div class="title">{{ _('Exam number') }}</div>
+        <div class="val">{{ exam.exam.id }}</div>
+      </div>
+      <div class="field col-sm-4 col-sm-offset-4">
+        <div class="title">{{ _('Name and surname') }}</div>
+        <div class="val">{{ user.account.name }} {{ user.account.surname }}</div>
+      </div>
+    </div> <!-- /summarypanel -->
 
     <div class="message-box" id="msgbox"></div>
   </div>
+
+  <!-- Templates -->
+  <script type="text/template" id="summary-li-tmpl">
+    <li id="q<%= index %>">
+      <div class="exam-row hdr">
+        <div class="cell img"><%= num %></div>
+        <div class="cell text">{{ _('Question text') }}</div>
+        <div class="cell vf">{{ _('T') }}</div>
+        <div class="cell vf">{{ _('F') }}</div>
+      </div>
+      <div class="exam-row q">
+        <div class="cell img"><%= img_tag %></div>
+        <div class="cell text"><%= text %></div>
+        <div class="cell vf" id="true"></div>
+        <div class="cell vf" id="false"></div>
+      </div>
+    </li>
+  </script>
+
+  <script type="text/template" id="summary-img-tmpl">
+    <a href="<%= url %>" class="cbox">
+      <div style="background-image: url(<%= url %>)"></div>
+    </a>
+  </script>
 {% endblock %}
 
 {% block script_include %}
@@ -130,16 +179,13 @@
     back_url: "{{ back_url }}",
     image_url: "{{ image_url }}",
     exam_url: "{{ exam_url }}",
+    review_url: "{{ exam_review_url }}",
     msgbox_el: $("#msgbox"),
     labels: {
       error_send: "{{ _('Error saving exam.') }}",
-      error_get: "{{ _('Error getting questions.') }}",
-      done: "{{ _('You have answered all the questions!') }}",
-      done_info: "{{ _('In this quiz you made errors: %%(errors)s')|safe }}",
+      done_info: "{{ _('In this exam you made errors: %%(errors)s')|safe }}",
       btt_close: "{{ _('Close') }}",
       btt_back: "{{ _('Back to menu') }}",
-      btt_quiz_back: "{{ _('Back to quiz') }}",
-      btt_restart: "{{ _('Restart') }}",
       btt_try_again: "{{ _('Try again') }}",
       btt_review: "{{ _('Review answers') }}"
     },

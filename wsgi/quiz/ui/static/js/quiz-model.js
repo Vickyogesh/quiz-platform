@@ -134,11 +134,11 @@
             var self = this;
             var url = this.getQuizUrl();
 
-            Aux.postJson(url, data, function() {
+            Aux.postJson(url, data, function(response) {
                 _.each(questions_to_mark, function(index) {
                     self.questions.at(index).markSaved();
                 });
-                ok_callback();
+                ok_callback(response);
             }).error(function(response) {
                 self.trigger("error:save", response, ok_callback);
             });

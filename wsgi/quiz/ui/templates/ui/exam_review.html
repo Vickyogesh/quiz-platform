@@ -1,0 +1,44 @@
+{% extends "ui/base_page.html" %}
+
+{% block subtitle %}{{ _('Exam review') }}{% endblock %}
+{% block content_class %}exam-review{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12"><h4>{{ _('Exam review') }}</h4></div>
+{% endblock %}
+
+{% block nav_brand %}
+  <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
+{% endblock %}
+
+{% block panel_content %}
+  <div id="exam-answers">
+    <div class="row separator" id="header">
+      <div class="col-md-12">{{ _("List of exam %(id)s answers.", id=exam.exam.id) }}</div>
+    </div>
+    {%- for question in exam.questions %}
+    <div class="tablerow">
+      <div class="content">
+        <div class="cell">
+          {%- if question.image %}
+            {%- set url =  url_for('img_file', filename='%s.jpg' % question.image) %}
+            <a href="{{ url }}" class="cbox" rel="gallery"><img src="{{ url }}"></a>
+          {% endif -%}
+        </div>
+        <div class="cell">
+          <span class="question-id">{{ question.id }}</span>
+          {{ question.text }}
+        </div>
+        <div class="cell"><span class="question-answer {%- if question.is_correct %} correct {%- else %} wrong {%- endif %}">
+          {%- if question.answer == 1 %} V {% else %} F {% endif -%}
+        </span></div>
+      </div>
+    </div>
+    {%- endfor -%}
+  </div>
+{% endblock %}
+
+{% block express_bar_anchor %}#header{% endblock %}
+{%- block page_script %}
+  $("a.cbox").colorbox();
+{% endblock %}
