@@ -52,7 +52,6 @@ assets.register('ui.css', css_ui)
 
 from . import babel
 from . import index
-from . import menu
-from . import quiz
-from . import statistics
-from . import exam
+from . import common
+from . import school
+from . import client

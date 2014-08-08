@@ -1,87 +1,25 @@
-from functools import wraps
-from werkzeug.urls import Href
-from flask import abort, redirect, url_for, session, request
-from flask import render_template as flask_render_template
-from flask_principal import PermissionDenied
-from .babel import gettext, ngettext, lazy_gettext
-from .. import app
-from ..access import current_user
-from ..login import QUIZ_TYPE_ID
-
-QUIZ_TITLE = {
-    1: lazy_gettext('B 2011'),
-    2: lazy_gettext('CQC'),
-    3: lazy_gettext('B 2013'),
-    4: lazy_gettext('Scooter')
-}
+from . import ui
+from . import school, client
+from .util import check_access
+from .. import access
 
 
-def check_access(f):
-    """This decorator extends view with extra access features:
-
-        * On access denied it redirects to login page which will redirect
-          back on success login.
-
-        * If quiz name is invalid then HTTP 404 will be returned.
-
-        * If quiz name conflicts with current user's one then
-          it will be redirected to login page.
-    """
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        name = session.get('quiz_type_name')
-
-        # Interrupt on unknown quizzes.
-        if name is not None and name not in QUIZ_TYPE_ID:
-            abort(404)
-        else:
-            # If 'upd' query parameter is set then this means account data
-            # was changed and we have to sync it.
-            upd = request.args.get('upd')
-            if upd == '1':
-                update_account_data()
-            try:
-                response = f(*args, **kwargs)
-            except PermissionDenied:
-                pass
-            # If everything is ok then just return response.
-            else:
-                return response
-
-        # In all other cases jump to index page which will redirect
-        # to the requested page on success login.
-        next_url = url_for('.%s' % f.__name__, **kwargs)
-        return redirect(url_for('.index', quiz_name=name, next=next_url))
-    return wrapper
+@ui.route('/p/menu')
+@check_access
+@access.be_user.require()
+def menu():
+    if access.current_user.is_school:
+        return school.menu()
+    else:
+        return client.menu()
 
 
-def render_template(*args, **kwargs):
-    """Adds to the flask's render_template domain's translation functions."""
-    kwargs['_'] = gettext
-    kwargs['_gettext'] = gettext
-    kwargs['_ngettext'] = ngettext
-    quiz_title = QUIZ_TITLE.get(session.get('quiz_type'))
-    if quiz_title is not None:
-        kwargs['quiz_title'] = quiz_title
-    return flask_render_template(*args, **kwargs)
-
-
-def account_url():
-    """Accounts URL with the fallback URL of current page."""
-    next_url = Href(request.url)
-    url, cid = app.account.getUserAccountPage()
-    args = {
-        'cid': cid,
-        'uid': current_user.account_id,
-        'next': next_url({'upd': 1})
-    }
-    hr = Href(url)
-    return hr(args)
-
-
-def update_account_data():
-    """Update account info from the accounts service."""
-    info = app.account.getUserInfo()
-    account = info['user']
-    session['user'] = account
-    current_user.set_account(account)
+# TODO: do we need guest statistics?
+@ui.route('/p/statistics')
+@check_access
+@access.be_user.require()
+def statistics():
+    if access.current_user.is_school:
+        return school.statistics()
+    else:
+        return client.statistics()

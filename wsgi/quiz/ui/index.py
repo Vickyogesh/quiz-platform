@@ -7,7 +7,7 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
 from . import ui
 from .babel import lazy_gettext, gettext
-from .common import render_template
+from .util import render_template
 from .. import app, access
 from ..login import QUIZ_TYPE_ID, do_login
 
