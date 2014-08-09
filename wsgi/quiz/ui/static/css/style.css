@@ -133,7 +133,12 @@ body {
   padding-bottom: 8px;
 }
 
-.navbar-toggle .icon-bar {
+.navbar .navbar-toggle {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.navbar .navbar-toggle .icon-bar {
     background-color: #000;
 }
 

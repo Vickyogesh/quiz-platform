@@ -1,0 +1,131 @@
+{% extends "ui/base_page.html" %}
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block content_class %}menu school{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>
+    <a href="{{ account_url }}">
+    {{ user.account.name }} {{ user.account.surname }}
+    </a>
+  </h4>
+</div>
+{% endblock %}
+
+{% block nav_brand %}
+  <a href="{{ url_for('.logout') }}" class="navbar-brand">{{ _('Exit') }} <span class="glyphicon glyphicon-log-out"></span></a>
+{% endblock %}
+
+{% block top_menu %}
+  <li><a href="#"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></li>
+  <li id="add-student"><a href="#"><span class="glyphicon glyphicon-plus"></span> {{ _('Add a student') }}</a></li>
+{% endblock %}
+
+{% block panel_content %}
+  <div id="school">
+    <div class="row separator" id="header">
+      <div class="col-md-12">{{ _('Student list') }}</div>
+    </div>
+    <div id="clients"></div>
+  </div>
+
+  <div class="modal" id="add-dlg" tabindex="-1" role="dialog" aria-labelledby="dlg-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{{_('Close')}}</span></button>
+          <h4 class="modal-title" id="dlg-label">{{ _('Add a student') }}</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" class="form-horizontal">
+            <div class="form-group">
+              <label for="name" class="col-sm-3 control-label">{{ _('Name') }}</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="name" placeholder="{{ _('Name') }}">
+              </div>
+            </div> <!-- /name -->
+            <div class="form-group">
+              <label for="surname" class="col-sm-3 control-label">{{ _('Surname') }}</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="surname" placeholder="{{ _('Surname') }}">
+              </div>
+            </div> <!-- /surname -->
+            <div class="form-group">
+              <label for="login" class="col-sm-3 control-label">{{ _('Login') }}</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="login" placeholder="{{ _('Login') }}">
+              </div>
+            </div> <!-- /login -->
+            <div class="form-group">
+              <label for="passwd" class="col-sm-3 control-label">{{ _('Password') }}</label>
+              <div class="col-sm-9">
+                <input type="password" class="form-control" id="passwd" placeholder="{{ _('Password') }}">
+              </div>
+            </div> <!-- /passwd -->
+          </form>
+        </div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+  </div> <!-- /add dialog -->
+
+  <div class="modal" id="dlg" tabindex="-1" role="dialog" aria-labelledby="dlg-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{{_('Close')}}</span></button>
+          <h4 class="modal-title" id="dlg-label"></h4>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+  </div> <!-- /msg dialog -->
+
+  <!-- Templates -->
+
+  <script type="text/template" id="client-tmpl">
+    <div class="content">
+      <div class="cell"><%= fullname %></div>
+      <div class="cell ctrl">
+        <span class="glyphicon glyphicon-pencil edit" title="{{ _('Change password') }}"></span>
+        <span class="glyphicon glyphicon-remove remove" title="{{ _('Remove') }}"></span>
+      </div>
+    </div>
+  </script>
+{% endblock %}
+
+
+{% block script_include %}
+  {{ super() }}
+  {% assets "bb.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% assets "school.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
+
+{% block express_bar_anchor %}#header{% endblock %}
+{% block page_script %}
+  var school = new SchoolView({
+    el: $(".contentpanel"),
+    labels: {
+      remove_title: "{{ _('Remove a student') }}",
+      remove_text: "{{ _('Are you sure you want to remove the student <b>%%(name)s</b> from your school?')|safe }}",
+      error_title: "{{ _('Error') }}",
+      remove_error_text: "{{ _('Error removing a student.') }}",
+      add_error_text: "{{ _('Error adding a student.') }}",
+      btt_cancel: "{{ _('Cancel') }}",
+      btt_close: "{{ _('Close') }}",
+      btt_add: "{{ _('Add') }}",
+      btt_remove: "{{ _('Yes, remove') }}"
+    },
+    clients: {{ clients|tojson }},
+    urls: {
+      add: "{{ add_url|safe }}",
+      remove: "{{ remove_url|safe }}",
+      change: "{{ change_url|safe }}"
+    }
+  });
+{% endblock %}

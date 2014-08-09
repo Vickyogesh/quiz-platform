@@ -66,15 +66,16 @@ def render_template(*args, **kwargs):
     return flask_render_template(*args, **kwargs)
 
 
-def account_url():
+def account_url(with_uid=True):
     """Accounts URL with the fallback URL of current page."""
     next_url = Href(request.url)
     url, cid = app.account.getUserAccountPage()
     args = {
         'cid': cid,
-        'uid': current_user.account_id,
         'next': next_url({'upd': 1})
     }
+    if with_uid is True:
+        args['uid'] = current_user.account_id
     hr = Href(url)
     return hr(args)
 
