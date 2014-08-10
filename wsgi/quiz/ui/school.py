@@ -28,7 +28,8 @@ class Menu(SchoolPage):
             'add': url_for('api.add_student', id=str_uid),
             'remove': url_for('api.delete_student', id=str_uid, student=0)[:-1],
             'change': account,
-            'account': account
+            'account': account,
+            'stat': url_for('ui.client_statistics', uid="0")[:-1]
         }
         return self.render(clients=res['students'])
 

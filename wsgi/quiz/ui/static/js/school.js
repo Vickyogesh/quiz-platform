@@ -58,6 +58,7 @@
         className: "tablerow",
 
         events: {
+            "click": "onClick",
             "click .edit": "onBttEdit",
             "click .remove": "onBttRemove"
         },
@@ -74,6 +75,10 @@
         initialize: function() {
             this.listenTo(this.model, "destroy", this.onRemove);
             this.listenTo(this.model, "change", this.render);
+        },
+
+        onClick: function() {
+            this.parent.trigger("click", this.index);
         },
 
         onBttEdit: function() {
@@ -181,6 +186,7 @@
             var params = arguments[0];
             this.model = new ClientList(params.clients, {urls:params.urls});
             this.labels = params.labels;
+            this.urls = params.urls;
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
 
@@ -190,6 +196,7 @@
             this.dlg = new BbDialog({el: this.$("#dlg")});
 
             this.render();
+            this.listenTo(this, "click", this.onClientClick);
             this.listenTo(this, "remove", this.onBttRemove);
             this.listenTo(this, "edit", this.onBttEdit);
             this.listenTo(this.add_dlg, "done", this.onAddDialogDone);
@@ -209,6 +216,11 @@
             this.clients_el.empty();
             this.clients_el.html(html);
             return this;
+        },
+
+        onClientClick: function(index) {
+            var id = this.model.at(index).get("id");
+            window.location = this.urls.stat + id;
         },
 
         onBttRemove: function(index) {

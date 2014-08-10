@@ -2,6 +2,7 @@ from flask import url_for, request, abort
 from .page import Page
 from .util import account_url
 from .. import access, app
+from ..api import get_user_id
 
 
 def register_urls_for(bp):
@@ -12,9 +13,13 @@ def register_urls_for(bp):
     bp.route('/c/exam')(Exam.get_view())
     bp.route('/c/exam_review/<int:id>')(ExamReview.get_view())
 
-    bp.route('/c/statistics')(Statistics.get_view())
-    bp.route('/c/statistics/topic/<int:topic_id>')(StatisticsTopic.get_view())
-    bp.route('/c/statistics/exams/<range>')(StatisticsExams.get_view())
+    view = Statistics.get_view()
+    bp.route('/c/statistics', defaults={'uid': 'me'})(view)
+    bp.route('/c/statistics/<uid:uid>')(view)
+    bp.route('/c/statistics/<uid:uid>/topic/<int:topic_id>')(
+        StatisticsTopic.get_view())
+    bp.route('/c/statistics/<uid:uid>/exams/<range>')(
+        StatisticsExams.get_view())
 
 
 ### Client only pages
@@ -123,6 +128,16 @@ class ExamReview(ClientPage):
 class ClientStatisticsPage(ClientPage):
     decorators = [access.be_user.require()]
 
+    def check(self, user_id, user_school_id):
+        # If we are school then requested client must have the same
+        # parent school ID.
+        if access.current_user.is_school:
+            if self.uid != user_school_id:
+                abort(404)
+        # If we are client then requested client must have the same ID.
+        elif self.uid != user_id:
+            abort(404)
+
     def render(self, **kwargs):
         if self.urls is None:
             self.urls = {}
@@ -134,28 +149,47 @@ class ClientStatisticsPage(ClientPage):
 class Statistics(ClientStatisticsPage):
     template_name = 'ui/statistics_client.html'
 
-    def on_request(self):
-        self.urls = {'back': url_for('.client_menu')}
-        stat = app.core.getUserStat(self.quiz_type, self.uid, self.lang)
-        exams = app.core.getExamList(self.quiz_type, self.uid)
-        return self.render(client_stat=stat, exams=exams)
+    def on_request(self, uid):
+        user_id = get_user_id(uid)
+        stat = app.core.getUserStat(self.quiz_type, user_id, self.lang)
+
+        self.check(user_id, stat['student']['school_id'])
+
+        exams = app.core.getExamList(self.quiz_type, user_id)
+
+        if access.current_user.is_school:
+            back_url = url_for('.school_menu')
+        else:
+            back_url = url_for('.client_menu')
+        self.urls = {'back': back_url}
+
+        return self.render(client_stat=stat, exams=exams, uid=uid)
 
 
 class StatisticsTopic(ClientStatisticsPage):
     template_name = 'ui/statistics_client_topic.html'
 
-    def on_request(self, topic_id):
-        self.urls = {'back': url_for('.client_statistics')}
-        errors = app.core.getTopicErrors(self.quiz_type, self.uid, topic_id,
+    def on_request(self, uid, topic_id):
+        user_id = get_user_id(uid)
+        self.urls = {'back': url_for('.client_statistics', uid=uid)}
+        errors = app.core.getTopicErrors(self.quiz_type, user_id, topic_id,
                                          self.lang)
+
+        self.check(user_id, errors['student']['school_id'])
+
         return self.render(errors=errors)
 
 
 class StatisticsExams(ClientStatisticsPage):
     template_name = 'ui/statistics_client_exams.html'
 
-    def on_request(self, range):
-        exams = app.core.getExamList(self.quiz_type, self.uid)['exams']
+    def on_request(self, uid, range):
+        user_id = get_user_id(uid)
+        info = app.core.getExamList(self.quiz_type, user_id)
+        exams = info['exams']
+
+        self.check(user_id, info['student']['school_id'])
+
         total = 40  # TODO: some quizzes has different value
         range_exams = exams.get(range)
         if range_exams is None:
@@ -163,7 +197,7 @@ class StatisticsExams(ClientStatisticsPage):
             range_exams.extend(exams['week'])
             range_exams.extend(exams['current'])
         self.urls = {
-            'back': url_for('.client_statistics'),
+            'back': url_for('.client_statistics', uid=uid),
             'exam': url_for('api.get_exam_info', id=0)[:-1],
             'image': url_for('img_file', filename='')
         }
