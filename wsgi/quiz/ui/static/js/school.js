@@ -81,11 +81,13 @@
             this.parent.trigger("click", this.index);
         },
 
-        onBttEdit: function() {
+        onBttEdit: function(event) {
+            event.stopPropagation();
             this.parent.trigger("edit", this.index);
         },
 
-        onBttRemove: function() {
+        onBttRemove: function(event) {
+            event.stopPropagation();
             this.parent.trigger("remove", this.index);
         },
 
@@ -253,11 +255,6 @@
         onAddDialogDone: function(data) {
             this.add_dlg.hide();
             this.model.addClient(data);
-        },
-
-        onChangeDialogDone: function(passwd) {
-            this.change_dlg.hide();
-            this.model.updatePasswd(this.change_dlg.index, passwd);
         },
 
         // Add view with support of sorting
