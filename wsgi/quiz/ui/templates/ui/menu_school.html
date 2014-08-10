@@ -5,7 +5,7 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4>
-    <a href="{{ account_url }}">
+    <a href="{{ urls.account }}">
     {{ user.account.name }} {{ user.account.surname }}
     </a>
   </h4>
@@ -122,10 +122,6 @@
       btt_remove: "{{ _('Yes, remove') }}"
     },
     clients: {{ clients|tojson }},
-    urls: {
-      add: "{{ add_url|safe }}",
-      remove: "{{ remove_url|safe }}",
-      change: "{{ change_url|safe }}"
-    }
+    urls: {{ urls|tojson }}
   });
 {% endblock %}

@@ -176,10 +176,6 @@
 {% block page_script %}
   var exam = new ExamView({
     el: $(".contentpanel").first(),
-    back_url: "{{ back_url }}",
-    image_url: "{{ image_url }}",
-    exam_url: "{{ exam_url }}",
-    review_url: "{{ exam_review_url }}",
     msgbox_el: $("#msgbox"),
     labels: {
       error_send: "{{ _('Error saving exam.') }}",
@@ -189,6 +185,7 @@
       btt_try_again: "{{ _('Try again') }}",
       btt_review: "{{ _('Review answers') }}"
     },
+    urls: {{ urls|tojson }},
     exam: {{ exam|tojson }}
   });
 {% endblock %}

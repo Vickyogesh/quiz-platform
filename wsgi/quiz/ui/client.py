@@ -1,190 +1,170 @@
-from flask import session, url_for, request, abort
-from . import ui
-from .util import render_template, check_access, account_url
+from flask import url_for, request, abort
+from .page import Page
+from .util import account_url
 from .. import access, app
 
 
-def menu():
-    quiz_name = session['quiz_type_name']
-    return render_template('ui/menu_client.html', quiz_name=quiz_name,
-                           user=access.current_user,
-                           account_url=account_url())
+def register_urls_for(bp):
+    bp.route('/c/menu')(Menu.get_view())
+    bp.route('/c/menu/quiz')(MenuQuiz.get_view())
+    bp.route('/c/quiz/<int:topic>')(Quiz.get_view())
+    bp.route('/c/review')(Review.get_view())
+    bp.route('/c/exam')(Exam.get_view())
+    bp.route('/c/exam_review/<int:id>')(ExamReview.get_view())
+
+    bp.route('/c/statistics')(Statistics.get_view())
+    bp.route('/c/statistics/topic/<int:topic_id>')(StatisticsTopic.get_view())
+    bp.route('/c/statistics/exams/<range>')(StatisticsExams.get_view())
 
 
-@ui.route('/p/menu/quiz')
-@check_access
-@access.be_client_or_guest.require()
-def menu_quiz():
-    quiz_name = session['quiz_type_name']
-    quiz_url = url_for('.quiz', topic=0)[:-1]
-    return render_template('ui/menu_quiz.html', quiz_name=quiz_name,
-                           back_url=url_for('.menu'),
-                           quiz_url=quiz_url,
-                           user=access.current_user,
-                           account_url=account_url())
+### Client only pages
+
+class ClientPage(Page):
+    decorators = [access.be_client_or_guest.require()]
+    endpoint_prefix = 'client'
 
 
-@ui.route('/p/quiz/<int:topic>')
-@check_access
-@access.be_client_or_guest.require()
-def quiz(topic):
-    quiz_name = session['quiz_type_name']
-    quiz_type = session['quiz_type']
-    lang = request.args.get('lang', 'it')
-    force = request.args.get('force', False)
+class Menu(ClientPage):
+    template_name = 'ui/menu_client.html'
 
-    # TODO: what if x is not int?
-    exclude = request.args.get('exclude', None)
-    if exclude is not None:
-        exclude = exclude.split(',')
-        exclude = [int(x) for x in exclude]
-
-    info = app.core.getQuiz(quiz_type, access.current_user.account_id, topic,
-                            lang, force, exclude)
-
-    image_url = url_for('img_file', filename='')
-    quiz_url = url_for('api.create_quiz', topic=0)[:-1]
-
-    return render_template('ui/quiz.html', quiz_name=quiz_name,
-                           back_url=url_for('.menu'),
-                           image_url=image_url,
-                           quiz_url=quiz_url,
-                           user=access.current_user,
-                           quiz=info,
-                           account_url=account_url())
+    def on_request(self):
+        self.urls = {'account': account_url()}
+        return self.render()
 
 
-@ui.route('/p/review')
-@check_access
-@access.be_client_or_guest.require()
-def review():
-    quiz_name = session['quiz_type_name']
-    quiz_type = session['quiz_type']
-    uid = access.current_user.account_id
-    lang = request.args.get('lang', 'it')
+class MenuQuiz(ClientPage):
+    template_name = 'ui/menu_quiz.html'
 
-    # TODO: what if x is not int?
-    exclude = request.args.get('exclude', None)
-    if exclude is not None:
-        exclude = exclude.split(',')
-        exclude = [int(x) for x in exclude]
-
-    info = app.core.getErrorReview(quiz_type, uid, lang, exclude)
-
-    image_url = url_for('img_file', filename='')
-    quiz_url = url_for('api.get_error_review')
-
-    return render_template('ui/review.html', quiz_name=quiz_name,
-                           back_url=url_for('.menu'),
-                           image_url=image_url,
-                           quiz_url=quiz_url,
-                           user=access.current_user,
-                           quiz=info,
-                           account_url=account_url())
+    def on_request(self):
+        quiz_url = url_for('.client_quiz', topic=0)[:-1]
+        self.urls = {
+            'back': url_for('.client_menu'),
+            'quiz': quiz_url,
+            'account': account_url()
+        }
+        return self.render()
 
 
-def statistics():
-    quiz_name = session['quiz_type_name']
-    uid = access.current_user.account_id
-    quiz_type = session['quiz_type']
-    lang = request.args.get('lang', 'it')
-    stat = app.core.getUserStat(quiz_type, uid, lang)
-    exams = app.core.getExamList(quiz_type, uid)
-    return render_template('ui/statistics_client.html',
-                           quiz_name=quiz_name,
-                           client_stat=stat,
-                           exams=exams,
-                           back_url=url_for('.menu'),
-                           account_url=account_url(),
-                           user=access.current_user)
+class QuizBase(ClientPage):
+    """Base class for quiz by topic and error review."""
+    def get_quiz(self, *args, **kwargs):
+        raise NotImplemented
+
+    def on_request(self, *args, **kwargs):
+        self.urls = {
+            'back': url_for('.client_menu'),
+            'image': url_for('img_file', filename='')
+        }
+        info = self.get_quiz(*args, **kwargs)
+        return self.render(quiz=info)
 
 
-@ui.route('/p/statistics/topic/<int:topic_id>')
-@check_access
-@access.be_client_or_guest.require()
-def statistics_topic(topic_id):
-    quiz_name = session['quiz_type_name']
-    quiz_type = session['quiz_type']
-    lang = request.args.get('lang', 'it')
-    uid = access.current_user.account_id
-    errors = app.core.getTopicErrors(quiz_type, uid, topic_id, lang)
-    return render_template('ui/statistics_client_topic.html',
-                           quiz_name=quiz_name,
-                           errors=errors,
-                           back_url=url_for('.statistics'),
-                           account_url=account_url(),
-                           user=access.current_user)
+class Quiz(QuizBase):
+    """Quiz by topic."""
+    template_name = 'ui/quiz.html'
+
+    def get_quiz(self, topic):
+        force = request.args.get('force', False)
+
+        # TODO: what if x is not int?
+        exclude = request.args.get('exclude', None)
+        if exclude is not None:
+            exclude = [int(x) for x in exclude.split(',')]
+
+        self.urls['quiz'] = url_for('api.create_quiz', topic=0)[:-1]
+        return app.core.getQuiz(self.quiz_type, self.uid, topic, self.lang,
+                                force, exclude)
 
 
-@ui.route('/p/statistics/exams/<range>')
-@check_access
-@access.be_client_or_guest.require()
-def statistics_exams(range):
-    quiz_name = session['quiz_type_name']
-    quiz_type = session['quiz_type']
-    uid = access.current_user.account_id
-    exams = app.core.getExamList(quiz_type, uid)['exams']
-    total = 40  # TODO: some quizzes has different value
+class Review(QuizBase):
+    """Error review."""
+    template_name = 'ui/review.html'
 
-    exam_url = url_for('api.get_exam_info', id=0)[:-1]
-    image_url = url_for('img_file', filename='')
+    def get_quiz(self):
+        # TODO: what if x is not int?
+        exclude = request.args.get('exclude', None)
+        if exclude is not None:
+            exclude = [int(x) for x in exclude.split(',')]
 
-    range_exams = exams.get(range)
-    if range_exams is None:
-        range_exams = exams['week3']
-        range_exams.extend(exams['week'])
-        range_exams.extend(exams['current'])
-
-    return render_template('ui/statistics_client_exams.html',
-                           quiz_name=quiz_name,
-                           back_url=url_for('.statistics'),
-                           account_url=account_url(),
-                           exams=range_exams,
-                           total=total,
-                           exam_url=exam_url,
-                           image_url=image_url,
-                           user=access.current_user)
+        self.urls['quiz'] = url_for('api.get_error_review')
+        return app.core.getErrorReview(self.quiz_type, self.uid, self.lang,
+                                       exclude)
 
 
-@ui.route('/p/exam')
-@check_access
-@access.be_client_or_guest.require()
-def exam():
-    quiz_name = session['quiz_type_name']
-    quiz_type = session['quiz_type']
-    user_id = access.current_user.account_id
-    lang = request.args.get('lang', 'it')
-    exam_type = request.args.get('exam_type', None)
-    data = app.core.createExam(quiz_type, user_id, lang, exam_type)
+class Exam(ClientPage):
+    template_name = 'ui/exam.html'
 
-    image_url = url_for('img_file', filename='')
-    exam_url = url_for('api.save_exam', id=0)[:-1]
-    exam_review_url = url_for('.exam_review', id=0)[:-1]
-    return render_template('ui/exam.html', quiz_name=quiz_name,
-                           back_url=url_for('.menu'),
-                           image_url=image_url,
-                           exam_url=exam_url,
-                           exam_review_url=exam_review_url,
-                           user=access.current_user,
-                           exam=data,
-                           account_url=account_url())
+    def on_request(self):
+        exam_type = request.args.get('exam_type', None)
+        data = app.core.createExam(self.quiz_type, self.uid, self.lang,
+                                   exam_type)
+        self.urls = {
+            'back': url_for('.client_menu'),
+            'image': url_for('img_file', filename=''),
+            'exam': url_for('api.save_exam', id=0)[:-1],
+            'exam_review': url_for('.client_exam_review', id=0)[:-1]
+        }
+        return self.render(exam=data)
 
 
-@ui.route('/p/exam_review/<int:id>')
-@check_access
-@access.be_client_or_guest.require()
-def exam_review(id):
-    quiz_name = session['quiz_type_name']
-    lang = request.args.get('lang', 'it')
-    image_url = url_for('img_file', filename='')
-    info = app.core.getExamInfo(id, lang)
+class ExamReview(ClientPage):
+    template_name = 'ui/exam_review.html'
 
-    if info['student']['id'] != access.current_user.account_id:
-        abort(404)
+    def on_request(self, id):
+        info = app.core.getExamInfo(id, self.lang)
+        if info['student']['id'] != access.current_user.account_id:
+            abort(404)
+        self.urls = {'back': url_for('.client_menu')}
+        return self.render(exam=info)
 
-    return render_template('ui/exam_review.html', quiz_name=quiz_name,
-                           back_url=url_for('.menu'),
-                           image_url=image_url,
-                           user=access.current_user,
-                           exam=info,
-                           account_url=account_url())
+
+### Statistics pages (accessible by clients and schools).
+
+class ClientStatisticsPage(ClientPage):
+    decorators = [access.be_user.require()]
+
+    def render(self, **kwargs):
+        if self.urls is None:
+            self.urls = {}
+        self.urls['account'] = account_url()
+        return ClientPage.render(self, **kwargs)
+
+
+# TODO: do we need guest statistics?
+class Statistics(ClientStatisticsPage):
+    template_name = 'ui/statistics_client.html'
+
+    def on_request(self):
+        self.urls = {'back': url_for('.client_menu')}
+        stat = app.core.getUserStat(self.quiz_type, self.uid, self.lang)
+        exams = app.core.getExamList(self.quiz_type, self.uid)
+        return self.render(client_stat=stat, exams=exams)
+
+
+class StatisticsTopic(ClientStatisticsPage):
+    template_name = 'ui/statistics_client_topic.html'
+
+    def on_request(self, topic_id):
+        self.urls = {'back': url_for('.client_statistics')}
+        errors = app.core.getTopicErrors(self.quiz_type, self.uid, topic_id,
+                                         self.lang)
+        return self.render(errors=errors)
+
+
+class StatisticsExams(ClientStatisticsPage):
+    template_name = 'ui/statistics_client_exams.html'
+
+    def on_request(self, range):
+        exams = app.core.getExamList(self.quiz_type, self.uid)['exams']
+        total = 40  # TODO: some quizzes has different value
+        range_exams = exams.get(range)
+        if range_exams is None:
+            range_exams = exams['week3']
+            range_exams.extend(exams['week'])
+            range_exams.extend(exams['current'])
+        self.urls = {
+            'back': url_for('.client_statistics'),
+            'exam': url_for('api.get_exam_info', id=0)[:-1],
+            'image': url_for('img_file', filename='')
+        }
+        return self.render(exams=range_exams, total=total)

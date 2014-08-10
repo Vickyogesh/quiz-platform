@@ -57,6 +57,8 @@ assets.register('ui.css', css_ui)
 
 from . import babel
 from . import index
-from . import common
 from . import school
 from . import client
+
+school.register_urls_for(ui)
+client.register_urls_for(ui)

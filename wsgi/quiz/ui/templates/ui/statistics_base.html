@@ -6,7 +6,7 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4>
-    <a href="{{ account_url }}">
+    <a href="{{ urls.account }}">
     {{ user.account.name }} {{ user.account.surname }}
     </a>
   </h4>
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block nav_brand %}
-  <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
+  <a href="{{ urls.back }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
 {% endblock %}
 
 {% block script_include %}

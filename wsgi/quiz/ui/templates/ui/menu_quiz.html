@@ -3,7 +3,7 @@
 {% block content_class %}quiz-menu{% endblock %}
 
 {% block nav_brand %}
-  <a href="{{ back_url }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
+  <a href="{{ urls.back }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
 {% endblock %}
 
 {% block header_row %}
@@ -54,6 +54,6 @@
 {% endblock %}
 
 {% block page_script %}
-  window.g.quiz_url = "{{ quiz_url }}";
+  window.g.quiz_url = "{{ urls.quiz }}";
   TopicSlider("#topics");
 {% endblock%}

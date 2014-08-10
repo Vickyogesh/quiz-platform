@@ -216,16 +216,14 @@
             var params = arguments[0];
 
             this.model = new ExamModel({
-                image_url: params.image_url,
-                exam_url: params.exam_url,
+                urls: params.urls,
                 exam_id: params.exam.exam.id
             });
             this.model.questions.reset(params.exam.questions);
 
             this.msgbox = new MessageBox({el: params.msgbox_el});
             this.labels = params.labels;
-            this.back_url = params.back_url;
-            this.review_url = params.review_url;
+            this.urls = params.urls;
 
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
@@ -262,7 +260,7 @@
         },
 
         backToMenu: function() {
-            window.location = this.back_url;
+            window.location = this.urls.back;
         },
 
         onModelSaveError: function(response, ok_callback) {
@@ -306,7 +304,7 @@
             }
 
             function to_review() {
-                window.location = this.review_url + this.model.get("exam_id");
+                window.location = this.urls.exam_review + this.model.get("exam_id");
             }
 
             this.msgbox.show({

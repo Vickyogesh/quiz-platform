@@ -7,7 +7,7 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4>
-    <a href="{{ account_url }}">
+    <a href="{{ urls.account }}">
     {{ user.account.name }} {{ user.account.surname }}
     </a>
   </h4>
@@ -17,7 +17,7 @@
 {% block panel_content %}
 <div class="content row">
   <div class="col-sm-4">
-    <a href="{{ url_for('.menu_quiz') }}">
+    <a href="{{ url_for('.client_menu_quiz') }}">
        <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
     </a>
   </div>
@@ -33,7 +33,7 @@
     </div>
   </div>
   <div class="col-sm-4">
-    <a href="{{ url_for('.review') }}">
+    <a href="{{ url_for('.client_review') }}">
       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
     </a>
   </div>
@@ -43,7 +43,7 @@
 {% block footer %}
 <div class="footer row">
   <div class="col-sm-3"></div>
-  <div class="col-sm-3"><a href="{{ url_for('.statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
+  <div class="col-sm-3"><a href="{{ url_for('.client_statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
   <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
   <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
 </div>
@@ -51,7 +51,7 @@
 
 {%- block page_script %}
   $(".btn-exam td").click(function(){
-  var lang = $(this).attr("id");
-  window.location = "{{ url_for('.exam') }}?lang=" + lang;
+    var lang = $(this).attr("id");
+    window.location = "{{ url_for('.client_exam') }}?lang=" + lang;
   });
 {% endblock %}

@@ -42,14 +42,18 @@
             this.questions = new QuestionList;
         },
 
+        get_url: function(name) {
+            return this.get("urls")[name];
+        },
+
         getImageUrl: function(name) {
             if (name == "" || name === undefined || name === null )
                 return null;
-            return this.get("image_url") + name + ".jpg";
+            return this.get_url("image") + name + ".jpg";
         },
 
         getQuizUrl: function() {
-            return this.get("quiz_url") + this.get("topic_id");
+            return this.get_url("quiz") + this.get("topic_id");
         },
 
         preloadNextImage: function() {

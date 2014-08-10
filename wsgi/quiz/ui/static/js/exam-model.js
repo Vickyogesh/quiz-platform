@@ -10,7 +10,7 @@
         },
 
         getQuizUrl: function() {
-            return this.get("exam_url") + this.get("exam_id");
+            return this.get_url("exam") + this.get("exam_id");
         },
 
         moveToNext: function() {

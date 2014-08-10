@@ -21,7 +21,7 @@
       <div class="col-md-12">{{ _('Statistics topics in greater blue portion of the graph corresponds to a better preparation.') }}</div>
     </div>
     {% for topic in client_stat.topics %}
-    <a class="tablerow" href="{{ url_for('.statistics_topic', topic_id=topic.id) }}">
+    <a class="tablerow" href="{{ url_for('.client_statistics_topic', topic_id=topic.id) }}">
       <div class="content">
         <div class="cell">
           <div class="chart" id="{{ topic.id }}"
@@ -39,6 +39,6 @@
 
 {% block express_bar_anchor %}#topic-header{% endblock %}
 {% block page_script %}
-  window.g.exam_url = "{{ url_for('.statistics_exams', range='') }}";
+  window.g.exam_url = "{{ url_for('.client_statistics_exams', range='') }}";
   UserStat({{ exams.exams|tojson }});
 {% endblock%}

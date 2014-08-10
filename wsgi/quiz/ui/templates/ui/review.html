@@ -11,9 +11,6 @@
 {% block page_script %}
   var quiz = new QuizReviewView({
     el: $(".contentpanel").first(),
-    back_url: "{{ back_url }}",
-    image_url: "{{ image_url }}",
-    quiz_url: "{{ quiz_url }}",
     msgbox_el: $("#msgbox"),
     labels: {
       error_send: "{{ _('Error sending answers.') }}",
@@ -26,6 +23,7 @@
       btt_try_again: "{{ _('Try again') }}",
       btt_review: "{{ _('Back to review') }}"
     },
+    urls: {{ urls|tojson }},
     data: {{ quiz|tojson }}
   });
 {% endblock %}

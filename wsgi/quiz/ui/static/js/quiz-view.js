@@ -107,8 +107,7 @@
 
         createModel: function(params) {
             return new QuizModel({
-                image_url: params.image_url,
-                quiz_url: params.quiz_url,
+                urls: params.urls,
                 topic_id: params.data.topic
             });
         },
@@ -119,7 +118,7 @@
             this.model.questions.reset(params.data.questions);
             this.msgbox = new MessageBox({el: params.msgbox_el});
             this.labels = params.labels;
-            this.back_url = params.back_url;
+            this.urls = params.urls;
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
 
@@ -209,7 +208,7 @@
 
         showDone: function(show_errors) {
             function back() {
-                window.location = this.back_url;
+                window.location = this.urls.back;
             }
             function restart() {
                 this.model.loadMoreQuestions(true);
@@ -253,7 +252,7 @@
 
         showFinish: function() {
             function back() {
-                window.location = this.back_url;
+                window.location = this.urls.back;
             }
             function review() {
                 this.msgbox.hide();

@@ -30,7 +30,7 @@
 
 {% block express_bar_anchor %}#header{% endblock %}
 {% block page_script %}
-  window.g.exam_url = "{{ exam_url }}";
-  window.g.image_url = "{{ image_url }}";
+  window.g.exam_url = "{{ urls.exam }}";
+  window.g.image_url = "{{ urls.image }}";
   var exam_stat = new ExamStat;
 {% endblock%}

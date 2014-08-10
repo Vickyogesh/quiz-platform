@@ -1,16 +1,13 @@
 (function () {
     QuizReviewModel = QuizModel.extend({
         getQuizUrl: function() {
-            return this.get("quiz_url");
+            return this.get_url("quiz");
         }
     });
 
     QuizReviewView = QuizView.extend({
         createModel: function(params) {
-            return new QuizReviewModel({
-                image_url: params.image_url,
-                quiz_url: params.quiz_url
-            });
+            return new QuizReviewModel({urls: params.urls});
         },
 
         showDone: function(show_errors) {
@@ -20,7 +17,7 @@
             }
 
             function back() {
-                window.location = this.back_url;
+                window.location = this.urls.back;
             }
             this.msgbox.show({
                 "text": this.labels.done,

@@ -20,7 +20,10 @@ def after_login():
     if next_url is not None:
         return redirect(next_url)
     else:
-        return redirect(url_for('.menu'))
+        if access.current_user.is_school:
+            return redirect(url_for('.school_menu'))
+        else:
+            return redirect(url_for('.client_menu'))
 
 
 class LoginFrom(Form):

@@ -5,9 +5,6 @@
 {% block page_script %}
   var quiz = new QuizView({
     el: $(".contentpanel").first(),
-    back_url: "{{ back_url }}",
-    image_url: "{{ image_url }}",
-    quiz_url: "{{ quiz_url }}",
     msgbox_el: $("#msgbox"),
     labels: {
       error_send: "{{ _('Error sending answers.') }}",
@@ -21,6 +18,7 @@
       btt_try_again: "{{ _('Try again') }}",
       btt_review: "{{ _('Review answers') }}"
     },
+    urls: {{ urls|tojson }},
     data: {{ quiz|tojson }}
   });
 {% endblock %}
