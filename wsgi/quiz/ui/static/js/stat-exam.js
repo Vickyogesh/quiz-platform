@@ -58,8 +58,7 @@
     ExamStat = function () {
         // Convert UTC exam time to local time
         $(".exam-time").each(function () {
-            var exam_date = moment($(this).html() + " Z");
-            $(this).html(exam_date.toDate().toLocaleString());
+            $(this).html(Aux.strFromISOUTC($(this).html()));
         });
 
         $("#examstat").find(".examrow").click(function(){

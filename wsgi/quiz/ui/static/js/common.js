@@ -15,6 +15,17 @@
     });
 
     this.Aux = {
+        // text must be in form YYYY-MM-DD hh:mm:ss
+        // http://stackoverflow.com/questions/15517024/convert-iso-date-string-in-javascript-to-date-object-without-converting-to-loca
+        dateFromISOUTC: function(text) {
+            var s = text.split(/\D/);
+            return new Date(Date.UTC(+s[0], --s[1], +s[2], +s[3], +s[4], +s[5], 0));
+        },
+        // See dateFromISOUTC()
+        strFromISOUTC: function(text) {
+            return Aux.dateFromISOUTC(text).toLocaleString();
+        },
+
         showError: function(msg) {
             // If msg is object then we interested in 'responseJSON'
             // which must be JSON with field 'description'.

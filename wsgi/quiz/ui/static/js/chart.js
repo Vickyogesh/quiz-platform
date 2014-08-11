@@ -1,3 +1,4 @@
+// TODO: optimize redrawing.
 function draw_pie(id, error_percent, opts) {
     var stroke = "#FFF";
     var values;

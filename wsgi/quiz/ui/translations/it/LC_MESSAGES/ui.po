@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-07 16:03+0700\n"
-"PO-Revision-Date: 2014-08-07 16:08+0700\n"
+"POT-Creation-Date: 2014-08-11 16:32+0700\n"
+"PO-Revision-Date: 2014-08-11 16:41+0700\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -18,33 +18,35 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "X-Generator: Poedit 1.5.7\n"
 
-#: wsgi/quiz/ui/common.py:12
-msgid "B 2011"
-msgstr "B 2011"
-
-#: wsgi/quiz/ui/common.py:13
-msgid "CQC"
-msgstr "CQC"
-
-#: wsgi/quiz/ui/common.py:14
-msgid "B 2013"
-msgstr "B 2013"
-
-#: wsgi/quiz/ui/common.py:15
-msgid "Scooter"
-msgstr "Scooter"
-
-#: wsgi/quiz/ui/index.py:27
+#: wsgi/quiz/ui/index.py:30 wsgi/quiz/ui/templates/ui/menu_school.html:44
+#: wsgi/quiz/ui/templates/ui/menu_school.html:46
 msgid "Login"
 msgstr "Login"
 
-#: wsgi/quiz/ui/index.py:28
+#: wsgi/quiz/ui/index.py:31 wsgi/quiz/ui/templates/ui/menu_school.html:50
+#: wsgi/quiz/ui/templates/ui/menu_school.html:52
 msgid "Password"
 msgstr "Password"
 
-#: wsgi/quiz/ui/index.py:60
+#: wsgi/quiz/ui/index.py:63
 msgid "Forbidden."
 msgstr "Vietato."
+
+#: wsgi/quiz/ui/util.py:12
+msgid "B 2011"
+msgstr "B 2011"
+
+#: wsgi/quiz/ui/util.py:13
+msgid "CQC"
+msgstr "CQC"
+
+#: wsgi/quiz/ui/util.py:14
+msgid "B 2013"
+msgstr "B 2013"
+
+#: wsgi/quiz/ui/util.py:15
+msgid "Scooter"
+msgstr "Scooter"
 
 #: wsgi/quiz/ui/templates/ui/base.html:15
 #: wsgi/quiz/ui/templates/ui/index.html:2
@@ -57,13 +59,17 @@ msgstr "Attendere prego ..."
 
 #: wsgi/quiz/ui/templates/ui/base.html:34
 #: wsgi/quiz/ui/templates/ui/base.html:40
-#: wsgi/quiz/ui/templates/ui/exam.html:187
-#: wsgi/quiz/ui/templates/ui/quiz.html:17
-#: wsgi/quiz/ui/templates/ui/review.html:23
+#: wsgi/quiz/ui/templates/ui/exam.html:183
+#: wsgi/quiz/ui/templates/ui/menu_school.html:26
+#: wsgi/quiz/ui/templates/ui/menu_school.html:66
+#: wsgi/quiz/ui/templates/ui/menu_school.html:99
+#: wsgi/quiz/ui/templates/ui/quiz.html:14
+#: wsgi/quiz/ui/templates/ui/review.html:20
 msgid "Close"
 msgstr "Fine"
 
 #: wsgi/quiz/ui/templates/ui/base.html:35
+#: wsgi/quiz/ui/templates/ui/menu_school.html:95
 msgid "Error"
 msgstr "Errore"
 
@@ -71,6 +77,7 @@ msgstr "Errore"
 #: wsgi/quiz/ui/templates/ui/exam_review.html:11
 #: wsgi/quiz/ui/templates/ui/menu_quiz.html:6
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:17
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:13
 msgid "Back"
 msgstr "Indietro"
 
@@ -153,29 +160,29 @@ msgstr "V"
 msgid "F"
 msgstr "F"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:185
+#: wsgi/quiz/ui/templates/ui/exam.html:181
 msgid "Error saving exam."
 msgstr "Risparmio esame errore."
 
-#: wsgi/quiz/ui/templates/ui/exam.html:186
+#: wsgi/quiz/ui/templates/ui/exam.html:182
 #, fuzzy, python-format
 msgid "In this exam you made errors: %%(errors)s"
 msgstr "Errori commessi in questa sessione: %%(errors)s"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:188
-#: wsgi/quiz/ui/templates/ui/quiz.html:18
-#: wsgi/quiz/ui/templates/ui/review.html:24
+#: wsgi/quiz/ui/templates/ui/exam.html:184
+#: wsgi/quiz/ui/templates/ui/quiz.html:15
+#: wsgi/quiz/ui/templates/ui/review.html:21
 msgid "Back to menu"
 msgstr "Torna al menu principale"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:189
-#: wsgi/quiz/ui/templates/ui/quiz.html:21
-#: wsgi/quiz/ui/templates/ui/review.html:26
+#: wsgi/quiz/ui/templates/ui/exam.html:185
+#: wsgi/quiz/ui/templates/ui/quiz.html:18
+#: wsgi/quiz/ui/templates/ui/review.html:23
 msgid "Try again"
 msgstr "Riprova"
 
-#: wsgi/quiz/ui/templates/ui/exam.html:190
-#: wsgi/quiz/ui/templates/ui/quiz.html:22
+#: wsgi/quiz/ui/templates/ui/exam.html:186
+#: wsgi/quiz/ui/templates/ui/quiz.html:19
 msgid "Review answers"
 msgstr "Controllo risposte"
 
@@ -195,15 +202,20 @@ msgstr "Registrati"
 
 #: wsgi/quiz/ui/templates/ui/menu_client.html:2
 #: wsgi/quiz/ui/templates/ui/menu_quiz.html:2
+#: wsgi/quiz/ui/templates/ui/menu_school.html:2
 msgid "Menu"
 msgstr "Menu"
 
 #: wsgi/quiz/ui/templates/ui/menu_client.html:46
+#: wsgi/quiz/ui/templates/ui/menu_school.html:10
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:3
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:3
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:18
 msgid "Statistics"
 msgstr "Statistiche"
 
 #: wsgi/quiz/ui/templates/ui/menu_client.html:47
+#: wsgi/quiz/ui/templates/ui/menu_school.html:6
 msgid "Log out"
 msgstr "Esci"
 
@@ -211,34 +223,92 @@ msgstr "Esci"
 msgid "Connect with"
 msgstr "Collegati con"
 
+#: wsgi/quiz/ui/templates/ui/menu_school.html:11
+#: wsgi/quiz/ui/templates/ui/menu_school.html:27
+msgid "Add a student"
+msgstr "Aggiungi Studente"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:17
+msgid "Student list"
+msgstr "Elenco Studenti"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:32
+#: wsgi/quiz/ui/templates/ui/menu_school.html:34
+msgid "Name"
+msgstr "Nome"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:38
+#: wsgi/quiz/ui/templates/ui/menu_school.html:40
+msgid "Surname"
+msgstr "Cognome"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:81
+msgid "Edit account"
+msgstr "Cambia"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:82
+msgid "Remove"
+msgstr "Promosso"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:93
+msgid "Remove a student"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:94
+#, python-format
+msgid ""
+"Are you sure you want to remove the student <b>%%(name)s</b> from your "
+"school?"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:96
+msgid "Error removing a student."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:97
+msgid "Error adding a student."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:98
+msgid "Cancel"
+msgstr "Annulla"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:100
+msgid "Add"
+msgstr "Aggiungi"
+
+#: wsgi/quiz/ui/templates/ui/menu_school.html:101
+msgid "Yes, remove"
+msgstr ""
+
 #: wsgi/quiz/ui/templates/ui/quiz.html:2
 msgid "Quiz"
 msgstr "Quiz"
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:13
-#: wsgi/quiz/ui/templates/ui/review.html:19
+#: wsgi/quiz/ui/templates/ui/quiz.html:10
+#: wsgi/quiz/ui/templates/ui/review.html:16
 msgid "Error sending answers."
 msgstr "Errore nell'invio delle risposte."
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:14
-#: wsgi/quiz/ui/templates/ui/review.html:20
+#: wsgi/quiz/ui/templates/ui/quiz.html:11
+#: wsgi/quiz/ui/templates/ui/review.html:17
 msgid "Error getting questions."
 msgstr "Errore nella ricezione delle domande."
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:15
+#: wsgi/quiz/ui/templates/ui/quiz.html:12
 msgid "You have answered all the questions!"
 msgstr "Hai già risposto a tutte le domande!"
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:16
+#: wsgi/quiz/ui/templates/ui/quiz.html:13
 #, python-format
 msgid "In this quiz you made errors: %%(errors)s"
 msgstr "Errori commessi in questa sessione: %%(errors)s"
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:19
+#: wsgi/quiz/ui/templates/ui/quiz.html:16
 msgid "Back to quiz"
 msgstr "Torna all'esercizio"
 
-#: wsgi/quiz/ui/templates/ui/quiz.html:20
+#: wsgi/quiz/ui/templates/ui/quiz.html:17
 msgid "Restart"
 msgstr "Ricomincia"
 
@@ -266,17 +336,17 @@ msgstr "Ripasso Errori"
 msgid "Error review"
 msgstr "Ripasso errori"
 
-#: wsgi/quiz/ui/templates/ui/review.html:21
+#: wsgi/quiz/ui/templates/ui/review.html:18
 msgid "You have no questions with wrong answers!"
 msgstr "Nessun errore! "
 
-#: wsgi/quiz/ui/templates/ui/review.html:22
+#: wsgi/quiz/ui/templates/ui/review.html:19
 #, python-format
 msgid "You made errors: %%(errors)s"
 msgstr "Errori commessi: %%(errors)s"
 
-#: wsgi/quiz/ui/templates/ui/review.html:25
-#: wsgi/quiz/ui/templates/ui/review.html:27
+#: wsgi/quiz/ui/templates/ui/review.html:22
+#: wsgi/quiz/ui/templates/ui/review.html:24
 msgid "Back to review"
 msgstr "Ritorna all'esercizio"
 
@@ -285,14 +355,17 @@ msgid "All"
 msgstr "TUTTO"
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:5
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:7
 msgid "Recent"
 msgstr "PIU' RECENTE"
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:6
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:8
 msgid "Last week"
 msgstr "ULTIMA SETTIMANA"
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:7
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:9
 msgid "Previous"
 msgstr "PERIODO PRECEDENTE"
 
@@ -330,3 +403,35 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/statistics_client_topic.html:29
 msgid "There are no questions with wrong answers."
 msgstr "Nessun errore."
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:21
+msgid "Guest visits"
+msgstr "Visitatori Esterni"
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:27
+msgid ""
+"Exam statistics: a greater blue sector of the graph, the better the "
+"preparation"
+msgstr ""
+"Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una "
+"migliore preparazione"
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:32
+msgid "Best students"
+msgstr "Studenti Migliori"
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:34
+msgid "Worst students"
+msgstr "Studenti Peggiori"
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:37
+msgid ""
+"Topic statistics: a greater blue sector of the graph, the better the "
+"preparation"
+msgstr ""
+"Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde "
+"una migliore preparazione"
+
+#: wsgi/quiz/ui/templates/ui/statistics_school.html:59
+msgid "<Empty>"
+msgstr ""

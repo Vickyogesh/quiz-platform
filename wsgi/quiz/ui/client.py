@@ -157,10 +157,12 @@ class Statistics(ClientStatisticsPage):
 
         exams = app.core.getExamList(self.quiz_type, user_id)
 
-        if access.current_user.is_school:
-            back_url = url_for('.school_menu')
-        else:
-            back_url = url_for('.client_menu')
+        back_url = request.args.get('back')
+        if back_url is None:
+            if access.current_user.is_school:
+                back_url = url_for('.school_menu')
+            else:
+                back_url = url_for('.client_menu')
         self.urls = {'back': back_url}
 
         return self.render(client_stat=stat, exams=exams, uid=uid)

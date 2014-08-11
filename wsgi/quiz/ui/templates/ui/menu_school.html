@@ -1,23 +1,13 @@
-{% extends "ui/base_page.html" %}
+{% extends "ui/base_page_school.html" %}
 {% block subtitle %}{{ _('Menu') }}{% endblock %}
 {% block content_class %}menu school{% endblock %}
 
-{% block header_row %}
-<div class="col-md-12">
-  <h4>
-    <a href="{{ urls.account }}">
-    {{ user.account.name }} {{ user.account.surname }}
-    </a>
-  </h4>
-</div>
-{% endblock %}
-
 {% block nav_brand %}
-  <a href="{{ url_for('.logout') }}" class="navbar-brand">{{ _('Exit') }} <span class="glyphicon glyphicon-log-out"></span></a>
+  <a href="{{ url_for('.logout') }}" class="navbar-brand">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a>
 {% endblock %}
 
 {% block top_menu %}
-  <li><a href="#"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></li>
+  <li><a href="{{ url_for('.school_statistics') }}"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></li>
   <li id="add-student"><a href="#"><span class="glyphicon glyphicon-plus"></span> {{ _('Add a student') }}</a></li>
 {% endblock %}
 
@@ -93,17 +83,6 @@
       </div>
     </div>
   </script>
-{% endblock %}
-
-
-{% block script_include %}
-  {{ super() }}
-  {% assets "bb.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
-  {% assets "school.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
 {% endblock %}
 
 {% block express_bar_anchor %}#header{% endblock %}

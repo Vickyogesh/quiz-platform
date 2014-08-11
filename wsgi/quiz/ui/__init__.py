@@ -22,14 +22,14 @@ bb_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
                'ui/js/dialog-bb.js', 'ui/js/quiz-model.js',
                filters=js_filter, output='ui/gen/bb.js')
 
-statistics_js = Bundle('ui/js/libs/raphael-min.js',
-                       'ui/js/libs/g.raphael-min.js',
-                       'ui/js/libs/g.line.js', 'ui/js/libs/g.pie.js',
-                       'ui/js/libs/moment.min.js',
-                       # ours
-                       'ui/js/chart.js', 'ui/js/stat-user.js',
-                       'ui/js/stat-exam.js',
-                       filters=js_filter, output='ui/gen/stat.js')
+graph_js = Bundle('ui/js/libs/raphael-min.js',
+                  'ui/js/libs/g.raphael-min.js',
+                  'ui/js/libs/g.line.js', 'ui/js/libs/g.pie.js',
+                  'ui/js/chart.js',
+                  filters=js_filter, output='ui/gen/graph.js')
+
+user_stat_js = Bundle('ui/js/stat-user.js', 'ui/js/stat-exam.js',
+                      filters=js_filter, output='ui/gen/user-stat.js')
 
 quiz_js = Bundle('ui/js/quiz-topicslider.js',
                  'ui/js/quiz-view.js', 'ui/js/quiz-review.js',
@@ -39,17 +39,19 @@ exam_js = Bundle('ui/js/exam-model.js', 'ui/js/exam-view.js',
                  filters=js_filter, output='ui/gen/exam.js')
 
 school_js = Bundle('ui/js/libs/md5.js', 'ui/js/school.js',
+                   'ui/js/school-stat.js',
                    filters=js_filter, output='ui/gen/school.js')
 
 css_ui = Bundle('ui/css/colorbox.css', 'ui/css/style.css', 'ui/css/startup.css',
                 'ui/css/menu.css', 'ui/css/statistics.css',
                 'ui/css/quiz.css', 'ui/css/msgbox.css', 'ui/css/exam.css',
-                'ui/css/school_menu.css',
+                'ui/css/school_menu.css', 'ui/css/school_stat.css',
                 filters=css_filter, output='ui/gen/ui.css')
 
 assets.register('base.js', base_js)
 assets.register('bb.js', bb_js)
-assets.register('stat.js', statistics_js)
+assets.register('graph.js', graph_js)
+assets.register('user-stat.js', user_stat_js)
 assets.register('quiz.js', quiz_js)
 assets.register('exam.js', exam_js)
 assets.register('school.js', school_js)

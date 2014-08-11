@@ -1,4 +1,4 @@
-from flask import url_for, request, abort
+from flask import url_for
 from .page import Page
 from .util import account_url
 from .. import access, app
@@ -38,5 +38,45 @@ class Statistics(SchoolPage):
     """School statistics page."""
     template_name = 'ui/statistics_school.html'
 
+    @staticmethod
+    def _get_ids(data):
+        if 'best' not in data or 'worst' not in data:
+            return []
+        return [x['id'] for x in data['best']] + [x['id'] for x in data['worst']]
+
+    @staticmethod
+    def _update_names(users, data):
+        for x in data:
+            user = users[x['id']]
+            x['name'] = user['name']
+            x['surname'] = user['surname']
+
     def on_request(self):
-        return self.render()
+        res = app.core.getSchoolStat(self.quiz_type, self.uid, self.lang)
+
+        # Since res doesn't contain user names then
+        # we need to get names from the account service and update result.
+        students = res['students']
+        lst = Statistics._get_ids(students['current']) \
+            + Statistics._get_ids(students['week']) \
+            + Statistics._get_ids(students['week3'])
+        lst = set(lst)
+
+        if lst:
+            data = app.account.getSchoolStudents(self.uid, lst)
+            lst = {}
+            for info in data['students']:
+                lst[info['id']] = info
+            Statistics._update_names(lst, students['current']['best'])
+            Statistics._update_names(lst, students['current']['worst'])
+            Statistics._update_names(lst, students['week']['best'])
+            Statistics._update_names(lst, students['week']['worst'])
+            Statistics._update_names(lst, students['week3']['best'])
+            Statistics._update_names(lst, students['week3']['worst'])
+
+        self.urls = {
+            'back': url_for('.school_menu'),
+            'account': account_url(with_uid=False),
+            'stat': url_for('ui.client_statistics', uid="0")[:-1]
+        }
+        return self.render(stat=res)

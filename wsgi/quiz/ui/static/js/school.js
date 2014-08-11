@@ -63,7 +63,10 @@
             "click .remove": "onBttRemove"
         },
 
-        template: _.template($("#client-tmpl").html()),
+        // We use OR to allows packing this script to bundle.
+        // If bundle is included to the file without #client-tmpl
+        // then with OR it will not fail.
+        template: _.template($("#client-tmpl").html() || ""),
 
         constructor: function() {
             var params = arguments[0];
