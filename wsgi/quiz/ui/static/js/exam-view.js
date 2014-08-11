@@ -140,10 +140,14 @@
             this.num_el.html(index + 1);
             this.text_el.html(question.get("text"));
 
-            if (question.has("text_extra"))
+            if (question.has("text_extra")) {
+                this.text_el.addClass("hidden-on-super-small");
                 this.text_translated_el.html(question.get("text_extra"));
-            else
+            }
+            else {
+                this.text_el.removeClass("hidden-on-super-small");
                 this.text_translated_el.empty();
+            }
 
             this.setImage(this.model.getCurrentQuestionImage());
             this.renderAnswer();
