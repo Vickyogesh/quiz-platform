@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, session
 from .page import Page
 from .util import account_url
 from .. import access, app
@@ -24,6 +24,9 @@ class Menu(SchoolPage):
         str_uid = str(self.uid)
         res = app.account.getSchoolStudents(self.uid)
         account = account_url(with_uid=False)
+        # See client.Statistics
+        if 'back_url' in session:
+            del session['back_url']
         self.urls = {
             'add': url_for('api.add_student', id=str_uid),
             'remove': url_for('api.delete_student', id=str_uid, student=0)[:-1],
@@ -79,4 +82,7 @@ class Statistics(SchoolPage):
             'account': account_url(with_uid=False),
             'stat': url_for('ui.client_statistics', uid="0")[:-1]
         }
+        # See client.Statistics
+        if 'back_url' in session:
+            del session['back_url']
         return self.render(stat=res)

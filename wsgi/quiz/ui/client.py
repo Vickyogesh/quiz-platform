@@ -1,4 +1,4 @@
-from flask import url_for, request, abort
+from flask import url_for, request, abort, session
 from .page import Page
 from .util import account_url
 from .. import access, app
@@ -149,6 +149,25 @@ class ClientStatisticsPage(ClientPage):
 class Statistics(ClientStatisticsPage):
     template_name = 'ui/statistics_client.html'
 
+    # Back URL:
+    # This is a workaround to correctly redirect to previous page.
+    # School can view client statistics from two locations:
+    # menu page and school statistics page,
+    # and to determine which page was before the client's page we
+    # save URL in session.
+    # School's statistics passes it query; school menu page doesn't set
+    # back URL at all. Client's stat page (this page) saves it
+    # in session. And later can extract it.
+    def get_back_url(self):
+        back_url = request.args.get('back', session.get('back_url'))
+        if back_url is None:
+            if access.current_user.is_school:
+                back_url = url_for('.school_menu')
+            else:
+                back_url = url_for('.client_menu')
+        session['back_url'] = back_url
+        return back_url
+
     def on_request(self, uid):
         user_id = get_user_id(uid)
         stat = app.core.getUserStat(self.quiz_type, user_id, self.lang)
@@ -156,15 +175,7 @@ class Statistics(ClientStatisticsPage):
         self.check(user_id, stat['student']['school_id'])
 
         exams = app.core.getExamList(self.quiz_type, user_id)
-
-        back_url = request.args.get('back')
-        if back_url is None:
-            if access.current_user.is_school:
-                back_url = url_for('.school_menu')
-            else:
-                back_url = url_for('.client_menu')
-        self.urls = {'back': back_url}
-
+        self.urls = {'back': self.get_back_url()}
         return self.render(client_stat=stat, exams=exams, uid=uid)
 
 
