@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-08-11 16:32+0700\n"
-"PO-Revision-Date: 2014-08-11 16:41+0700\n"
+"PO-Revision-Date: 2014-08-11 19:27+0700\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -252,22 +252,22 @@ msgstr "Promosso"
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:93
 msgid "Remove a student"
-msgstr ""
+msgstr "Rimozione studente"
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:94
 #, python-format
 msgid ""
 "Are you sure you want to remove the student <b>%%(name)s</b> from your "
 "school?"
-msgstr ""
+msgstr "Sei sicuro di voler rimuovere lo studente <b>%%(name)s</b>? "
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:96
 msgid "Error removing a student."
-msgstr ""
+msgstr "Errore nella rimozione dello studente."
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:97
 msgid "Error adding a student."
-msgstr ""
+msgstr "Errore nella creazione dello studente."
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:98
 msgid "Cancel"
@@ -279,7 +279,7 @@ msgstr "Aggiungi"
 
 #: wsgi/quiz/ui/templates/ui/menu_school.html:101
 msgid "Yes, remove"
-msgstr ""
+msgstr "Si, rimuovi"
 
 #: wsgi/quiz/ui/templates/ui/quiz.html:2
 msgid "Quiz"
@@ -434,4 +434,4 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:59
 msgid "<Empty>"
-msgstr ""
+msgstr "Ancora nessuno studente nelle statistiche"
