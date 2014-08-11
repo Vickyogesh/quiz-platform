@@ -21,4 +21,5 @@ fi
 # Generate translations
 source $OPENSHIFT_DATA_DIR/venv/bin/activate
 $OPENSHIFT_DATA_DIR/venv/bin/pybabel compile -d $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/translations -D ui
-
+# Build assets
+python $OPENSHIFT_REPO_DIR/manage.py assets build
