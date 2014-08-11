@@ -6,9 +6,13 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4>
+    {% if force_name %}
+      {{ force_name }}
+    {% else %}
     <a href="{{ urls.account }}">
     {{ user.account.name }} {{ user.account.surname }}
     </a>
+    {% endif %}
   </h4>
 </div>
 {% endblock %}

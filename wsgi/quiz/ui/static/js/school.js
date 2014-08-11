@@ -224,8 +224,10 @@
         },
 
         onClientClick: function(index) {
-            var id = this.model.at(index).get("id");
-            window.location = this.urls.stat + id;
+            var client = this.model.at(index);
+            var id = client.get("id");
+            var params = $.param({name: client.fullName()});
+            window.location = this.urls.stat + id + "?" + params;
         },
 
         onBttRemove: function(index) {

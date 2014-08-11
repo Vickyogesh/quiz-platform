@@ -107,7 +107,8 @@
         },
 
         onClick: function(event) {
-            this.trigger("click", $(event.currentTarget).attr("id"));
+            var name = $(event.currentTarget).find(".cell").html();
+            this.trigger("click", $(event.currentTarget).attr("id"), name);
         }
     });
 
@@ -158,8 +159,9 @@
             this.render();
         },
 
-        onStudentClicked: function(id) {
-            window.location = this.urls.stat + id + "?back=" + window.location;
+        onStudentClicked: function(id, name) {
+            var params = $.param({back: window.location.href, name: name});
+            window.location = this.urls.stat + id + "?" + params;
         },
 
         render: function() {

@@ -143,6 +143,10 @@ class ClientStatisticsPage(ClientPage):
         if self.urls is None:
             self.urls = {}
         self.urls['account'] = account_url()
+        force_name = request.args.get('name', session.get('force_name'))
+        if force_name is not None:
+            kwargs['force_name'] = force_name
+            session['force_name'] = force_name
         return ClientPage.render(self, **kwargs)
 
 

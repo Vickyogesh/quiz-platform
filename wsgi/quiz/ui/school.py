@@ -15,6 +15,13 @@ class SchoolPage(Page):
     endpoint_prefix = 'school'
     decorators = [access.be_admin_or_school.require()]
 
+    # See client.Statistics and client.ClientStatisticsPage
+    def pop_session_helpers(self):
+        if 'back_url' in session:
+            del session['back_url']
+        if 'force_name' in session:
+            del session['force_name']
+
 
 class Menu(SchoolPage):
     """School menu page."""
@@ -24,9 +31,6 @@ class Menu(SchoolPage):
         str_uid = str(self.uid)
         res = app.account.getSchoolStudents(self.uid)
         account = account_url(with_uid=False)
-        # See client.Statistics
-        if 'back_url' in session:
-            del session['back_url']
         self.urls = {
             'add': url_for('api.add_student', id=str_uid),
             'remove': url_for('api.delete_student', id=str_uid, student=0)[:-1],
@@ -34,6 +38,7 @@ class Menu(SchoolPage):
             'account': account,
             'stat': url_for('ui.client_statistics', uid="0")[:-1]
         }
+        self.pop_session_helpers()
         return self.render(clients=res['students'])
 
 
@@ -82,7 +87,5 @@ class Statistics(SchoolPage):
             'account': account_url(with_uid=False),
             'stat': url_for('ui.client_statistics', uid="0")[:-1]
         }
-        # See client.Statistics
-        if 'back_url' in session:
-            del session['back_url']
+        self.pop_session_helpers()
         return self.render(stat=res)
