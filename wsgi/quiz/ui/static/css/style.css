@@ -266,3 +266,8 @@ a.tablerow:hover {
 .question-answer.wrong {
   background-color: #c9463e;
 }
+
+p.info {
+  padding: 21px;
+  text-align: center;
+}

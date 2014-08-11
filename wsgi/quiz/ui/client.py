@@ -3,6 +3,7 @@ from .page import Page
 from .util import account_url
 from .. import access, app
 from ..api import get_user_id
+from ..core.exceptions import QuizCoreError
 
 
 def register_urls_for(bp):
@@ -170,11 +171,15 @@ class Statistics(ClientStatisticsPage):
 
     def on_request(self, uid):
         user_id = get_user_id(uid)
-        stat = app.core.getUserStat(self.quiz_type, user_id, self.lang)
+        try:
+            stat = app.core.getUserStat(self.quiz_type, user_id, self.lang)
+        except QuizCoreError:
+            stat = None
+            exams = None
+        else:
+            self.check(user_id, stat['student']['school_id'])
+            exams = app.core.getExamList(self.quiz_type, user_id)
 
-        self.check(user_id, stat['student']['school_id'])
-
-        exams = app.core.getExamList(self.quiz_type, user_id)
         self.urls = {'back': self.get_back_url()}
         return self.render(client_stat=stat, exams=exams, uid=uid)
 
