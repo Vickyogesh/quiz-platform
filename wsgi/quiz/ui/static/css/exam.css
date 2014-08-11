@@ -327,7 +327,7 @@ body:after {
   line-height: 1;
 }
 
-.exam .buttons .btt-prev {
+.exam .btt-prev {
   display: inline-block;
   background: url(../i/exam_btt_prev.png) no-repeat;
   background-origin: content-box;
@@ -337,7 +337,7 @@ body:after {
   cursor: pointer;
 }
 
-.exam .buttons .btt-next {
+.exam .btt-next {
   display: inline-block;
   background: url(../i/exam_btt_next.png) no-repeat;
   background-origin: content-box;
@@ -417,21 +417,69 @@ body:after {
   margin-top: 10px;
 }
 
+.exam .small-screen-ctrl > div {
+  margin-top: 20px;
+  min-width: 50px;
+}
+
+.visible-on-super-small {
+  display: none !important;
+}
+
+.hidden-on-super-small {
+  display: block !important;
+}
+
+.cell.hidden-on-super-small {
+  display: table-cell !important;
+}
+
+/* super-small */
+@media (max-width: 480px) {
+  .visible-on-super-small {
+    display: block !important;
+  }
+
+  .hidden-on-super-small {
+    display: none !important;
+  }
+
+  .cell.hidden-on-super-small {
+    display: none !important;
+  }
+}
+
+
 @media (max-width: 768px) {
   .exam .exam-data .image {
     height: inherit;
     margin-bottom: 4px;
   }
+
   .exam .exam-data .question > div:first-child {
     padding-right: 15px;
+    margin-top: 10px;
   }
+
   .exam .exam-data .question > div:last-child {
     padding-left: 15px;
   }
+
   .exam .bottom-nav {
     padding-top: 6px;
   }
+
   .exam .answer-rect {
     margin-top: 4px;
+  }
+
+  .exam .img-ans {
+    width: 50px;
+    height: 50px;
+    margin-top: 5px;
+  }
+
+  .exam .exam-data .data .text-rect {
+    height: inherit;
   }
 }

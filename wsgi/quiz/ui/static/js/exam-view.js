@@ -208,8 +208,8 @@
     ExamView = Backbone.View.extend({
         events: {
             "click .control .summary": "onSummary",
-            "click .control .buttons .btt-prev": "onPrev",
-            "click .control .buttons .btt-next": "onNext"
+            "click .btt-prev": "onPrev",
+            "click .btt-next": "onNext"
         },
 
         constructor: function() {

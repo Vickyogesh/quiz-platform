@@ -29,7 +29,7 @@
         {%- endfor %}
       </div>
 
-      <div class="bottom-nav">
+      <div class="bottom-nav hidden-xs">
         {% for i in range(40) -%}
         <div id="rect{{ loop.index0 }}">{{ loop.index }}</div>
         {%- endfor %}
@@ -52,8 +52,8 @@
 
             <div class="text-rect">
               <table>
-                <tr><td id="text">dsads</td></tr>
-                <tr><td id="text-lang">dsdsd</td></tr>
+                <tr class="hidden-on-super-small"><td id="text"></td></tr>
+                <tr><td id="text-lang"></td></tr>
               </table>
             </div>
           </div> <!-- /text -->
@@ -61,10 +61,18 @@
           <div class="answer-rect">
             <div>
               <div>
-                <div>{{ _('True') }}</div><div class="img-ans true-big" id="true"></div>
+                <div class="hidden-xs">{{ _('True') }}</div><div class="img-ans true-big" id="true"></div>
               </div>
               <div>
-                <div>{{ _('False') }}</div><div class="img-ans false-big" id="false"></div>
+                <div class="hidden-xs">{{ _('False') }}</div><div class="img-ans false-big" id="false"></div>
+              </div>
+            </div>
+            <div class="visible-on-super-small small-screen-ctrl">
+              <div id="prev">
+                <div class="btt-prev"></div>
+              </div>
+              <div id="next">
+                <div class="btt-next"></div>
               </div>
             </div>
           </div> <!-- /answer-rect -->
@@ -94,7 +102,7 @@
           <span>{{ _('Summary') }}</span>
           <div class="btt-summary"></div>
         </div>
-        <div class="cell buttons">
+        <div class="cell buttons hidden-on-super-small">
           <div id="prev">
             <span>{{ _('Previous question') }}</span>
             <div class="btt-prev"></div>
@@ -125,11 +133,11 @@
         </div>
       </div>
 
-      <div class="field col-sm-4 col-sm-offset-4">
+      <div class="field col-sm-4 col-sm-offset-4 hidden-sm hidden-xs">
         <div class="title">{{ _('Exam number') }}</div>
         <div class="val">{{ exam.exam.id }}</div>
       </div>
-      <div class="field col-sm-4 col-sm-offset-4">
+      <div class="field col-sm-4 col-sm-offset-4 hidden-sm hidden-xs">
         <div class="title">{{ _('Name and surname') }}</div>
         <div class="val">{{ user.account.name }} {{ user.account.surname }}</div>
       </div>
