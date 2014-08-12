@@ -43,7 +43,7 @@
         </a>
       </div>
     </div><!--
-    --><div id="questions" class="col-sm-10 vcenter">
+    --><div id="questions" class="col-sm-9 vcenter">
 
       <div class="qrow pos2" id="row0">
         <div class="qcell">
@@ -89,10 +89,12 @@
         </div>
         <div class="qcell">
           <div class="qrect tbl ansbox">
-            <div>
-                <a href="#"><div class="img-ans true"></a></div>
-                <a href="#"><div class="img-ans false"></a></div>
+            <div class="qnav glyphicon glyphicon-chevron-left" id="btt-prev"></div>
+            <div class="imgbox">
+                <a href="#"><div class="img-ans true"></div></a>
+                <a href="#"><div class="img-ans false"></div></a>
             </div>
+            <div class="qnav glyphicon glyphicon-chevron-right" id="btt-next"></div>
           </div>
         </div>
       </div> <!-- row -->
@@ -132,8 +134,11 @@
           </div>
         </div>
       </div> <!-- row -->
-    </div> <!-- /questions -->
-
+    </div> <!--
+    --><div class="navbox col-sm-1 vcenter ">
+      <div class="qnav glyphicon glyphicon-chevron-up" id="btt-prev"></div>
+      <div class="qnav glyphicon glyphicon-chevron-up" id="btt-next"></div>
+    </div>
     <div class="message-box" id="msgbox"></div>
   </div>
 {% endblock %}

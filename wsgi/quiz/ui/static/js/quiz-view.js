@@ -102,6 +102,8 @@
     QuizView = Backbone.View.extend({
         events: {
             "click #btt-done": "onBttFinish",
+            "click .qnav#btt-prev": "onBttPrev",
+            "click .qnav#btt-next": "onBttNext",
             "mousewheel": "onWheel"
         },
 
@@ -286,6 +288,14 @@
                 "text": text,
                 "buttons": buttons
             });
+        },
+
+        onBttPrev: function() {
+            this.model.showPrevious();
+        },
+
+        onBttNext: function() {
+            this.model.showNext();
         },
 
         onWheel: function(event) {

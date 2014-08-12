@@ -271,3 +271,31 @@ p.info {
   padding: 21px;
   text-align: center;
 }
+
+
+.visible-on-super-small {
+  display: none !important;
+}
+
+.hidden-on-super-small {
+  display: block !important;
+}
+
+.cell.hidden-on-super-small {
+  display: table-cell !important;
+}
+
+/* super-small */
+@media (max-width: 480px) {
+  .visible-on-super-small {
+    display: block !important;
+  }
+
+  .hidden-on-super-small {
+    display: none !important;
+  }
+
+  .cell.hidden-on-super-small {
+    display: none !important;
+  }
+}
