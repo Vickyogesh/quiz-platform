@@ -35,6 +35,23 @@
     {% block footer %}
     <div class="footer-space"></div>
     {% endblock %}
+
+    {% if user.is_guest %}
+    <div class="message-box" id="ge-box">
+      <div>
+        <div>
+          <span class="glyphicon icon glyphicon-remove-circle"></span>
+          <p>{{ _("Guest's visits is exceeded. Access will be unlocked within 1 hr.") }}</p>
+          <div>
+            <a type="button" class="btn btn-success" href="{{ url_for('.client_menu') }}">
+              <span class="glyphicon glyphicon-arrow-left"></span>
+              {{ _('Back to menu') }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /guest error box -->
+    {% endif %}
   </div>  <!-- /contentpanel -->
 {% endblock %}
 
@@ -58,7 +75,9 @@
     $("#gotop").click(function() {
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
-    window.g = {};
+    window.g = {
+      user_type: "{{ user.user_type}}"
+    };
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;
     {%- block page_script %} {% endblock %}

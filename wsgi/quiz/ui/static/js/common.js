@@ -11,6 +11,10 @@
         // Hide busy indicator after sending request.
         complete: function() {
             $(busy_el_id).fadeOut();
+        },
+        error: function(event) {
+            if (event.status == 403 && window.g.user_type == "guest")
+                Aux.showGuestError();
         }
     });
 
@@ -67,6 +71,10 @@
               data: payload,
               success: func
             });
+        },
+
+        showGuestError: function() {
+            $(".contentpanel #ge-box").show();
         }
     };
 }).call(this);

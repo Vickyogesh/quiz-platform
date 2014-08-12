@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-11 16:32+0700\n"
+"POT-Creation-Date: 2014-08-12 16:00+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,7 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base.html:34
 #: wsgi/quiz/ui/templates/ui/base.html:40
-#: wsgi/quiz/ui/templates/ui/exam.html:183
+#: wsgi/quiz/ui/templates/ui/exam.html:191
 #: wsgi/quiz/ui/templates/ui/menu_school.html:26
 #: wsgi/quiz/ui/templates/ui/menu_school.html:66
 #: wsgi/quiz/ui/templates/ui/menu_school.html:99
@@ -75,7 +75,7 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
 #: wsgi/quiz/ui/templates/ui/exam_review.html:11
 #: wsgi/quiz/ui/templates/ui/menu_quiz.html:6
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:17
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:21
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:13
 msgid "Back"
 msgstr ""
@@ -86,6 +86,17 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_page.html:17
 msgid "Toggle navigation"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/base_page.html:44
+msgid "Guest's visits is exceeded. Access will be unlocked within 1 hr."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/base_page.html:48
+#: wsgi/quiz/ui/templates/ui/exam.html:192
+#: wsgi/quiz/ui/templates/ui/quiz.html:15
+#: wsgi/quiz/ui/templates/ui/review.html:21
+msgid "Back to menu"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/exam.html:2 wsgi/quiz/ui/templates/ui/exam.html:6
@@ -113,74 +124,68 @@ msgstr ""
 msgid "False"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:79
+#: wsgi/quiz/ui/templates/ui/exam.html:87
 msgid "Time available"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:85
-#: wsgi/quiz/ui/templates/ui/exam.html:129
+#: wsgi/quiz/ui/templates/ui/exam.html:93
+#: wsgi/quiz/ui/templates/ui/exam.html:137
 msgid "Exam number"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:89
-#: wsgi/quiz/ui/templates/ui/exam.html:133
+#: wsgi/quiz/ui/templates/ui/exam.html:97
+#: wsgi/quiz/ui/templates/ui/exam.html:141
 msgid "Name and surname"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:94
+#: wsgi/quiz/ui/templates/ui/exam.html:102
 msgid "Summary"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:99
+#: wsgi/quiz/ui/templates/ui/exam.html:107
 msgid "Previous question"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:103
+#: wsgi/quiz/ui/templates/ui/exam.html:111
 msgid "Next question"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:117
+#: wsgi/quiz/ui/templates/ui/exam.html:125
 msgid "Back to questions"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:123
+#: wsgi/quiz/ui/templates/ui/exam.html:131
 msgid "Finish exam"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:146
+#: wsgi/quiz/ui/templates/ui/exam.html:154
 msgid "Question text"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:147
+#: wsgi/quiz/ui/templates/ui/exam.html:155
 msgid "T"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:148
+#: wsgi/quiz/ui/templates/ui/exam.html:156
 msgid "F"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:181
+#: wsgi/quiz/ui/templates/ui/exam.html:189
 msgid "Error saving exam."
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:182
+#: wsgi/quiz/ui/templates/ui/exam.html:190
 #, python-format
 msgid "In this exam you made errors: %%(errors)s"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:184
-#: wsgi/quiz/ui/templates/ui/quiz.html:15
-#: wsgi/quiz/ui/templates/ui/review.html:21
-msgid "Back to menu"
-msgstr ""
-
-#: wsgi/quiz/ui/templates/ui/exam.html:185
+#: wsgi/quiz/ui/templates/ui/exam.html:193
 #: wsgi/quiz/ui/templates/ui/quiz.html:18
 #: wsgi/quiz/ui/templates/ui/review.html:23
 msgid "Try again"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/exam.html:186
+#: wsgi/quiz/ui/templates/ui/exam.html:194
 #: wsgi/quiz/ui/templates/ui/quiz.html:19
 msgid "Review answers"
 msgstr ""
@@ -349,33 +354,37 @@ msgstr ""
 msgid "Back to review"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:4
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:5
 msgid "All"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:5
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:6
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:7
 msgid "Recent"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:6
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:7
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:8
 msgid "Last week"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:7
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:8
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:9
 msgid "Previous"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:14
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:17
 msgid "Exam statistics"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/statistics_client.html:21
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:24
 msgid ""
 "Statistics topics in greater blue portion of the graph corresponds to a "
 "better preparation."
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/statistics_client.html:41
+msgid "The student has not passed any exercises."
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/statistics_client_exams.html:8
