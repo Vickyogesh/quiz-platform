@@ -285,6 +285,15 @@ p.info {
   display: table-cell !important;
 }
 
+.img-preload {
+  position: absolute;
+  overflow: hidden;
+  left: -9999px;
+  top: -9999px;
+  height: 1px;
+  width: 1px;
+}
+
 /* super-small */
 @media (max-width: 480px) {
   .visible-on-super-small {

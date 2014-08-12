@@ -1,8 +1,3 @@
-body:after {
-  content: url(../i/true_big.png) url(../i/true_selected_big.png) url(../i/false_big.png) url(../i/false_selected_big.png);
-  display: none;
-}
-
 .container.exam, .container.exam-review {
   max-width: 750px;
 }
@@ -219,23 +214,22 @@ body:after {
   cursor: pointer;
 }
 
-.exam .img-ans.true-big {
+.img-ans.true-big {
   background-image: url(../i/true_big.png);
 }
-.exam .img-ans.true-big.sel {
+.img-ans.true-big.sel {
   background-image: url(../i/true_selected_big.png);
 }
-.exam .img-ans.false-big {
+.img-ans.false-big {
   background-image: url(../i/false_big.png);
 }
-.exam .img-ans.false-big.sel {
+.img-ans.false-big.sel {
   background-image: url(../i/false_selected_big.png);
 }
 
 .exam .control {
   margin-right: 19px;
   margin-left: 19px;
-  /*background-color: #fff;*/
 }
 
 .exam .control .time {
