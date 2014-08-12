@@ -7,7 +7,7 @@
     <div class="row separator" id="header">
       <div class="col-md-12">{{ _('Exam list') }}</div>
     </div>
-    {% for exam in exams %}
+    {% for exam in exams if exam.status == 'failed' or exam.status == 'passed'%}
     <div class="row examrow" id="exam{{ exam.id }}">
       <div class="col-md-12 exam-title">
         <span class="glyphicon
