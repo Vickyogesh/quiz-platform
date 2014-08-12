@@ -186,6 +186,9 @@
         },
 
         showLoadError: function(msg, tryagain_callback) {
+            function back() {
+                window.location = this.urls.back;
+            }
             function close() {
                 this.msgbox.hide();
             }
@@ -193,6 +196,11 @@
                 "text": msg,
                 "icon": "glyphicon-remove-circle",
                 "buttons": [
+                    {
+                        text: this.labels.btt_back, type: "btn-success",
+                        icon: "glyphicon-arrow-left",
+                        callback: back.bind(this)
+                    },
                     {
                         text: this.labels.btt_close, type: "btn-danger",
                         callback: close.bind(this)
@@ -309,17 +317,15 @@
         },
 
         onModelSaveError: function(response, ok_callback) {
-            var self = this;
             this.showLoadError(this.labels.error_get, function() {
-                ok_callback();
-            });
+                this.model.sendCurrentAnswers(ok_callback);
+            }.bind(this));
         },
 
         onModelLoadError: function(response) {
-            var self = this;
             this.showLoadError(this.labels.error_get, function() {
-                self.model.loadMoreQuestions();
-            });
+                this.model.loadMoreQuestions();
+            }.bind(this));
         },
         
         onDone: function () {
