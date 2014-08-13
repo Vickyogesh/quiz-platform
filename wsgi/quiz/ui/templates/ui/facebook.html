@@ -1,4 +1,4 @@
-{% macro async_init() -%}
+{% macro async_init(callback=None) -%}
   <div id="fb-root"></div>
   <script>
     window.fbAsyncInit = function() {
@@ -8,6 +8,10 @@
         status     : true,
         version    : 'v2.0'
       });
+
+      {% if callback %}
+      {{ callback }}();
+      {% endif %}
     };
 
     (function(d, s, id){

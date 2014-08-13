@@ -3,7 +3,27 @@
 {% block title %}{{ _('Quiz Platform') }}{% endblock %}
 
 {% block body %}
-  {{ fb.async_init() }}
+  <script>
+    function dologin(keepForm) {
+      if (!keepForm) {
+        $("#login-form").hide();
+        $("#busy_layer").fadeIn(100);
+      }
+      FB.login(function(response) {
+        $("#busy_layer").hide();
+        if (response.authResponse) {
+          $("form #is_fb").val(1);
+          $("form #fb_auth_id").val(response.authResponse.userID);
+          $("form #fb_auth_token").val(response.authResponse.accessToken);
+          $("form").submit();
+        }
+        else {
+          $("#login-form").show();
+        }
+      }, {scope: 'publish_actions'});
+    }
+  </script>
+  {{ fb.async_init(callback='dologin' if fb_autologin else None) }}
   {{ super() }}
 {% endblock %}
 
@@ -62,12 +82,7 @@
     });
 
     $("form #btt-fb").click(function() {
-      FB.login(function(response) {
-        $("form #is_fb").val(1);
-        $("form #fb_auth_id").val(response.authResponse.userID);
-        $("form #fb_auth_token").val(response.authResponse.accessToken);
-        $("form").submit();
-      }, {scope: 'publish_actions'});
+      dologin(true);
     });
   </script>
 {%- endblock %}

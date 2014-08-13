@@ -82,6 +82,7 @@ def index(quiz_name):
         if session['quiz_type_name'] == quiz_name:
             return after_login()
 
+    fb_autologin = request.args.get('fblogin')
     form = LoginFrom()
     if form.validate_on_submit():
         if form.is_fb.data == "1":
@@ -96,6 +97,7 @@ def index(quiz_name):
         try:
             do_login(data)
         except HTTPException as e:
+            fb_autologin = None
             if e.code == 403:
                 flash(gettext('Forbidden.'))
             else:
@@ -103,7 +105,8 @@ def index(quiz_name):
         else:
             return after_login()
 
-    return render_template('ui/index.html', quiz_name=quiz_name, form=form)
+    return render_template('ui/index.html', quiz_name=quiz_name, form=form,
+                           fb_autologin=fb_autologin)
 
 
 @ui.route('/logout')
