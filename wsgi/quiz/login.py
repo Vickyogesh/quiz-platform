@@ -9,7 +9,8 @@ from . import access
 QUIZ_TYPE_ID = {
     'b2011': 1,
     'cqc': 2,
-    'b2013': 3
+    'b2013': 3,
+    'scooter': 4
 }
 
 login_api = Blueprint('login_api', __name__)

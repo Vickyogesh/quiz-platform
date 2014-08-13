@@ -25,7 +25,7 @@ class SchoolPage(Page):
 
 class Menu(SchoolPage):
     """School menu page."""
-    template_name = 'ui/menu_school.html'
+    default_template = 'ui/menu_school.html'
 
     def on_request(self):
         str_uid = str(self.uid)
@@ -44,7 +44,7 @@ class Menu(SchoolPage):
 
 class Statistics(SchoolPage):
     """School statistics page."""
-    template_name = 'ui/statistics_school.html'
+    default_template = 'ui/statistics_school.html'
 
     @staticmethod
     def _get_ids(data):

@@ -1,10 +1,11 @@
+# coding=utf-8
 from flask import url_for, request, abort, session
 from .page import Page
 from .util import account_url
 from .. import access, app
 from ..api import get_user_id
 from ..core.exceptions import QuizCoreError
-from .babel import gettext
+from .babel import gettext, lazy_gettext
 
 
 def register_urls_for(bp):
@@ -32,7 +33,7 @@ class ClientPage(Page):
 
 
 class Menu(ClientPage):
-    template_name = 'ui/menu_client.html'
+    default_template = 'ui/menu_client.html'
 
     def on_request(self):
         self.urls = {'account': account_url()}
@@ -40,13 +41,36 @@ class Menu(ClientPage):
 
 
 class MenuQuiz(ClientPage):
-    template_name = 'ui/menu_quiz.html'
+    default_template = 'ui/menu_quiz.html'
+    templates = {
+        'scooter': 'ui/scooter/menu_quiz.html'
+    }
+
+    scooter_topics = [
+        (lazy_gettext(u'Segnali di pericolo'),
+         lazy_gettext(u'Segnali di divieto, segnali di obbligo, segnali di precedenza')
+        ),
+        (lazy_gettext(u'Pannelli integrativi, segnali di indicazione, segnali luminosi, segnali orizzontali'),
+         lazy_gettext(u'Norme sulla precedenza')
+        ),
+        (lazy_gettext(u'Velocità, distanza di sicurezza, sorpasso, svolta, cambio di corsia, cambio di direzione'),
+         lazy_gettext(u'Fermata, sosta, definizioni stradali')
+        ),
+        (lazy_gettext(u'Cause di incidenti, assicurazione'),
+         lazy_gettext(u'Elementi del ciclomotore e loro uso, casco')
+        ),
+        (lazy_gettext(u'Comportamenti alla guida del ciclomotore'),
+         lazy_gettext(u'Educazione alla legalità')
+        )
+    ]
+
+    def scooter_template_params(self):
+        return {'topics': self.scooter_topics}
 
     def on_request(self):
-        quiz_url = url_for('.client_quiz', topic=0)[:-1]
         self.urls = {
             'back': url_for('.client_menu'),
-            'quiz': quiz_url,
+            'quiz': url_for('.client_quiz', topic=0)[:-1],
             'account': account_url()
         }
         return self.render()
@@ -68,7 +92,7 @@ class QuizBase(ClientPage):
 
 class Quiz(QuizBase):
     """Quiz by topic."""
-    template_name = 'ui/quiz.html'
+    default_template = 'ui/quiz.html'
 
     def get_quiz(self, topic):
         force = request.args.get('force', False)
@@ -85,7 +109,7 @@ class Quiz(QuizBase):
 
 class Review(QuizBase):
     """Error review."""
-    template_name = 'ui/review.html'
+    default_template = 'ui/review.html'
 
     def get_quiz(self):
         # TODO: what if x is not int?
@@ -99,7 +123,15 @@ class Review(QuizBase):
 
 
 class Exam(ClientPage):
-    template_name = 'ui/exam.html'
+    default_template = 'ui/exam.html'
+    templates = {
+        'scooter': 'ui/scooter/exam.html'
+    }
+
+    def scooter_template_params(self):
+        return {
+            'exam_meta': {'max_errors': 3, 'total_time': 1500}
+        }
 
     def on_request(self):
         exam_type = request.args.get('exam_type', None)
@@ -124,11 +156,12 @@ class Exam(ClientPage):
             fb_data = dict((k, v) for k, v in fb_data.iteritems() if v)
         else:
             fb_data = None
-        return self.render(exam=data, fb_data=fb_data)
+        default_meta = {'max_errors': 4, 'total_time': 1800}
+        return self.render(exam=data, fb_data=fb_data, exam_meta=default_meta)
 
 
 class ExamReview(ClientPage):
-    template_name = 'ui/exam_review.html'
+    default_template = 'ui/exam_review.html'
 
     def on_request(self, id):
         info = app.core.getExamInfo(id, self.lang)
@@ -166,7 +199,7 @@ class ClientStatisticsPage(ClientPage):
 
 # TODO: do we need guest statistics?
 class Statistics(ClientStatisticsPage):
-    template_name = 'ui/statistics_client.html'
+    default_template = 'ui/statistics_client.html'
 
     # Back URL:
     # This is a workaround to correctly redirect to previous page.
@@ -203,7 +236,7 @@ class Statistics(ClientStatisticsPage):
 
 
 class StatisticsTopic(ClientStatisticsPage):
-    template_name = 'ui/statistics_client_topic.html'
+    default_template = 'ui/statistics_client_topic.html'
 
     def on_request(self, uid, topic_id):
         user_id = get_user_id(uid)
@@ -217,7 +250,7 @@ class StatisticsTopic(ClientStatisticsPage):
 
 
 class StatisticsExams(ClientStatisticsPage):
-    template_name = 'ui/statistics_client_exams.html'
+    default_template = 'ui/statistics_client_exams.html'
 
     def on_request(self, uid, range):
         user_id = get_user_id(uid)

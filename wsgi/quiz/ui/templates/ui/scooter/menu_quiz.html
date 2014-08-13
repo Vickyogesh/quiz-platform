@@ -1,0 +1,59 @@
+{% extends "ui/base_page.html" %}
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block content_class %}quiz-menu scooter{% endblock %}
+
+{% block styles %}
+{{super()}}
+  <style type="text/css">
+    #topics .row {
+      height: 60px;
+      min-height: 60px;
+    }
+    #topics .col-md-6 {
+      display: table;
+      height: 100%;
+      cursor: pointer;
+      color: #fff;
+      text-decoration: none;
+    }
+    #topics .col-md-6 > div {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 6px;
+    }
+    .area8 {background: #0acd9b;}
+    .area8:hover {background: #09bd8f;}
+
+    .area9 {background: #3b5865;}
+    .area9:hover {background: #354f5a;}
+
+    .area10 {background: #1182df;}
+    .area10:hover {background: #1079cf;}
+  </style>
+{% endblock %}
+
+{% block nav_brand %}
+  <a href="{{ urls.back }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
+{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4> {{ quiz_title }} </h4>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+  <div class="topics" id="topics">
+    {% for item in topics %}
+    {% set idx = loop.index0 * 2 + 1 %}
+    <div class="row">
+      <a class="col-md-6 area{{ idx}}" href="{{ url_for('.client_quiz', topic=idx) }}">
+        <div>{{ item[0] }}</div>
+      </a>
+      <a class="col-md-6 area{{ idx + 1 }}" href="{{ url_for('.client_quiz', topic=idx + 1) }}">
+        <div>{{ item[1] }}</div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}

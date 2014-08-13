@@ -218,17 +218,18 @@
 
         constructor: function() {
             var params = arguments[0];
-
-            this.model = new ExamModel({
-                urls: params.urls,
-                exam_id: params.exam.exam.id
-            });
-            this.model.questions.reset(params.exam.questions);
-
-            this.msgbox = new MessageBox({el: params.msgbox_el});
             this.labels = params.labels;
             this.urls = params.urls;
             this.fb = params.fb;
+            this.meta = params.exam_meta;
+
+            this.model = new ExamModel({
+                urls: params.urls,
+                exam_id: params.exam.exam.id,
+                max_errors: this.meta.max_errors
+            });
+            this.model.questions.reset(params.exam.questions);
+            this.msgbox = new MessageBox({el: params.msgbox_el});
 
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
@@ -247,7 +248,7 @@
             this.timer = new ExamTimerView({
                 el: this.$(".control .time #time"),
                 model: this.model,
-                total: 1800 // total time in seconds
+                total: this.meta.total_time
             });
 
             this.summary = new ExamSummaryView({

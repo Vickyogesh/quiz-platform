@@ -15,7 +15,15 @@ def camel_to_underscore(name):
 
 
 class Page(View):
-    template_name = None
+    # This template will be used if no template will be found in
+    # 'templates'.
+    default_template = None
+
+    # Specific templates for quizzes. Key is quiz name, value - template.
+    templates = {}
+
+    # Result page endpoint is <endpoint_prefix>_<class_name>.
+    # See get_view().
     endpoint_prefix = None
 
     def __init__(self):
@@ -42,6 +50,21 @@ class Page(View):
 
         return cls.as_view(ep)
 
+    def get_template_name(self):
+        """Return template path depending on quiz name.
+
+        At first this function searches template in 'templates' and then,
+        if nothing found, returns 'default_template'.
+        """
+        return self.templates.get(self.quiz_name, self.default_template)
+
+    def get_quiz_template_params(self):
+        """Returns a dict with quiz specific parameters for the template.
+        """
+        func = getattr(self, '%s_template_params' % self.quiz_name, None)
+        if func is not None:
+            return func()
+
     def dispatch_request(self, *args, **kwargs):
         self.quiz_type = session['quiz_type']
         self.quiz_name = session['quiz_type_name']
@@ -57,7 +80,10 @@ class Page(View):
         kwargs['user'] = access.current_user
         if self.urls is not None:
             kwargs['urls'] = self.urls
-        return render_template(self.template_name, **kwargs)
+        extra = self.get_quiz_template_params()
+        if extra is not None:
+            kwargs.update(extra)
+        return render_template(self.get_template_name(), **kwargs)
 
     def on_request(self, *args, **kwargs):
         raise NotImplemented

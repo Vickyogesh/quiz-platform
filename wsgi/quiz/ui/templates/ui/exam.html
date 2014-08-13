@@ -21,7 +21,9 @@
 {% block panel_content %}
   <div id="exam-content">
     <img src="{{ url_for('.static', filename='i/exam_header.jpg') }}" class="header hidden-xs">
+
     <div class="exam-nav">
+    {%- block exam_nav %}
       <div class="exam-row top-nav hidden-xs">
         {% for i in range(4) -%}
         <div class="cell" id="rect{{ loop.index0 }}">
@@ -42,6 +44,7 @@
         <div id="rect{{ loop.index0 }}">{{ loop.index }}</div>
         {%- endfor %}
       </div>
+    {% endblock -%}
     </div> <!-- /exam-nav -->
 
     <div class="exam-data">
@@ -210,6 +213,7 @@
       btt_review: "{{ _('Review answers') }}"
     },
     urls: {{ urls|tojson }},
-    exam: {{ exam|tojson }}
+    exam: {{ exam|tojson }},
+    exam_meta: {{ exam_meta|tojson }}
   });
 {% endblock %}

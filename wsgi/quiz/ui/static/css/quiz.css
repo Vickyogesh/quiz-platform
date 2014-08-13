@@ -6,25 +6,25 @@
 }
 
 .area1 {background: #c0c0c0;}
-li.area1:hover {background: #b8b8b8;}
+.area1:hover {background: #b8b8b8;}
 
 .area2 {background: #00ae00;}
-li.area2:hover {background: #009d00;}
+.area2:hover {background: #009d00;}
 
 .area3 {background: #9966cc;}
-li.area3:hover {background: #9159c8;}
+.area3:hover {background: #9159c8;}
 
 .area4 {background: #ffdd00;}
-li.area4:hover {background: #eece00;}
+.area4:hover {background: #eece00;}
 
 .area5 {background: #ff6633;}
-li.area5:hover {background: #ff5922;}
+.area5:hover {background: #ff5922;}
 
 .area6 {background: #004586;}
-li.area6:hover {background: #003c75;}
+.area6:hover {background: #003c75;}
 
 .area7 {background: #b84747;}
-li.area7:hover {background: #ac4242;}
+.area7:hover {background: #ac4242;}
 
 .topics {
   margin: 15px 20px;
