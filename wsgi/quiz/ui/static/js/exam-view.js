@@ -228,6 +228,7 @@
             this.msgbox = new MessageBox({el: params.msgbox_el});
             this.labels = params.labels;
             this.urls = params.urls;
+            this.fb = params.fb;
 
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
@@ -293,10 +294,21 @@
             });
         },
 
+        postOnFacebook: function(num_errors) {
+            FbAux.post({
+                message: sprintf(this.fb.text, {num: num_errors}),
+                link: this.fb.school_link,
+                title: this.fb.school_title,
+                description: this.fb.description,
+                pic_url: this.fb.school_logo_url
+            });
+        },
+
         showAfterSave: function(response) {
             var max = this.model.get("max_errors");
             var icon = "";
             var text = "";
+            var num_errors = null;
 
             if (response !== undefined && response.num_errors !== undefined) {
                 if (max >= response.num_errors)
@@ -304,12 +316,16 @@
                 else
                     icon = "glyphicon-remove-circle";
 
+                num_errors = response.num_errors;
                 text = sprintf(this.labels.done_info, {errors: response.num_errors});
             }
 
             function to_review() {
                 window.location = this.urls.exam_review + this.model.get("exam_id");
             }
+
+            if (this.fb !== undefined && num_errors !== null)
+                this.postOnFacebook(num_errors);
 
             this.msgbox.show({
                 "text": text,

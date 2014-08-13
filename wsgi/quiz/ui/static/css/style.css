@@ -308,3 +308,12 @@ p.info {
     display: none !important;
   }
 }
+
+
+@media (min-width: 768px) {
+  .vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+  }
+}

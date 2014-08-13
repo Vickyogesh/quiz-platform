@@ -76,7 +76,11 @@
       $("html, body").animate({scrollTop: 0}, 500, "swing");
     });
     window.g = {
-      user_type: "{{ user.user_type}}"
+      user_type: "{{ user.user_type}}",
+      labels: {
+        info: "{{ _('Info') }}",
+        error: "{{ _('Error') }}"
+      }
     };
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;

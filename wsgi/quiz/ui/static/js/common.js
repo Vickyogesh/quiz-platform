@@ -30,13 +30,27 @@
             return Aux.dateFromISOUTC(text).toLocaleString();
         },
 
-        showError: function(msg) {
+        showError: function(msg, callback) {
             // If msg is object then we interested in 'responseJSON'
             // which must be JSON with field 'description'.
             if (msg.responseJSON !== undefined)
                 msg = msg.responseJSON.description;
-            var dlg = $('#errorbox');
+            var dlg = $('#infobox');
+            dlg.unbind("hidden.bs.modal");
+            if (callback !== undefined)
+                dlg.on("hidden.bs.modal", callback);
+            dlg.find(".modal-title").html( window.g.labels.error);
             dlg.find('.modal-body').html(msg);
+            dlg.modal();
+        },
+
+        showInfo: function(msg, callback) {
+            var dlg = $('#infobox');
+            dlg.unbind("hidden.bs.modal");
+            if (callback !== undefined)
+                dlg.on("hidden.bs.modal", callback);
+            dlg.find(".modal-title").html(window.g.labels.info);
+            dlg.find(".modal-body").html(msg);
             dlg.modal();
         },
 

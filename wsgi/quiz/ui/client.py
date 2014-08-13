@@ -4,6 +4,7 @@ from .util import account_url
 from .. import access, app
 from ..api import get_user_id
 from ..core.exceptions import QuizCoreError
+from .babel import gettext
 
 
 def register_urls_for(bp):
@@ -110,7 +111,20 @@ class Exam(ClientPage):
             'exam': url_for('api.save_exam', id=0)[:-1],
             'exam_review': url_for('.client_exam_review', id=0)[:-1]
         }
-        return self.render(exam=data)
+
+        if 'fb_id' in access.current_user.account:
+            fb_data = {
+                'id': access.current_user.account['fb_id'],
+                'text': gettext('Number of errors in exam: %%(num)s'),
+                'description': 'Quiz Patente',
+                'school_title': session.get('extra_school_name'),
+                'school_link': session.get('extra_school_url'),
+                'school_logo_url': session.get('extra_school_logo_url')
+            }
+            fb_data = dict((k, v) for k, v in fb_data.iteritems() if v)
+        else:
+            fb_data = None
+        return self.render(exam=data, fb_data=fb_data)
 
 
 class ExamReview(ClientPage):

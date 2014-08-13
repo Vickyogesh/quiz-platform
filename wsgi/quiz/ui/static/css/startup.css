@@ -30,20 +30,23 @@
   margin-left: 4px;
   margin-right: 4px;
 }
-#login-form .form-group.bottom .col-sm-2 {
-  padding-left: 0px;
-}
-#login-form .form-group.bottom .col-sm-10 {
+
+#login-form .form-group.bottom .row > div {
   padding-left: 0px;
   padding-right: 0px;
+  padding-top: 4px;
 }
-#login-form .form-group.bottom .col-sm-2,
-#login-form .form-group.bottom .col-sm-10 {
-    float:none;
-    display:inline-block;
-    vertical-align:middle;
-    margin-right:-4px;
+
+#login-form .form-group.bottom .row > div:last-child {
+  text-align: right;
 }
+
 #login-form .form-group.bottom p {
-  margin: 0px;
+  margin: 6px 0px 0px;
+  text-align: center;
+}
+
+#login-form .form-group.bottom #btt-fb {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }

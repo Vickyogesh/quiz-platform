@@ -11,11 +11,11 @@ ui = Blueprint('ui', __name__,
 js_filter = 'yui_js'
 css_filter = 'yui_css'
 
-base = ['ui/js/libs/sprintf.min.js', 'ui/js/libs/jquery.colorbox-min.js',
-        'ui/js/libs/jquery.mousewheel.min.js', 'ui/js/common.js',
-        'ui/js/expressbar.js']
-
-base_js = Bundle(*base, filters=js_filter, output='ui/gen/base.js')
+base_js = Bundle('ui/js/libs/sprintf.min.js',
+                 'ui/js/libs/jquery.colorbox-min.js',
+                 'ui/js/libs/jquery.mousewheel.min.js', 'ui/js/common.js',
+                 'ui/js/expressbar.js', 'ui/js/fbsupport.js',
+                 filters=js_filter, output='ui/gen/base.js')
 
 bb_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
                'ui/js/libs/backbone-min.js', 'ui/js/msgbox.js',

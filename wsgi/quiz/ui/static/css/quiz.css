@@ -348,11 +348,3 @@ li.area7:hover {background: #ac4242;}
     display: none;
   }
 }
-
-@media (min-width: 768px) {
-  .vcenter {
-    display: inline-block;
-    vertical-align: middle;
-    float: none;
-  }
-}

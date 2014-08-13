@@ -1,5 +1,13 @@
 {% extends "ui/base_page.html" %}
+{% import "ui/facebook.html" as fb %}
 {% block subtitle %} {{ _('Exam') }} {% endblock %}
+
+{% block body %}
+  {% if user.account.fb_id %}
+  {{ fb.async_init() }}
+  {% endif %}
+  {{ super() }}
+{% endblock %}
 
 {% block header_row %}
 <div class="col-md-12">
@@ -190,6 +198,9 @@
   var exam = new ExamView({
     el: $(".contentpanel").first(),
     msgbox_el: $("#msgbox"),
+    {%- if user.account.fb_id %}
+    fb: {{ fb_data|tojson }},
+    {% endif %}
     labels: {
       error_send: "{{ _('Error saving exam.') }}",
       done_info: "{{ _('In this exam you made errors: %%(errors)s')|safe }}",

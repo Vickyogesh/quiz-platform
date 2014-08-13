@@ -94,6 +94,7 @@ def link_facebook():
     except KeyError:
         raise BadRequest('Missing parameter.')
     res = app.account.linkFacebookAccount(user_id)
+    current_user.account['fb_id'] = user_id
     return dict_to_json_response(res)
 
 

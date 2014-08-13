@@ -1,14 +1,20 @@
 {% extends "ui/base_page.html" %}
-{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% import "ui/facebook.html" as fb %}
 
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
 {% block navbar_class %}hidden{% endblock %}
 {% block content_class %}menu{% endblock %}
+
+{% block body %}
+  {{ fb.async_init() }}
+  {{ super() }}
+{% endblock %}
 
 {% block header_row %}
 <div class="col-md-12">
   <h4>
     <a href="{{ urls.account }}">
-    {{ user.account.name }} {{ user.account.surname }}
+    <span>{{ user.account.name }} {{ user.account.surname }}</span>
     </a>
   </h4>
 </div>
@@ -45,7 +51,11 @@
   <div class="col-sm-3"></div>
   <div class="col-sm-3"><a href="{{ url_for('.client_statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
   <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
-  <div class="col-sm-3"><a href="#" class="button">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a></div>
+  <div class="col-sm-3">
+    {% if not user.account.fb_id %}
+    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 
@@ -54,4 +64,15 @@
     var lang = $(this).attr("id");
     window.location = "{{ url_for('.client_exam') }}?lang=" + lang;
   });
+
+  {% if not user.account.fb_id %}
+    window.g.labels.fb_connect_ok = "{{ _('Your facebook account has been successfully linked!') }}";
+    window.g.labels.fb_connect_fail = "{{ _('Unable to link account with Facebook.') }}";
+    window.g.link_fb_url = "{{ url_for('api.link_facebook') }}";
+    $("#fb-link").click(function() {
+      FbAux.linkFbAccount(function() {
+        location.reload();
+      });
+    });
+  {% endif %}
 {% endblock %}
