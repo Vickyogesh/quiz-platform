@@ -76,3 +76,10 @@
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+
+@media (max-width: 768px) {
+  .menu .footer > div:nth-child(n+2) {
+    margin-top: 15px;
+  }
+}
