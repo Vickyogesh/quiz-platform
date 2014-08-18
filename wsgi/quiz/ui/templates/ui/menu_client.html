@@ -24,7 +24,7 @@
 <div class="content row">
   <div class="col-sm-4">
     <a href="{{ url_for('.client_menu_quiz') }}">
-       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='base/i/menu-quiz.png') }}">
     </a>
   </div>
   <div class="col-sm-4">
@@ -40,7 +40,7 @@
   </div>
   <div class="col-sm-4">
     <a href="{{ url_for('.client_review') }}">
-      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
+      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='base/i/menu-review.png') }}">
     </a>
   </div>
 </div>
@@ -53,7 +53,7 @@
   <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
   <div class="col-sm-3">
     {% if not user.account.fb_id %}
-    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='base/i/fb-small.png') }}"></a>
     {% endif %}
   </div>
 </div>
