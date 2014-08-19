@@ -158,6 +158,26 @@ Update translations:
     pybabel update -i wsgi/quiz/ui/translations/ui.pot -d wsgi/quiz/ui/translations -D ui
 
 
+Adding new quiz
+---------------
+
+Pretty awkward for now.
+
+To add new quiz you have to:
+* Update exams() in misc/dbtools/func.py and recreate stored procedures in DB::
+
+    > python misc/dbinit.py -c misc/config.ini -only-triggers
+
+* Add questions to DB::
+
+    > python misc/dbfill.py -c misc/config.ini -i ... -t [quiz_id]
+* Update QUIZ_ID_MAP in wsgi/quiz/login.py with new quiz_id and quiz full name
+* Update QUIZ_TITLE in wsgi/quiz/ui/uti.py
+* If you add new quiz type then you need to create new page models in
+  wsgi/quiz/ui/client and register them in wsgi/quiz/ui/client/__init__.py.
+
+
 TODOs:
-* [menu] center facebook image vertically
-* [menu] fix exam hover borders
+* [menu] center facebook image vertically.
+* [menu] fix exam hover borders.
+* Reformat readme.

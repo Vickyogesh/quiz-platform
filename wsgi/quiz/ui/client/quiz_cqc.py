@@ -20,11 +20,5 @@ class CqcPagesMetadata(PagesMetadata):
     standard_page_models = {
         'menu': CqcModel,
         'menu_quiz': CqcQuizMenuModel,
-        'exam': CqcExamModel,
-        # these pages will use default models.
-        # 'quiz': CommonModel,
-        # 'review': CommonModel,
-        # 'stat': CommonModel,
-        # 'topic_stat': CommonModel,
-        # 'exam_stat': CommonModel
+        'exam': CqcExamModel
     }

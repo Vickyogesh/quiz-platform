@@ -14,6 +14,10 @@ from ... import access
 
 
 class ClientPage(PageView):
+    """Base class for client's page views.
+
+    It sets endpoint prefix and common decorator to control access.
+    """
     decorators = [access.be_client_or_guest.require()]
     endpoint_prefix = 'client'
 
@@ -70,6 +74,8 @@ class StatisticsExamsView(StatisticsPage):
     default_model = StatisticsExamsModel
 
 
+# Client pages.
+# Used in __init__.py by page.register_pages().
 page_views = {
     'menu': MenuView,
     'menu_quiz': MenuQuizView,

@@ -13,12 +13,22 @@ from ..util import account_url
 ### Menu
 
 class MenuModel(PageModel):
+    """Common menu model.
+
+     It adds account url to template.
+     Subclass may only set :attr:`template` value.
+    """
     def on_request(self, *args, **kwargs):
         self.page.urls = {'account': account_url()}
         return PageModel.on_request(self, *args, **kwargs)
 
 
 class QuizMenuModel(PageModel):
+    """Common quiz menu model.
+
+    It adds some urls to template.
+     Subclass may only set :attr:`template` value.
+    """
     def on_request(self, *args, **kwargs):
         self.page.urls = {
             'back': url_for('.client_menu'),
@@ -31,7 +41,16 @@ class QuizMenuModel(PageModel):
 ### Quiz/Review
 
 class BaseQuizModel(PageModel):
+    """Base class for quiz and review models.
+
+    Provides common routines for both of them.
+    Adds some urls to template.
+    """
     def get_quiz(self, *args, **kwargs):
+        """Return questions for quiz/review.
+
+        Must be overridden in subclass.
+        """
         raise NotImplemented
 
     def on_request(self, *args, **kwargs):
@@ -44,6 +63,10 @@ class BaseQuizModel(PageModel):
 
 
 class QuizModel(BaseQuizModel):
+    """Quiz model.
+
+    Implements common quiz and may be used for each quiz type without changes.
+    """
     template = 'ui/common_quiz.html'
 
     def get_quiz(self, topic):
@@ -60,7 +83,10 @@ class QuizModel(BaseQuizModel):
 
 
 class ReviewModel(BaseQuizModel):
-    """Error review."""
+    """Error review.
+
+    Implements common review and may be used for each quiz type without changes.
+    """
     template = 'ui/common_review.html'
 
     def get_quiz(self):
@@ -77,6 +103,11 @@ class ReviewModel(BaseQuizModel):
 ### Exam/Exam review
 
 class ExamModel(PageModel):
+    """Base exam page model.
+
+    It adds some urls and facebook data to template.
+    Subclass must provide at least :attr:`exam_meta` and :attr:`template`.
+    """
     exam_meta = None
 
     def on_request(self, *args, **kwargs):
@@ -107,6 +138,11 @@ class ExamModel(PageModel):
 
 
 class ExamReviewModel(PageModel):
+    """Exam review page model.
+
+    Implements common exam answers review
+    and may be used for each quiz type without changes.
+    """
     template = 'ui/common_exam_review.html'
 
     def on_request(self, id):
@@ -119,8 +155,12 @@ class ExamReviewModel(PageModel):
 
 ### Statistics
 
-
+# TODO: add docs about 'force_name'.
 class StatisticsBaseModel(PageModel):
+    """Base class for all client statistics page models.
+
+    It provides access check method and handles 'name' url parameter.
+    """
     def check(self, user_id, user_school_id):
         # If we are school then requested client must have the same
         # parent school ID.
@@ -141,6 +181,10 @@ class StatisticsBaseModel(PageModel):
 
 
 class StatisticsModel(StatisticsBaseModel):
+    """Client statistics page model.
+
+    May be used for each quiz type without changes.
+    """
     template = 'ui/statistics_client.html'
 
     # Back URL:
@@ -179,6 +223,10 @@ class StatisticsModel(StatisticsBaseModel):
 
 
 class StatisticsTopicModel(StatisticsBaseModel):
+    """Client topics statistics page model.
+
+    May be used for each quiz type without changes.
+    """
     template = 'ui/statistics_client_topic.html'
 
     def on_request(self, uid, topic_id):
@@ -192,6 +240,10 @@ class StatisticsTopicModel(StatisticsBaseModel):
 
 
 class StatisticsExamsModel(StatisticsBaseModel):
+    """Client exams statistics page model.
+
+    May be used for each quiz type without changes.
+    """
     template = 'ui/statistics_client_exams.html'
 
     def on_request(self, uid, range):

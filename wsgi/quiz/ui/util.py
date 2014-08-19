@@ -16,6 +16,7 @@ QUIZ_TITLE = {
 }
 
 
+#FIXME: may cause infinite recursion on access denied.
 def check_access(f):
     """This decorator extends view with extra access features:
 

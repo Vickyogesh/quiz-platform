@@ -21,11 +21,5 @@ class ScooterPagesMetadata(PagesMetadata):
     standard_page_models = {
         'menu': ScooterModel,
         'menu_quiz': ScooterQuizMenuModel,
-        'exam': ScooterExamModel,
-        # these pages will use default models.
-        # 'quiz': CommonModel,
-        # 'review': CommonModel,
-        # 'stat': CommonModel,
-        # 'topic_stat': CommonModel,
-        # 'exam_stat': CommonModel
+        'exam': ScooterExamModel
     }

@@ -100,6 +100,7 @@ class SchoolPagesMetadata(PagesMetadata):
     name = 'school'
 
 
+# School pages.
 page_views = {
     'menu': MenuView,
     'statistics': StatisticsView

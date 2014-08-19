@@ -20,11 +20,5 @@ class BPagesMetadata(PagesMetadata):
     standard_page_models = {
         'menu': BModel,
         'menu_quiz': BQuizMenuModel,
-        'exam': BExamModel,
-        # these pages will use default models.
-        # 'quiz': CommonModel,
-        # 'review': CommonModel,
-        # 'stat': CommonModel,
-        # 'topic_stat': CommonModel,
-        # 'exam_stat': CommonModel
+        'exam': BExamModel
     }
