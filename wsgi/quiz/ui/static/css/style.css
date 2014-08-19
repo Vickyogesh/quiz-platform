@@ -295,6 +295,10 @@ p.info {
   width: 1px;
 }
 
+a.btn span {
+  vertical-align: middle;
+}
+
 /* super-small */
 @media (max-width: 480px) {
   .visible-on-super-small {

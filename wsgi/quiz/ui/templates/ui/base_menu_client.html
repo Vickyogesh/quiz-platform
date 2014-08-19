@@ -43,7 +43,7 @@
   <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
   <div class="col-sm-3">
     {% if not user.account.fb_id %}
-    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+    <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
     {% endif %}
   </div>
 </div>

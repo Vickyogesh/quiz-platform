@@ -55,7 +55,7 @@
               <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
             </div>
             <div class="col-xs-6">
-              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> {{ _('Log In') }}</a>
+              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> <span>{{ _('Log In') }}</span></a>
             </div>
           </div>
           {%- set messages = get_flashed_messages() %}
