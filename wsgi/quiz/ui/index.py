@@ -9,7 +9,44 @@ from . import ui
 from .babel import lazy_gettext, gettext
 from .util import render_template
 from .. import app, access
-from ..login import QUIZ_TYPE_ID, do_login
+from ..login import QUIZ_ID_MAP, do_login, quiz_name_parts
+
+
+def first_digit_index(txt):
+    """Return index of the first digit in the given string."""
+    index = -1
+    for x in txt:
+        index += 1
+        if x.isdigit():
+            return index
+    return -1
+
+
+def quiz_name_parts(quiz_name):
+    """Split given quiz name in to parts: name[year[.version]].
+
+    Returns:
+        tuple(name, year, version)
+    """
+    basename = quiz_name
+    year = None
+    version = None
+    index = first_digit_index(quiz_name)
+    if index != -1:
+        basename = quiz_name[:index]
+        year = quiz_name[index:]
+        index = year.find('.')
+        if index != -1:
+            version = year[index + 1:]
+            year = year[:index]
+        try:
+            year = year and int(year)
+            version = version and int(version)
+        except ValueError:
+            basename = quiz_name
+            year = None
+            version = None
+    return basename, year, version
 
 
 def after_login():
@@ -46,7 +83,7 @@ class LoginFrom(Form):
     is_fb = HiddenField()
 
 
-def get_plain_login(login, passwd, quiz_name):
+def get_plain_login(login, passwd, quiz_fullname):
     nonce = app.account.get_auth().get('nonce', '')
     digest = hashlib.md5('{0}:{1}'.format(login, passwd)).hexdigest()
     digest = hashlib.md5('{0}:{1}'.format(nonce, digest)).hexdigest()
@@ -54,15 +91,15 @@ def get_plain_login(login, passwd, quiz_name):
         'nonce': nonce,
         'login': login,
         'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
-        'quiz_type': quiz_name,
+        'quiz_type': quiz_fullname,
         'digest': digest
     }
 
 
-def get_fb_login(fb_id, fb_auth_token, quiz_name):
+def get_fb_login(fb_id, fb_auth_token, quiz_fullname):
     return {
         'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
-        'quiz_type': quiz_name,
+        'quiz_type': quiz_fullname,
         'fb': {
             'id': fb_id,
             'token': fb_auth_token
@@ -70,16 +107,16 @@ def get_fb_login(fb_id, fb_auth_token, quiz_name):
     }
 
 
-@ui.route('/', defaults={'quiz_name': 'b2013'}, methods=['GET', 'POST'])
-@ui.route('/<word:quiz_name>', methods=['GET', 'POST'])
-def index(quiz_name):
-    if quiz_name not in QUIZ_TYPE_ID:
+@ui.route('/', defaults={'quiz_fullname': 'b2013'}, methods=['GET', 'POST'])
+@ui.route('/<quiz_fullname>', methods=['GET', 'POST'])
+def index(quiz_fullname):
+    if quiz_fullname not in QUIZ_ID_MAP:
         abort(404)
 
     # Skip login for already signed users (for the given quiz).
     if current_user.is_authenticated() and (current_user.is_school
                                             or current_user.is_school_member):
-        if session['quiz_type_name'] == quiz_name:
+        if session['quiz_fullname'] == quiz_fullname:
             return after_login()
 
     fb_autologin = request.args.get('fblogin')
@@ -88,11 +125,11 @@ def index(quiz_name):
         if form.is_fb.data == "1":
             fb_id = form.fb_auth_id.data
             fb_auth_token = form.fb_auth_token.data
-            data = get_fb_login(fb_id, fb_auth_token, quiz_name)
+            data = get_fb_login(fb_id, fb_auth_token, quiz_fullname)
         else:
             login = form.name.data
             passwd = form.pwd.data
-            data = get_plain_login(login, passwd, quiz_name)
+            data = get_plain_login(login, passwd, quiz_fullname)
 
         try:
             do_login(data)
@@ -105,13 +142,16 @@ def index(quiz_name):
         else:
             return after_login()
 
-    return render_template('ui/index.html', quiz_name=quiz_name, form=form,
+    quiz_name, _, _ = quiz_name_parts(quiz_fullname)
+    return render_template('ui/index.html', form=form,
+                           quiz_fullname=quiz_fullname,
+                           quiz_name=quiz_name,
                            fb_autologin=fb_autologin)
 
 
 @ui.route('/logout')
 @access.login_required
 def logout():
-    quiz_name = session['quiz_type_name']
+    quiz_fullname = session['quiz_fullname']
     access.logout()
-    return redirect(url_for('.index', quiz_name=quiz_name))
+    return redirect(url_for('.index', quiz_fullname=quiz_fullname))

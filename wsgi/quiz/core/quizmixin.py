@@ -146,7 +146,7 @@ class QuizMixin(object):
             col = t.c.text_fr
         else:
             col = t.c.text
-        s = select([col], t.c.id == topic_id)
+        s = select([col], and_(t.c.id == topic_id, t.c.quiz_type == quiz_type))
         row = self.engine.execute(s).fetchone()
         return {'topic': topic_id, 'questions': questions, 'title': row[col]}
 

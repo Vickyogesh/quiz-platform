@@ -74,7 +74,6 @@
             [24, 25]
         ];
 
-        var quiz_url = "Quiz.html";
         var fmt_page = '<div id="page%1$s" class="page area%1$s" style="display:none"><div class="page-wrapper"><div class="page-content"><table>';
         var fmt_chapter ='<tr><td width="30%%" style="text-align:right">Capitolo %(ch)s</td><td><a href="%(url)s%(tid)s">%(title)s</a></td></tr>';
         var fmt_topic ='<tr><td></td><td><a href="%(url)s%(tid)s">%(title)s</a></td></tr>';

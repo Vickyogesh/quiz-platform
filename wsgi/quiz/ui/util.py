@@ -6,7 +6,7 @@ from flask_principal import PermissionDenied
 from .babel import gettext, ngettext, lazy_gettext
 from .. import app
 from ..access import current_user
-from ..login import QUIZ_TYPE_ID
+from ..login import QUIZ_ID_MAP
 
 QUIZ_TITLE = {
     1: lazy_gettext('B 2011'),
@@ -32,7 +32,7 @@ def check_access(f):
         name = session.get('quiz_type_name')
 
         # Interrupt on unknown quizzes.
-        if name is not None and name not in QUIZ_TYPE_ID:
+        if name is not None and name not in QUIZ_ID_MAP:
             abort(404)
         else:
             # If 'upd' query parameter is set then this means account data
@@ -60,7 +60,7 @@ def render_template(*args, **kwargs):
     kwargs['_'] = gettext
     kwargs['_gettext'] = gettext
     kwargs['_ngettext'] = ngettext
-    quiz_title = QUIZ_TITLE.get(session.get('quiz_type'))
+    quiz_title = QUIZ_TITLE.get(session.get('quiz_id'))
     if quiz_title is not None:
         kwargs['quiz_title'] = quiz_title
     return flask_render_template(*args, **kwargs)

@@ -1,11 +1,11 @@
-{% extends "ui/quiz_base.html" %}
+{% extends "ui/base_quiz.html" %}
 {% block subtitle %} {{ _('Error Review') }} {% endblock %}
 {% block content_class %} {{ super() }} review {% endblock %}
 {% block quiz_title %} {{ _('Error review') }} {% endblock %}
 
 {%- block scripts %}
   {{ super() }}
-  <script type="text/javascript" src="{{ url_for('.static', filename='base/js/quiz-review.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('.static', filename='js/quiz-review.js') }}"></script>
 {% endblock %}
 
 {% block page_script %}

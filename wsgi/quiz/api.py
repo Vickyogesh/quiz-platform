@@ -26,13 +26,13 @@ def count_user_access(handle_guest=True):
         def wrapper(*args, **kwargs):
             user = current_user
             if not user.is_anonymous() and user.is_school_member:
-                quiz_type = session['quiz_type']
+                quiz_id = session['quiz_id']
                 sid = user.account['school_id']
                 uid = user.account_id
                 user_type = user.user_type
-                app.core.updateUserLastVisit(quiz_type, uid, user_type, sid)
+                app.core.updateUserLastVisit(quiz_id, uid, user_type, sid)
                 if handle_guest and user.is_guest:
-                    if not app.core.processGuestAccess(quiz_type, uid):
+                    if not app.core.processGuestAccess(quiz_id, uid):
                         abort(403)
             return f(*args, **kwargs)
         return wrapper
@@ -113,7 +113,7 @@ def create_quiz(topic):
             exclude = [int(x) for x in exclude]
         except ValueError:
             raise QuizCoreError('Invalid parameters.')
-    quiz = app.core.getQuiz(session['quiz_type'], user_id, topic, lang, force,
+    quiz = app.core.getQuiz(session['quiz_id'], user_id, topic, lang, force,
                             exclude)
     return dict_to_json_response(quiz)
 
@@ -130,7 +130,7 @@ def save_quiz(topic):
         answers = data['answers']
     except KeyError:
         raise BadRequest('Missing parameter.')
-    app.core.saveQuiz(session['quiz_type'], user_id, topic, id_list, answers)
+    app.core.saveQuiz(session['quiz_id'], user_id, topic, id_list, answers)
     return json_response()
 
 
@@ -141,7 +141,7 @@ def save_quiz(topic):
 def get_student_stat(user):
     user_id = get_user_id(user)  # requested user
     lang = request.args.get('lang', 'it')
-    stat = app.core.getUserStat(session['quiz_type'], user_id, lang)
+    stat = app.core.getUserStat(session['quiz_id'], user_id, lang)
 
     # School can access to it's students only.
     if (current_user.is_school and (user == 'me' or
@@ -171,7 +171,7 @@ def get_error_review():
             exclude = [int(x) for x in exclude]
         except ValueError:
             raise QuizCoreError('Invalid parameters.')
-    res = app.core.getErrorReview(session['quiz_type'], user_id, lang, exclude)
+    res = app.core.getErrorReview(session['quiz_id'], user_id, lang, exclude)
     return dict_to_json_response(res)
 
 
@@ -186,7 +186,7 @@ def save_error_review():
         answers = data['answers']
     except KeyError:
         raise BadRequest('Missing parameter.')
-    app.core.saveErrorReview(session['quiz_type'], user_id, id_list, answers)
+    app.core.saveErrorReview(session['quiz_id'], user_id, id_list, answers)
     return json_response()
 
 
@@ -197,9 +197,9 @@ def create_exam():
     user_id = get_user_id()
     lang = request.args.get('lang', 'it')
     exam_type = request.args.get('exam_type', None)
-    if session['quiz_type_name'] == 'cqc' and exam_type is None:
+    if session['quiz_name'] == 'cqc' and exam_type is None:
         raise BadRequest('Invalid exam type.')
-    exam = app.core.createExam(session['quiz_type'], user_id, lang, exam_type)
+    exam = app.core.createExam(session['quiz_id'], user_id, lang, exam_type)
     return dict_to_json_response(exam)
 
 
@@ -249,7 +249,7 @@ def get_student_exams(user):
         (current_user.is_school_member and not OwnerPermission(user_id))):
         abort(403)
 
-    exams = app.core.getExamList(session['quiz_type'], user_id)
+    exams = app.core.getExamList(session['quiz_id'], user_id)
     school_id = exams['student']['school_id']
 
     # School can access to exams of it's students only.
@@ -272,7 +272,7 @@ def get_topic_error(user, id):
         (current_user.is_school_member and not OwnerPermission(user_id))):
         abort(403)
 
-    info = app.core.getTopicErrors(session['quiz_type'], user_id, id, lang)
+    info = app.core.getTopicErrors(session['quiz_id'], user_id, id, lang)
     school_id = info['student']['school_id']
 
     # School can access to info of it's students only.
@@ -378,7 +378,7 @@ def school_stat(id):
         abort(403)
 
     lang = request.args.get('lang', 'it')
-    res = app.core.getSchoolStat(session['quiz_type'], school_id, lang)
+    res = app.core.getSchoolStat(session['quiz_id'], school_id, lang)
 
     # Since res doesn't contain user names then
     # we need to get names from the account service and update result.

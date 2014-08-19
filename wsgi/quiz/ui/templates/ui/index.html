@@ -32,7 +32,7 @@
 <div class="contentpanel" id="login-form">
   <div class="topspace"></div>
   <img class="startup-img"
-    src="{{url_for('.static', filename='base/i/startup_%s.jpg' % quiz_name)}}">
+    src="{{url_for('.static', filename='i/%s/startup_%s.jpg' % (quiz_name, quiz_fullname))}}">
 
     <div class="row">
       <div class="col-md-12">
@@ -55,7 +55,7 @@
               <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
             </div>
             <div class="col-xs-6">
-              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='base/i/fb-small.png') }}"> {{ _('Log In') }}</a>
+              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> {{ _('Log In') }}</a>
             </div>
           </div>
           {%- set messages = get_flashed_messages() %}

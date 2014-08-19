@@ -14,6 +14,86 @@ def camel_to_underscore(name):
     return _underscorer2.sub(r'\1_\2', subbed).lower()
 
 
+class PageView(View):
+    models = {}
+    endpoint_prefix = None
+
+    def __init__(self):
+        super(PageView, self).__init__()
+        self.model = None
+        self.template = None
+        self.quiz_id = None
+        self.quiz_name = None
+        self.quiz_year = None
+        self.quiz_fullname = None
+        self.lang = None
+        self.uid = None
+        self.urls = None
+        self._setup_models()
+
+    @classmethod
+    def get_view(cls):
+        name = camel_to_underscore(cls.__name__)
+        ep = '%s_%s' % (cls.endpoint_prefix, name)
+
+        # Add default decorator if not present.
+        # We need check_access to be called right after route so
+        # we append it to the end of decorators list since they are applied
+        # from the beginning of the list.
+        if cls.decorators is None:
+            cls.decorators = [check_access]
+        elif cls.decorators[0] != check_access:
+            cls.decorators.append(check_access)
+
+        return cls.as_view(ep)
+
+    def _setup_models(self):
+        self._model_list = {}
+        self._default_model = None
+        for name, cls in self.models.iteritems():
+            if name == '':
+                self._default_model = cls(self)
+            else:
+                self._model_list[name] = cls(self)
+
+    def dispatch_request(self, *args, **kwargs):
+        self.quiz_id = session['quiz_id']
+        self.quiz_name = session['quiz_name']
+        self.quiz_year = session['quiz_year']
+        self.quiz_fullname = session['quiz_fullname']
+        self.uid = access.current_user.account_id
+        self.lang = request.args.get('lang', 'it')
+        self.urls = None
+        self.model = self._model_list.get(self.quiz_name, self._default_model)
+        self.template = self.model.template
+        return self.model.on_request(*args, **kwargs)
+
+    def render(self, **kwargs):
+        kwargs['quiz_name'] = self.quiz_name
+        kwargs['quiz_year'] = self.quiz_year
+        kwargs['quiz_fullname'] = self.quiz_fullname
+        kwargs['lang'] = self.lang
+        kwargs['user'] = access.current_user
+        if self.urls is not None:
+            kwargs['urls'] = self.urls
+        return render_template(self.template, **kwargs)
+
+
+class PageModel(object):
+    template = None
+
+    def __init__(self, page):
+        self.page = page
+
+    def on_request(self, *args, **kwargs):
+        return self.page.render(**kwargs)
+
+
+class ClientPage(PageView):
+    decorators = [access.be_client_or_guest.require()]
+    endpoint_prefix = 'client'
+
+
 class Page(View):
     # This template will be used if no template will be found in
     # 'templates'.

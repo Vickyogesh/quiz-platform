@@ -62,9 +62,11 @@ def init_app(app):
         from werkzeug import SharedDataMiddleware
         here = os.path.dirname(__file__)
         b2013 = os.path.join(here, '../..', 'web', 'b2013')
+        cqc = os.path.join(here, '../..', 'web', 'cqc')
         app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
             '/img':  app.config['DATA_DIR'] + '/img',
-            '/b2013': b2013
+            '/b2013': b2013,
+            '/cqc': cqc
         })
 
     # Logic setup

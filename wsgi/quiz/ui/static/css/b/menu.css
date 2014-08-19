@@ -1,0 +1,43 @@
+.btn-exam {
+  display: inline-block;
+  overflow: hidden;
+  margin: 4px;
+  width: 200px;
+  height: 200px;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  box-shadow: 1px 3px 5px #888888;
+  behavior: url(../../PIE.htc); /* IE fix. */
+  background-image: url(../../i/b/menu-exam.png);
+}
+.btn-exam table {
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+}
+.btn-exam td {
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid transparent;
+  behavior: url(../../PIE.htc); /* IE fix. */
+  vertical-align: middle;
+}
+.btn-exam td:hover {
+  border: 1px solid #fff;
+  border-radius: 10px;
+  behavior: url(../../PIE.htc); /* IE fix. */
+}
+.btn-exam #fr {
+  margin: auto;
+  width: 32px;
+  height: 20px;
+  background: url(../../i/b/flag_fr.png) no-repeat center;
+  background-size: contain;
+}
+.btn-exam #de {
+  margin: auto;
+  width: 32px;
+  height: 20px;
+  background: url(../../i/b/flag_de.png) no-repeat center;
+  background-size: contain;
+}

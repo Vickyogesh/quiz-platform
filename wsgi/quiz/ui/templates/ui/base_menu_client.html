@@ -24,23 +24,13 @@
 <div class="content row">
   <div class="col-sm-4">
     <a href="{{ url_for('.client_menu_quiz') }}">
-       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='base/i/menu-quiz.png') }}">
+       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
     </a>
   </div>
-  <div class="col-sm-4">
-    <div class="btn-exam">
-      <table cellpadding="0" cellspacing="0">
-        <tr><td colspan="2" id="it"></td></tr>
-        <tr style="height:30px">
-          <td id="fr"></td>
-          <td id="de"></td>
-        </tr>
-      </table>
-    </div>
-  </div>
+  <div class="col-sm-4">{% block exam_button %}{% endblock %}</div>
   <div class="col-sm-4">
     <a href="{{ url_for('.client_review') }}">
-      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='base/i/menu-review.png') }}">
+      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
     </a>
   </div>
 </div>
@@ -53,18 +43,13 @@
   <div class="col-sm-3"><a href="{{ url_for('.logout') }}" class="button">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
   <div class="col-sm-3">
     {% if not user.account.fb_id %}
-    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='base/i/fb-small.png') }}"></a>
+    <a href="#" class="button" id="fb-link">{{ _('Connect with') }} <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
     {% endif %}
   </div>
 </div>
 {% endblock %}
 
 {%- block page_script %}
-  $(".btn-exam td").click(function(){
-    var lang = $(this).attr("id");
-    window.location = "{{ url_for('.client_exam') }}?lang=" + lang;
-  });
-
   {% if not user.account.fb_id %}
     window.g.labels.fb_connect_ok = "{{ _('Your facebook account has been successfully linked!') }}";
     window.g.labels.fb_connect_fail = "{{ _('Unable to link account with Facebook.') }}";

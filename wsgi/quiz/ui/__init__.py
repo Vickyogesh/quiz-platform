@@ -11,43 +11,44 @@ ui = Blueprint('ui', __name__,
 js_filter = 'yui_js'
 css_filter = 'yui_css'
 
-base_js = Bundle('ui/base/js/libs/sprintf.min.js',
-                 'ui/base/js/libs/jquery.colorbox-min.js',
-                 'ui/base/js/libs/jquery.mousewheel.min.js',
-                 'ui/base/js/common.js', 'ui/base/js/expressbar.js',
-                 'ui/base/js/fbsupport.js',
+base_js = Bundle('ui/js/libs/sprintf.min.js',
+                 'ui/js/libs/jquery.colorbox-min.js',
+                 'ui/js/libs/jquery.mousewheel.min.js',
+                 'ui/js/common.js', 'ui/js/expressbar.js',
+                 'ui/js/fbsupport.js',
                  filters=js_filter, output='ui/gen/base.js')
 
-bb_js = Bundle('ui/base/js/libs/json2.js', 'ui/base/js/libs/underscore-min.js',
-               'ui/base/js/libs/backbone-min.js', 'ui/base/js/msgbox.js',
-               'ui/base/js/dialog-bb.js', 'ui/base/js/quiz-model.js',
+bb_js = Bundle('ui/js/libs/json2.js', 'ui/js/libs/underscore-min.js',
+               'ui/js/libs/backbone-min.js', 'ui/js/msgbox.js',
+               'ui/js/dialog-bb.js', 'ui/js/quiz-model.js',
+               'ui/js/quiz-menu.js',
                filters=js_filter, output='ui/gen/bb.js')
 
-graph_js = Bundle('ui/base/js/libs/raphael-min.js',
-                  'ui/base/js/libs/g.raphael-min.js',
-                  'ui/base/js/libs/g.line.js', 'ui/base/js/libs/g.pie.js',
-                  'ui/base/js/chart.js',
+graph_js = Bundle('ui/js/libs/raphael-min.js',
+                  'ui/js/libs/g.raphael-min.js',
+                  'ui/js/libs/g.line.js', 'ui/js/libs/g.pie.js',
+                  'ui/js/chart.js',
                   filters=js_filter, output='ui/gen/graph.js')
 
-user_stat_js = Bundle('ui/base/js/stat-user.js', 'ui/base/js/stat-exam.js',
+user_stat_js = Bundle('ui/js/stat-user.js', 'ui/js/stat-exam.js',
                       filters=js_filter, output='ui/gen/user-stat.js')
 
-quiz_js = Bundle('ui/base/js/quiz-topicslider.js',
-                 'ui/base/js/quiz-view.js', 'ui/base/js/quiz-review.js',
+quiz_js = Bundle('ui/js/quiz-view.js', 'ui/js/quiz-review.js',
                  filters=js_filter, output='ui/gen/quiz.js')
 
-exam_js = Bundle('ui/base/js/exam-model.js', 'ui/base/js/exam-view.js',
+exam_js = Bundle('ui/js/exam-model.js', 'ui/js/exam-view.js',
                  filters=js_filter, output='ui/gen/exam.js')
 
-school_js = Bundle('ui/base/js/libs/md5.js', 'ui/base/js/school.js',
-                   'ui/base/js/school-stat.js',
+school_js = Bundle('ui/js/libs/md5.js', 'ui/js/school.js',
+                   'ui/js/school-stat.js',
                    filters=js_filter, output='ui/gen/school.js')
 
-css_ui = Bundle('ui/base/css/colorbox.css', 'ui/base/css/style.css',
-                'ui/base/css/startup.css', 'ui/base/css/menu.css',
-                'ui/base/css/statistics.css', 'ui/base/css/quiz.css',
-                'ui/base/css/msgbox.css', 'ui/base/css/exam.css',
-                'ui/base/css/school_menu.css', 'ui/base/css/school_stat.css',
+css_ui = Bundle('ui/css/colorbox.css', 'ui/css/style.css',
+                'ui/css/startup.css', 'ui/css/menu.css',
+                'ui/css/statistics.css', 'ui/css/quiz.css',
+                'ui/css/msgbox.css', 'ui/css/exam.css',
+                'ui/css/school_menu.css', 'ui/css/school_stat.css',
+                'ui/css/b/menu.css', 'ui/css/cqc/menu.css',
                 filters=css_filter, output='ui/gen/ui.css')
 
 assets.register('base.js', base_js)
@@ -65,4 +66,5 @@ from . import school
 from . import client
 
 school.register_urls_for(ui)
-client.register_urls_for(ui)
+client.register_views(ui)
+# client.register_urls_for(ui)

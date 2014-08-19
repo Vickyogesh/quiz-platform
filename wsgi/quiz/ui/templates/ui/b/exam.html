@@ -1,9 +1,9 @@
 {% extends "ui/base_exam.html" %}
-{% block content_class %}exam scooter{% endblock %}
+{% block content_class %}exam b{% endblock %}
 
 {%- block exam_nav %}
   <div class="exam-row top-nav hidden-xs">
-    {% for i in range(3) -%}
+    {% for i in range(4) -%}
     <div class="cell" id="rect{{ loop.index0 }}">
       <div class="head">{{ _('Questions') }}</div>
       <div class="text">{{ _('From %(from)s to %(to)s', from=1 + loop.index0 * 10, to=loop.index * 10) }}</div>
@@ -18,8 +18,8 @@
   </div>
 
   <div class="bottom-nav hidden-xs">
-    {% for i in range(30) -%}
+    {% for i in range(40) -%}
     <div id="rect{{ loop.index0 }}">{{ loop.index }}</div>
     {%- endfor %}
   </div>
-{% endblock %}
+{% endblock -%}

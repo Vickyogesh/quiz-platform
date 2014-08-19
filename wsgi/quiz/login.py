@@ -6,7 +6,7 @@ from .core.exceptions import QuizCoreError
 from .appcore import json_response
 from . import access
 
-QUIZ_TYPE_ID = {
+QUIZ_ID_MAP = {
     'b2011': 1,
     'cqc': 2,
     'b2013': 3,
@@ -16,14 +16,51 @@ QUIZ_TYPE_ID = {
 login_api = Blueprint('login_api', __name__)
 
 
-def _get_quiz_type(quiz_name):
-    return QUIZ_TYPE_ID.get(quiz_name, None)
+def first_digit_index(txt):
+    """Return index of the first digit in the given string."""
+    index = -1
+    for x in txt:
+        index += 1
+        if x.isdigit():
+            return index
+    return -1
+
+
+def quiz_name_parts(quiz_name):
+    """Split given quiz name in to parts: name[year[.version]].
+
+    Returns:
+        tuple(name, year, version)
+    """
+    basename = quiz_name
+    year = None
+    version = None
+    index = first_digit_index(quiz_name)
+    if index != -1:
+        basename = quiz_name[:index]
+        year = quiz_name[index:]
+        index = year.find('.')
+        if index != -1:
+            version = year[index + 1:]
+            year = year[:index]
+        try:
+            year = year and int(year)
+            version = version and int(version)
+        except ValueError:
+            basename = quiz_name
+            year = None
+            version = None
+    return basename, year, version
+
+
+def _get_quiz_id(quiz_name):
+    return QUIZ_ID_MAP.get(quiz_name, None)
 
 
 # Raises error if access is denied or returns expiration date.
-def _validate_quiz_access(quiz_type, quiz_type_id, user):
+def _validate_quiz_access(quiz_name, quiz_id, user):
     access = user['access']
-    date_str = access.get(quiz_type, None)
+    date_str = access.get(quiz_name, None)
     if not date_str:
         abort(403)
     # Convert string to date.
@@ -82,20 +119,24 @@ def do_login(data):
     can_check_date = user['type'] != 'admin'
 
     try:
-        quiz_type = data["quiz_type"]
+        quiz_fullname = data["quiz_type"]
     except KeyError:
         raise BadRequest('Invalid parameters.')
 
-    quiz_type_id = _get_quiz_type(quiz_type)
-    if quiz_type_id is None:
+    quiz_id = _get_quiz_id(quiz_fullname)
+    if quiz_id is None:
         raise BadRequest('Invalid parameters.')
 
     if can_check_date:
-        end_date = _validate_quiz_access(quiz_type, quiz_type_id, user)
+        end_date = _validate_quiz_access(quiz_fullname, quiz_id, user)
 
     # Used by API to detect current quiz.
-    session['quiz_type'] = quiz_type_id
-    session['quiz_type_name'] = quiz_type
+    basename, year, version = quiz_name_parts(quiz_fullname)
+    session['quiz_name'] = basename
+    session['quiz_year'] = year
+    session['quiz_version'] = version
+    session['quiz_fullname'] = quiz_fullname
+    session['quiz_id'] = quiz_id
 
     if can_check_date:
         session['access_end_date'] = end_date
