@@ -48,7 +48,7 @@ css_ui = Bundle('ui/css/colorbox.css', 'ui/css/style.css',
                 'ui/css/statistics.css', 'ui/css/quiz.css',
                 'ui/css/msgbox.css', 'ui/css/exam.css',
                 'ui/css/school_menu.css', 'ui/css/school_stat.css',
-                'ui/css/b/menu.css', 'ui/css/cqc/menu.css',
+                'ui/css/b_menu.css', 'ui/css/cqc_menu.css',
                 filters=css_filter, output='ui/gen/ui.css')
 
 assets.register('base.js', base_js)

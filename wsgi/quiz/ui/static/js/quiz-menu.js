@@ -27,7 +27,7 @@
         },
 
         addArea: function(area, topics) {
-            var item = new Area({text: area.text, class: area.class});
+            var item = new Area({text: area.text, cls: area.cls});
             if (typeof area.chapters == "number") {
                 for (var i = 0; i < area.chapters; ++i)
                     item.chapters.push(this.createChapter(topics, []));
@@ -56,7 +56,7 @@
 
         render: function() {
             var id = this.model.collection.indexOf(this.model) + 1;
-            var cls = this.model.get("class");
+            var cls = this.model.get("cls");
             if (cls === undefined)
                 this.$el.attr("class", "area" + id);
             else
@@ -91,7 +91,7 @@
         render: function() {
             var id = this.model.collection.indexOf(this.model) + 1;
             this.$el.attr("id", "page" + id);
-            var cls = this.model.get("class");
+            var cls = this.model.get("cls");
             if (cls === undefined)
                 this.$el.attr("class", "page area" + id);
             else
