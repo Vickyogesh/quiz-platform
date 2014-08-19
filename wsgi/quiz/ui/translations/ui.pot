@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-19 10:53+0700\n"
+"POT-Creation-Date: 2014-08-19 15:21+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,7 +47,7 @@ msgstr ""
 msgid "Scooter"
 msgstr ""
 
-#: wsgi/quiz/ui/client/exam.py:28
+#: wsgi/quiz/ui/client/models.py:96
 #, python-format
 msgid "Number of errors in exam: %%(num)s"
 msgstr ""
@@ -193,9 +193,9 @@ msgstr ""
 msgid "Unable to link account with Facebook."
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:6
+#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:7
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:11
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:12
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:21
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:13
 msgid "Back"
@@ -239,11 +239,11 @@ msgid "No"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/common_exam_review.html:3
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:7
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:8
 msgid "Exam review"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:17
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:18
 #, python-format
 msgid "List of exam %(id)s answers."
 msgstr ""
