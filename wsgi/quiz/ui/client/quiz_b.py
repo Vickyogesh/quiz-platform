@@ -1,4 +1,4 @@
-from ..page import PageModels
+from ..page import PagesMetadata
 from .models import MenuModel, QuizMenuModel, ExamModel
 
 
@@ -15,7 +15,7 @@ class BExamModel(ExamModel):
     exam_meta = {'max_errors': 4, 'total_time': 1800}
 
 
-class BPageModels(PageModels):
+class BPagesMetadata(PagesMetadata):
     name = 'b'
     standard_page_models = {
         'menu': BModel,

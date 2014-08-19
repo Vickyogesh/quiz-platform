@@ -65,6 +65,6 @@ from . import index
 from . import school
 from . import client
 
-school.register_urls_for(ui)
+school.register_views(ui)
 client.register_views(ui)
 

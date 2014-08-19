@@ -1,4 +1,4 @@
-from ..page import PageModels
+from ..page import PagesMetadata
 from .models import QuizMenuModel, ExamModel
 from .quiz_b import BModel
 
@@ -16,7 +16,7 @@ class ScooterExamModel(ExamModel):
     exam_meta = {'max_errors': 3, 'total_time': 1500}
 
 
-class ScooterPageModels(PageModels):
+class ScooterPagesMetadata(PagesMetadata):
     name = 'scooter'
     standard_page_models = {
         'menu': ScooterModel,

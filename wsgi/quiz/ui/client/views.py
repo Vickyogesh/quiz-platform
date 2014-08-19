@@ -9,11 +9,13 @@ from .models import (
     StatisticsTopicModel,
     StatisticsExamsModel
 )
-from ..page import ClientPage
+from ..page import PageView
+from ... import access
 
-############################################################
-# Base class for quiz page views.
-############################################################
+
+class ClientPage(PageView):
+    decorators = [access.be_client_or_guest.require()]
+    endpoint_prefix = 'client'
 
 
 class MenuView(ClientPage):
@@ -46,7 +48,11 @@ class ExamReviewView(ClientPage):
     default_model = ExamReviewModel
 
 
-class StatisticsView(ClientPage):
+class StatisticsPage(ClientPage):
+    decorators = [access.be_user.require()]
+
+
+class StatisticsView(StatisticsPage):
     rules = (
         {'rule': '/c/statistics', 'defaults': {'uid': 'me'}},
         {'rule': '/c/statistics/<uid:uid>'}
@@ -54,12 +60,12 @@ class StatisticsView(ClientPage):
     default_model = StatisticsModel
 
 
-class StatisticsTopicView(ClientPage):
+class StatisticsTopicView(StatisticsPage):
     rules = ({'rule': '/c/statistics/<uid:uid>/topic/<int:topic_id>'},)
     default_model = StatisticsTopicModel
 
 
-class StatisticsExamsView(ClientPage):
+class StatisticsExamsView(StatisticsPage):
     rules = ({'rule': '/c/statistics/<uid:uid>/exams/<range>'},)
     default_model = StatisticsExamsModel
 

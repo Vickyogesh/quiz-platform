@@ -29,7 +29,7 @@ def check_access(f):
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
-        name = session.get('quiz_type_name')
+        name = session.get('quiz_fullname')
 
         # Interrupt on unknown quizzes.
         if name is not None and name not in QUIZ_ID_MAP:

@@ -3,9 +3,9 @@ from ..page import register_pages
 
 def register_views(bp):
     from .views import page_views
-    from .quiz_b import BPageModels
-    from .quiz_cqc import CqcPageModels
-    from .quiz_scooter import ScooterPageModels
+    from .quiz_b import BPagesMetadata
+    from .quiz_cqc import CqcPagesMetadata
+    from .quiz_scooter import ScooterPagesMetadata
 
-    register_pages(bp, page_views, [BPageModels, CqcPageModels,
-                                    ScooterPageModels])
+    register_pages(bp, page_views, [BPagesMetadata, CqcPagesMetadata,
+                                    ScooterPagesMetadata])

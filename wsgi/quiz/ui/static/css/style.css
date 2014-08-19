@@ -255,16 +255,17 @@ a.tablerow:hover {
 
 .question-answer {
   font-weight: bold;
-  color: #fff;
   padding: 4px 20px;
 }
 
 .question-answer.correct {
   background-color: #6a9077;
+  color: #fff;
 }
 
 .question-answer.wrong {
   background-color: #c9463e;
+  color: #fff;
 }
 
 p.info {

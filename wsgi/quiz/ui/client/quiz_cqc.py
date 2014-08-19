@@ -1,4 +1,4 @@
-from ..page import PageModels
+from ..page import PagesMetadata
 from .models import MenuModel, QuizMenuModel, ExamModel
 
 
@@ -15,7 +15,7 @@ class CqcExamModel(ExamModel):
     exam_meta = {'max_errors': 6, 'total_time': 7200}
 
 
-class CqcPageModels(PageModels):
+class CqcPagesMetadata(PagesMetadata):
     name = 'cqc'
     standard_page_models = {
         'menu': CqcModel,
