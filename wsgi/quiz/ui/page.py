@@ -9,14 +9,41 @@ _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 
 
 # https://gist.github.com/jaytaylor/3660565
-def camel_to_underscore(name):
+def _camel_to_underscore(name):
     subbed = _underscorer1.sub(r'\1_\2', name)
     return _underscorer2.sub(r'\1_\2', subbed).lower()
+
+
+def register_pages(bp, page_views, ui_models):
+    page_models = {}
+
+    for ui in ui_models:
+        for name, cls in ui.standard_page_models.iteritems():
+            if name not in page_models:
+                pages = {}
+                page_models[name] = pages
+            else:
+                pages = page_models[name]
+            pages[ui.name] = cls
+
+    for name, cls in page_views.iteritems():
+        class_name = cls.__name__[:-4]  # name without 'View'
+        fields = {'models': page_models.get(name)}
+        view_class = type(class_name, (cls,), fields)
+        v = view_class.get_view()
+        for rule in view_class.rules:
+            bp.route(**rule)(v)
+
+
+class PageModels(object):
+    name = None
+    standard_page_models = None
 
 
 class PageView(View):
     models = {}
     endpoint_prefix = None
+    default_model = None
 
     def __init__(self):
         super(PageView, self).__init__()
@@ -33,7 +60,7 @@ class PageView(View):
 
     @classmethod
     def get_view(cls):
-        name = camel_to_underscore(cls.__name__)
+        name = _camel_to_underscore(cls.__name__)
         ep = '%s_%s' % (cls.endpoint_prefix, name)
 
         # Add default decorator if not present.
@@ -49,12 +76,15 @@ class PageView(View):
 
     def _setup_models(self):
         self._model_list = {}
-        self._default_model = None
-        for name, cls in self.models.iteritems():
-            if name == '':
-                self._default_model = cls(self)
-            else:
-                self._model_list[name] = cls(self)
+        if self.default_model is not None:
+            self.default_model = self.default_model(self)
+
+        if self.models is not None:
+            for name, cls in self.models.iteritems():
+                if name == '' and self.default_model is None:
+                    self.default_model = cls(self)
+                else:
+                    self._model_list[name] = cls(self)
 
     def dispatch_request(self, *args, **kwargs):
         self.quiz_id = session['quiz_id']
@@ -64,7 +94,7 @@ class PageView(View):
         self.uid = access.current_user.account_id
         self.lang = request.args.get('lang', 'it')
         self.urls = None
-        self.model = self._model_list.get(self.quiz_name, self._default_model)
+        self.model = self._model_list.get(self.quiz_name, self.default_model)
         self.template = self.model.template
         return self.model.on_request(*args, **kwargs)
 
@@ -116,7 +146,7 @@ class Page(View):
 
     @classmethod
     def get_view(cls):
-        name = camel_to_underscore(cls.__name__)
+        name = _camel_to_underscore(cls.__name__)
         ep = '%s_%s' % (cls.endpoint_prefix, name)
 
         # Add default decorator if not present.

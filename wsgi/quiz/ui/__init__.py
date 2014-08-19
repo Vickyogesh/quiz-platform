@@ -67,4 +67,4 @@ from . import client
 
 school.register_urls_for(ui)
 client.register_views(ui)
-# client.register_urls_for(ui)
+
