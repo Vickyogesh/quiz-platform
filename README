@@ -177,6 +177,6 @@ To add new quiz you have to:
   wsgi/quiz/ui/client and register them in wsgi/quiz/ui/client/__init__.py.
 
 
-TODOs:
+TODO:
 * [menu] fix exam hover borders.
 * Reformat readme.
