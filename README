@@ -131,7 +131,7 @@ Note: if you want to build API docs at deployment then create
       the docs will be built.
 
 Note: DB backup
-mysqldump --routines --triggers -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENSHIFT_MYSQL_DB_USERNAME:-'admin'} --password="$OPENSHIFT_MYSQL_DB_PASSWORD" "$OPENSHIFT_APP_NAME"  | gzip > dump.sql.gz
+mysqldump --routines --triggers -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENSHIFT_MYSQL_DB_USERNAME:-'admin'} --password="$OPENSHIFT_MYSQL_DB_PASSWORD" "$OPENSHIFT_APP_NAME"  | gzip > dump-`date +%d.%m.%Y`-sql.gz
 mysql -h $OPENSHIFT_MYSQL_DB_HOST -P ${OPENSHIFT_MYSQL_DB_PORT:-3306} -u ${OPENSHIFT_MYSQL_DB_USERNAME:-'admin'} --password="$OPENSHIFT_MYSQL_DB_PASSWORD" "$OPENSHIFT_APP_NAME" < dump.sql
 UPDATE proc SET DEFINER = "newUser@host" WHERE DEFINER = "oldUser@localhost";
 UPDATE quiz.proc SET DEFINER = "adminGafibX9@127.7.200.130" WHERE DEFINER = "adminASAJxDv@127.12.159.129";
@@ -180,3 +180,6 @@ To add new quiz you have to:
 TODO:
 * [menu] fix exam hover borders.
 * Reformat readme.
+
+https://www.openshift.com/blogs/openshift-online-march-2014-release-blog
+http://openshift.github.io/documentation/oo_cartridge_guide.html#python

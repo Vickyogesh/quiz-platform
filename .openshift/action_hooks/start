@@ -1,8 +1,0 @@
-#!/bin/bash
-# The logic to start up your application should be put in this
-# script. The application will work only if it binds to
-# $OPENSHIFT_INTERNAL_IP:8080
-# nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_INTERNAL_IP $OPENSHIFT_REPO_DIR/diy > $OPENSHIFT_HOMEDIR/diy-0.1/logs/server.log 2>&1 &
-
-$OPENSHIFT_DATA_DIR/nginx/sbin/nginx
-$OPENSHIFT_DATA_DIR/venv/bin/uwsgi --ini $OPENSHIFT_REPO_DIR/misc/uwsgi.ini -H $OPENSHIFT_DATA_DIR/venv

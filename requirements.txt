@@ -1,4 +1,3 @@
-uWSGI>=1.9.6
 Babel==1.3
 Beaker==1.6.4
 Flask==0.10.1
