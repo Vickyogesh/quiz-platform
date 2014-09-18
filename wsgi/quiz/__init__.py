@@ -114,6 +114,6 @@ def init_app():
     from .api import api
     from .ui import ui
 
+    app.register_blueprint(ui)
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
-    app.register_blueprint(ui, url_prefix='/ui')
