@@ -9,8 +9,6 @@ try:
 except IOError:
     pass
 
-print "Runs wsgi/wsgi.py"
-
 sys.path.append(os.path.join(os.path.dirname(__file__), 'wsgi'))
 from quiz import create_app
 application = create_app()

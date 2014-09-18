@@ -90,7 +90,7 @@ def init_app():
                               target_cookie_domain=domain)
     # build_only - because we need an endpoint to reference to images
     # in the templates, and files will be handled by apache or nginx.
-    app.add_url_rule('/img/<filename>', 'img_file', build_only=True)
+    app.add_url_rule('/static/qimg/<filename>', 'img_file', build_only=True)
 
     # for testing
     if app.config.get('DEBUG', False) is True:
@@ -114,6 +114,6 @@ def init_app():
     from .api import api
     from .ui import ui
 
-    app.register_blueprint(ui)
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
+    app.register_blueprint(ui, url_prefix='/ui')

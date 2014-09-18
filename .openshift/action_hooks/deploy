@@ -16,6 +16,12 @@ echo "Unpacking images to quiz data dir..."
 unzip -o $OPENSHIFT_REPO_DIR/misc/img.zip -d $OPENSHIFT_DATA_DIR/quiz/img
 fi
 
+if [ ! -d $OPENSHIFT_REPO_DIR/wsgi/static ]; then
+echo "Creating wsgi/static..."
+mkdir $OPENSHIFT_REPO_DIR/wsgi/static
+ln -s $OPENSHIFT_DATA_DIR/quiz/img $OPENSHIFT_REPO_DIR/wsgi/static/qimg
+fi
+
 # Generate translations & build assets
 cd $OPENSHIFT_REPO_DIR
 pybabel compile -d wsgi/quiz/ui/translations -D ui

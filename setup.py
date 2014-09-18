@@ -1,7 +1,7 @@
 from setuptools import setup
 
 # NOTE: all dependencies are provided by requirements.txt
-setup(name='YourAppName',
+setup(name='QuizPlatform',
       version='1.0',
       description='TONI Quiz Platform',
       author='Sergey Kozlov',

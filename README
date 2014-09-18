@@ -183,3 +183,4 @@ TODO:
 
 https://www.openshift.com/blogs/openshift-online-march-2014-release-blog
 http://openshift.github.io/documentation/oo_cartridge_guide.html#python
+https://github.com/openshift/origin-server/blob/master/cartridges/openshift-origin-cartridge-python/usr/versions/shared/etc/conf.d/openshift.conf.erb
