@@ -68,3 +68,8 @@ from . import client
 school.register_views(ui)
 client.register_views(ui)
 
+# TODO: remove me, only for testing apache URL routing
+@ui.route('/img/<name>')
+def img_test(name):
+    print "WSGI HANDING [/img/%s]" % name
+    return "ok %s" % name
