@@ -92,8 +92,10 @@ def init_app():
     # in the templates, and files will be handled by apache or nginx.
     app.add_url_rule('/img/<filename>', 'img_file', build_only=True)
 
+    debug = app.config.get('DEBUG', False)
+
     # for testing
-    if app.config.get('DEBUG', False) is True:
+    if debug is True:
         import os.path
         from werkzeug import SharedDataMiddleware
         here = os.path.dirname(__file__)
@@ -117,3 +119,22 @@ def init_app():
     app.register_blueprint(ui)
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
+
+    # Like this we disable static files handing by flask on production
+    # to test (and be sure) if apache (or nginx) serve them.
+    # If apache/nginx configured wrongly then static files will not be
+    # handled at all.
+    # NOTE: for OpenShift all static files must be placed inside wsgi/static
+    # to be correctly handled by apache (at least for python cartridge).
+    # You need to add symlinks to wsgi/static if you have assets
+    # in other locations in .openshift/action_hooks/deploy. For example:
+    #
+    #   ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static \
+    #         $OPENSHIFT_REPO_DIR/wsgi/static/ui
+    #
+    # here we create symlink for frontend's static files, now apache will serve
+    # urls like site.com/static/ui/<path to asset>.
+    if debug is False:
+        for rule in app.url_map._rules:
+            if rule.rule.startswith('/static/ui'):
+                rule.build_only = True
