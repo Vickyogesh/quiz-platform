@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Remove session files which are older than one day.
-find $OPENSHIFT_DATA_DIR/quiz/sessions -mtime +1 -type f -exec rm {} \;
+find $OPENSHIFT_DATA_DIR/sessions -mtime +1 -type f -exec rm {} \;
