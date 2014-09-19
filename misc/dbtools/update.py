@@ -134,7 +134,7 @@ def get_guest_stat(school):
          AND DATE(UTC_TIMESTAMP() - INTERVAL 7 DAY)), -1) week,
         IFNULL((SELECT ROUND(avg(num_requests)) FROM guest_access_snapshot
         WHERE guest_id=:guest_id AND
-         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)), -1) week3;
         """), guest_id=guest_id).fetchone()
 
@@ -182,7 +182,7 @@ def get_week_student_rating(users, quiz_type):
 
 
 def get_week3_student_rating(users, quiz_type):
-    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+    date = """DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
         AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)"""
     return _get_students_rating(users, quiz_type, date)
 
@@ -206,7 +206,7 @@ def get_exams_stat(users_str, quiz_type):
 
         (SELECT ROUND(SUM(IF(err_count > %(err)d, 1, 0))/COUNT(end_time)*100) e
          FROM exams WHERE quiz_type=%(t)d AND user_id IN (%(u)s) AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)) week3;
         """ % {'u': users_str, 't': quiz_type, 'err': num_err}).fetchone()
     return (res[0], res[1], res[2])
@@ -230,10 +230,10 @@ def do_clean(school_list):
 
 def clean_schools_data():
     engine.execute("""DELETE FROM school_topic_err_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 62 day)""")
 
     engine.execute("""DELETE FROM guest_access_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)""")
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 62 day)""")
 
 
 # NONE: this will take long time.
@@ -248,12 +248,12 @@ def clean_users_data(school):
 
     # Delete old progress date
     engine.execute("""DELETE FROM user_progress_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 62 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
     # Delete old topic data
     engine.execute("""DELETE FROM topic_err_snapshot
-                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 28 day)
+                   WHERE now_date < DATE(UTC_TIMESTAMP() - interval 62 day)
                    AND user_id IN (%s) and quiz_type=%d""" % (students, qt))
 
     # Delete in-progress exams
@@ -266,5 +266,5 @@ def clean_users_data(school):
     # Delete old exams
     engine.execute("""DELETE FROM exams
                    WHERE user_id IN (%s) AND quiz_type=%d AND
-                   start_time < DATE(UTC_TIMESTAMP() - interval 28 day)
+                   start_time < DATE(UTC_TIMESTAMP() - interval 62 day)
                    """ % (students, qt))
