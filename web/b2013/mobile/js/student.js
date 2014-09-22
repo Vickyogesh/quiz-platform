@@ -20,7 +20,7 @@ $("#page-student").bind("pageinit", function() {
     function saveFbId(userId) {
         var data = {userId: userId};
         $.mobile.loading("show");
-        aux_postJSON("/v1/link_facebook", data, function (data) {
+        aux_postJSON("/v1/link_facebook", data, null).always(function (data) {
             $.mobile.loading("hide");
             if (data.status != 200) {
                 // Can't link Facebook account

@@ -1,0 +1,48 @@
+.container.statistics {
+  max-width: 750px;
+}
+
+.tablerow .chart {
+  width: 20px;
+  height: 20px;
+}
+
+#exams {
+  text-align: center;
+}
+
+#exams a {
+  text-decoration: none;
+}
+
+#exam_chart {
+  height: 150px;
+  padding: 6px;
+}
+
+.examrow {
+  cursor: pointer;
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  color: #102F68;
+}
+.examrow.active, .examrow:hover {
+  background-color: #F2F4F6;
+}
+.examrow .exam-title {
+  border-bottom: 1px solid #E8ECEF;
+  padding: 7px;
+}
+.examrow .glyphicon-ok-circle {
+  color: #6a9077;
+}
+.examrow .glyphicon-remove-circle {
+  color: #c9463e;
+}
+.examrow > div span {
+  margin-left: 10px;
+}
+.exam-answers {
+  display: none;
+}

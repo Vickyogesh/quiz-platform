@@ -51,8 +51,8 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
                AdminMixin, SchoolMixin):
     """ Core quiz logic. """
 
-    def __init__(self, settings):
-        self._setupDb(settings.dbinfo)
+    def __init__(self, app):
+        self._setupDb(app)
         UserMixin.__init__(self)
         QuizMixin.__init__(self)
         ErrorReviewMixin.__init__(self)
@@ -63,7 +63,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
 
         # used in the _aux_question_delOptionalField()
         self.__optional_question_fields = ['image', 'image_bis']
-        self.guest_allowed_requests = settings.main['guest_allowed_requests']
+        self.guest_allowed_requests = app.config['GUEST_ALLOWED_REQUESTS']
 
     # Setup db connection and tables
     # NOTE: MySQL features an automatic connection close behavior,
@@ -71,10 +71,10 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
     # See:
     # http://docs.sqlalchemy.org/en/rel_0_8/dialects/mysql.html#connection-timeouts
     # http://www.sqlalchemy.org/trac/wiki/FAQ#MySQLserverhasgoneaway
-    def _setupDb(self, cfg):
-        verbose = cfg['verbose'].lower() == 'true'
-        self.engine = create_engine(cfg['database'], echo=verbose,
-                                    pool_recycle=3600)
+    def _setupDb(self, app):
+        verbose = app.config.get('SQLALCHEMY_ECHO', False)
+        uri = app.config['SQLALCHEMY_DATABASE_URI']
+        self.engine = create_engine(uri, echo=verbose, pool_recycle=3600)
 
         self.meta = MetaData()
         self.meta.reflect(bind=self.engine)

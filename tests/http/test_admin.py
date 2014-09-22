@@ -48,14 +48,14 @@ class HttpAdminTest(unittest.TestCase):
     def test_newSchoolBad(self):
         # Check: not a json
         r = self.req.post(url('/admin/newschool'))
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Not a JSON.', data['description'])
 
         # Check: empty json
         r = self.req.post(url('/admin/newschool'), data='{}', headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -64,14 +64,14 @@ class HttpAdminTest(unittest.TestCase):
 
         data = json.dumps({'name': '2'})
         r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': '2', 'login': '22'})
         r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -80,14 +80,14 @@ class HttpAdminTest(unittest.TestCase):
 
         data = json.dumps({'name': '', 'login': '', 'passwd': ''})
         r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': 'dd', 'login': '12', 'passwd': []})
         r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -112,7 +112,7 @@ class HttpAdminTest(unittest.TestCase):
 
         data = json.dumps({'name': 'some', 'login': 'log', 'passwd': 'hello'})
         r = self.req.post(url('/admin/newschool'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Already exists.', data['description'])
@@ -121,7 +121,7 @@ class HttpAdminTest(unittest.TestCase):
     def test_delSchoolBad(self):
         # Check: malformed request (no action param)
         r = self.req.post(url('/admin/school/200'), data='{}', headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid action.', data['description'])
@@ -129,7 +129,7 @@ class HttpAdminTest(unittest.TestCase):
         # Check: malformed request (send some post data)
         r = self.req.post(url('/admin/school/200?action=delete'),
                           data='{}', headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid request.', data['description'])
@@ -137,14 +137,14 @@ class HttpAdminTest(unittest.TestCase):
         # Check: delete non-existent school
         r = self.req.post(url('/admin/school/200?action=delete'),
                           headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Unknown school.', data['description'])
 
         # Check: delete non-existent school with HTTP DELETE
         r = self.req.delete(url('/admin/school/200'))
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Unknown school.', data['description'])

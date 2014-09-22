@@ -48,6 +48,8 @@ function createExamQuestionManager(config) {
         // Handle response error.
         processError: function(info) {
             var user = sessionStorage.getItem('quizutype');
+            if (info.responseText !== undefined && info.responseText[0] == '{')
+                info = JSON.parse(info.responseText);              
             if (info.status == 403 && user == "guest")
                 this.onGuestLimit();
             else
@@ -89,7 +91,7 @@ function createExamQuestionManager(config) {
                     sessionStorage.setItem("examid", info.exam.id);
                     onOk.call(self, info.questions);
                 }
-            });
+            }).error(self.processError);
         },
 
         // Send answers list.
@@ -116,13 +118,16 @@ function createExamQuestionManager(config) {
             var url = this.sendAnswersUrl();
             var data = {questions: id_list, answers: answer_list};
 
-            aux_postJSON(url, data, function(info) {
+            aux_postJSON(url, data, null).always(function(info) {
               $.mobile.hidePageLoadingMsg();
               if (info.status != 200) {
                 if (onError === undefined)
                     self.processError(info);
-                else
+                else {
+                    if (info.responseText !== undefined && info.responseText[0] == '{')
+                        info = JSON.parse(info.responseText);                     
                     onError.call(self, info);
+                }
               }
               else if (onOk !== undefined)
                 onOk.call(self, info);

@@ -109,8 +109,7 @@
 
         var d = {}
         d.lang = lang;
-
-        $.getJSON(url("/v1/exam/" + exam_id), d, function(data) {
+        $.getJSON(url("/v1/exam/" + exam_id), d).always(function(data) {
             WaitMsg.hide();
             if (data.status != 200) {
                 var user = sessionStorage.getItem('quizutype');

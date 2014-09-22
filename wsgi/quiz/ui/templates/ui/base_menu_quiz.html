@@ -1,0 +1,25 @@
+{% extends "ui/base_page.html" %}
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block content_class %}quiz-menu{% endblock %}
+{% block navbar_header_class %}no-button{% endblock %}
+
+{% block nav_brand %}
+  <a href="{{ urls.back }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Back') }}</span></a>
+{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4> {{ quiz_title }} </h4>
+</div>
+{% endblock %}
+
+{% block script_include %}
+  {{ super() }}
+  {% assets "bb.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% assets "quiz.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
+

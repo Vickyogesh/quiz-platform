@@ -20,7 +20,7 @@ function getUrlParameterByName(name) {
 function aux_postJSON(url, data, success)
 {
   if (success === undefined) {
-    $.ajax({
+    return $.ajax({
       url: url,
       type: "POST",
       contentType: "application/json; charset=UTF-8",
@@ -29,11 +29,11 @@ function aux_postJSON(url, data, success)
     });
   }
   else {
-    $.ajax({
+    return $.ajax({
       url: url,
       type: "POST",
       contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify(data),
+      data: data != null ? JSON.stringify(data) : null,
       dataType: "json",
       success: success
     });

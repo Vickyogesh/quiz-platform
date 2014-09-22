@@ -277,6 +277,7 @@ def exams(mgr):
     # NOTE: we skip 'in-progress' exams.
     # NOTE: NEW.quiz_type == 1 means quiz B
     # and NEW.quiz_type == 2 means quiz CQC
+    # and NEW.quiz_type == 4 means quiz scooter
     mgr.conn.execute("DROP TRIGGER IF EXISTS on_exams_after_upd;")
     mgr.conn.execute(text("""CREATE TRIGGER on_exams_after_upd
         AFTER UPDATE ON exams FOR EACH ROW BEGIN
@@ -284,6 +285,10 @@ def exams(mgr):
 
             IF NEW.quiz_type = 2 THEN
                 SELECT SUM(IF(err_count > 6, 1, 0)) / count(end_time)
+                INTO coef FROM exams WHERE user_id=NEW.user_id
+                AND quiz_type=NEW.quiz_type;
+            ELSEIF NEW.quiz_type = 4 THEN
+                SELECT SUM(IF(err_count > 3, 1, 0)) / count(end_time)
                 INTO coef FROM exams WHERE user_id=NEW.user_id
                 AND quiz_type=NEW.quiz_type;
             ELSE

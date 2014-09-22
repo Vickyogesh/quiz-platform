@@ -191,8 +191,8 @@ __unittest = True
 
 class HttpStatusTest(unittest.TestCase):
     def assertHttp_Unauthorized(self, response):
-        if response.status_code != 200:
-            raise self.failureException('Non 200 response from server.')
+        if response.status_code != 401:
+            raise self.failureException('Non 401 response from server.')
 
         data = response.json()
         if 'status' not in data or 'description' not in data:
@@ -211,8 +211,8 @@ class HttpStatusTest(unittest.TestCase):
             raise self.failureException(msg)
 
     def assertHttp_Forbidden(self, response):
-        if response.status_code != 200:
-            raise self.failureException('Non 200 response from server.')
+        if response.status_code != 403:
+            raise self.failureException('Non 403 response from server.')
 
         data = response.json()
         if 'status' not in data:
@@ -231,14 +231,11 @@ class HttpStatusTest(unittest.TestCase):
             raise self.failureException(msg)
 
     def assertHttp_NotForbidden(self, response):
-        if response.status_code != 200:
-            raise self.failureException('Non 200 response from server.')
-
         data = response.json()
         if 'status' not in data:
             raise self.failureException('Malformed server error response.')
 
-        if data['status'] == 403:
+        if response.status_code == 403 or data['status'] == 403:
             raise self.failureException('Forbidden.')
 
     def assertHttp_Ok(self, response):

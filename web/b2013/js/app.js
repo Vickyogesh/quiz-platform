@@ -107,7 +107,7 @@ function doQuit()
 function aux_postJSON(url, data, success)
 {
   if (success === undefined) {
-    $.ajax({
+    return $.ajax({
       url: url,
       type: "POST",
       contentType: "application/json; charset=UTF-8",
@@ -116,11 +116,11 @@ function aux_postJSON(url, data, success)
     });
   }
   else {
-    $.ajax({
+    return $.ajax({
       url: url,
       type: "POST",
       contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify(data),
+      data: data != null ? JSON.stringify(data): null,
       dataType: "json",
       success: success
     });
@@ -131,6 +131,8 @@ function aux_postJSON(url, data, success)
 
 function aux_showJSONError(data)
 {
+  if (data.responseText !== undefined)
+    data = JSON.parse(data.responseText);  
   aux_showError(data.description, data.status)
 }
 //----------------------------------------------------------------------------
@@ -147,6 +149,7 @@ function aux_showError(msg, code)
 
 function showGuestAccessError() {
   alert("Guest's visits is exceeded. Access will be unlocked within 1 hr.");
+  window.location = "student.html";
 }
 //----------------------------------------------------------------------------
 
@@ -160,6 +163,6 @@ $(document).ready(function() {
 		
 	$('#btnlogout').click(function(){
 		window.qsid = null;
-		window.location = "index.html";
+		window.location = "/";
 	});
 });

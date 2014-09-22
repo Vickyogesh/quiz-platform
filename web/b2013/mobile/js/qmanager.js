@@ -48,6 +48,8 @@ function createQuestionManager(config) {
         // Handle response error.
         processError: function(info) {
             var user = sessionStorage.getItem('quizutype');
+            if (info.responseText !== undefined && info.responseText[0] == '{')
+                info = JSON.parse(info.responseText);              
             if (info.status == 403 && user == "guest")
                 this.onGuestLimit();
             else
@@ -88,7 +90,7 @@ function createQuestionManager(config) {
                     self.processError(info);
                 else
                     onOk.call(self, info.questions);
-            });
+            }).error(self.processError);
         },
 
         // Send answers list.
@@ -112,13 +114,16 @@ function createQuestionManager(config) {
             this.current_ids = [];
             this.current_answers = [];
 
-            aux_postJSON(url, data, function(info) {
+            aux_postJSON(url, data, null).always(function(info) {
               $.mobile.hidePageLoadingMsg();
               if (info.status != 200) {
                 if (onError === undefined)
                     self.processError(info);
-                else
+                else {
+                    if (info.responseText !== undefined && info.responseText[0] == '{')
+                        info = JSON.parse(info.responseText);                     
                     onError.call(self, info);
+                }
               }
               else if (onOk !== undefined)
                 onOk.call(self, info);
