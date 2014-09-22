@@ -133,8 +133,8 @@ def init_app():
     #         $OPENSHIFT_REPO_DIR/wsgi/static/ui
     #
     # here we create symlink for frontend's static files, now apache will serve
-    # urls like site.com/static/ui/<path to asset>.
+    # urls like site.com/ui/static/ui/<path to asset>.
     if debug is False:
         for rule in app.url_map._rules:
-            if rule.rule.startswith('/static/ui'):
+            if rule.rule.startswith('/ui/static/ui'):
                 rule.build_only = True
