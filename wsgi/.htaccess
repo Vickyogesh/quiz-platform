@@ -6,6 +6,11 @@ RewriteRule /img/(.+)$ /static/qimg/$1 [L]
 RewriteCond %{REQUEST_URI} ^/ui/static/ui/
 RewriteRule /ui/static/ui/(.+)$ /static/ui/$1 [L]
 
+# Old frontends
+
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule /$ /b2013/ [R,L]
+
 RewriteCond %{REQUEST_URI} ^/b2013/$
 RewriteRule /b2013/$ /static/oldfrontend/b2013/index.html [L]
 
