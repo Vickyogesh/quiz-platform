@@ -52,9 +52,12 @@ class ExamMixin(object):
     # quiz_type is defined in the QuizApp (quiz/wsgi.py)
     # 1 - b2011
     # 2 - cqc
+    # 4 - scooter
     def __generate_idList(self, quiz_type, examType):
         if quiz_type == 2:
             return self.__generate_idListCQC(quiz_type, examType)
+        elif quiz_type == 4:
+            return self.__generate_idListScooter(quiz_type, examType)
         else:
             return self.__generate_idListB(quiz_type, examType)
 
@@ -115,6 +118,19 @@ class ExamMixin(object):
         start = res[0]
         end = res[1] + 1
         return random.sample(xrange(start, end), 60), []
+
+    # Create list of exam questions for CQC quiz
+    # 3 questions per topic. Total 30 questions.
+    def __generate_idListScooter(self, quiz_type, examType):
+        id_list = []
+
+        t = self.chapters
+        res = self.__stmt_ch_info.execute(quiz_type=quiz_type)
+        for row in res:
+            # 3 random questions for each chapter
+            vals = random.sample(xrange(row[1], row[2] + 1), 3)
+            id_list.extend(vals)
+        return id_list, []
 
     #@profile
     def __initExam(self, quiz_type, user_id, questions):
@@ -199,9 +215,15 @@ class ExamMixin(object):
             raise QuizCoreError('Exam is expired.')
         elif not isinstance(answers, list):
             raise QuizCoreError('Invalid value.')
-        elif quiz_type == 2 and len(answers) != 60:
-            raise QuizCoreError('Wrong number of answers.')
-        elif quiz_type != 2 and len(answers) != 40:
+
+        if quiz_type == 2:
+            exam_answers = 60
+        elif quiz_type == 4:
+            exam_answers = 30
+        else:
+            exam_answers = 40
+
+        if len(answers) != exam_answers:
             raise QuizCoreError('Wrong number of answers.')
 
         res = self.__examids.execute(exam_id=exam_id)

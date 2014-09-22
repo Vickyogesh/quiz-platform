@@ -1,7 +1,11 @@
 *.pyc
 *.pyo
+*.mo
 *.sublime-*
 .virtualenv/
 test-data/
+local/
 doc/html/
 .idea/
+.webassets-cache/
+wsgi/quiz/ui/static/gen/

@@ -28,7 +28,7 @@ class UserMixin(object):
             IFNULL((SELECT avg(err_percent) FROM topic_err_snapshot WHERE
                user_id=:user_id AND quiz_type=t.quiz_type AND topic_id = t.id
                AND
-               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+               DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
                AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)
                GROUP BY topic_id), -1) week3
             from topics t WHERE quiz_type=:quiz_type order by t.id""")
@@ -46,7 +46,7 @@ class UserMixin(object):
 
         (SELECT SUM(IF(err_count > :numerr, 1, 0))/COUNT(end_time)*100 e
          FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type AND
-         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+         DATE(start_time) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
          AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)) week3;
         """)
 

@@ -4,16 +4,27 @@
 # up again.  This script gets executed directly, so it could be python, php,
 # ruby, etc.
 
-echo "Pre-processing nginx config..."
-env | sed 's/[\%]/\\&/g;s/\([^=]*\)=\(.*\)/s%${\1}%\2%/' > $OPENSHIFT_TMP_DIR/sed.script
-cat $OPENSHIFT_REPO_DIR/misc/nginx.conf | sed -f $OPENSHIFT_TMP_DIR/sed.script > $OPENSHIFT_DATA_DIR/nginx/conf/nginx.conf
+source $OPENSHIFT_PYTHON_DIR/virtenv/bin/activate
+
+if [ ! -d $OPENSHIFT_DATA_DIR/quiz ]; then
+echo "Creating quiz data dir..."
+mkdir $OPENSHIFT_DATA_DIR/quiz
+fi
 
 if [ ! -d $OPENSHIFT_DATA_DIR/quiz/img ]; then
-echo "Unpacking images..."
+echo "Unpacking images to quiz data dir..."
 unzip -o $OPENSHIFT_REPO_DIR/misc/img.zip -d $OPENSHIFT_DATA_DIR/quiz/img
 fi
 
-# Generate documantation (if needed).
-if [ -d $OPENSHIFT_DATA_DIR/quiz/apidoc ]; then
-$OPENSHIFT_DATA_DIR/bin/sphinx-build -b html  $OPENSHIFT_REPO_DIR/doc $OPENSHIFT_DATA_DIR/quiz/apidoc
+if [ ! -d $OPENSHIFT_REPO_DIR/wsgi/static ]; then
+echo "Creating wsgi/static..."
+mkdir $OPENSHIFT_REPO_DIR/wsgi/static
+ln -s $OPENSHIFT_DATA_DIR/quiz/img $OPENSHIFT_REPO_DIR/wsgi/static/qimg
+ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static $OPENSHIFT_REPO_DIR/wsgi/static/ui
+ln -s $OPENSHIFT_REPO_DIR/web $OPENSHIFT_REPO_DIR/wsgi/static/oldfrontend
 fi
+
+# Generate translations & build assets
+cd $OPENSHIFT_REPO_DIR
+pybabel compile -d wsgi/quiz/ui/translations -D ui
+python manage.py assets build

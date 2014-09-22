@@ -1,0 +1,158 @@
+{% extends "ui/base_page.html" %}
+
+{% block content_class %}quiz{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>{% block quiz_title %}{% endblock %}</h4>
+</div>
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header pull-right">
+      <button type="button" class="btn btn-primary navbar-btn" id="btt-done">
+        <span class="glyphicon glyphicon-ok"></span>
+        {{  _('Finish') }}
+      </button>
+    </div>
+    <div class="navbar-nocollapse" id="navbar">
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <label>{{ _('Show answers:') }}</label>
+          <div class="btn-group btn-group-sm" data-toggle="buttons">
+            <label class="btn btn-default">
+              <input type="radio" name="options" id="opt_yes">{{ _('Yes') }}</label>
+            <label class="btn btn-default active">
+              <input type="radio" name="options" id="opt_no" checked>{{ _('No') }}</label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+
+{% block panel_content %}
+  <div id="quiz-content" class="row">
+    <div class="col-sm-2 vcenter">
+      <div class="img-wrapper">
+        <a id="question_image" class="cbox">
+        </a>
+      </div>
+    </div><!--
+    --><div id="questions" class="col-sm-9 vcenter">
+
+      <div class="qrow pos2" id="row0">
+        <div class="qcell">
+          <div class="qrect tbl">
+            <div class="hidelong">
+              <div id="text"></div>
+            </div>
+          </div>
+        </div>
+        <div class="qcell">
+          <div class="qrect tbl ansbox">
+            <div>
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- row -->
+
+      <div class="qrow pos1"  id="row1">
+        <div class="qcell">
+          <div class="qrect tbl">
+            <div class="hidelong">
+              <div id="text"></div>
+            </div>
+          </div>
+        </div>
+        <div class="qcell">
+          <div class="qrect tbl ansbox">
+            <div>
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- row -->
+
+      <div class="qrow pos0"  id="row2">
+        <div class="qcell">
+          <div class="qrect tbl">
+            <div id="text"></div>
+          </div>
+        </div>
+        <div class="qcell">
+          <div class="qrect tbl ansbox">
+            <div class="qnav glyphicon glyphicon-chevron-left" id="btt-prev"></div>
+            <div class="imgbox">
+                <a href="#"><div class="img-ans true"></div></a>
+                <a href="#"><div class="img-ans false"></div></a>
+            </div>
+            <div class="qnav glyphicon glyphicon-chevron-right" id="btt-next"></div>
+          </div>
+        </div>
+      </div> <!-- row -->
+
+      <div class="qrow pos1" id="row3">
+        <div class="qcell">
+          <div class="qrect tbl">
+            <div class="hidelong">
+              <div id="text"></div>
+            </div>
+          </div>
+        </div>
+        <div class="qcell">
+          <div class="qrect tbl ansbox">
+            <div>
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- row -->
+
+      <div class="qrow pos2" id="row4">
+        <div class="qcell">
+          <div class="qrect tbl">
+            <div class="hidelong">
+              <div id="text"></div>
+            </div>
+          </div>
+        </div>
+        <div class="qcell">
+          <div class="qrect tbl ansbox">
+            <div>
+                <div class="img-ans true"></div>
+                <div class="img-ans false"></div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- row -->
+    </div> <!--
+    --><div class="navbox col-sm-1 vcenter ">
+      <div class="qnav glyphicon glyphicon-chevron-up" id="btt-prev"></div>
+      <div class="qnav glyphicon glyphicon-chevron-up" id="btt-next"></div>
+    </div>
+    <div class="message-box" id="msgbox"></div>
+  </div>
+  <div class="img-preload"><div class="img-ans true"></div></div>
+  <div class="img-preload"><div class="img-ans true sel"></div></div>
+  <div class="img-preload"><div class="img-ans false"></div></div>
+  <div class="img-preload"><div class="img-ans false sel"></div></div>
+{% endblock %}
+
+{% block script_include %}
+  {{ super() }}
+  {% assets "bb.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% assets "quiz.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}

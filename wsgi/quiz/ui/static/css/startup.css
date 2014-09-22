@@ -1,0 +1,52 @@
+.container.startup {
+  max-width: 550px;
+}
+
+.topspace {
+  height: 20px;
+}
+
+@media (min-width: 768px) {
+  .topspace {
+    height: 50px;
+  }
+}
+
+.startup-img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 220px;
+}
+
+#login-form .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+#login-form .col-md-12 form {
+  margin: 10px;
+}
+#login-form span {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+#login-form .form-group.bottom .row > div {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 4px;
+}
+
+#login-form .form-group.bottom .row > div:last-child {
+  text-align: right;
+}
+
+#login-form .form-group.bottom p {
+  margin: 6px 0px 0px;
+  text-align: center;
+}
+
+#login-form .form-group.bottom #btt-fb {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}

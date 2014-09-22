@@ -1,0 +1,22 @@
+{% extends "ui/base_menu_client.html" %}
+{% block content_class %}menu b{% endblock %}
+
+{% block exam_button %}
+  <div class="btn-exam">
+    <table cellpadding="0" cellspacing="0">
+      <tr><td colspan="2" id="it"></td></tr>
+      <tr style="height:30px">
+        <td id="fr"></td>
+        <td id="de"></td>
+      </tr>
+    </table>
+  </div>
+{% endblock %}
+
+{%- block page_script %}
+  {{ super() }}
+  $(".btn-exam td").click(function(){
+    var lang = $(this).attr("id");
+    window.location = "{{ url_for('.client_exam') }}?lang=" + lang;
+  });
+{% endblock %}

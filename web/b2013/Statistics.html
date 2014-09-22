@@ -189,8 +189,9 @@
 		else
 			urlstat = url("/v1/student/me/exam");
 			
-		$.getJSON(urlstat, function(data) {
+		$.getJSON(urlstat).always(function(data) {
 			if (data.status != 200) {
+                data = JSON.parse(data.responseText);
                 WaitMsg.hide();
                 // Means: probably no student activity
                 if (data.description == "Unknown student.")
@@ -215,8 +216,9 @@
 			else
 				urlstat = url("/v1/student/me");
 				
-			$.getJSON(urlstat, data, function(data) {
+			$.getJSON(urlstat, data).always(function(data) {
 				if (data.status != 200) {
+                    data = JSON.parse(data.responseText);
 					WaitMsg.hide();
                     // Means: probably no student activity
                     if (data.description == "Unknown student.")
@@ -294,7 +296,7 @@
 					else
 						urlstat = url("/v1/student/me/topicerrors/" + $(this).attr('id'));
 						
-					$.getJSON(urlstat, data, function(data) {
+					$.getJSON(urlstat, data).always(function(data) {
 						if (data.status != 200) {
 							WaitMsg.hide();
                             var user = sessionStorage.getItem('quizutype');
@@ -337,9 +339,6 @@
                             html += '</div></li>';
 						}
                         $("#topicerrorlist ul").append(html);
-					})
-					.error(function(data) {
-						aux_showError(data.responseText, data.status);
 					});
 					
 					$('#topicerrorlist #back').click(function(){
@@ -359,16 +358,8 @@
                 $("#month").hide();
                 $("#all").hide();
                 // $("#total").hide();
-			})
-			.error(function(data) {
-				WaitMsg.hide();
-				aux_showError(data.responseText, data.status);
 			});				
 				
-		})
-		.error(function(data) {
-			WaitMsg.hide();
-			aux_showError(data.responseText, data.status);
 		});
 			
 		$("#wexamgraph").click(function(){			
@@ -483,7 +474,7 @@
 				data = {};
 				data.lang = "it";
 				
-				$.getJSON(url("/v1/exam/" + $(this).attr('id')), function(data) {
+				$.getJSON(url("/v1/exam/" + $(this).attr('id'))).always(function(data) {
 					if (data.status != 200) {
 						WaitMsg.hide();
                         var user = sessionStorage.getItem('quizutype');

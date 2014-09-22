@@ -23,7 +23,7 @@ class SchoolMixin(object):
         IFNULL((SELECT avg(err_percent) FROM school_topic_err_snapshot WHERE
            school_id=:school_id AND quiz_type=t.quiz_type AND topic_id = t.id
            AND
-           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 28 DAY)
+           DATE(now_date) BETWEEN DATE(UTC_TIMESTAMP() - INTERVAL 62 DAY)
            AND DATE(UTC_TIMESTAMP() - INTERVAL 8 DAY)
            GROUP BY topic_id), -1) week3
         FROM topics t WHERE quiz_type=:quiz_type;""")

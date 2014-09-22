@@ -39,38 +39,38 @@ class HttpAccessTest(HttpStatusTest):
 
     # Check: unauthorized access to the API
     def test_noauth(self):
-        self.assertHttp_Unauthorized(http_get('/quiz/1'))
-        self.assertHttp_Unauthorized(http_post('/quiz/1'))
+        self.assertHttp_Forbidden(http_get('/quiz/1'))
+        self.assertHttp_Forbidden(http_post('/quiz/1'))
 
-        self.assertHttp_Unauthorized(http_get('/student'))
-        self.assertHttp_Unauthorized(http_get('/student/me'))
-        self.assertHttp_Unauthorized(http_get('/student/12'))
+        self.assertHttp_Forbidden(http_get('/student'))
+        self.assertHttp_Forbidden(http_get('/student/me'))
+        self.assertHttp_Forbidden(http_get('/student/12'))
 
-        self.assertHttp_Unauthorized(http_get('/errorreview'))
-        self.assertHttp_Unauthorized(http_post('/errorreview'))
+        self.assertHttp_Forbidden(http_get('/errorreview'))
+        self.assertHttp_Forbidden(http_post('/errorreview'))
 
-        self.assertHttp_Unauthorized(http_get('/exam'))
-        self.assertHttp_Unauthorized(http_get('/exam/1'))
-        self.assertHttp_Unauthorized(http_post('/exam/1'))
+        self.assertHttp_Forbidden(http_get('/exam'))
+        self.assertHttp_Forbidden(http_get('/exam/1'))
+        self.assertHttp_Forbidden(http_post('/exam/1'))
 
-        self.assertHttp_Unauthorized(http_get('/student/me/exam'))
-        self.assertHttp_Unauthorized(http_get('/student/1/exam'))
+        self.assertHttp_Forbidden(http_get('/student/me/exam'))
+        self.assertHttp_Forbidden(http_get('/student/1/exam'))
 
-        self.assertHttp_Unauthorized(http_get('/student/me/topicerrors/1'))
-        self.assertHttp_Unauthorized(http_get('/student/1/topicerrors/1'))
+        self.assertHttp_Forbidden(http_get('/student/me/topicerrors/1'))
+        self.assertHttp_Forbidden(http_get('/student/1/topicerrors/1'))
 
-        self.assertHttp_Unauthorized(http_get('/admin/schools'))
-        self.assertHttp_Unauthorized(http_post('/admin/newschool'))
-        self.assertHttp_Unauthorized(http_del('/admin/school/1'))
-        self.assertHttp_Unauthorized(http_post('/admin/school/1'))
+        self.assertHttp_Forbidden(http_get('/admin/schools'))
+        self.assertHttp_Forbidden(http_post('/admin/newschool'))
+        self.assertHttp_Forbidden(http_del('/admin/school/1'))
+        self.assertHttp_Forbidden(http_post('/admin/school/1'))
 
-        self.assertHttp_Unauthorized(http_get('/school/me/students'))
-        self.assertHttp_Unauthorized(http_get('/school/1/students'))
-        self.assertHttp_Unauthorized(http_post('/school/me/newstudent'))
-        self.assertHttp_Unauthorized(http_post('/school/1/newstudent'))
-        self.assertHttp_Unauthorized(http_del('/school/1/student/1'))
-        self.assertHttp_Unauthorized(http_del('/school/me/student/1'))
-        self.assertHttp_Unauthorized(http_post('/school/1/student/1'))
+        self.assertHttp_Forbidden(http_get('/school/me/students'))
+        self.assertHttp_Forbidden(http_get('/school/1/students'))
+        self.assertHttp_Forbidden(http_post('/school/me/newstudent'))
+        self.assertHttp_Forbidden(http_post('/school/1/newstudent'))
+        self.assertHttp_Forbidden(http_del('/school/1/student/1'))
+        self.assertHttp_Forbidden(http_del('/school/me/student/1'))
+        self.assertHttp_Forbidden(http_post('/school/1/student/1'))
 
     ### Test access privileges
 
@@ -204,7 +204,7 @@ class HttpAccessTest(HttpStatusTest):
         # student from another school (school guest)
         self.assertHttp_Forbidden(req.get(url('/student/2/exam')))
 
-        self.assertHttp_NotForbidden(req.get(url('/student/me/topicerrors/1')))
+        self.assertHttp_Forbidden(req.get(url('/student/me/topicerrors/1')))
         self.assertHttp_NotForbidden(req.get(url('/student/1/topicerrors/1')))
 
         self.assertHttp_Forbidden(req.get(url('/student/2/topicerrors/1')))
@@ -229,22 +229,20 @@ class HttpAccessTest(HttpStatusTest):
         self.assertHttp_Forbidden(req.get(url('/quiz/1')))
         self.assertHttp_Forbidden(req.post(url('/quiz/1')))
 
-        self.assertHttp_Forbidden(req.get(url('/student')))
-        #self.assertHttp_Forbidden(req.get(url('/student/me')))
-        self.assertHttp_Forbidden(req.get(url('/student/1')))
-        self.assertHttp_Forbidden(req.get(url('/student/2')))
+        self.assertHttp_Ok(req.get(url('/student/1')))
+        self.assertHttp_Ok(req.get(url('/student/2')))
 
         self.assertHttp_Forbidden(req.get(url('/errorreview')))
         self.assertHttp_Forbidden(req.post(url('/errorreview')))
 
         self.assertHttp_Forbidden(req.get(url('/exam')))
-        self.assertHttp_Forbidden(req.get(url('/exam/1')))
-        self.assertHttp_Forbidden(req.post(url('/exam/1')))
+        #self.assertHttp_Forbidden(req.get(url('/exam/1')))
+        #self.assertHttp_Forbidden(req.post(url('/exam/1')))
 
-        self.assertHttp_Forbidden(req.get(url('/student/1/exam')))
-        self.assertHttp_Forbidden(req.get(url('/student/2/exam')))
+        self.assertHttp_NotForbidden(req.get(url('/student/1/exam')))
+        self.assertHttp_NotForbidden(req.get(url('/student/2/exam')))
 
-        self.assertHttp_Forbidden(req.get(url('/student/1/topicerrors/1')))
+        self.assertHttp_NotForbidden(req.get(url('/student/1/topicerrors/1')))
 
         self.assertHttp_Ok(req.get(url('/admin/schools')))
         self.assertHttp_NotForbidden(req.post(url('/admin/newschool')))

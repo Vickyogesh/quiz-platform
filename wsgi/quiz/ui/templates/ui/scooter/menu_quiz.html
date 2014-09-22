@@ -1,0 +1,77 @@
+{% extends "ui/base_menu_quiz.html" %}
+{% block content_class %}quiz-menu scooter{% endblock %}
+
+{% block styles %}
+{{super()}}
+  <style type="text/css">
+    #topics .row {
+      height: 60px;
+      min-height: 60px;
+    }
+    #topics .col-md-6 {
+      display: table;
+      height: 100%;
+      cursor: pointer;
+      color: #fff;
+      text-decoration: none;
+    }
+    #topics .col-md-6 > div {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 6px;
+    }
+    .area8 {background: #0acd9b;}
+    .area8:hover {background: #09bd8f;}
+
+    .area9 {background: #3b5865;}
+    .area9:hover {background: #354f5a;}
+
+    .area10 {background: #1182df;}
+    .area10:hover {background: #1079cf;}
+  </style>
+{% endblock %}
+
+{% block panel_content %}
+  <div class="topics" id="topics">
+    <div class="row">
+      <a class="col-md-6 area1" href="{{ url_for('.client_quiz', topic=1) }}">
+        <div>Segnali di pericolo</div>
+      </a>
+      <a class="col-md-6 area2" href="{{ url_for('.client_quiz', topic=2) }}">
+        <div>Segnali di divieto, segnali di obbligo, segnali di precedenza</div>
+      </a>
+    </div>
+    <div class="row">
+      <a class="col-md-6 area3" href="{{ url_for('.client_quiz', topic=3) }}">
+        <div>Pannelli integrativi, segnali di indicazione, segnali luminosi, segnali orizzontali</div>
+      </a>
+      <a class="col-md-6 area4" href="{{ url_for('.client_quiz', topic=4) }}">
+        <div>Norme sulla precedenza</div>
+      </a>
+    </div>
+    <div class="row">
+      <a class="col-md-6 area5" href="{{ url_for('.client_quiz', topic=5) }}">
+        <div>Velocità, distanza di sicurezza, sorpasso, svolta, cambio di corsia, cambio di direzione</div>
+      </a>
+      <a class="col-md-6 area6" href="{{ url_for('.client_quiz', topic=6) }}">
+        <div>Fermata, sosta, definizioni stradali</div>
+      </a>
+    </div>
+    <div class="row">
+      <a class="col-md-6 area7" href="{{ url_for('.client_quiz', topic=7) }}">
+        <div>Cause di incidenti, assicurazione</div>
+      </a>
+      <a class="col-md-6 area8" href="{{ url_for('.client_quiz', topic=8) }}">
+        <div>Elementi del ciclomotore e loro uso, casco</div>
+      </a>
+    </div>
+    <div class="row">
+      <a class="col-md-6 area9" href="{{ url_for('.client_quiz', topic=9) }}">
+        <div>Comportamenti alla guida del ciclomotore</div>
+      </a>
+      <a class="col-md-6 area10" href="{{ url_for('.client_quiz', topic=10) }}">
+        <div>Educazione alla legalità</div>
+      </a>
+    </div>
+  </div>
+{% endblock %}

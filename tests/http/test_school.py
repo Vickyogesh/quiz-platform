@@ -55,14 +55,14 @@ class HttpSchoolTest(unittest.TestCase):
     def test_newStudentBad(self):
         # Check: not a json
         r = self.req.post(url('/school/me/newstudent'))
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Not a JSON.', data['description'])
 
         # Check: empty json
         r = self.req.post(url('/school/me/newstudent'), data='{}', headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -71,21 +71,21 @@ class HttpSchoolTest(unittest.TestCase):
 
         data = json.dumps({'name': '2'})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': '2', 'login': '22'})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': '2', 'login': '22', 'surname': ''})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -94,14 +94,14 @@ class HttpSchoolTest(unittest.TestCase):
 
         data = json.dumps({'name': '', 'surname': '', 'login': '', 'passwd': ''})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
 
         data = json.dumps({'name': [], 'surname': '', 'login': '', 'passwd': ''})
         r = self.req.post(url('/school/me/newstudent'), data=data, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid parameters.', data['description'])
@@ -135,7 +135,7 @@ class HttpSchoolTest(unittest.TestCase):
         self.assertEqual(5, data['id'])
 
         r = self.req.post(url('/school/me/newstudent'), data=student, headers=self.headers)
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Already exists.', data['description'])
@@ -144,14 +144,14 @@ class HttpSchoolTest(unittest.TestCase):
     def test_delStudentBad(self):
         # Check: malformed request (no action param)
         r = self.req.post(url('/school/1/student/1'), data='{}')
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid action.', data['description'])
 
         # Check: malformed request (send some post data)
         r = self.req.post(url('/school/1/student/1?action=delete'), data='{}')
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(400, r.status_code)
         data = r.json()
         self.assertEqual(400, data['status'])
         self.assertEqual('Invalid request.', data['description'])
@@ -175,7 +175,7 @@ class HttpSchoolTest(unittest.TestCase):
         # TODO: check me!
         # Check: delete student from another school
         r = self.req.delete(url('/school/me/student/2'))
-        self.assertEqual(200, r.status_code)
+        self.assertEqual(403, r.status_code)
         data = r.json()
         self.assertEqual(403, data['status'])
         self.assertEqual('Forbidden.', data['description'])
