@@ -64,6 +64,11 @@ from . import babel
 from . import index
 from . import school
 from . import client
+from . import util
 
 school.register_views(ui)
 client.register_views(ui)
+
+@ui.route('/policy')
+def policy():
+    return util.render_template('ui/policy.html')
