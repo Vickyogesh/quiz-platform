@@ -245,6 +245,7 @@ class StatisticsExamsModel(StatisticsBaseModel):
     May be used for each quiz type without changes.
     """
     template = 'ui/statistics_client_exams.html'
+    num_exam_questions = 40
 
     def on_request(self, uid, range):
         user_id = get_user_id(uid)
@@ -253,7 +254,6 @@ class StatisticsExamsModel(StatisticsBaseModel):
 
         self.check(user_id, info['student']['school_id'])
 
-        total = 40  # TODO: some quizzes has different value
         range_exams = exams.get(range)
         if range_exams is None:
             range_exams = exams['week3']
@@ -264,5 +264,5 @@ class StatisticsExamsModel(StatisticsBaseModel):
             'exam': url_for('api.get_exam_info', id=0)[:-1],
             'image': url_for('img_file', filename='')
         }
-        return self.render(exams=range_exams, total=total)
+        return self.render(exams=range_exams, total=self.num_exam_questions)
 
