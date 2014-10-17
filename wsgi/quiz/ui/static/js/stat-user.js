@@ -1,5 +1,7 @@
 (function() {
     var exam_list;
+    var num_exam_questions;
+    var max_exam_errors;
 
     function update_topics(range) {
         $(".tablerow .cell .chart").each(function() {
@@ -37,6 +39,8 @@
         var examY = [];
         var count = 0;
 
+        var pass_limit = num_exam_questions - max_exam_errors;
+
         if (key == "all") {
             data = [].concat(exam_list['week3'], exam_list['week'],
                 exam_list['current']);
@@ -48,7 +52,7 @@
             if (data[i].status != "passed" && data[i].status != "failed")
                 continue;
             examX.push(count);
-            examY.push(40 - data[i].errors);
+            examY.push(num_exam_questions - data[i].errors);
             count++;
         }
 
@@ -59,9 +63,10 @@
         var p = Raphael(id, w, h);
         p.setViewBox(0, 0, w, h, true);
 
+
         p = p.linechart(10, 0, w - 12, h - 10,
             [examX, [0, count]],
-            [examY, [36, 36], [0, 40]], {
+            [examY, [pass_limit, pass_limit], [0, num_exam_questions]], {
                 symbol: ["circle"],
                 axis: "0 0 1 1",
                 axisxstep: examX.length || 2,
@@ -117,8 +122,10 @@
         update_stat(current_range);
     }
 
-    UserStat = function(exam_data) {
+    UserStat = function(exam_data, num_questions, max_errors) {
         exam_list = exam_data;
+        num_exam_questions = num_questions;
+        max_exam_errors = max_errors;
         update_stat(current_range);
         $(".navbar-nav li").click(on_history_range);
 

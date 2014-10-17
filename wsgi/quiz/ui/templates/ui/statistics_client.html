@@ -47,6 +47,6 @@
 {% block page_script %}
   {%- if exams %}
     window.g.exam_url = "{{ url_for('.client_statistics_exams', uid=uid, range='') }}";
-    UserStat({{ exams.exams|tojson }});
+    UserStat({{ exams.exams|tojson }}, {{ exam_meta.num_questions }}, {{ exam_meta.max_errors }});
   {% endif -%}
 {% endblock%}

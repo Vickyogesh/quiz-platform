@@ -1,5 +1,7 @@
 from ..page import PagesMetadata
-from .models import MenuModel, QuizMenuModel, ExamModel
+from .models import MenuModel, QuizMenuModel, ExamModel, StatisticsModel
+
+exam_meta = {'max_errors': 4, 'total_time': 1800, 'num_questions': 40}
 
 
 class BModel(MenuModel):
@@ -12,7 +14,11 @@ class BQuizMenuModel(QuizMenuModel):
 
 class BExamModel(ExamModel):
     template = 'ui/b/exam.html'
-    exam_meta = {'max_errors': 4, 'total_time': 1800}
+    exam_meta = exam_meta
+
+
+class BStatisticsModel(StatisticsModel):
+    exam_meta = exam_meta
 
 
 class BPagesMetadata(PagesMetadata):
@@ -20,5 +26,6 @@ class BPagesMetadata(PagesMetadata):
     standard_page_models = {
         'menu': BModel,
         'menu_quiz': BQuizMenuModel,
-        'exam': BExamModel
+        'exam': BExamModel,
+        'stat': BStatisticsModel
     }

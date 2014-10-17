@@ -186,6 +186,7 @@ class StatisticsModel(StatisticsBaseModel):
     May be used for each quiz type without changes.
     """
     template = 'ui/statistics_client.html'
+    exam_meta = None
 
     # Back URL:
     # This is a workaround to correctly redirect to previous page.
@@ -219,7 +220,8 @@ class StatisticsModel(StatisticsBaseModel):
             exams = app.core.getExamList(self.page.quiz_id, user_id)
 
         self.page.urls = {'back': self.get_back_url()}
-        return self.render(client_stat=stat, exams=exams, uid=uid)
+        return self.render(client_stat=stat, exams=exams, uid=uid,
+                           exam_meta=self.exam_meta)
 
 
 class StatisticsTopicModel(StatisticsBaseModel):

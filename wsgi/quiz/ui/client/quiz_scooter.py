@@ -1,7 +1,8 @@
 from ..page import PagesMetadata
-from .models import QuizMenuModel, ExamModel, StatisticsExamsModel
+from .models import QuizMenuModel, ExamModel, StatisticsExamsModel, StatisticsModel
 from .quiz_b import BModel
 
+exam_meta = {'max_errors': 3, 'total_time': 1500, 'num_questions': 30}
 
 class ScooterModel(BModel):
     pass
@@ -13,11 +14,15 @@ class ScooterQuizMenuModel(QuizMenuModel):
 
 class ScooterExamModel(ExamModel):
     template = 'ui/scooter/exam.html'
-    exam_meta = {'max_errors': 3, 'total_time': 1500}
+    exam_meta = exam_meta
 
 
 class ScooterStatisticsExamsModel(StatisticsExamsModel):
-    num_exam_questions = 30
+    num_exam_questions = exam_meta['num_questions']
+
+
+class ScooterStatisticsModel(StatisticsModel):
+    exam_meta = exam_meta
 
 
 class ScooterPagesMetadata(PagesMetadata):
@@ -26,5 +31,6 @@ class ScooterPagesMetadata(PagesMetadata):
         'menu': ScooterModel,
         'menu_quiz': ScooterQuizMenuModel,
         'exam': ScooterExamModel,
-        'exam_stat': ScooterStatisticsExamsModel
+        'exam_stat': ScooterStatisticsExamsModel,
+        'stat': ScooterStatisticsModel
     }
