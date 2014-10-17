@@ -126,7 +126,8 @@
 
         initialize: function() {
             this.question_image_a_el = this.$("#question_image");
-            this.question_image_el = this.question_image_a_el.find("img");
+            this.question_image_num_el = this.$("#question_image_num");
+            this.question_image_num_span_el = this.question_image_num_el.find("span");
 
             this.switch_view = new AnswersSwitchView({
                 el: this.$("form.navbar-form")
@@ -177,13 +178,18 @@
             });
         },
 
-        _setImage: function(url) {
-            if (url === undefined || url === null)
+        _setImage: function(url, q) {
+            if (url === undefined || url === null) {
                 this.question_image_a_el.hide();
+                this.question_image_num_el.hide();
+            }
             else {
                 this.question_image_a_el.attr("href", url);
                 this.question_image_a_el.css("background-image", "url(" + url + ")");
+
+                this.question_image_num_span_el.html(q.get("image"));
                 this.question_image_a_el.show();
+                this.question_image_num_el.show();
             }
         },
 
@@ -323,7 +329,8 @@
             this._setQuestions(this.model.getBottomQuestions(), this.bottom_rows);
             var question = this.model.getCurrentQuestion();
             this.active_row.setModel(question);
-            this._setImage(this.model.getCurrentQuestionImage());
+            this._setImage(this.model.getCurrentQuestionImage(),
+                this.model.getCurrentQuestion());
         },
 
         onModelSaveError: function(response, ok_callback) {

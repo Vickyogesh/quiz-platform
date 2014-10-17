@@ -1,5 +1,5 @@
 import re
-from flask import session, request
+from flask import session, request, current_app
 from flask.views import View
 from .util import render_template, check_access
 from .. import access
@@ -268,6 +268,7 @@ class PageView(View):
         kwargs['quiz_fullname'] = self.quiz_fullname
         kwargs['lang'] = self.lang
         kwargs['user'] = access.current_user
+        kwargs['fb_appid'] = current_app.config['FACEBOOK_APP_ID']
         if self.urls is not None:
             kwargs['urls'] = self.urls
         return render_template(self.template, **kwargs)

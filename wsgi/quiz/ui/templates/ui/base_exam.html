@@ -4,7 +4,7 @@
 
 {% block body %}
   {% if user.account.fb_id %}
-  {{ fb.async_init() }}
+  {{ fb.async_init(fb_appid) }}
   {% endif %}
   {{ super() }}
 {% endblock %}

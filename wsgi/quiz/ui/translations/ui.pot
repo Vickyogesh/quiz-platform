@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-04 22:43+0700\n"
+"POT-Creation-Date: 2014-10-17 15:28+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,6 +237,10 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_quiz.html:28
 msgid "No"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:44
+msgid "Img."
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/common_exam_review.html:3

@@ -82,6 +82,7 @@
         error: "{{ _('Error') }}"
       }
     };
+    moment.locale("{{ current_lang }}");
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;
     {%- block page_script %} {% endblock %}

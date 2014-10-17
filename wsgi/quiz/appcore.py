@@ -140,4 +140,4 @@ class Application(Flask):
         # Inject current language to the template context.
         @self.context_processor
         def inject_lang():
-            return dict(curent_lang=get_locale().language)
+            return dict(current_lang=get_locale().language)

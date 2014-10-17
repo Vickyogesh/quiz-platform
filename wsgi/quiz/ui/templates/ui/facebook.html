@@ -1,17 +1,17 @@
-{% macro async_init(callback=None) -%}
+{% macro async_init(appid, callback=None) -%}
   <div id="fb-root"></div>
   <script>
     window.fbAsyncInit = function() {
       FB.init({
-        appId      : '306969962800273',
+        appId      : '{{ appid }}',
         xfbml      : true,
         status     : true,
         version    : 'v2.0'
       });
 
-      {% if callback %}
+      {%- if callback %}
       {{ callback }}();
-      {% endif %}
+      {% endif -%}
     };
 
     (function(d, s, id){

@@ -23,7 +23,7 @@
       }, {scope: 'publish_actions'});
     }
   </script>
-  {{ fb.async_init(callback='dologin' if fb_autologin else None) }}
+  {{ fb.async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
   {{ super() }}
 {% endblock %}
 

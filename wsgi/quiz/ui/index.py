@@ -104,11 +104,13 @@ def index(quiz_fullname):
         else:
             return after_login()
 
+    fb_appid = app.config['FACEBOOK_APP_ID']
     quiz_name, _, _ = quiz_name_parts(quiz_fullname)
     return render_template('ui/index.html', form=form,
                            quiz_fullname=quiz_fullname,
                            quiz_name=quiz_name,
-                           fb_autologin=fb_autologin)
+                           fb_autologin=fb_autologin,
+                           fb_appid=fb_appid)
 
 
 @ui.route('/logout')

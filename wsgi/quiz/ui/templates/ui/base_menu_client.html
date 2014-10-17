@@ -6,7 +6,7 @@
 {% block content_class %}menu{% endblock %}
 
 {% block body %}
-  {{ fb.async_init() }}
+  {{ fb.async_init(fb_appid) }}
   {{ super() }}
 {% endblock %}
 

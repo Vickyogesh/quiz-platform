@@ -1,5 +1,5 @@
 from ..page import PagesMetadata
-from .models import QuizMenuModel, ExamModel
+from .models import QuizMenuModel, ExamModel, StatisticsExamsModel
 from .quiz_b import BModel
 
 
@@ -16,10 +16,15 @@ class ScooterExamModel(ExamModel):
     exam_meta = {'max_errors': 3, 'total_time': 1500}
 
 
+class ScooterStatisticsExamsModel(StatisticsExamsModel):
+    num_exam_questions = 30
+
+
 class ScooterPagesMetadata(PagesMetadata):
     name = 'scooter'
     standard_page_models = {
         'menu': ScooterModel,
         'menu_quiz': ScooterQuizMenuModel,
-        'exam': ScooterExamModel
+        'exam': ScooterExamModel,
+        'exam_stat': ScooterStatisticsExamsModel
     }
