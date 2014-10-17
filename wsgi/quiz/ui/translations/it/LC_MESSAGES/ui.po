@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-04 22:43+0700\n"
-"PO-Revision-Date: 2014-10-04 22:43+0600\n"
+"POT-Creation-Date: 2014-10-17 14:49+0700\n"
+"PO-Revision-Date: 2014-10-17 14:49+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -239,6 +239,10 @@ msgstr "Sì"
 #: wsgi/quiz/ui/templates/ui/base_quiz.html:28
 msgid "No"
 msgstr "No"
+
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:44
+msgid "Img."
+msgstr "Fig."
 
 #: wsgi/quiz/ui/templates/ui/common_exam_review.html:3
 #: wsgi/quiz/ui/templates/ui/common_exam_review.html:8
