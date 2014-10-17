@@ -15,6 +15,8 @@ css_filter = 'yui_css'
 base_js = Bundle('ui/js/libs/sprintf.min.js',
                  'ui/js/libs/jquery.colorbox-min.js',
                  'ui/js/libs/jquery.mousewheel.min.js',
+                 'ui/js/libs/moment.min.js',
+                 'ui/js/libs/moment.langs.js',
                  'ui/js/common.js', 'ui/js/expressbar.js',
                  'ui/js/fbsupport.js',
                  filters=js_filter, output='ui/gen/base.js')

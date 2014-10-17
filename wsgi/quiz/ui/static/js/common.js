@@ -27,7 +27,7 @@
         },
         // See dateFromISOUTC()
         strFromISOUTC: function(text) {
-            return Aux.dateFromISOUTC(text).toLocaleString();
+            return moment(Aux.dateFromISOUTC(text)).format("LL LT");
         },
 
         showError: function(msg, callback) {
