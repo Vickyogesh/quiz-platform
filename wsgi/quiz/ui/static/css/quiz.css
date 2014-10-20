@@ -87,6 +87,7 @@ li.area7:hover {background: #ac4242;}
   border-collapse: inherit;
   border-spacing: 6px;
   color: #fff;
+  width: 98%;
 }
 
 .topics .slides .page table td {
