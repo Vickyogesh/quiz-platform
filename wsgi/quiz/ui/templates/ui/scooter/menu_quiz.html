@@ -1,77 +1,97 @@
 {% extends "ui/base_menu_quiz.html" %}
 {% block content_class %}quiz-menu scooter{% endblock %}
 
-{% block styles %}
-{{super()}}
-  <style type="text/css">
-    #topics .row {
-      height: 60px;
-      min-height: 60px;
-    }
-    #topics .col-md-6 {
-      display: table;
-      height: 100%;
-      cursor: pointer;
-      color: #fff;
-      text-decoration: none;
-    }
-    #topics .col-md-6 > div {
-      display: table-cell;
-      vertical-align: middle;
-      padding: 6px;
-    }
-    .area8 {background: #0acd9b;}
-    .area8:hover {background: #09bd8f;}
+{% block head -%}
+  {{ super() }}
+  <style>
+    .area1 {background: #00ae00;}
+    li.area1:hover {background: #009d00;}
 
-    .area9 {background: #3b5865;}
-    .area9:hover {background: #354f5a;}
+    .area2 {background: #9966cc;}
+    li.area2:hover {background: #9159c8;}
 
-    .area10 {background: #1182df;}
-    .area10:hover {background: #1079cf;}
+    .area3 {background: #004586;}
+    li.area3:hover {background: #003c75;}
+
+    .area4 {background: #d11a6f;}
+    li.area4:hover {background: #b3165f;}
+
+    .area5 {background: #ff6633;}
+    li.area5:hover {background: #ff4d11;}
+
+    .area6 {background: #1eaade;}
+    li.area6:hover {background: #1a93c0;}
   </style>
 {% endblock %}
 
 {% block panel_content %}
-  <div class="topics" id="topics">
-    <div class="row">
-      <a class="col-md-6 area1" href="{{ url_for('.client_quiz', topic=1) }}">
-        <div>Segnali di pericolo</div>
-      </a>
-      <a class="col-md-6 area2" href="{{ url_for('.client_quiz', topic=2) }}">
-        <div>Segnali di divieto, segnali di obbligo, segnali di precedenza</div>
-      </a>
-    </div>
-    <div class="row">
-      <a class="col-md-6 area3" href="{{ url_for('.client_quiz', topic=3) }}">
-        <div>Pannelli integrativi, segnali di indicazione, segnali luminosi, segnali orizzontali</div>
-      </a>
-      <a class="col-md-6 area4" href="{{ url_for('.client_quiz', topic=4) }}">
-        <div>Norme sulla precedenza</div>
-      </a>
-    </div>
-    <div class="row">
-      <a class="col-md-6 area5" href="{{ url_for('.client_quiz', topic=5) }}">
-        <div>Velocità, distanza di sicurezza, sorpasso, svolta, cambio di corsia, cambio di direzione</div>
-      </a>
-      <a class="col-md-6 area6" href="{{ url_for('.client_quiz', topic=6) }}">
-        <div>Fermata, sosta, definizioni stradali</div>
-      </a>
-    </div>
-    <div class="row">
-      <a class="col-md-6 area7" href="{{ url_for('.client_quiz', topic=7) }}">
-        <div>Cause di incidenti, assicurazione</div>
-      </a>
-      <a class="col-md-6 area8" href="{{ url_for('.client_quiz', topic=8) }}">
-        <div>Elementi del ciclomotore e loro uso, casco</div>
-      </a>
-    </div>
-    <div class="row">
-      <a class="col-md-6 area9" href="{{ url_for('.client_quiz', topic=9) }}">
-        <div>Comportamenti alla guida del ciclomotore</div>
-      </a>
-      <a class="col-md-6 area10" href="{{ url_for('.client_quiz', topic=10) }}">
-        <div>Educazione alla legalità</div>
-      </a>
-    </div>
+  <div class="topics row" id="topics">
+    <div class="col-xs-4 areas"><ul></ul></div>
+    <div class="col-xs-8 slides"></div>
   </div>
+
+  <script type="text/template" id="area-tmpl"><span><%= text %></span></script>
+
+  <script type="text/template" id="page-tmpl">
+    <div class="page-wrapper">
+      <div class="page-content">
+        <table><%= rows %></table>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="chapter-tmpl">
+    <tr><td width="30%" style="text-align:right">{{ _('Chapter') }} <%= chapter_id %></td><td><a href="<%= topic_url %>"><%= topic_text %></a></td></tr>
+  </script>
+
+  <script type="text/template" id="topic-tmpl">
+    <tr><td></td><td><a href="<%= topic_url %>"><%= topic_text %></a></td></tr>
+  </script>
+
 {% endblock %}
+
+{% block page_script %}
+  var menu = new QuizMenuView({
+    el: $("#topics"),
+    urls: {{ urls|tojson }},
+    topics: [
+      "Segnali di pericolo",
+      "Segnali di precedenza",
+      "Segnali di divieto",
+      "Segnali di obbligo",
+      "Segnali di indicazione",
+      "Pannelli integrativi",
+      "Segnali orizzontali",
+      "Segnali luminosi",
+      "Segnali complementari",
+      "Segnali temporanei",
+      "Precedenza (esemplificazioni)",
+      "Velocità",
+      "Distanza di sicurezza",
+      "Cambio di corsia, cambio di direzione, svolta",
+      "Sorpasso",
+      "Fermata, sosta, parcheggio",
+      "Definizioni stradali",
+      "Cause di incidenti",
+      "Conoscenze utili per la prevenzione degli incidenti",
+      "Assicurazione",
+      "Elementi del ciclomotore e loro uso",
+      "Casco",
+      "Documenti",
+      "Comportamenti alla guida del ciclomotore",
+      "Responsabilità civile e penale",
+      "Educazione alla legalità",
+      "Rispetto della vita e comportamento solidale",
+      "Salute del conducente",
+      "Rispetto dell'ambiente"
+    ],
+    areas: [
+        {text: "Segnaletica", chapters: [[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]]},
+        {text: "Norme di comportamento per la circolazione sulla strada", chapters: [[11], [12, 13, 14, 15], [16, 17]]},
+        {text: "Sicurezza e prevenzione degli incidenti", chapters: [[18, 19, 20]]},
+        {text: "Funzionamento, efficienza e uso del ciclomotore e loro uso", chapters: [[21, 22]]},
+        {text: "Documenti obbligatori e regole di comportamento", chapters: [[23, 24]]},
+        {text: "Valore e necessità della regola", chapters: [[25, 26, 27, 28, 29]]}
+    ]
+  });
+{% endblock%}
