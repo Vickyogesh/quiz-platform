@@ -1,4 +1,4 @@
 #!/bin/bash
 # TODO: django cartridge doesn't run stop script
-echo "pre build!"
-#$OPENSHIFT_REPO_DIR/.openshift/action_hooks/stop
+$OPENSHIFT_REPO_DIR/.openshift/action_hooks/stop
+echo "---"

@@ -1,0 +1,4 @@
+#!/bin/bash
+# TODO: django cartridge doesn't run start script
+$OPENSHIFT_REPO_DIR/.openshift/action_hooks/start
+echo "---"
