@@ -1,0 +1,24 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+if [ ! -d $OPENSHIFT_DATA_DIR/collectd ]; then
+    echo "Installing collectd stuff."
+
+    rm -rf $OPENSHIFT_DATA_DIR/build_cd
+    mkdir $OPENSHIFT_DATA_DIR/build_cd
+    cd $OPENSHIFT_DATA_DIR/build_cd
+
+    wget https://collectd.org/files/collectd-5.4.1.tar.bz2
+    tar jxf collectd-5.4.1.tar.bz2
+    cd collectd-5.4.1
+    ./configure --prefix=$OPENSHIFT_DATA_DIR/collectd
+    make all install
+
+    cd $OPENSHIFT_DATA_DIR
+    rm -rf $OPENSHIFT_DATA_DIR/build_cd
+else
+    echo "Skip collectd install."
+fi

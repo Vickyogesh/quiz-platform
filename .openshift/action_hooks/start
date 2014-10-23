@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Starting collectd..."
+$OPENSHIFT_DATA_DIR/collectd/sbin/collectd

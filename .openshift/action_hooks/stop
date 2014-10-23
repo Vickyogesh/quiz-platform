@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Stopping collectd..."
+kill `cat $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid`
