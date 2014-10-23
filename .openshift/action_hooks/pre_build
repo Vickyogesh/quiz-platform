@@ -1,0 +1,3 @@
+#!/bin/bash
+# TODO: django cartridge doesn't run stop script
+$OPENSHIFT_REPO_DIR/.openshift/action_hooks/stop
