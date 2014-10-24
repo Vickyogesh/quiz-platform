@@ -1,6 +1,6 @@
 #!/bin/bash
 
-host="${COLLECTD_HOSTNAME}"
+host="${COLLECTD_HOSTNAME:-quiz}"
 pause="${COLLECTD_INTERVAL:-10}"
 
 # old way:
