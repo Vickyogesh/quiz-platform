@@ -23,9 +23,9 @@ do
     usage=${data[1]}
     limit=${data[3]}
     percentage=$(echo "(${usage}/${limit})*100" |bc -l|sed 's/^\./0./')
-    echo "PUTVAL $host/disk/usage interval=${pause} ${time}:${usage}"
-    echo "PUTVAL $host/disk/limit interval=${pause} ${time}:${limit}"
-    echo "PUTVAL $host/disk/percentage interval=${pause} ${time}:${percentage/\.*}"
-    echo "PUTVAL $host/memory/usage interval=${pause} ${time}:${mem[0]/\.*}"
-    echo "PUTVAL $host/memory/usage_max interval=${pause} ${time}:${mem[1]/\.*}"
+    echo "PUTVAL $host/disk/bytes-usage interval=${pause} ${time}:${usage}"
+    echo "PUTVAL $host/disk/bytes-limit interval=${pause} ${time}:${limit}"
+    echo "PUTVAL $host/disk/percent-usage interval=${pause} ${time}:${percentage/\.*}"
+    echo "PUTVAL $host/memory/percent-usage interval=${pause} ${time}:${mem[0]/\.*}"
+    echo "PUTVAL $host/memory/percent-usage_max interval=${pause} ${time}:${mem[1]/\.*}"
 done
