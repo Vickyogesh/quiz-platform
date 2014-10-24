@@ -1,3 +1,6 @@
 #!/bin/bash
-echo "Stopping collectd..."
-kill `cat $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid`
+
+if [ -f $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid ]; then
+  echo "Stopping collectd..."
+  kill `cat $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid`
+fi
