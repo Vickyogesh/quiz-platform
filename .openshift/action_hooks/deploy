@@ -39,4 +39,4 @@ pybabel compile -d wsgi/quiz/ui/translations -D ui
 python manage.py assets build
 
 echo "Creating collectd.conf"
-expand_env_vars $OPENSHIFT_REPO_DIR/misc/collectd.conf $OPENSHIFT_DATA_DIR/collectd/etc/collectd.conf
+expand_env_vars $OPENSHIFT_REPO_DIR/misc/metrics/collectd.conf $OPENSHIFT_DATA_DIR/collectd/etc/collectd.conf
