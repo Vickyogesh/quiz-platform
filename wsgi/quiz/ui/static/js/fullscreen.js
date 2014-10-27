@@ -45,11 +45,14 @@
     }
 
     function onFullScreen() {
-        var p = $(document.getElementById('cframe').contentWindow.document.body).parent();
-        if (isFullscreen())
+        var iwin = document.getElementById('cframe').contentWindow;
+        var p = $(iwin.document.body).parent();
+        var state = isFullscreen();
+        if (state)
             p.addClass("is-fullscreen");
         else
             p.removeClass("is-fullscreen");
+        iwin.fireFullscreenChanged(state);
     }
 
     function applyListener(el) {

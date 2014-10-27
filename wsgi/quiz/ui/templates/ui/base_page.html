@@ -94,3 +94,13 @@
   });
 </script>
 {% endblock %}
+
+
+{% block head -%}
+  {{super()}}
+  <script>
+    function fireFullscreenChanged(state) {
+     $("html").trigger("fullscreenChanged", state);
+    }
+  </script>
+{% endblock %}
