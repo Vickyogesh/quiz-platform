@@ -58,7 +58,7 @@ class UserMixin(object):
                 AND DATE(UTC_TIMESTAMP() - INTERVAL 1 DAY) THEN 2
             ELSE 3 END)
             FROM exams WHERE user_id=:user_id AND quiz_type=:quiz_type
-            ORDER BY id""")
+            ORDER BY id DESC""")
 
         self.__topicerr = self.sql("""SELECT * FROM
             (SELECT * FROM questions WHERE topic_id=:topic_id AND

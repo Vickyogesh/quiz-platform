@@ -85,7 +85,28 @@
     moment.locale("{{ current_lang }}");
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;
+
+    if (!Aux.canFullscreen() || parent.FullScreen == undefined)
+      $("#btt-fullscreen").hide();
+    else
+      $("#btt-fullscreen").click(parent.FullScreen.toggle);
+
+    if (parent.FullScreen !== undefined)
+      parent.FullScreen.applyIFrameClass();
+
+    $("body > .container").show();
+
     {%- block page_script %} {% endblock %}
   });
 </script>
+{% endblock %}
+
+
+{% block head -%}
+  {{super()}}
+  <script>
+    function fireFullscreenChanged(state) {
+     $("html").trigger("fullscreenChanged", state);
+    }
+  </script>
 {% endblock %}

@@ -147,7 +147,25 @@
 
             $(window).resize(this.doResize.bind(this));
 
+            $("html").on("fullscreenChanged", this.updateGeom.bind(this));
+            this.updateGeom();
             this.showPage(1);
+        },
+
+        updateGeom: function(ev, state) {
+            var is_fullscreen = ev ? state : $("html").hasClass("is-fullscreen");
+            if (is_fullscreen) {
+                var html_h = $("html").height();
+                var top = this.$el.offset().top;
+                var fullscreen_height = html_h - top - 40;
+                var item_height = fullscreen_height / this.model.areas.length;
+                this.$el.find(".areas ul > li").css("height", item_height + "px");
+            }
+            else {
+                this.$el.find(".areas ul > li").removeAttr("style");
+            }
+            this.content_width = this.slides_el.width();
+            this.doResize();
         },
 
         render: function() {
@@ -194,7 +212,9 @@
 
             if (this.current !== null) {
                 var old_page = this.current;
-                old_page.animate({marginLeft: this.content_width});
+                old_page.animate({marginLeft: this.content_width}, {complete: function() {
+                    old_page.hide();
+                }});
                 page.animate({marginLeft: 0});
             }
             else

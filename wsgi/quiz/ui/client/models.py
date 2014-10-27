@@ -258,9 +258,9 @@ class StatisticsExamsModel(StatisticsBaseModel):
 
         range_exams = exams.get(range)
         if range_exams is None:
-            range_exams = exams['week3']
+            range_exams = exams['current']
             range_exams.extend(exams['week'])
-            range_exams.extend(exams['current'])
+            range_exams.extend(exams['week3'])
         self.page.urls = {
             'back': url_for('.client_statistics', uid=uid),
             'exam': url_for('api.get_exam_info', id=0)[:-1],

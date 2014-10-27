@@ -263,6 +263,46 @@
 
             this.model.set("index", 0);
             this.$("a.cbox").colorbox();
+
+            $("html").on("fullscreenChanged", this.updateGeom.bind(this));
+            this.updateGeom();
+        },
+
+        updateGeom: function(ev, state) {
+            var is_fullscreen = ev ? state : $("html").hasClass("is-fullscreen");
+
+            if (is_fullscreen) {
+                var html_h = $("html").height();
+
+                // "green rect" area height and top value.
+                var el = this.$("#exam-content");
+                var area_top = el.offset().top;
+                var area_height = el.outerHeight(true);
+
+                // center row height
+                el = this.$(".exam-data .row.question");
+                var row_eight = el.outerHeight(true);
+
+                // Calc fullscreen height
+                var fullscreen_height =
+                    row_eight + (html_h - area_height - area_top - 40);
+
+                el.find(".image").css("height", fullscreen_height + "px");
+
+                // Calc hegith of the exam text rect.
+                var margin = 5 * 2; // ".data .text-rect" margin * 2
+                var h1 = fullscreen_height
+                    - el.find(".answer-rect").outerHeight(true)
+                    - el.find(".data #number").outerHeight(true)
+                    - margin;
+
+                el.find(".data .text-rect").css("height", h1 + "px");
+            }
+            else {
+                var el = this.$(".exam-data .row.question");
+                el.find(".image").removeAttr("style");
+                el.find(".data .text-rect").removeAttr("style");
+            }
         },
 
         backToMenu: function() {
@@ -370,3 +410,4 @@
         }
     });
 })();
+

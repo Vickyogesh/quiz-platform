@@ -6,6 +6,15 @@
 
 source $OPENSHIFT_PYTHON_DIR/virtenv/bin/activate
 
+env | sed 's/[\%]/\\&/g;s/\([^=]*\)=\(.*\)/s%${\1}%\2%/' > $OPENSHIFT_TMP_DIR/sed.script
+
+function expand_env_vars() {
+    local SRC=$1
+    local DEST=$2
+    cat $SRC | sed -f $OPENSHIFT_TMP_DIR/sed.script > $DEST
+}
+
+
 if [ ! -d $OPENSHIFT_DATA_DIR/quiz ]; then
 echo "Creating quiz data dir..."
 mkdir $OPENSHIFT_DATA_DIR/quiz
@@ -28,3 +37,6 @@ fi
 cd $OPENSHIFT_REPO_DIR
 pybabel compile -d wsgi/quiz/ui/translations -D ui
 python manage.py assets build
+
+echo "Creating collectd.conf"
+expand_env_vars $OPENSHIFT_REPO_DIR/misc/metrics/collectd.conf $OPENSHIFT_DATA_DIR/collectd/etc/collectd.conf

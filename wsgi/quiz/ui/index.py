@@ -31,10 +31,14 @@ def after_login():
     if next_url is not None:
         return redirect(next_url)
     else:
+        # Maybe there will be fullscreen version for schools.
+        # So comments are just a reminders how to implement.
         if access.current_user.is_school:
+            # return redirect(url_for('.fullscreen', type='s'))
             return redirect(url_for('.school_menu'))
         else:
-            return redirect(url_for('.client_menu'))
+            return redirect(url_for('.fullscreen'))
+            # return redirect(url_for('.client_menu'))
 
 
 class LoginFrom(Form):
