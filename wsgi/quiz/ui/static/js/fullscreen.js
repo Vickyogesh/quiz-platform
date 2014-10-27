@@ -76,6 +76,10 @@
                 requestFullScreen(document.documentElement);
         },
 
+        cancel: function() {
+            cancelFullScreen();
+        },
+
         applyIFrameClass: function() {
             onFullScreen();
         }

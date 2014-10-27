@@ -6,15 +6,15 @@
   {{super()}}
   {{fixes.ie8()}}
   <style>
-  html, body, iframe {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  iframe {
-    border: 0;
-  }
+  html, body, iframe {width:100%; height:100%; overflow:hidden}
+  iframe {border:0}
   </style>
+  <script>
+  function logout() {
+    FullScreen.cancel();
+    window.location = "{{ url_for('.logout') }}";
+  }
+  </script>
 {% endblock %}
 
 {% block title %} {{ _('Quiz Platform') }} {%- endblock %}
@@ -25,7 +25,7 @@
     FullScreen.init();
     $("#cframe").on("load", function() {
       document.title = this.contentWindow.document.title;
-{#      FullScreen.applyIFrameClass();#}
+      FullScreen.applyIFrameClass();
     });
   </script>
 {%- endblock %}
