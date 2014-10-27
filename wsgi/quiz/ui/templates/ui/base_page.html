@@ -90,6 +90,12 @@
       $("#btt-fullscreen").hide();
     else
       $("#btt-fullscreen").click(parent.FullScreen.toggle);
+
+    if (parent.FullScreen !== undefined)
+      parent.FullScreen.applyIFrameClass();
+
+    $("body > .container").show();
+
     {%- block page_script %} {% endblock %}
   });
 </script>
