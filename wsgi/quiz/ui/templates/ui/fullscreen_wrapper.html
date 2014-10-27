@@ -1,0 +1,40 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% block html_attribs %} lang="{{ current_lang }}"{% endblock %}
+
+{% block head -%}
+  {{super()}}
+  {{fixes.ie8()}}
+  <style>
+  html, body, iframe {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  iframe {
+    border: 0;
+  }
+  </style>
+{% endblock %}
+
+{% block title %} {{ _('Quiz Platform') }} {%- endblock %}
+{% block body %}
+  {{super()}}
+  <iframe src="/ui/{{ acc_type }}/menu" id="cframe" allowfullscreen></iframe>
+  <script>
+    FullScreen.init();
+    $("#cframe").on("load", function() {
+      document.title = this.contentWindow.document.title;
+{#      FullScreen.applyIFrameClass();#}
+    });
+  </script>
+{%- endblock %}
+
+{%- block scripts -%}
+  {{super()}}
+  {%- block script_include -%}
+    {%- assets "fullscreen.js" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets -%}
+  {% endblock -%}
+{% endblock -%}

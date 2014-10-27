@@ -32,9 +32,11 @@ def after_login():
         return redirect(next_url)
     else:
         if access.current_user.is_school:
-            return redirect(url_for('.school_menu'))
+            return redirect(url_for('.fullscreen', type='s'))
+            # return redirect(url_for('.school_menu'))
         else:
-            return redirect(url_for('.client_menu'))
+            return redirect(url_for('.fullscreen', type='c'))
+            # return redirect(url_for('.client_menu'))
 
 
 class LoginFrom(Form):

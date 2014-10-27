@@ -2,6 +2,16 @@
     // NOTE: busy element id is hardcoded.
     var busy_el_id = "#busy_layer";
 
+    // TODO: add IE support. document.msFullscreenEnabled always return true.
+    // For more info see fullscreen.js
+    function hasFullScreen(el) {
+        var f = el.requestFullScreen
+                || el.mozRequestFullScreen
+                || el.webkitRequestFullScreen
+                || el.msRequestFullscreen;
+        return f !== undefined;
+    }
+
     $.ajaxSetup({
         cache: false,
         // Show busy indicator before sending request.
@@ -89,6 +99,10 @@
 
         showGuestError: function() {
             $(".contentpanel #ge-box").show();
+        },
+
+        canFullscreen: function() {
+            return hasFullScreen(document.documentElement);
         }
     };
 }).call(this);

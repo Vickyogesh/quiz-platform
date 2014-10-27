@@ -46,12 +46,16 @@ school_js = Bundle('ui/js/libs/md5.js', 'ui/js/school.js',
                    'ui/js/school-stat.js',
                    filters=js_filter, output='ui/gen/school.js')
 
+fullscreen_js = Bundle('ui/js/fullscreen.js', filters=js_filter,
+                       output='ui/gen/fullscreen.js')
+
 css_ui = Bundle('ui/css/colorbox.css', 'ui/css/style.css',
                 'ui/css/startup.css', 'ui/css/menu.css',
                 'ui/css/statistics.css', 'ui/css/quiz.css',
                 'ui/css/msgbox.css', 'ui/css/exam.css',
                 'ui/css/school_menu.css', 'ui/css/school_stat.css',
                 'ui/css/b_menu.css', 'ui/css/cqc_menu.css',
+                'ui/css/fullscreen.css',
                 filters=css_filter, output='ui/gen/ui.css')
 
 assets.register('base.js', base_js)
@@ -61,6 +65,7 @@ assets.register('user-stat.js', user_stat_js)
 assets.register('quiz.js', quiz_js)
 assets.register('exam.js', exam_js)
 assets.register('school.js', school_js)
+assets.register('fullscreen.js', fullscreen_js)
 assets.register('ui.css', css_ui)
 
 from . import babel
@@ -68,6 +73,7 @@ from . import index
 from . import school
 from . import client
 from . import util
+from . import fullscreen
 
 school.register_views(ui)
 client.register_views(ui)

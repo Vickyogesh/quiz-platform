@@ -85,6 +85,11 @@
     moment.locale("{{ current_lang }}");
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = null;
+
+    if (!Aux.canFullscreen())
+      $("#btt-fullscreen").hide();
+    else
+      $("#btt-fullscreen").click(parent.FullScreen.toggle);
     {%- block page_script %} {% endblock %}
   });
 </script>
