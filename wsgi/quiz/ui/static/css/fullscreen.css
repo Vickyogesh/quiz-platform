@@ -66,6 +66,10 @@ html.is-fullscreen .quiz #quiz-content {
   top: 30%;
 }
 
+html.is-fullscreen .quiz-menu .topics {
+  font-size: 16px;
+}
+
 /* Exam */
 html.is-fullscreen #exam-content img.header {
   width: inherit;
