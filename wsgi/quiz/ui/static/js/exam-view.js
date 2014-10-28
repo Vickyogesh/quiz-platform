@@ -94,7 +94,7 @@
 
         initialize: function() {
             this.img_a_el = this.$("#image");
-            this.img_el = this.img_a_el.find("img");
+            this.image_src_el = this.$("#question_image_src");
             this.num_el = this.$("#number #val");
             this.text_el = this.$("#text");
             this.text_translated_el = this.$("#text-lang");
@@ -124,11 +124,14 @@
         },
 
         setImage: function(url) {
-            if (url === undefined || url === null)
+            if (url === undefined || url === null) {
                 this.img_a_el.hide();
+                this.image_src_el.attr("src", "");
+            }
             else {
                 this.img_a_el.attr("href", url);
-                this.img_a_el.css("background-image", "url(" + url + ")");
+//                this.img_a_el.css("background-image", "url(" + url + ")");
+                this.image_src_el.attr("src", url);
                 this.img_a_el.show();
             }
         },

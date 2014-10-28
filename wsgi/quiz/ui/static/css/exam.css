@@ -133,13 +133,12 @@
   background-repeat: no-repeat;
   background-origin: content-box;
   background-size: contain;
-  width: 100px;
-  height: 100px;
 }
 
 .exam .exam-data .image a > img {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: auto;
+  max-width: 100px;
 }
 
 .exam .exam-data .data {

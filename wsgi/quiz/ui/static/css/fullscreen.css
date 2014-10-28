@@ -71,8 +71,6 @@ html.is-fullscreen .quiz #quiz-content {
 }
 
 html.is-fullscreen .quiz #quiz-content .img-wrapper a > img {
-  width: 100%;
-  height: auto;
   max-width: inherit;
 }
 
@@ -95,6 +93,12 @@ html.is-fullscreen .exam .bottom-nav > div {
 html.is-fullscreen .exam .text-rect table {
   font-size: 20px;
 }
+
+html.is-fullscreen .exam .exam-data .image a > img {
+  max-width: inherit;
+}
+
+
 
 .container.menu, .container.exam, .container.exam-review, .container.quiz-menu,
 .container.statistics, .container.quiz {
