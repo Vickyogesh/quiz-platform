@@ -59,6 +59,10 @@ html.is-fullscreen .menu .footer {
 }
 
 /* Quiz/Review */
+html.is-fullscreen .quiz-menu .topics {
+  font-size: 16px;
+}
+
 html.is-fullscreen .quiz #quiz-content {
   position: absolute;
   right: 10px;
@@ -66,8 +70,15 @@ html.is-fullscreen .quiz #quiz-content {
   top: 30%;
 }
 
-html.is-fullscreen .quiz-menu .topics {
-  font-size: 16px;
+html.is-fullscreen .quiz #quiz-content .img-wrapper a > img {
+  width: 100%;
+  height: auto;
+  max-width: inherit;
+}
+
+html.is-fullscreen #colorbox .cboxPhoto {
+  width: 400px;
+  height: 400px;
 }
 
 /* Exam */

@@ -116,12 +116,16 @@ li.area7:hover {background: #ac4242;}
 }
 
 .quiz #quiz-content .img-wrapper a {
-  width: 100px;
-  height: 100px;
   display: inline-block;
   background-repeat: no-repeat;
   background-origin: content-box;
   background-size: contain;
+}
+
+.quiz #quiz-content .img-wrapper a > img {
+  width: 100%;
+  height: auto;
+  max-width: 100px;
 }
 
 .quiz #quiz-content #questions {

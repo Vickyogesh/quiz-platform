@@ -126,6 +126,7 @@
 
         initialize: function() {
             this.question_image_a_el = this.$("#question_image");
+            this.question_image_src_el = this.$("#question_image_src");
             this.question_image_num_el = this.$("#question_image_num");
             this.question_image_num_span_el = this.question_image_num_el.find("span");
 
@@ -182,10 +183,11 @@
             if (url === undefined || url === null) {
                 this.question_image_a_el.hide();
                 this.question_image_num_el.hide();
+                this.question_image_src_el.attr("src", "");
             }
             else {
                 this.question_image_a_el.attr("href", url);
-                this.question_image_a_el.css("background-image", "url(" + url + ")");
+                this.question_image_src_el.attr("src", url);
 
                 this.question_image_num_span_el.html(q.get("image"));
                 this.question_image_a_el.show();
