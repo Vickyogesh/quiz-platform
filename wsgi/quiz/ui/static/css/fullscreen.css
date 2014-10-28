@@ -98,8 +98,6 @@ html.is-fullscreen .exam .exam-data .image a > img {
   max-width: inherit;
 }
 
-
-
 .container.menu, .container.exam, .container.exam-review, .container.quiz-menu,
 .container.statistics, .container.quiz {
   display: none;
