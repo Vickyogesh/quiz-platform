@@ -154,6 +154,7 @@ class ExamMixin(object):
 
         s = q.select().where(and_(
             q.c.quiz_type == quiz_type, q.c.id.in_(questions)))
+        s = s.order_by(func.field(q.c.id, *questions))
         res = self.engine.execute(s)
 
         # TODO: maybe preallocate with exam = [None] * 40?
