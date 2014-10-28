@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-17 15:28+0700\n"
+"POT-Creation-Date: 2014-10-28 23:08+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: wsgi/quiz/ui/index.py:41 wsgi/quiz/ui/templates/ui/menu_school.html:44
+#: wsgi/quiz/ui/index.py:45 wsgi/quiz/ui/templates/ui/menu_school.html:44
 #: wsgi/quiz/ui/templates/ui/menu_school.html:46
 msgid "Login"
 msgstr ""
 
-#: wsgi/quiz/ui/index.py:42 wsgi/quiz/ui/templates/ui/menu_school.html:50
+#: wsgi/quiz/ui/index.py:46 wsgi/quiz/ui/templates/ui/menu_school.html:50
 #: wsgi/quiz/ui/templates/ui/menu_school.html:52
 msgid "Password"
 msgstr ""
 
-#: wsgi/quiz/ui/index.py:101
+#: wsgi/quiz/ui/index.py:105
 msgid "Forbidden."
 msgstr ""
 
@@ -53,6 +53,7 @@ msgid "Number of errors in exam: %%(num)s"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base.html:15
+#: wsgi/quiz/ui/templates/ui/fullscreen_wrapper.html:20
 #: wsgi/quiz/ui/templates/ui/index.html:3
 #: wsgi/quiz/ui/templates/ui/policy.html:4
 msgid "Quiz Platform"
@@ -64,7 +65,7 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base.html:34
 #: wsgi/quiz/ui/templates/ui/base.html:40
-#: wsgi/quiz/ui/templates/ui/base_exam.html:185
+#: wsgi/quiz/ui/templates/ui/base_exam.html:187
 #: wsgi/quiz/ui/templates/ui/common_quiz.html:14
 #: wsgi/quiz/ui/templates/ui/common_review.html:20
 #: wsgi/quiz/ui/templates/ui/menu_school.html:26
@@ -73,131 +74,131 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:3
-#: wsgi/quiz/ui/templates/ui/base_exam.html:14
+#: wsgi/quiz/ui/templates/ui/base_exam.html:4
+#: wsgi/quiz/ui/templates/ui/base_exam.html:15
 msgid "Exam"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:35
+#: wsgi/quiz/ui/templates/ui/base_exam.html:37
 msgid "Question number"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:50
+#: wsgi/quiz/ui/templates/ui/base_exam.html:52
 msgid "True"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:53
+#: wsgi/quiz/ui/templates/ui/base_exam.html:55
 msgid "False"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:73
+#: wsgi/quiz/ui/templates/ui/base_exam.html:75
 msgid "Time available"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:79
-#: wsgi/quiz/ui/templates/ui/base_exam.html:123
+#: wsgi/quiz/ui/templates/ui/base_exam.html:81
+#: wsgi/quiz/ui/templates/ui/base_exam.html:125
 msgid "Exam number"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:83
-#: wsgi/quiz/ui/templates/ui/base_exam.html:127
+#: wsgi/quiz/ui/templates/ui/base_exam.html:85
+#: wsgi/quiz/ui/templates/ui/base_exam.html:129
 msgid "Name and surname"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:88
+#: wsgi/quiz/ui/templates/ui/base_exam.html:90
 msgid "Summary"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:93
+#: wsgi/quiz/ui/templates/ui/base_exam.html:95
 msgid "Previous question"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:97
+#: wsgi/quiz/ui/templates/ui/base_exam.html:99
 msgid "Next question"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:111
+#: wsgi/quiz/ui/templates/ui/base_exam.html:113
 msgid "Back to questions"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:117
+#: wsgi/quiz/ui/templates/ui/base_exam.html:119
 msgid "Finish exam"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:145
+#: wsgi/quiz/ui/templates/ui/base_exam.html:147
 msgid "Question text"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:146
+#: wsgi/quiz/ui/templates/ui/base_exam.html:148
 msgid "T"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:147
+#: wsgi/quiz/ui/templates/ui/base_exam.html:149
 msgid "F"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:183
+#: wsgi/quiz/ui/templates/ui/base_exam.html:185
 msgid "Error saving exam."
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:184
+#: wsgi/quiz/ui/templates/ui/base_exam.html:186
 #, python-format
 msgid "In this exam you made errors: %%(errors)s"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:186
+#: wsgi/quiz/ui/templates/ui/base_exam.html:188
 #: wsgi/quiz/ui/templates/ui/base_page.html:48
 #: wsgi/quiz/ui/templates/ui/common_quiz.html:15
 #: wsgi/quiz/ui/templates/ui/common_review.html:21
 msgid "Back to menu"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:187
+#: wsgi/quiz/ui/templates/ui/base_exam.html:189
 #: wsgi/quiz/ui/templates/ui/common_quiz.html:18
 #: wsgi/quiz/ui/templates/ui/common_review.html:23
 msgid "Try again"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_exam.html:188
+#: wsgi/quiz/ui/templates/ui/base_exam.html:190
 #: wsgi/quiz/ui/templates/ui/common_quiz.html:19
 msgid "Review answers"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_menu_client.html:4
-#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:2
+#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:4
 #: wsgi/quiz/ui/templates/ui/menu_school.html:2
 msgid "Menu"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:42
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:43
 #: wsgi/quiz/ui/templates/ui/menu_school.html:10
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:3
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:4
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:3
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:18
 msgid "Statistics"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:43
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:44
 #: wsgi/quiz/ui/templates/ui/menu_school.html:6
 msgid "Log out"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:46
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:47
 msgid "Connect with"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:54
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:57
 msgid "Your facebook account has been successfully linked!"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:55
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:58
 msgid "Unable to link account with Facebook."
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:7
+#: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:9
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
 #: wsgi/quiz/ui/templates/ui/common_exam_review.html:12
-#: wsgi/quiz/ui/templates/ui/statistics_base.html:21
+#: wsgi/quiz/ui/templates/ui/statistics_base.html:23
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:13
 msgid "Back"
 msgstr ""
@@ -223,23 +224,23 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_quiz.html:17
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:19
 msgid "Finish"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_quiz.html:23
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:25
 msgid "Show answers:"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_quiz.html:26
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:28
 msgid "Yes"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_quiz.html:28
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:30
 msgid "No"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_quiz.html:44
+#: wsgi/quiz/ui/templates/ui/base_quiz.html:47
 msgid "Img."
 msgstr ""
 
@@ -473,6 +474,7 @@ msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/b/menu_quiz.html:21
 #: wsgi/quiz/ui/templates/ui/cqc/menu_quiz.html:21
+#: wsgi/quiz/ui/templates/ui/scooter/menu_quiz.html:44
 msgid "Chapter"
 msgstr ""
 

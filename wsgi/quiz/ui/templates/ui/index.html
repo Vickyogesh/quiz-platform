@@ -1,5 +1,5 @@
 {% extends "ui/base.html" %}
-{% import "ui/facebook.html" as fb %}
+{% import "ui/utils.html" as utils %}
 {% block title %}{{ _('Quiz Platform') }}{% endblock %}
 
 {% block body %}
@@ -23,7 +23,7 @@
       }, {scope: 'publish_actions'});
     }
   </script>
-  {{ fb.async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
+  {{ utils.fb_async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
   {{ super() }}
 {% endblock %}
 

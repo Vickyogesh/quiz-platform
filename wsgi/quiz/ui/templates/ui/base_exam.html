@@ -1,10 +1,11 @@
 {% extends "ui/base_page.html" %}
-{% import "ui/facebook.html" as fb %}
+{% import "ui/utils.html" as utils %}
+{
 {% block subtitle %} {{ _('Exam') }} {% endblock %}
 
 {% block body %}
   {% if user.account.fb_id %}
-  {{ fb.async_init(fb_appid) }}
+  {{ utils.fb_async_init(fb_appid) }}
   {% endif %}
   {{ super() }}
 {% endblock %}
@@ -12,7 +13,7 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4>{{ _('Exam') }}</h4>
-  <div class="pull-right fullscreen"><a href="#" id="btt-fullscreen" class="glyphicon glyphicon-fullscreen"></a></div>
+  {{ utils.fullscreen_button() }}
 </div>
 {% endblock %}
 

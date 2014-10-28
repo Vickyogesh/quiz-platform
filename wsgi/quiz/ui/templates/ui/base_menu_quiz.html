@@ -1,4 +1,6 @@
 {% extends "ui/base_page.html" %}
+{% import "ui/utils.html" as utils %}
+
 {% block subtitle %}{{ _('Menu') }}{% endblock %}
 {% block content_class %}quiz-menu{% endblock %}
 {% block navbar_header_class %}no-button{% endblock %}
@@ -10,7 +12,7 @@
 {% block header_row %}
 <div class="col-md-12">
   <h4> {{ quiz_title }} </h4>
-  <div class="pull-right fullscreen"><a href="#" id="btt-fullscreen" class="glyphicon glyphicon-fullscreen"></a></div>
+  {{ utils.fullscreen_button() }}
 </div>
 {% endblock %}
 

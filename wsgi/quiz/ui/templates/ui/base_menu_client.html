@@ -1,12 +1,12 @@
 {% extends "ui/base_page.html" %}
-{% import "ui/facebook.html" as fb %}
+{% import "ui/utils.html" as utils %}
 
 {% block subtitle %}{{ _('Menu') }}{% endblock %}
 {% block navbar_class %}hidden{% endblock %}
 {% block content_class %}menu{% endblock %}
 
 {% block body %}
-  {{ fb.async_init(fb_appid) }}
+  {{ utils.fb_async_init(fb_appid) }}
   {{ super() }}
 {% endblock %}
 
@@ -17,7 +17,7 @@
     <span>{{ user.account.name }} {{ user.account.surname }}</span>
     </a>
   </h4>
-  <div class="pull-right fullscreen"><a href="#" id="btt-fullscreen" class="glyphicon glyphicon-fullscreen"></a></div>
+  {{ utils.fullscreen_button() }}
 </div>
 {% endblock %}
 

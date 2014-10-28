@@ -1,4 +1,4 @@
-{% macro async_init(appid, callback=None) -%}
+{% macro fb_async_init(appid, callback=None) -%}
   <div id="fb-root"></div>
   <script>
     window.fbAsyncInit = function() {
@@ -22,4 +22,8 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   </script>
+{%- endmacro %}
+
+{% macro fullscreen_button() -%}
+  <div class="pull-right fullscreen hidden-xs"><a href="#" id="btt-fullscreen" class="glyphicon glyphicon-fullscreen"></a></div>
 {%- endmacro %}
