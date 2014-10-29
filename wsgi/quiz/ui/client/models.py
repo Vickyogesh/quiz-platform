@@ -217,7 +217,8 @@ class StatisticsModel(StatisticsBaseModel):
             exams = None
         else:
             self.check(user_id, stat['student']['school_id'])
-            exams = app.core.getExamList(self.page.quiz_id, user_id)
+            exams = app.core.getExamList(self.page.quiz_id, user_id,
+                                         from_old_to_new=True)
 
         self.page.urls = {'back': self.get_back_url()}
         return self.render(client_stat=stat, exams=exams, uid=uid,

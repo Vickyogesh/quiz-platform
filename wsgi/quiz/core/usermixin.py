@@ -183,7 +183,7 @@ class UserMixin(object):
         }
 
     # TODO: not sure about performance
-    def _getExamList(self, quiz_type, user_id):
+    def _getExamList(self, quiz_type, user_id, from_old_to_new):
         rows = self.__examlist.execute(user_id=user_id, quiz_type=quiz_type)
         current, week, week3 = [], [], []
         for row in rows:
@@ -195,14 +195,18 @@ class UserMixin(object):
                 week.append(info)
             else:
                 week3.append(info)
+        if from_old_to_new:
+            current = list(reversed(current))
+            week = list(reversed(week))
+            week3 = list(reversed(week3))
         return {'current': current, 'week': week, 'week3': week3}
         # rows = [self._createExamInfo(row) for row in rows]
         # return rows
 
-    def getExamList(self, quiz_type, user_id):
+    def getExamList(self, quiz_type, user_id, from_old_to_new=False):
         return {
             'student': self._getStudentById(user_id),
-            'exams': self._getExamList(quiz_type, user_id)
+            'exams': self._getExamList(quiz_type, user_id, from_old_to_new)
         }
 
     def getTopicErrors(self, quiz_type, user_id, topic_id, lang):
