@@ -1,8 +1,10 @@
 from ..page import PagesMetadata
 from .models import QuizMenuModel, ExamModel, StatisticsExamsModel, StatisticsModel
 from .quiz_b import BModel
+from ...core import exammixin
 
-exam_meta = {'max_errors': 3, 'total_time': 1500, 'num_questions': 30}
+exam_meta = exammixin.exam_meta[4]
+
 
 class ScooterModel(BModel):
     pass

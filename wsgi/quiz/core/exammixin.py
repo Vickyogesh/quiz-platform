@@ -5,6 +5,14 @@ from sqlalchemy import select, func, and_, between
 from .exceptions import QuizCoreError
 
 
+exam_meta = {
+    1: {'max_errors': 4, 'total_time': 1800, 'num_questions': 40},
+    2: {'max_errors': 6, 'total_time': 7200, 'num_questions': 60},
+    3: {'max_errors': 4, 'total_time': 1800, 'num_questions': 40},
+    4: {'max_errors': 3, 'total_time': 1500, 'num_questions': 30}
+}
+
+
 class ExamMixin(object):
     """Mixin for working with exams. Used in QuizCore."""
     def __init__(self):
@@ -217,12 +225,8 @@ class ExamMixin(object):
         elif not isinstance(answers, list):
             raise QuizCoreError('Invalid value.')
 
-        if quiz_type == 2:
-            exam_answers = 60
-        elif quiz_type == 4:
-            exam_answers = 30
-        else:
-            exam_answers = 40
+        meta = exam_meta[quiz_type]
+        exam_answers = meta['num_questions']
 
         if len(answers) != exam_answers:
             raise QuizCoreError('Wrong number of answers.')

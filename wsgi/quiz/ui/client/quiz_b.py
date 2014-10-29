@@ -1,8 +1,8 @@
 from ..page import PagesMetadata
 from .models import MenuModel, QuizMenuModel, ExamModel, StatisticsModel
+from ...core import exammixin
 
-exam_meta = {'max_errors': 4, 'total_time': 1800, 'num_questions': 40}
-
+exam_meta = exammixin.exam_meta[3]
 
 class BModel(MenuModel):
     template = 'ui/b/menu_client.html'

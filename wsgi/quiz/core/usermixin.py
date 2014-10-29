@@ -1,5 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 from .exceptions import QuizCoreError
+from .exammixin import exam_meta
 
 
 class UserMixin(object):
@@ -128,11 +129,9 @@ class UserMixin(object):
         return stat
 
     def __getExamStat(self, quiz_type, user_id):
+        meta = exam_meta[quiz_type]
+        numerr = meta['max_errors']
         try:
-            if quiz_type == 2:  # For CQC quiz
-                numerr = 6
-            else:               # For B quiz
-                numerr = 4
             row = self.__examstat.execute(user_id=user_id,
                                           quiz_type=quiz_type,
                                           numerr=numerr)
@@ -162,10 +161,9 @@ class UserMixin(object):
         errors = exam_db_row[5]
         expired = exam_db_row[6]
 
-        if quiz_type == 2:  # CQC quiz
-            numerr = 6
-        else:               # B quiz
-            numerr = 4
+        meta = exam_meta[quiz_type]
+        numerr = meta['max_errors']
+
         if end:
             if errors > numerr:
                 status = 'failed'

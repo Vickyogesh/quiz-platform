@@ -1,7 +1,9 @@
 from ..page import PagesMetadata
 from .models import MenuModel, QuizMenuModel, ExamModel, StatisticsExamsModel, StatisticsModel
+from ...core import exammixin
 
-exam_meta = {'max_errors': 6, 'total_time': 7200, 'num_questions': 60}
+exam_meta = exammixin.exam_meta[2]
+
 
 class CqcModel(MenuModel):
     template = 'ui/cqc/menu_client.html'
