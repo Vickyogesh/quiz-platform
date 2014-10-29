@@ -178,7 +178,7 @@ To add new quiz you have to:
 
     > python misc/dbfill.py -c misc/config.ini -i ... -t [quiz_id]
 * Update QUIZ_ID_MAP in wsgi/quiz/login.py with new quiz_id and quiz full name
-* Update QUIZ_TITLE in wsgi/quiz/ui/uti.py
+* Update QUIZ_TITLE in wsgi/quiz/ui/util.py
 * If you add new quiz type then you need to create new page models in
   wsgi/quiz/ui/client and register them in wsgi/quiz/ui/client/__init__.py.
 

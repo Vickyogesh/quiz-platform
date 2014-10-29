@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-10-29 15:59+0700\n"
-"PO-Revision-Date: 2014-10-29 14:59+0600\n"
+"PO-Revision-Date: 2014-10-29 15:01+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -46,7 +46,7 @@ msgstr "B 2013"
 
 #: wsgi/quiz/ui/util.py:15
 msgid "Scooter"
-msgstr "Scooter"
+msgstr "Patente AM"
 
 #: wsgi/quiz/ui/client/models.py:127
 #, python-format
