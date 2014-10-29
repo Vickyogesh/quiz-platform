@@ -10,7 +10,7 @@ QUIZ_ID_MAP = {
     'b2011': 1,
     'cqc': 2,
     'b2013': 3,
-    'scooter': 4
+    'am': 4
 }
 
 login_api = Blueprint('login_api', __name__)

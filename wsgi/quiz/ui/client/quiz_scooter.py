@@ -26,7 +26,7 @@ class ScooterStatisticsModel(StatisticsModel):
 
 
 class ScooterPagesMetadata(PagesMetadata):
-    name = 'scooter'
+    name = 'am'
     standard_page_models = {
         'menu': ScooterModel,
         'menu_quiz': ScooterQuizMenuModel,
