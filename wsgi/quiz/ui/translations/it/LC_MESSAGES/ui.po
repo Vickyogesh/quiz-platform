@@ -7,15 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 23:08+0700\n"
-"PO-Revision-Date: 2014-10-28 22:03+0600\n"
+"POT-Creation-Date: 2014-10-29 15:59+0700\n"
+"PO-Revision-Date: 2014-10-29 14:59+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+"X-Generator: Poedit 1.5.7\n"
 
 #: wsgi/quiz/ui/index.py:45 wsgi/quiz/ui/templates/ui/menu_school.html:44
 #: wsgi/quiz/ui/templates/ui/menu_school.html:46
@@ -309,7 +310,7 @@ msgstr "Ritorna all'esercizio"
 
 #: wsgi/quiz/ui/templates/ui/index.html:55
 msgid "Sign In"
-msgstr "Registrati"
+msgstr "Entra"
 
 #: wsgi/quiz/ui/templates/ui/index.html:58
 msgid "Log In"
@@ -405,8 +406,8 @@ msgid ""
 "Statistics topics in greater blue portion of the graph corresponds to a "
 "better preparation."
 msgstr ""
-"Statistiche argomenti: a una maggior porzione blu del grafico corrisponde"
-" una migliore preparazione."
+"Statistiche argomenti: a una maggior porzione blu del grafico corrisponde "
+"una migliore preparazione."
 
 #: wsgi/quiz/ui/templates/ui/statistics_client.html:41
 msgid "The student has not passed any exercises."
@@ -444,8 +445,8 @@ msgid ""
 "Exam statistics: a greater blue sector of the graph, the better the "
 "preparation"
 msgstr ""
-"Statistiche Esami: a una maggiore porzione blu del grafico corrisponde "
-"una migliore preparazione"
+"Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una "
+"migliore preparazione"
 
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:32
 msgid "Best students"
@@ -460,8 +461,8 @@ msgid ""
 "Topic statistics: a greater blue sector of the graph, the better the "
 "preparation"
 msgstr ""
-"Statistiche Argomenti: a una maggiore porzione blu del grafico "
-"corrisponde una migliore preparazione"
+"Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde "
+"una migliore preparazione"
 
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:59
 msgid "<Empty>"
@@ -488,4 +489,3 @@ msgstr "Capitolo"
 
 #~ msgid "Full-screen mode"
 #~ msgstr "Modalità a schermo intero"
-
