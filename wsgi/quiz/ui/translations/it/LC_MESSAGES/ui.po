@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-29 15:59+0700\n"
-"PO-Revision-Date: 2014-10-29 15:01+0600\n"
+"POT-Creation-Date: 2014-10-29 17:27+0700\n"
+"PO-Revision-Date: 2014-10-29 16:27+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -140,7 +140,7 @@ msgstr "F"
 
 #: wsgi/quiz/ui/templates/ui/base_exam.html:185
 msgid "Error saving exam."
-msgstr "Risparmio esame errore."
+msgstr "Errore nel salvataggio dell'esame."
 
 #: wsgi/quiz/ui/templates/ui/base_exam.html:186
 #, python-format
