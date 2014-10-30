@@ -180,6 +180,13 @@ def create(mgr):
             err_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
             CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
+
+        CREATE TABLE truck_last_sublicense(
+          user_id INTEGER UNSIGNED NOT NULL,
+          user_type SMALLINT UNSIGNED NOT NULL,
+          sublicense SMALLINT UNSIGNED NOT NULL,
+          CONSTRAINT PRIMARY KEY (user_id, user_type)
+        );
         """)
     reflect(mgr)
 

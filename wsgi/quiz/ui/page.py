@@ -104,6 +104,11 @@ def register_pages(bp, page_views, ui_models):
                 else:
                     pages = page_models[name]
                 pages[ui.name] = cls
+        if ui.extra_views is not None:
+            for view in ui.extra_views:
+                v = view.get_view()
+                for rule in view.rules:
+                    bp.route(**rule)(v)
 
     for name, cls in page_views.iteritems():
         class_name = cls.__name__
@@ -271,6 +276,7 @@ class PageView(View):
         kwargs['fb_appid'] = current_app.config['FACEBOOK_APP_ID']
         if self.urls is not None:
             kwargs['urls'] = self.urls
+        self.model.update_render_context(kwargs)
         return render_template(self.template, **kwargs)
 
 
@@ -290,6 +296,9 @@ class PageModel(object):
 
     def __init__(self, page):
         self.page = page
+
+    def update_render_context(self, ctx):
+        pass
 
     def on_request(self, *args, **kwargs):
         """This method is called on each request with all the arguments
@@ -316,3 +325,6 @@ class PagesMetadata(object):
     #: Models will be linked with views with the same names.
     #: See :func:`register_pages` for more info.
     standard_page_models = None
+
+    #: List of extra views to register (PageView).
+    extra_views = None

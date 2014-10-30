@@ -9,7 +9,15 @@ exam_meta = {
     1: {'max_errors': 4, 'total_time': 1800, 'num_questions': 40},
     2: {'max_errors': 6, 'total_time': 7200, 'num_questions': 60},
     3: {'max_errors': 4, 'total_time': 1800, 'num_questions': 40},
-    4: {'max_errors': 3, 'total_time': 1500, 'num_questions': 30}
+    4: {'max_errors': 3, 'total_time': 1500, 'num_questions': 30},
+    # Truck (fake)
+    5: {'max_errors': 1, 'total_time': 2000, 'num_questions': 31},
+    6: {'max_errors': 2, 'total_time': 2100, 'num_questions': 32},
+    7: {'max_errors': 3, 'total_time': 2200, 'num_questions': 33},
+    8: {'max_errors': 4, 'total_time': 2300, 'num_questions': 34},
+    9: {'max_errors': 5, 'total_time': 2400, 'num_questions': 35},
+    10: {'max_errors': 6, 'total_time': 2500, 'num_questions': 36},
+    11: {'max_errors': 7, 'total_time': 2600, 'num_questions': 37}
 }
 
 
@@ -61,13 +69,18 @@ class ExamMixin(object):
     # 1 - b2011
     # 2 - cqc
     # 4 - scooter
+    # 5 - 11 - truck
     def __generate_idList(self, quiz_type, examType):
         if quiz_type == 2:
             return self.__generate_idListCQC(quiz_type, examType)
         elif quiz_type == 4:
             return self.__generate_idListScooter(quiz_type, examType)
-        else:
+        elif quiz_type == 1 or quiz_type == 3:
             return self.__generate_idListB(quiz_type, examType)
+        elif 5 <= quiz_type <= 11:
+            return self.__generate_idListTruck(quiz_type, examType)
+        else:
+            raise QuizCoreError('Unknown exam generator')
 
     # Create list of exam questions for B quiz.
     # At first, we get info about chapters: chapter priority,
@@ -139,6 +152,10 @@ class ExamMixin(object):
             vals = random.sample(xrange(row[1], row[2] + 1), 3)
             id_list.extend(vals)
         return id_list, []
+
+    def __generate_idListTruck(self, quiz_type, examType):
+        meta = exam_meta[quiz_type]
+        return random.sample(xrange(1, 6000), meta['num_questions']), []
 
     #@profile
     def __initExam(self, quiz_type, user_id, questions):
