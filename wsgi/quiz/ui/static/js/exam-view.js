@@ -288,7 +288,7 @@
 
                 // Calc fullscreen height
                 var fullscreen_height =
-                    row_eight + (html_h - area_height - area_top - 40);
+                    row_eight + (html_h - area_height - area_top - 60);
 
                 el.find(".image").css("height", fullscreen_height + "px");
 
