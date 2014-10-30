@@ -17,7 +17,7 @@
     <div class="tablerow">
       <div class="content">
         <div class="cell">
-          <a href="{{ url_for('.client_menu') }}?id={{ item.id }}">{{ item.title }}</a>
+          <a href="{% if user.is_school %}{{ url_for('.school_menu') }}{% else %}{{ url_for('.client_menu') }}{% endif %}?id={{ item.id }}">{{ item.title }}</a>
         </div>
       </div>
     </div>

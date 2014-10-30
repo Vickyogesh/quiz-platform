@@ -5,6 +5,7 @@ from .views import ClientPage
 from .models import MenuModel, QuizMenuModel, ExamModel, StatisticsModel
 from ..util import QUIZ_TITLE
 from ...core import exammixin
+from .. import school
 
 
 class SubLicenseModel(PageModel):
@@ -20,14 +21,15 @@ class SubLicenseView(ClientPage):
     default_model = SubLicenseModel
 
 
-class TruckModel(MenuModel):
+class TruckBaseMenuModel(MenuModel):
     """Truck menu handles sub license value.
 
     It redirects to sub license select page if no value is found.
     """
-    template = 'ui/truck/menu_client.html'
+    sub_license_endpoint = None
 
-    def on_request(self, *args, **kwargs):
+    def _handle_sub_license(self):
+        """Return True if need to select a license"""
         user = access.current_user
 
         try:
@@ -71,11 +73,17 @@ class TruckModel(MenuModel):
 
         # If sub_license is not found in session and DB then we redirect
         # to page with sub_license choices.
-        if sub_license is None:
-            return redirect(url_for('.client_sub_license'))
+        return sub_license is None
 
-        # Otherwise show menu.
+    def on_request(self, *args, **kwargs):
+        if self._handle_sub_license():
+            return redirect(url_for(self.sub_license_endpoint))
         return MenuModel.on_request(self, *args, **kwargs)
+
+
+class TruckClientMenuModel(TruckBaseMenuModel):
+    template = 'ui/truck/menu_client.html'
+    sub_license_endpoint = '.client_sub_license'
 
 
 class TruckQuizMenuModel(QuizMenuModel):
@@ -102,10 +110,37 @@ class TruckExamModel(ExamModel):
 class TruckPagesMetadata(PagesMetadata):
     name = 'truck'
     standard_page_models = {
-        'menu': TruckModel,
+        'menu': TruckClientMenuModel,
         'menu_quiz': TruckQuizMenuModel,
         'exam': TruckExamModel,
         'stat': TruckStatisticsModel
     }
 
     extra_views = [SubLicenseView]
+
+
+###########################################################
+# school related stuff
+###########################################################
+
+class SubLicense(school.SchoolPage):
+    rules = ({'rule': '/s/truck/sublicense'},)
+    default_model = SubLicenseModel
+
+
+class TruckSchoolMenuModel(TruckBaseMenuModel, school.MenuModel):
+    template = 'ui/truck/menu_school.html'
+    sub_license_endpoint = '.school_sub_license'
+
+    def on_request(self, *args, **kwargs):
+        if self._handle_sub_license():
+            return redirect(url_for(self.sub_license_endpoint))
+        return school.MenuModel.on_request(self)
+
+
+class SchoolTruckPagesMetadata(PagesMetadata):
+    name = 'truck'
+    standard_page_models = {
+        'menu': TruckSchoolMenuModel
+    }
+    extra_views = [SubLicense]
