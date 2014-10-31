@@ -14,7 +14,7 @@
 {% block panel_content %}
   <div id="school">
     <div class="row separator" id="header">
-      <div class="col-md-12">{{ _('Student list') }}</div>
+      <div class="col-md-12">{% block student_list_header %}{{ _('Student list') }}{% endblock %}</div>
     </div>
     <div id="clients"></div>
   </div>

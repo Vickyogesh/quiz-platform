@@ -12,7 +12,15 @@ QUIZ_TITLE = {
     1: lazy_gettext('B 2011'),
     2: lazy_gettext('CQC'),
     3: lazy_gettext('B 2013'),
-    4: lazy_gettext('Scooter')
+    4: lazy_gettext('Scooter'),
+    # Truck
+    5: lazy_gettext('Truck C1 and C1E'),
+    6: lazy_gettext('Truck C1 and C1E non-professional'),
+    7: lazy_gettext('Truck C and CE'),
+    8: lazy_gettext('Truck C and CE with C1 and C1E category'),
+    9: lazy_gettext('Truck D1 and D1E'),
+    10: lazy_gettext('Truck D and DE'),
+    11: lazy_gettext('Truck D and DE with D1 and D1E category')
 }
 
 

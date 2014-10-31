@@ -41,12 +41,7 @@
 
         var pass_limit = num_exam_questions - max_exam_errors;
 
-        if (key == "all") {
-            data = [].concat(exam_list['week3'], exam_list['week'],
-                exam_list['current']);
-        }
-        else
-            data = exam_list[key];
+        data = exam_list[key];
 
         for (i = 0; i < data.length; i++) {
             if (data[i].status != "passed" && data[i].status != "failed")
@@ -124,6 +119,11 @@
 
     UserStat = function(exam_data, num_questions, max_errors) {
         exam_list = exam_data;
+
+        var all = [].concat(exam_list['current'], exam_list['week'], exam_list['week3']);
+        all.reverse();
+        exam_list["all"] = all;
+
         num_exam_questions = num_questions;
         max_exam_errors = max_errors;
         update_stat(current_range);

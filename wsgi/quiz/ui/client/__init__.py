@@ -7,6 +7,7 @@ def register_views(bp):
     from .quiz_b import BPagesMetadata
     from .quiz_cqc import CqcPagesMetadata
     from .quiz_scooter import ScooterPagesMetadata
+    from .quiz_truck import TruckPagesMetadata
 
     register_pages(bp, page_views, [BPagesMetadata, CqcPagesMetadata,
-                                    ScooterPagesMetadata])
+                                    ScooterPagesMetadata, TruckPagesMetadata])

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 23:08+0700\n"
+"POT-Creation-Date: 2014-10-30 23:59+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,6 +45,34 @@ msgstr ""
 
 #: wsgi/quiz/ui/util.py:15
 msgid "Scooter"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:17
+msgid "Truck C1 and C1E"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:18
+msgid "Truck C1 and C1E non-professional"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:19
+msgid "Truck C and CE"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:20
+msgid "Truck C and CE with C1 and C1E category"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:21
+msgid "Truck D1 and D1E"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:22
+msgid "Truck D and DE"
+msgstr ""
+
+#: wsgi/quiz/ui/util.py:23
+msgid "Truck D and DE with D1 and D1E category"
 msgstr ""
 
 #: wsgi/quiz/ui/client/models.py:127
@@ -167,6 +195,7 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/base_menu_client.html:4
 #: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:4
 #: wsgi/quiz/ui/templates/ui/menu_school.html:2
+#: wsgi/quiz/ui/templates/ui/truck/truck_sublicense.html:4
 msgid "Menu"
 msgstr ""
 
@@ -175,29 +204,33 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:4
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:3
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:18
+#: wsgi/quiz/ui/templates/ui/truck/menu_client.html:7
 msgid "Statistics"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_menu_client.html:44
 #: wsgi/quiz/ui/templates/ui/menu_school.html:6
+#: wsgi/quiz/ui/templates/ui/truck/menu_client.html:8
+#: wsgi/quiz/ui/templates/ui/truck/truck_sublicense.html:29
 msgid "Log out"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_menu_client.html:47
+#: wsgi/quiz/ui/templates/ui/truck/menu_client.html:11
 msgid "Connect with"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:57
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:62
 msgid "Your facebook account has been successfully linked!"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/base_menu_client.html:58
+#: wsgi/quiz/ui/templates/ui/base_menu_client.html:63
 msgid "Unable to link account with Facebook."
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/base_menu_quiz.html:9
 #: wsgi/quiz/ui/templates/ui/base_page.html:6
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:12
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:16
 #: wsgi/quiz/ui/templates/ui/statistics_base.html:23
 #: wsgi/quiz/ui/templates/ui/statistics_school.html:13
 msgid "Back"
@@ -244,12 +277,12 @@ msgstr ""
 msgid "Img."
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:3
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:8
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:4
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:10
 msgid "Exam review"
 msgstr ""
 
-#: wsgi/quiz/ui/templates/ui/common_exam_review.html:18
+#: wsgi/quiz/ui/templates/ui/common_exam_review.html:22
 #, python-format
 msgid "List of exam %(id)s answers."
 msgstr ""
@@ -462,12 +495,14 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/b/exam.html:8
 #: wsgi/quiz/ui/templates/ui/cqc/exam.html:8
 #: wsgi/quiz/ui/templates/ui/scooter/exam.html:8
+#: wsgi/quiz/ui/templates/ui/truck/exam.html:10
 msgid "Questions"
 msgstr ""
 
 #: wsgi/quiz/ui/templates/ui/b/exam.html:9
 #: wsgi/quiz/ui/templates/ui/cqc/exam.html:9
 #: wsgi/quiz/ui/templates/ui/scooter/exam.html:9
+#: wsgi/quiz/ui/templates/ui/truck/exam.html:11
 #, python-format
 msgid "From %(from)s to %(to)s"
 msgstr ""
@@ -475,6 +510,16 @@ msgstr ""
 #: wsgi/quiz/ui/templates/ui/b/menu_quiz.html:21
 #: wsgi/quiz/ui/templates/ui/cqc/menu_quiz.html:21
 #: wsgi/quiz/ui/templates/ui/scooter/menu_quiz.html:44
+#: wsgi/quiz/ui/templates/ui/truck/menu_quiz.html:21
 msgid "Chapter"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/truck/menu_client.html:6
+#: wsgi/quiz/ui/templates/ui/truck/menu_school.html:4
+msgid "Change license"
+msgstr ""
+
+#: wsgi/quiz/ui/templates/ui/truck/truck_sublicense.html:10
+msgid "Truck sub license"
 msgstr ""
 
