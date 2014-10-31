@@ -109,4 +109,6 @@ page_views = {
 
 def register_views(bp):
     """Register school views in the blueprint *bp*."""
-    register_pages(bp, page_views, [SchoolPagesMetadata])
+    from .client import quiz_truck
+    register_pages(bp, page_views, [SchoolPagesMetadata,
+                                    quiz_truck.SchoolTruckPagesMetadata])

@@ -88,6 +88,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.quiz_answers = self.meta.tables['quiz_answers']
         self.exam_answers = self.meta.tables['exam_answers']
         self.exams = self.meta.tables['exams']
+        self.truck_last_sublicense = self.meta.tables['truck_last_sublicense']
 
     def sql(self, stmt):
         """Build SQL expression."""

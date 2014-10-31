@@ -1,11 +1,15 @@
 {% extends "ui/base_page.html" %}
+{% import "ui/utils.html" as utils %}
 
 {% block subtitle %}{{ _('Exam review') }}{% endblock %}
 {% block navbar_header_class %}no-button{% endblock %}
 {% block content_class %}exam-review{% endblock %}
 
 {% block header_row %}
-<div class="col-md-12"><h4>{{ _('Exam review') }}</h4></div>
+<div class="col-md-12">
+  <h4>{{ _('Exam review') }}</h4>
+  {{ utils.fullscreen_button() }}
+</div>
 {% endblock %}
 
 {% block nav_brand %}

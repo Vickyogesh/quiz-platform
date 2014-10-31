@@ -1,0 +1,8 @@
+{% extends "ui/menu_school.html" %}
+
+{% block top_menu %}
+  <li><a href="{{ url_for('.school_sub_license') }}"><span class="glyphicon glyphicon-book"></span> {{ _('Change license') }}</a></li>
+  {{ super() }}
+{% endblock %}
+
+{% block student_list_header %}{{ super() }} ({{ quiz_title }}){% endblock %}

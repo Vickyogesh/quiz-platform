@@ -1,0 +1,40 @@
+{% extends "ui/base_page.html" %}
+{% import "ui/utils.html" as utils %}
+
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block navbar_class %}hidden{% endblock %}
+{% block content_class %}menu truck{% endblock %}
+
+{% block header_row %}
+  <div class="col-md-12">
+    <h4>{{ _('Truck sub license') }}</h4>
+    {{ utils.fullscreen_button() }}
+  </div>
+{% endblock %}
+
+{% block panel_content %}
+  {% for item in sublicense %}
+    <div class="tablerow">
+      <div class="content">
+        <div class="cell">
+          <a href="{% if user.is_school %}{{ url_for('.school_menu') }}{% else %}{{ url_for('.client_menu') }}{% endif %}?id={{ item.id }}">{{ item.title }}</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block footer %}
+<div class="footer row">
+  <div class="center-block"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
+</div>
+{% endblock %}
+
+{%- block page_script %}
+  $("#btt-logout").click(function() {
+    if (parent.logout !== undefined)
+      parent.logout();
+    else
+      window.location = "{{ url_for('.logout') }}";
+  });
+{% endblock %}
