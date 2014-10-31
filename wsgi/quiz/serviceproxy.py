@@ -269,7 +269,7 @@ class AccountsApi(HttpServiceProxy):
         del data['status']
         return data, self._session_cookie
 
-    def send_fb_auth(self, id, token, caller_service):
+    def send_fb_auth(self, id, token, caller_service, app_id=None, secret=None):
         """Send auth info to the Accounts Service.
 
         Args: accounts service auth args.
@@ -280,6 +280,10 @@ class AccountsApi(HttpServiceProxy):
         """
         hdr = 'QAuth fbid="{0}", fbtoken="{1}"'
         hdr = hdr.format(id, token)
+
+        if app_id is not None and secret is not None:
+            hdr += ', appid="%s", secret="%s' % (app_id, secret)
+
         hdr = {'Authenticate': hdr}
 
         if caller_service is not None:

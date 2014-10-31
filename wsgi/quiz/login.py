@@ -108,7 +108,10 @@ def _facebook_login(data):
     except QuizCoreError:
         raise BadRequest('Authorization is invalid.')
 
-    return appid, app.account.send_fb_auth(fb_id, fb_token, 'quiz')
+    app_id = app.config['FACEBOOK_APP_ID']
+    secret = app.config['FACEBOOK_APP_SECRET']
+    return appid, app.account.send_fb_auth(fb_id, fb_token, 'quiz',
+                                           app_id=app_id, secret=secret)
 
 
 def do_login(data):
