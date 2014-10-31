@@ -120,8 +120,11 @@
     UserStat = function(exam_data, num_questions, max_errors) {
         exam_list = exam_data;
 
-        var all = [].concat(exam_list['current'], exam_list['week'], exam_list['week3']);
-        all.reverse();
+        exam_list['current'].reverse();
+        exam_list['week'].reverse();
+        exam_list['week3'].reverse();
+        var all = [].concat(exam_list['week3'], exam_list['week'], exam_list['current']);
+
         exam_list["all"] = all;
 
         num_exam_questions = num_questions;
