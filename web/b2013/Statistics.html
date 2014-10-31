@@ -218,53 +218,60 @@
 				
 			$.getJSON(urlstat, data).always(function(data) {
 				if (data.status != 200) {
-                    data = JSON.parse(data.responseText);
+          data = JSON.parse(data.responseText);
 					WaitMsg.hide();
-                    // Means: probably no student activity
-                    if (data.description == "Unknown student.")
-                        no_activity();
-                    else {
-                        var user = sessionStorage.getItem('quizutype');
-                        if (user == 'guest' && data.status == 403) {
-                            showGuestAccessError();
-                            window.location = "student.html";
-                        }
-                        else                    
-                            aux_showJSONError(data);
-                    }
-                    return;
+          // Means: probably no student activity
+          if (data.description == "Unknown student.")
+              no_activity();
+          else {
+              var user = sessionStorage.getItem('quizutype');
+              if (user == 'guest' && data.status == 403) {
+                  showGuestAccessError();
+                  window.location = "student.html";
+              }
+              else
+                  aux_showJSONError(data);
+          }
+          return;
 				}
 				WaitMsg.hide();
 				$("#work_area").show();
-				
-                var name = data.student.name;
-                if (data.student.surname)
-                    name += ' ' + data.student.surname;
-                window.name = name;
-                sessionStorage.setItem('quizname', name);
+
+        var name = data.student.name;
+        if (data.student.surname)
+            name += ' ' + data.student.surname;
+        window.name = name;
+        sessionStorage.setItem('quizname', name);
+
 				$("#student_stat .header .item a span").html(name);
-                fb_set_user_pic("#bttAccount img", true);
-		
-                var all_exams = [].concat(examData.exams['week3'], 
-                                          examData.exams['week'],
-                                          examData.exams['current']);
+        fb_set_user_pic("#bttAccount img", true);
 
-                drawExamGraph("wexamgraph", examData.exams['current']);
-                drawExamGraph("mexamgraph", examData.exams['week']);
-                drawExamGraph("aexamgraph", examData.exams['week3']);
-                drawExamGraph("totexamgraph", all_exams);
+        examData.exams['current'].reverse();
+        examData.exams['week'].reverse();
+        examData.exams['week3'].reverse();
+        var all_exams = [].concat(examData.exams['week3'], examData.exams['week'],
+                                  examData.exams['current']);
 
-                fill_topics(data.topics, "week", "wtgraph");
-                fill_topics(data.topics, "month", "mtgraph");
-                fill_topics(data.topics, "all", "atgraph");
-                fill_topics(data.topics, "total", "ttgraph");
+        drawExamGraph("wexamgraph", examData.exams['current']);
+        drawExamGraph("mexamgraph", examData.exams['week']);
+        drawExamGraph("aexamgraph", examData.exams['week3']);
+        drawExamGraph("totexamgraph", all_exams);
 
-                $("#bttAccount").click(function() {
-                    if (studentId > 0)
-                        editAccount(studentId);
-                    else
-                        editAccount();
-                });
+        examData.exams['current'].reverse();
+        examData.exams['week'].reverse();
+        examData.exams['week3'].reverse();
+
+        fill_topics(data.topics, "week", "wtgraph");
+        fill_topics(data.topics, "month", "mtgraph");
+        fill_topics(data.topics, "all", "atgraph");
+        fill_topics(data.topics, "total", "ttgraph");
+
+        $("#bttAccount").click(function() {
+            if (studentId > 0)
+                editAccount(studentId);
+            else
+                editAccount();
+        });
 
 				// topic click events
 				$('ul #topic ul li').click(function(){
@@ -275,11 +282,11 @@
 					var html = "";
 					
 					$("#topicerrorlist").empty();
-					
-                    html = '<li class="examid">';
-                    html += '<a class="lustre-button" id="back" style="cursor:pointer; font-size:14px">';
-                    html += '&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>';
-                    html += '</li>';
+
+          html = '<li class="examid">';
+          html += '<a class="lustre-button" id="back" style="cursor:pointer; font-size:14px">';
+          html += '&#8592;&nbsp;&nbsp;&nbsp;Indietro</a>';
+          html += '</li>';
 					$("#topicerrorlist").append(html);
 
 					html = '<li>';
@@ -428,9 +435,9 @@
             var exams;
 
             if (period == null) {
-                exams = [].concat(examData.exams["week3"],
+                exams = [].concat(examData.exams["current"],
                                   examData.exams["week"],
-                                  examData.exams["current"]);
+                                  examData.exams["week3"]);
             }
             else
                 exams = examData.exams[period];
