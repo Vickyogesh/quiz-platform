@@ -282,7 +282,7 @@ class AccountsApi(HttpServiceProxy):
         hdr = hdr.format(id, token)
 
         if app_id is not None and secret is not None:
-            hdr += ', appid="%s", secret="%s' % (app_id, secret)
+            hdr += ', appid="%s", secret="%s"' % (app_id, secret)
 
         hdr = {'Authenticate': hdr}
 
