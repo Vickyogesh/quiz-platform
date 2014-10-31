@@ -1,6 +1,6 @@
 $.getScript('//connect.facebook.net/en_UK/all.js', function() {
     FB.init({
-        appId: '306969962800273',
+        appId: '386320724865196',
         version: "v2.0",
         status: true,
         xfbml: 1
