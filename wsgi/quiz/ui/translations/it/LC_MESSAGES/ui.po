@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quiz Platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-10-30 23:59+0700\n"
-"PO-Revision-Date: 2014-10-30 23:04+0600\n"
+"PO-Revision-Date: 2014-11-03 14:31+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -526,11 +526,11 @@ msgstr "Capitolo"
 #: wsgi/quiz/ui/templates/ui/truck/menu_client.html:6
 #: wsgi/quiz/ui/templates/ui/truck/menu_school.html:4
 msgid "Change license"
-msgstr ""
+msgstr "Cambia Programma"
 
 #: wsgi/quiz/ui/templates/ui/truck/truck_sublicense.html:10
 msgid "Truck sub license"
-msgstr ""
+msgstr "Programma"
 
 #~ msgid "Full-screen mode"
 #~ msgstr "Modalità a schermo intero"
