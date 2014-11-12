@@ -327,6 +327,8 @@
         },
 
         onModelChange: function() {
+            if (this.model.get("index") == -1)
+                return;
             this._setQuestions(this.model.getTopQuestions(), this.top_rows);
             this._setQuestions(this.model.getBottomQuestions(), this.bottom_rows);
             var question = this.model.getCurrentQuestion();

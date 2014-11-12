@@ -42,6 +42,14 @@
             this.questions = new QuestionList;
         },
 
+        reset: function() {
+            this.questions.reset();
+            this.is_can_load_more = true;
+            this.set("total_errors", 0);
+            this.set("last_answered_index", -1);
+            this.set("index", -1);
+        },
+
         get_url: function(name) {
             return this.get("urls")[name];
         },
@@ -161,8 +169,12 @@
 
             if (exclude.length != 0)
                 params.exclude = exclude.toString();
-            if (force == true)
+
+            if (force == true) {
                 params.force = true;
+                // We don't need to excude questions since we restart quiz.
+                delete params.exclude;
+            }
 
             params = decodeURIComponent($.param(params));
             if (params.length != 0)
@@ -171,8 +183,14 @@
             var self = this;
             this.sendCurrentAnswers(function() {
                 $.getJSON(url, function(data) {
+                    if (force)
+                        self.reset();
                     self.addQuestions(data.questions);
-                    self.moveToNext();
+
+                    if (force)
+                        self.set("index", 0);
+                    else
+                        self.moveToNext();
                 }).error(function(response) {
                     self.trigger("error:load", response);
                 });
