@@ -246,9 +246,6 @@
 				$("#student_stat .header .item a span").html(name);
         fb_set_user_pic("#bttAccount img", true);
 
-        examData.exams['current'].reverse();
-        examData.exams['week'].reverse();
-        examData.exams['week3'].reverse();
         var all_exams = [].concat(examData.exams['week3'], examData.exams['week'],
                                   examData.exams['current']);
 
@@ -256,10 +253,6 @@
         drawExamGraph("mexamgraph", examData.exams['week']);
         drawExamGraph("aexamgraph", examData.exams['week3']);
         drawExamGraph("totexamgraph", all_exams);
-
-        examData.exams['current'].reverse();
-        examData.exams['week'].reverse();
-        examData.exams['week3'].reverse();
 
         fill_topics(data.topics, "week", "wtgraph");
         fill_topics(data.topics, "month", "mtgraph");
@@ -435,9 +428,9 @@
             var exams;
 
             if (period == null) {
-                exams = [].concat(examData.exams["current"],
+                exams = [].concat(examData.exams["week3"],
                                   examData.exams["week"],
-                                  examData.exams["week3"]);
+                                  examData.exams["current"]);
             }
             else
                 exams = examData.exams[period];

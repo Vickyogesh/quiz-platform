@@ -93,7 +93,7 @@
         var lab = p.label($('#' + id).width() / 2, 8, "Statistiche esami");
         lab.attr([{fill:"none"}, {fill:"#0459ac", "font-weight": "bold"}]);
 
-        var id = "#" + id + " svg";
+        id = "#" + id + " svg";
         $(id).attr("width", "100%");
         $(id).attr("height", "100%");
     }
@@ -120,12 +120,8 @@
     UserStat = function(exam_data, num_questions, max_errors) {
         exam_list = exam_data;
 
-        exam_list['current'].reverse();
-        exam_list['week'].reverse();
-        exam_list['week3'].reverse();
-        var all = [].concat(exam_list['week3'], exam_list['week'], exam_list['current']);
-
-        exam_list["all"] = all;
+        exam_list["all"] = [].concat(exam_list['week3'], exam_list['week'],
+                                     exam_list['current']);
 
         num_exam_questions = num_questions;
         max_exam_errors = max_errors;
