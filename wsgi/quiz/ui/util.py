@@ -9,9 +9,9 @@ from ..access import current_user
 from ..login import QUIZ_ID_MAP
 
 QUIZ_TITLE = {
-    1: lazy_gettext('B 2011'),
+    1: lazy_gettext('Quiz Patente 2011'),
     2: lazy_gettext('CQC'),
-    3: lazy_gettext('B 2013'),
+    3: lazy_gettext('Quiz Patente 2013'),
     4: lazy_gettext('Scooter'),
     # Truck
     5: lazy_gettext('Truck C1 and C1E'),
