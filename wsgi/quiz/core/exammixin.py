@@ -26,7 +26,7 @@ class ExamMixin(object):
     def __init__(self):
         # Get chapters info: priority and chapter's questions' id range.
         sql = self.sql("""SELECT priority, min_id, max_id FROM chapters
-            WHERE quiz_type=:quiz_type""")
+            WHERE quiz_type=:quiz_type ORDER BY id""")
         self.__stmt_ch_info = sql
 
         self.__create_exam = self.sql(self.exams.insert().values(
