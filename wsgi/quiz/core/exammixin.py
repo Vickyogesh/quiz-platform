@@ -65,7 +65,7 @@ class ExamMixin(object):
             WHERE id=:exam_id""")
 
     # Create list of exam questions.
-    # quiz_type is defined in the QuizApp (quiz/wsgi.py)
+    # quiz_type is defined above in the exam_meta.
     # 1 - b2011
     # 2 - cqc
     # 4 - scooter
