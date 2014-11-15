@@ -140,7 +140,6 @@ def init_app():
         for rule in app.url_map._rules:
             if rule.rule.startswith('/ui/static/ui'):
                 rule.build_only = True
-    # print app.url_map
 
 
 def init_quiz(app):

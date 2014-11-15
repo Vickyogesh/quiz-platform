@@ -11,8 +11,12 @@ class ClientView(BaseView):
     """
     decorators = [access.be_client_or_guest.require()]
 
+    @staticmethod
+    def account_url():
+        return account_url()
+
     def page_urls(self):
-        return {'account': account_url()}
+        return {'account': ClientView.account_url()}
 
 
 class ClientFullscreenView(ClientView):
