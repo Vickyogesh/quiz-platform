@@ -114,11 +114,13 @@ def init_app():
     from . import access
     from . import login
     from .api import api
-    from .ui import ui
+    # from .ui import ui
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
-    app.register_blueprint(ui, url_prefix='/ui')
+    # app.register_blueprint(ui, url_prefix='/ui')
+
+    init_quiz(app)
 
     # Like this we disable static files handing by flask on production
     # to test (and be sure) if apache (or nginx) serve them.
@@ -138,3 +140,12 @@ def init_app():
         for rule in app.url_map._rules:
             if rule.rule.startswith('/ui/static/ui'):
                 rule.build_only = True
+    # print app.url_map
+
+
+def init_quiz(app):
+    from .assets import assets
+    from . import quiz_b
+
+    assets.init_app(app)
+    quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/new')

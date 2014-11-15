@@ -1,0 +1,71 @@
+{% extends "base_page.html" %}
+{% import "utils.html" as utils %}
+
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block navbar_class %}hidden{% endblock %}
+{% block content_class %}menu{% endblock %}
+
+{% block body %}
+  {{ utils.fb_async_init(fb_appid) }}
+  {{ super() }}
+{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>
+    <a href="{{ urls.account }}">
+    <span>{{ user.account.name }} {{ user.account.surname }}</span>
+    </a>
+  </h4>
+  {{ utils.fullscreen_button() }}
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<div class="content row">
+  <div class="col-sm-4">
+    <a href="{{ url_for('.client_menu_quiz') }}">
+       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+    </a>
+  </div>
+  <div class="col-sm-4">{% block exam_button %}{% endblock %}</div>
+  <div class="col-sm-4">
+    <a href="{{ url_for('.client_review') }}">
+      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="footer row">
+  <div class="col-sm-3"></div>
+  <div class="col-sm-3"><a href="{{ url_for('.client_statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
+  <div class="col-sm-3"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
+  <div class="col-sm-3">
+    {% if not user.account.fb_id %}
+    <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{%- block page_script %}
+  $("#btt-logout").click(function() {
+    if (parent.logout !== undefined)
+      parent.logout();
+    else
+      window.location = "{{ url_for('.logout') }}";
+  });
+
+  {% if not user.account.fb_id %}
+    window.g.labels.fb_connect_ok = "{{ _('Your facebook account has been successfully linked!') }}";
+    window.g.labels.fb_connect_fail = "{{ _('Unable to link account with Facebook.') }}";
+    window.g.link_fb_url = "{{ url_for('api.link_facebook') }}";
+    $("#fb-link").click(function() {
+      FbAux.linkFbAccount(function() {
+        location.reload();
+      });
+    });
+  {% endif %}
+{% endblock %}

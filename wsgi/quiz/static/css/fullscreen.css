@@ -1,0 +1,104 @@
+.header h4 {
+  display: inline-block;
+}
+.header .fullscreen {
+  margin-top: 10px;
+  margin-right: 5px;
+}
+
+.header .fullscreen > a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+html.is-fullscreen, html.is-fullscreen body {
+  width:100% !important;
+  height:100% !important;
+}
+
+html.is-fullscreen .container {
+    width:100%;
+    height:100%;
+    max-width: inherit;
+    padding: 15px;
+}
+
+html.is-fullscreen .container .contentpanel {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  height: 100%;
+}
+
+/* Menu */
+
+html.is-fullscreen .menu .contentpanel .content {
+  height: 70%;
+}
+
+html.is-fullscreen .menu .contentpanel .col-sm-4 {
+  height: 100%;
+  display: table;
+}
+html.is-fullscreen .menu .contentpanel .col-sm-4 a {
+  display: table-cell;
+  vertical-align: middle;
+}
+html.is-fullscreen .menu .contentpanel .col-sm-4 > div {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+html.is-fullscreen .menu .footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
+}
+
+/* Quiz/Review */
+html.is-fullscreen .quiz-menu .topics {
+  font-size: 16px;
+}
+
+html.is-fullscreen .quiz #quiz-content {
+  position: absolute;
+  right: 10px;
+  left: 0;
+  top: 30%;
+}
+
+html.is-fullscreen .quiz #quiz-content .img-wrapper a > img {
+  max-width: inherit;
+}
+
+html.is-fullscreen #colorbox .cboxPhoto {
+  width: 400px;
+  height: 400px;
+}
+
+/* Exam */
+html.is-fullscreen #exam-content img.header {
+  width: inherit;
+  display: block;
+  margin: auto;
+}
+
+html.is-fullscreen .exam .bottom-nav > div {
+  width: 20px;
+}
+
+html.is-fullscreen .exam .text-rect table {
+  font-size: 20px;
+}
+
+html.is-fullscreen .exam .exam-data .image a > img {
+  max-width: inherit;
+}
+
+.container.menu, .container.exam, .container.exam-review, .container.quiz-menu,
+.container.statistics, .container.quiz {
+  display: none;
+}
