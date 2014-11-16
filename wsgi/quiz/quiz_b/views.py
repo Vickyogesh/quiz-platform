@@ -22,7 +22,7 @@ class ClientMenu(views.ClientView):
 
 @quiz.view
 class ClientMenuQuiz(views.ClientTopicsView):
-    template_name = 'quiz_b/menu_quiz.html'
+    template_name = 'quiz_b/menu_topics.html'
 
 
 @quiz.view

@@ -77,7 +77,7 @@ class IndexView(BaseView):
     """
     methods = ['GET', 'POST']
     check_access = False
-    template_name = 'index.html'
+    template_name = 'common_index.html'
     url_rule = '/'
 
     def dispatch_request(self, *args, **kwargs):

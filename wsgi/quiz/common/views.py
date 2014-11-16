@@ -287,7 +287,7 @@ class ClientStatisticsView(ClientStatisticsBase):
 
     May be used without changes for various quiz types.
     """
-    template_name = 'statistics_client.html'
+    template_name = 'common_statistics_client.html'
     endpoint = 'client_statistics'
     url_rule = (
         ('/statistics', {'defaults': {'uid': 'me'}}),
@@ -331,7 +331,7 @@ class ClientTopicStatisticsView(ClientStatisticsBase):
 
     May be used without changes for various quiz types.
     """
-    template_name = 'statistics_client_topic.html'
+    template_name = 'common_statistics_client_topic.html'
     endpoint = 'client_statistics_topic'
     url_rule = '/statistics/<uid:uid>/topic/<int:topic_id>'
 
@@ -362,7 +362,7 @@ class ClientExamStatisticsView(ClientStatisticsBase):
 
     May be used without changes for various quiz types.
     """
-    template_name = 'statistics_client_exams.html'
+    template_name = 'common_statistics_client_exams.html'
     endpoint = 'client_statistics_exams'
     url_rule = '/statistics/<uid:uid>/exams/<range>'
 
