@@ -10,7 +10,7 @@ from .. import access
 class SchoolView(BaseView):
     """Base school page view.
 
-    It adds to the :class:`BaseView` school permission check.
+    It adds account URl to the template and performs school permission check.
     """
     decorators = [access.be_admin_or_school.require()]
 
@@ -32,7 +32,7 @@ class SchoolView(BaseView):
 class SchoolMenuView(SchoolView):
     """Common school menu view.
 
-    It adds URLs to the template and renders school's client list.
+    It adds extra URLs to the template and renders school's client list.
 
     May be used without changes for various quiz types.
     """
@@ -63,6 +63,7 @@ class SchoolMenuView(SchoolView):
 class SchoolStatisticsView(SchoolView):
     """Common school statistics view.
 
+    It adds extra URLs to the template and renders common school statistics.
     """
     template_name = 'common_statistics_school.html'
     endpoint = 'school_statistics'

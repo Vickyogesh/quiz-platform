@@ -55,6 +55,8 @@ class ClientFullscreenView(ClientView):
             return self.render_template()
 
 
+# -- Quiz & Review views -------------------------------------------------------
+
 class ClientTopicsView(ClientView):
     """Common view for the quiz topics page.
 
@@ -73,8 +75,6 @@ class ClientTopicsView(ClientView):
             'account': ClientView.account_url()
         }
 
-
-# -- Quiz & Review views ----------------------------------
 
 class QuizViewBase(ClientView):
     """Base class for Quiz & Review views.
@@ -158,7 +158,7 @@ class ClientReviewView(QuizViewBase):
                                                self.request_lang, exclude)
 
 
-# -- Exam views -------------------------------------------
+# -- Exam views ----------------------------------------------------------------
 
 class ClientExamView(ClientView):
     """Common exam view.
@@ -218,7 +218,7 @@ class ClientExamReviewView(ClientView):
         return self.render_template(exam=info)
 
 
-# -- Statistics views -------------------------------------
+# -- Statistics views ----------------------------------------------------------
 
 class ClientStatisticsBase(ClientView):
     """Base class for the client statistics views.
