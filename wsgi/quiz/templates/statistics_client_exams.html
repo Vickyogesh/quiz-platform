@@ -1,0 +1,36 @@
+{% extends "statistics_base.html" %}
+
+{% block navbar_header_class %}no-button{% endblock %}
+
+{% block panel_content %}
+  <div id="examstat">
+    <div class="row separator" id="header">
+      <div class="col-md-12">{{ _('Exam list') }}</div>
+    </div>
+    {% for exam in exams if exam.status == 'failed' or exam.status == 'passed'%}
+    <div class="row examrow" id="exam{{ exam.id }}">
+      <div class="col-md-12 exam-title">
+        <span class="glyphicon
+          {% if exam.status == 'passed' %}
+          glyphicon-ok-circle
+          {% else %}
+          glyphicon-remove-circle
+          {% endif %}
+        "></span>
+        <span class="exam-time">{{ exam.start }}</span>
+        <span>{{ _('Exam %(num)d (%(err)d/%(total)d)', num=exam.id, err=exam.errors, total=quiz_meta.exam_meta.num_questions) }}</span>
+      </div>
+    </div>
+    <div class="exam-answers" data-exam-id="{{ exam.id }}"></div>
+    {% else %}
+    <p class="bg-danger footer-space">{{ _('There are no exams.') }} </p>
+    {%- endfor -%}
+  </div>
+{% endblock %}
+
+{% block express_bar_anchor %}#header{% endblock %}
+{% block page_script %}
+  window.g.exam_url = "{{ urls.exam }}";
+  window.g.image_url = "{{ urls.image }}";
+  var exam_stat = new ExamStat;
+{% endblock%}

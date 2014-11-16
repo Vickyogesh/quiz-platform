@@ -406,4 +406,9 @@ class BaseView(View):
                 bp.route(cls.url_rule)(view)
             else:
                 for rule in cls.url_rule:
-                    bp.route(*rule)(view)
+                    if len(rule) == 2:
+                        bp.route(rule[0], **rule[1])(view)
+                    elif len(rule) == 1:
+                        bp.route(rule[0])(view)
+                    else:
+                        raise ValueError('Invalud URL rule')
