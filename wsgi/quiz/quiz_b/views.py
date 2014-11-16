@@ -1,14 +1,14 @@
-from ..common import views
+from ..common import client_views
 from ..common import index
 from .bundle import quiz
 
 
-quiz.view(views.ClientQuizView)
-quiz.view(views.ClientReviewView)
-quiz.view(views.ClientExamReviewView)
-quiz.view(views.ClientStatisticsView)
-quiz.view(views.ClientTopicStatisticsView)
-quiz.view(views.ClientExamStatisticsView)
+quiz.view(client_views.ClientQuizView)
+quiz.view(client_views.ClientReviewView)
+quiz.view(client_views.ClientExamReviewView)
+quiz.view(client_views.ClientStatisticsView)
+quiz.view(client_views.ClientTopicStatisticsView)
+quiz.view(client_views.ClientExamStatisticsView)
 
 @quiz.view
 class IndexView(index.IndexView):
@@ -16,17 +16,17 @@ class IndexView(index.IndexView):
 
 
 @quiz.view
-class ClientMenu(views.ClientView):
+class ClientMenu(client_views.ClientView):
     template_name = 'quiz_b/menu_client.html'
 
 
 @quiz.view
-class ClientMenuQuiz(views.ClientTopicsView):
+class ClientMenuQuiz(client_views.ClientTopicsView):
     template_name = 'quiz_b/menu_topics.html'
 
 
 @quiz.view
-class ClientExam(views.ClientExamView):
+class ClientExam(client_views.ClientExamView):
     template_name = 'quiz_b/exam.html'
 
 

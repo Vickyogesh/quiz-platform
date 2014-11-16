@@ -241,7 +241,7 @@ class Bundle(object):
             access.logout()
             return redirect(url_for('.index'))
 
-        from .views import ClientFullscreenView
+        from .client_views import ClientFullscreenView
         self.view(ClientFullscreenView)
 
     def view(self, view_cls):
