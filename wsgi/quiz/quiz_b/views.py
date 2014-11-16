@@ -5,6 +5,7 @@ from .bundle import quiz
 
 quiz.view(views.ClientQuizView)
 quiz.view(views.ClientReviewView)
+quiz.view(views.ClientExamReviewView)
 quiz.view(views.ClientStatisticsView)
 quiz.view(views.ClientTopicStatisticsView)
 quiz.view(views.ClientExamStatisticsView)
@@ -25,7 +26,7 @@ class ClientMenuQuiz(views.ClientTopicsView):
 
 
 @quiz.view
-class ClientExam(views.ClientView):
+class ClientExam(views.ClientExamView):
     template_name = 'quiz_b/exam.html'
 
 

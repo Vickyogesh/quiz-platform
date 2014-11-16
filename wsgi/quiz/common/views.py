@@ -3,6 +3,7 @@ This module provides common quiz views.
 """
 from flask import redirect, url_for, request, current_app, abort, session
 from flask_login import current_user
+from flask_babelex import gettext
 from .base import BaseView, account_url
 from .. import access
 from ..api import get_user_id
@@ -161,6 +162,68 @@ class ClientReviewView(QuizViewBase):
 
         return current_app.core.getErrorReview(self.meta['id'], uid, lang,
                                                exclude)
+
+
+# -- Exam views -------------------------------------------
+
+class ClientExamView(ClientView):
+    """Common exam view.
+
+    It supposed to be subclassed and set template name.
+    """
+    endpoint = 'client_exam'
+    url_rule = '/exam'
+
+    def page_urls(self):
+        urls = ClientView.page_urls(self)
+        urls['quiz'] = url_for('api.get_error_review')
+        urls['back'] = url_for('.client_menu')
+        urls['image'] = url_for('img_file', filename='')
+        urls['exam'] = url_for('api.save_exam', id=0)[:-1]
+        urls['exam_review'] = url_for('.client_exam_review', id=0)[:-1]
+        return urls
+
+    def dispatch_request(self):
+        lang = request.args.get('lang', 'it')
+        exam_type = request.args.get('exam_type', None)
+        uid = current_user.account_id
+        data = current_app.core.createExam(self.meta['id'], uid, lang,
+                                           exam_type)
+        if 'fb_id' in current_user.account:
+            fb_data = {
+                'id': current_user.account['fb_id'],
+                'text': gettext('Number of errors in exam: %%(num)s'),
+                'description': 'Quiz Patente',
+                'school_title': session.get('extra_school_name'),
+                'school_link': session.get('extra_school_url'),
+                'school_logo_url': session.get('extra_school_logo_url')
+            }
+            fb_data = dict((k, v) for k, v in fb_data.iteritems() if v)
+        else:
+            fb_data = None
+        return self.render_template(exam=data, fb_data=fb_data)
+
+
+class ClientExamReviewView(ClientView):
+    """Common exam review view.
+
+    May be used without changes for various quiz types.
+    """
+    template_name = 'common_exam_review.html'
+    endpoint = 'client_exam_review'
+    url_rule = '/exam_review/<int:id>'
+
+    def page_urls(self):
+        urls = ClientView.page_urls(self)
+        urls['back'] = url_for('.client_menu')
+        return urls
+
+    def dispatch_request(self, id):
+        lang = request.args.get('lang', 'it')
+        info = current_app.core.getExamInfo(id, lang)
+        if info['student']['id'] != current_user.account_id:
+            abort(404)
+        return self.render_template(exam=info)
 
 
 # -- Statistics views -------------------------------------
