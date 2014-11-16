@@ -168,6 +168,21 @@ class Bundle(object):
         #: If not set then prefix will be set as ``/<quiz name>/<quiz year>``.
         self.base_url = base_url
 
+        self.default_rules()
+
+    def default_rules(self):
+        """Default URL rules.
+
+        It adds logout and client fullscreen endpoints to quiz.
+        """
+        @self.route('/logout', methods=['GET', 'POST'])
+        def logout():
+            access.logout()
+            return redirect(url_for('.index'))
+
+        from .client_views import ClientFullscreenView
+        self.view(ClientFullscreenView)
+
     def init_app(self, app, quiz_id, quiz_year, base_prefix=''):
         """Register quiz in the flask application.
 
@@ -203,9 +218,6 @@ class Bundle(object):
         def apply_quiz():
             g.quiz_meta = meta
 
-        # Bind any extra rules.
-        self.extra_rules(bp)
-
         # Register bundle's pluggable views which was decorated with
         # Bundle.view().
         for view_cls in self._views:
@@ -226,24 +238,6 @@ class Bundle(object):
         # And register quiz blueprint in the application.
         app.register_blueprint(bp, url_prefix=prefix)
 
-    def extra_rules(self, bp):
-        """Implement this method in a subclass to perform any extra
-        configuration steps like bind more URL rules.
-
-        This method called from :meth:`Bundle.init_app` before binding all
-        bundle's views.
-
-        Args:
-            bp: quiz blueprint.
-        """
-        @self.route('/logout', methods=['GET', 'POST'])
-        def logout():
-            access.logout()
-            return redirect(url_for('.index'))
-
-        from .client_views import ClientFullscreenView
-        self.view(ClientFullscreenView)
-
     def view(self, view_cls):
         """Decorator to add pluggable views to the quiz bundle.
 
@@ -253,6 +247,8 @@ class Bundle(object):
             class MyView(BaseView):
                 ...
         """
+        if view_cls in self._views:
+            raise AssertionError('Already registered: %s' % view_cls.__name__)
         self._views.append(view_cls)
         return view_cls
 
