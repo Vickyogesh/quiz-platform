@@ -9,8 +9,8 @@
 {% endblock %}
 
 {% block title %}{% block subtitle %}{% endblock%} &mdash;
-  {%- if quiz_title is defined -%}
-    {{ quiz_title }} &mdash;
+  {%- if quiz_meta.title -%}
+    {{ quiz_meta.title }} &mdash;
   {%- endif %}
   {{ _('Quiz Platform') }}
 {%- endblock %}

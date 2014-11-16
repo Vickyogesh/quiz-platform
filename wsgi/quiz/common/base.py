@@ -200,7 +200,8 @@ class Bundle(object):
         """
         # Prepare result metadata as a mix of Bundle.meta and init_app()
         # parameters.
-        meta = dict(id=quiz_id, year=quiz_year, **self.meta)
+        meta = self.meta.__class__(id=quiz_id, year=quiz_year, **self.meta)
+        # meta = dict(id=quiz_id, year=quiz_year, **self.meta)
 
         # Create blueprint for quiz. It's name is always builds as
         # <quiz_name><quiz_year>.
