@@ -234,7 +234,8 @@ class ClientStatisticsBase(ClientView):
     """
     decorators = [access.be_user.require()]
 
-    def check(self, user_id, user_school_id):
+    @staticmethod
+    def check(user_id, user_school_id):
         """Check if current user can access to the statistics.
 
         * If user is a school then requested statistics must belongs to the
