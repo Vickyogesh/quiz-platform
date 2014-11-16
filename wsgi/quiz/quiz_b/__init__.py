@@ -13,6 +13,7 @@ quiz = Bundle(__name__, {
 
 # -- Common views --------------------------------------------------------------
 
+quiz.view(index.IndexView)
 quiz.view(client_views.ClientQuizView)
 quiz.view(client_views.ClientReviewView)
 quiz.view(client_views.ClientExamReviewView)
@@ -24,12 +25,7 @@ quiz.view(school_views.SchoolMenuView)
 quiz.view(school_views.SchoolStatisticsView)
 
 
-# -- Quiz B specific views -----------------------------------------------------
-
-@quiz.view
-class IndexView(index.IndexView):
-    pass
-
+# -- Quiz specific views -------------------------------------------------------
 
 @quiz.view
 class ClientMenu(client_views.ClientView):
