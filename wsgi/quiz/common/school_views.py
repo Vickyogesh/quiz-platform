@@ -37,6 +37,7 @@ class SchoolMenuView(SchoolView):
     May be used without changes for various quiz types.
     """
     template_name = 'common_menu_school.html'
+    url_rule = '/school/menu'
     endpoint = 'school_menu'
 
     def __init__(self):
@@ -66,6 +67,7 @@ class SchoolStatisticsView(SchoolView):
     It adds extra URLs to the template and renders common school statistics.
     """
     template_name = 'common_statistics_school.html'
+    url_rule = '/school/statistics'
     endpoint = 'school_statistics'
 
     @staticmethod
