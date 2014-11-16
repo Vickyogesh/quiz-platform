@@ -144,8 +144,10 @@ def init_app():
 
 def init_quiz(app):
     from .assets import assets
-    from . import quiz_b, quiz_cqc
+    from . import quiz_b, quiz_cqc, quiz_am
 
     assets.init_app(app)
+
     quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/new')
     quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/new')
+    quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2013, base_prefix='/new')
