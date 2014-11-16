@@ -1,0 +1,42 @@
+{% extends "bootstrap/base.html" %}
+{% block html_attribs %} lang="{{ current_lang }}"{% endblock %}
+{% block head -%}{{super()}}{% endblock %}
+{% block title %}{{ _('Privacy') }} &mdash; {{ _('Quiz Platform') }}{% endblock %}
+{% block styles %}
+{{super()}}
+  <style>
+  h2 {text-align: center}
+  .container {max-width: 720px}
+  </style>
+{% endblock %}
+{%- block scripts %}{% endblock -%}
+{%- block content -%}
+<div class="container">
+  <h2>Informativa Privacy</h2>
+  Informativa ai sensi dell’art. 13 del Decreto Legislativo 30 giugno 2003, n.
+  196 e successive modifiche ed integrazioni cd. “Codice Privacy”.
+  Casa Editrice Toni informa che i dati personali forniti ovvero altrimenti
+  acquisiti nell'ambito dell’attività sono trattati nel rispetto del Codice
+  Privacy e degli obblighi di riservatezza cui è ispirata l'attività di Casa
+  Editrice Toni. I dati sono raccolti con modalità telematiche e successivamente
+  trattati con mezzi informatici e manuali, esclusivamente per finalità connesse
+  alla prestazione dei servizi o prodotti richiesti dall’utente, la registrazione
+  al Sito, l’iscrizione al servizio di newsletter, la risposta a domande
+  dell’utente e l’invio di informazioni richieste dall’utente. La presente
+  informativa si ispira alla Raccomandazione n. 2/2001 che le autorità europee
+  per la protezione dei dati personali, riunite nel Gruppo istituito dall’art.
+  29 della direttiva n. 95/46/CE , hanno adottato il 17 maggio 2001 per
+  individuare alcuni requisiti minimi per la raccolta di dati personali on-line,
+  e, in particolare, le modalità, i tempi e la natura delle informazioni che i
+  titolari del trattamento devono fornire agli utenti quando questi si collegano
+  a pagine web, indipendentemente dagli scopi del collegamento. I dati personali
+  richiesti in fase di registrazione sono raccolti dalla Casa Editrice Toni e
+  trattati al fine di soddisfare le obbligazioni nascenti dal contratto concluso
+  con il Cliente. La Casa Editrice Toni garantisce ai propri clienti il rispetto
+  della normativa in materia di trattamento dei dati personali, disciplinata dal
+  codice della privacy di cui al D. Lgs. n. 196/2003. Il titolare del trattamento
+  dati è Casa Editrice Toni di Zana Mirella e C. S.a.s., in persona del legale
+  rappresentante, salvo che sia nominato un responsabile ad hoc, ai sensi
+  dell'art. 29 del D. Lgs. n. 196/2003.
+</div>
+{%- endblock -%}
