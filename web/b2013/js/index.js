@@ -15,7 +15,7 @@ $(document).ready(function () {
 
   $.getScript('//connect.facebook.net/it_IT/sdk.js', function() {
     FB.init({
-        appId: '386320724865196',
+        appId: '306969962800273',
         version: "v2.0",
         xfbml: true,
         status: true

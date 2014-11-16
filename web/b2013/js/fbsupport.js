@@ -42,7 +42,7 @@ function fb_set_user_pic(sel, do_init) {
     if (do_init === true) {
         $.getScript('//connect.facebook.net/en_UK/all.js', function() {
             FB.init({
-                appId: '386320724865196',
+                appId: '306969962800273',
                 version: "v2.0",
                 status: true
             });
