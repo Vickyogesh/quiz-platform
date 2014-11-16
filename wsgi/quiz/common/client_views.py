@@ -120,7 +120,6 @@ class ClientQuizView(QuizViewBase):
 
     def get_quiz(self, topic):
         force = request.args.get('force', False)
-        lang = request.args.get('lang', 'it')
         uid = current_user.account_id
 
         # TODO: what if x is not int?
@@ -128,8 +127,8 @@ class ClientQuizView(QuizViewBase):
         if exclude is not None:
             exclude = [int(x) for x in exclude.split(',')]
 
-        return current_app.core.getQuiz(self.meta['id'], uid, topic, lang,
-                                        force, exclude)
+        return current_app.core.getQuiz(self.meta['id'], uid, topic,
+                                        self.request_lang, force, exclude)
 
 
 class ClientReviewView(QuizViewBase):
@@ -148,7 +147,6 @@ class ClientReviewView(QuizViewBase):
         return urls
 
     def get_quiz(self):
-        lang = request.args.get('lang', 'it')
         uid = current_user.account_id
 
         # TODO: what if x is not int?
@@ -156,8 +154,8 @@ class ClientReviewView(QuizViewBase):
         if exclude is not None:
             exclude = [int(x) for x in exclude.split(',')]
 
-        return current_app.core.getErrorReview(self.meta['id'], uid, lang,
-                                               exclude)
+        return current_app.core.getErrorReview(self.meta['id'], uid,
+                                               self.request_lang, exclude)
 
 
 # -- Exam views -------------------------------------------
@@ -180,11 +178,10 @@ class ClientExamView(ClientView):
         return urls
 
     def dispatch_request(self):
-        lang = request.args.get('lang', 'it')
         exam_type = request.args.get('exam_type', None)
         uid = current_user.account_id
-        data = current_app.core.createExam(self.meta['id'], uid, lang,
-                                           exam_type)
+        data = current_app.core.createExam(self.meta['id'], uid,
+                                           self.request_lang, exam_type)
         if 'fb_id' in current_user.account:
             fb_data = {
                 'id': current_user.account['fb_id'],
@@ -215,8 +212,7 @@ class ClientExamReviewView(ClientView):
         return urls
 
     def dispatch_request(self, id):
-        lang = request.args.get('lang', 'it')
-        info = current_app.core.getExamInfo(id, lang)
+        info = current_app.core.getExamInfo(id, self.request_lang)
         if info['student']['id'] != current_user.account_id:
             abort(404)
         return self.render_template(exam=info)
@@ -308,9 +304,9 @@ class ClientStatisticsView(ClientStatisticsBase):
 
     def dispatch_request(self, uid):
         user_id = get_user_id(uid)
-        lang = request.args.get('lang', 'it')
         try:
-            stat = current_app.core.getUserStat(self.meta['id'], user_id, lang)
+            stat = current_app.core.getUserStat(self.meta['id'], user_id,
+                                                self.request_lang)
         except QuizCoreError:
             stat = None
             exams = None
@@ -342,11 +338,10 @@ class ClientTopicStatisticsView(ClientStatisticsBase):
         return urls
 
     def dispatch_request(self, uid, topic_id):
-        lang = request.args.get('lang', 'it')
         user_id = get_user_id(uid)
         self._uid = uid
         errors = current_app.core.getTopicErrors(self.meta['id'], user_id,
-                                                 topic_id, lang)
+                                                 topic_id, self.request_lang)
 
         self.check(user_id, errors['student']['school_id'])
         return self.render_template(errors=errors, uid=uid)

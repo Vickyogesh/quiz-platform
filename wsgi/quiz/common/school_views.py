@@ -88,8 +88,8 @@ class SchoolStatisticsView(SchoolView):
 
     def dispatch_request(self):
         uid = current_user.account_id
-        lang = request.args.get('lang', 'it')
-        res = current_app.core.getSchoolStat(self.meta['id'], uid, lang)
+        res = current_app.core.getSchoolStat(self.meta['id'], uid,
+                                             self.request_lang)
 
         # Since res doesn't contain user names then
         # we need to get names from the account service and update result.

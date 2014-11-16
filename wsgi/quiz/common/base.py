@@ -275,7 +275,7 @@ class Bundle(object):
 class BaseView(View):
     """Base view for all quiz views.
 
-    It extends :class:`flask.views.View` with the following fetures:
+    It extends :class:`flask.views.View` with the following features:
 
     * template rendering with common values in the template context.
     * access to the quiz metadata.
@@ -329,6 +329,18 @@ class BaseView(View):
         Consist of ``<quiz_name><quiz_year>``, like *b2014*.
         """
         return ''.join((self.meta['name'], str(self.meta['year'])))
+
+    @property
+    def request_lang(self):
+        """Requested language.
+
+        Returns:
+            Value of ``lang`` URL query parameter if set, otherwise *it*.
+
+        Note:
+            Valid only withing request context.
+        """
+        return request.args.get('lang', 'it')
 
     def page_urls(self):
         """Implement in a subclass to put URLs dic to the template."""
