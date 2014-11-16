@@ -40,7 +40,7 @@ class IndexView(index.IndexView):
 
 
 @quiz.view
-class ClientMenu(client_views.ClientView):
+class ClientMenu(client_views.ClientMenuView):
     template_name = 'quiz_cqc/menu_client.html'
 
 

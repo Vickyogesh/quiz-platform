@@ -28,7 +28,7 @@ quiz.view(school_views.SchoolStatisticsView)
 # -- Quiz specific views -------------------------------------------------------
 
 @quiz.view
-class ClientMenu(client_views.ClientView):
+class ClientMenu(client_views.ClientMenuView):
     template_name = 'quiz_b/menu_client.html'
 
 

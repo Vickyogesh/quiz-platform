@@ -55,6 +55,15 @@ class ClientFullscreenView(ClientView):
             return self.render_template()
 
 
+class ClientMenuView(ClientView):
+    """Base class for client menu view.
+
+    It sets default valued for url and endpoint.
+    """
+    url_rule = '/menu'
+    endpoint = 'client_menu'
+
+
 # -- Quiz & Review views -------------------------------------------------------
 
 class ClientTopicsView(ClientView):
@@ -66,6 +75,7 @@ class ClientTopicsView(ClientView):
     * quiz - Quiz by topic base URL.
     * account - Account page URL.
     """
+    url_rule = '/menu/quiz'
     endpoint = 'client_menu_quiz'
 
     def page_urls(self):
@@ -139,6 +149,7 @@ class ClientReviewView(QuizViewBase):
     May be used without changes for various quiz types.
     """
     template_name = 'common_review.html'
+    url_rule = '/review'
     endpoint = 'client_review'
 
     def page_urls(self):
