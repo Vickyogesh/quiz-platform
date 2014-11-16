@@ -1,5 +1,5 @@
 """
-This module provides common quiz views.
+This module provides common client related quiz views.
 """
 from flask import redirect, url_for, request, current_app, abort, session
 from flask_login import current_user
@@ -9,10 +9,6 @@ from .. import access
 from ..api import get_user_id
 from ..core.exceptions import QuizCoreError
 
-
-###########################################################
-# Client views
-###########################################################
 
 class ClientView(BaseView):
     """Base client page view.
