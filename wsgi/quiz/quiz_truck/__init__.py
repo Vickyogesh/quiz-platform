@@ -31,22 +31,38 @@ sublicense = {
 
 
 class TruckMeta(dict):
+    """Extends :class:`dict` with pseudo items.
+
+    If one of the :attr:`TruckMeta.sub_items` is requested then lookup will be
+    performed in :attr:`sublicense` dictionary depending on value
+    in the session's ``sub_license``.
+
+    It used to fit truck quiz sublicense metadata to the common quiz bundle
+    structure.
+
+    Notes:
+        * This class requires request context
+        * There must be ``session['sub_license']`` value.
+
+    See Also:
+        :func:`_handle_sub_license` sources.
+    """
     sub_items = ('id', 'title', 'exam_meta')
+
+    def __subitem(self, name, d=None):
+        sub = session.get('sub_license')
+        if name == 'id':
+            return sub
+        return sublicense[name][sub] if sub is not None else d
 
     def __getitem__(self, item):
         if item in self.sub_items:
-            sub = session.get('sub_license')
-            if item == 'id':
-                return sub
-            return sublicense[item][sub] if sub is not None else '<>'
+            return self.__subitem(item)
         return dict.__getitem__(self, item)
 
     def get(self, k, d=None):
         if k in self.sub_items:
-            sub = session.get('sub_license')
-            if k == 'id':
-                return sub
-            return sublicense[k][sub] if sub is not None else d
+            return self.__subitem(item, d)
         return dict.get(self, k, d)
 
 
@@ -60,6 +76,13 @@ def _handle_sub_license():
     session and DB.
 
     Otherwise try to get it from DB and put on session.
+
+    This function is used by client and school menu pages where the user
+    can change sub license type.
+
+    Note:
+        ``sub`` query parameter is provided by the
+        :file:`templates/quiz_truck/sublicense.html`.
     """
     user = current_user
     try:
