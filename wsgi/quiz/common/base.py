@@ -123,6 +123,37 @@ def check_access(f):
     return wrapper
 
 
+def modify_static_endpoint(app, endpoint):
+    """Updates given *static* ``endpoint`` to have
+    the same URL as application's *static* endpoint.
+
+    It also makes the URL build only to  disable static files handing by
+    flask on production to test (and be sure) if apache (or nginx) serve them.
+    If apache/nginx configured wrongly then static files will not be
+    handled at all.
+
+    For OpenShift all static files must be placed inside ``wsgi/static``
+    to be correctly handled by apache (at least for python cartridge).
+    You need to add symlinks to ``wsgi/static`` if you have assets
+    in other locations in ``.openshift/action_hooks/deploy``. For example::
+
+        ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static \
+              $OPENSHIFT_REPO_DIR/wsgi/static/ui
+
+    Here we create symlink for frontend's static files, now apache will serve
+    urls like ``site.com/ui/static/ui/<path to asset>``.
+
+    Args:
+        app: Application instance
+        endpoint: source endpoint which must have the same static URL as app's.
+    """
+    app_static = next(app.url_map.iter_rules('static'))
+    for rule in app.url_map.iter_rules(endpoint):
+        rule.rule = app_static.rule
+        rule.build_only = not app.debug
+        rule.refresh()
+
+
 class Bundle(object):
     """Quiz bundle.
 
@@ -196,6 +227,16 @@ class Bundle(object):
         from .client_views import ClientFullscreenView
         self.view(ClientFullscreenView)
 
+    def modify_static_endpoint(self, app, bp_name):
+        """Updates quiz blueprint's *static* endpoint to have
+        the same URL as application's *static* endpoint.
+
+        Notes:
+            It used because quizzes shares a lot of web assets (js, css etc)
+            so there is no reason to split static files URLs.
+        """
+        modify_static_endpoint(app, '%s.static' % bp_name)
+
     def init_app(self, app, quiz_id, quiz_year, base_prefix=''):
         """Register quiz in the flask application.
 
@@ -251,6 +292,7 @@ class Bundle(object):
 
         # And register quiz blueprint in the application.
         app.register_blueprint(bp, url_prefix=prefix)
+        self.modify_static_endpoint(app, bp_name)
 
     def view(self, view_cls):
         """Decorator to add pluggable views to the quiz bundle.

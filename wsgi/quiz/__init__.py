@@ -8,7 +8,6 @@ from .core.exceptions import QuizCoreError
 from .serviceproxy import AccountsApi
 
 app = None
-assets = None
 
 
 class IdConverter(BaseConverter):
@@ -40,7 +39,6 @@ class WordConverter(BaseConverter):
 def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
     # Default initialization
     global app
-    global assets
     app = Application(__name__)
 
     # Load configuration
@@ -51,7 +49,6 @@ def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
 
     # Core initialization
     app.init()
-    assets = app.assets
 
     # Force Italian translations.
     # Also may be configured via BABEL_DEFAULT_LOCALE.
@@ -92,10 +89,8 @@ def init_app():
     # in the templates, and files will be handled by apache or nginx.
     app.add_url_rule('/img/<filename>', 'img_file', build_only=True)
 
-    debug = app.config.get('DEBUG', False)
-
     # for testing
-    if debug is True:
+    if app.debug:
         import os.path
         from werkzeug import SharedDataMiddleware
         here = os.path.dirname(__file__)
@@ -114,32 +109,17 @@ def init_app():
     from . import access
     from . import login
     from .api import api
-    # from .ui import ui
+    from .ui import ui
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
-    # app.register_blueprint(ui, url_prefix='/ui')
+    app.register_blueprint(ui, url_prefix='/ui')
 
+    from .common import base
+
+    base.modify_static_endpoint(app, 'ui.static')
     init_quiz(app)
-
-    # Like this we disable static files handing by flask on production
-    # to test (and be sure) if apache (or nginx) serve them.
-    # If apache/nginx configured wrongly then static files will not be
-    # handled at all.
-    # NOTE: for OpenShift all static files must be placed inside wsgi/static
-    # to be correctly handled by apache (at least for python cartridge).
-    # You need to add symlinks to wsgi/static if you have assets
-    # in other locations in .openshift/action_hooks/deploy. For example:
-    #
-    #   ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static \
-    #         $OPENSHIFT_REPO_DIR/wsgi/static/ui
-    #
-    # here we create symlink for frontend's static files, now apache will serve
-    # urls like site.com/ui/static/ui/<path to asset>.
-    if debug is False:
-        for rule in app.url_map._rules:
-            if rule.rule.startswith('/ui/static/ui'):
-                rule.build_only = True
+    print app.url_map
 
 
 def init_quiz(app):
