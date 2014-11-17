@@ -1,3 +1,6 @@
+"""
+This module implements common login feature.
+"""
 import hashlib
 from werkzeug.exceptions import HTTPException
 from flask import request, current_app, flash, session, redirect, url_for
@@ -63,17 +66,30 @@ def after_login():
 
 
 class LoginFrom(Form):
+    """Login form"""
+    #: Account name
     name = StringField(lazy_gettext('Login'))
+
+    #: Account password
     pwd = PasswordField(lazy_gettext('Password'))
+
+    #: Hidden field to pass FB auth ID from JS side to backend.
     fb_auth_id = HiddenField()
+
+    #: Hidden field to pass FB auth token from JS side to backend.
     fb_auth_token = HiddenField()
+
+    #: Hidden field to determine if normal or facebook login is used.
     is_fb = HiddenField()
 
 
 class IndexView(BaseView):
-    """Common quiz index page with login form.
+    """Common quiz index view with login form.
 
     It also redirects already signed in users to corresponding pages.
+
+    See Also:
+        :func:`after_login`.
     """
     methods = ['GET', 'POST']
     check_access = False

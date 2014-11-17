@@ -61,7 +61,16 @@ def update_account_data():
 
 
 def account_url(with_uid=True):
-    """Accounts URL with the fallback URL of current page."""
+    """Returns user account page URL.
+    with the fallback URL of current page.
+
+    Example::
+
+        http://accounts-service.com/path/to/profile?cid=...&uid=...&next...
+
+    Args:
+        with_uid: Include user ID to the query.
+    """
     next_url = Href(request.url)
     url, cid = current_app.account.getUserAccountPage()
     args = {
@@ -173,7 +182,11 @@ class Bundle(object):
     def default_rules(self):
         """Default URL rules.
 
-        It adds logout and client fullscreen endpoints to quiz.
+        It adds logout and client fullscreen endpoints to quiz. So by default
+        quiz bundle has two endpoints preconfigured:
+
+        * logout - log out from the quiz and redirect to login page.
+        * client_fullscreen - see :class:`.ClientFullscreenView`.
         """
         @self.route('/logout', methods=['GET', 'POST'])
         def logout():
@@ -256,7 +269,7 @@ class Bundle(object):
     def route(self, rule, **kwargs):
         """Decorator to add view function to the quiz bundle.
 
-        Like :meth:`Flask.route` but for :class:`Bundle`.
+        Like :meth:`flask.Flask.route` but for :class:`Bundle`.
         """
         def decorator(f):
             protect = True
@@ -288,7 +301,7 @@ class BaseView(View):
     #: Custom endpoint name. If not set then it will be built
     #: from the class name in *under_scored* format.
     #:
-    #: .. seealso: :class:`BaseView.get_endpoint`.
+    #: .. seealso:: :class:`BaseView.get_endpoint`.
     endpoint = None
 
     #: URL rule(s).
@@ -301,11 +314,12 @@ class BaseView(View):
     #: string
     #:      will ne used as URL.
     #:
-    #: iterable with tuples (URL, **options)
-    #:      will be applied each rule. (URL, **options) are parameters for
-    #:      blueprint's route().
+    #: iterable with tuples (``URL``, ``**options``)
+    #:      will be applied each rule. (``URL``, ``**options``) are
+    #:      parameters for blueprint's route().
     #:
-    #: .. seealso: :class:`BaseView.register_in`.
+    #:
+    #: .. seealso:: :class:`BaseView.register_in`.
     url_rule = None
 
     @property
@@ -319,7 +333,7 @@ class BaseView(View):
 
     @property
     def quiz_fullname(self):
-        """Full name if the quiz.
+        """Full name of the quiz.
 
         Mainly used to pass to the **Accounts Service**.
 
@@ -340,14 +354,29 @@ class BaseView(View):
         return request.args.get('lang', 'it')
 
     def page_urls(self):
-        """Implement in a subclass to put URLs dic to the template."""
+        """Returns dict with URLs for template.
+
+        It's just a convention to use some URLs in a template. The view will
+        pass ``urls`` to the template context.
+
+        Example workflow::
+
+            def page_urls(self):
+                return {'myurl': 'http://google.com'}
+
+        In the template.html::
+
+            {{ urls.myurl }}
+
+        Returns None by default (no urls will be passed to the template).
+        """
         pass
 
     def render_template(self, **kwargs):
         """Renders :attr:`BaseView.template_name`.
 
         Args:
-            kwargs: keyvalue arguments to be passed to the template.
+            kwargs: keyword arguments to be passed to the template.
 
         By default passes few parameters to the template:
 
@@ -355,7 +384,7 @@ class BaseView(View):
         * ``quiz_fullname`` - ``<quiz_name><quiz_year>``.
         * ``user`` - current user object, see :class:`quiz.access.User`.
         * ``fb_appid`` - Facebook application ID.
-        * ``urls`` - Page URLs, see :math:``BaseView.page_urls``.
+        * ``urls`` - Page URLs, see :meth:`BaseView.page_urls`.
         """
         kwargs['quiz_meta'] = self.meta
         kwargs['quiz_fullname'] = self.quiz_fullname
@@ -369,12 +398,23 @@ class BaseView(View):
         return render_template(self.template_name, **kwargs)
 
     def dispatch_request(self, *args, **kwargs):
-        """Render template on request."""
+        """By default renders template on request.
+
+        Override in subclass to change this behaviour.
+        """
         return self.render_template()
 
     @classmethod
     def get_endpoint(cls):
-        """Returns final endpoint of the view class."""
+        """Returns final endpoint of the view class.
+
+        It returns :attr:`BaseView.endpoint` if set otherwise constructs it
+        from the class name in ``under_scored`` format without *View* postfix.
+
+        For example::
+
+            MySuperView -> my_super
+        """
         if cls.endpoint:
             return cls.endpoint
         else:

@@ -13,7 +13,7 @@ from ..core.exceptions import QuizCoreError
 class ClientView(BaseView):
     """Base client page view.
 
-    It adds to the :class:`BaseView` client permission check and account URL
+    It adds to the :class:`.BaseView` client permission check and account URL
     for template.
     """
     decorators = [access.be_client_or_guest.require()]
@@ -23,7 +23,7 @@ class ClientView(BaseView):
         """Account page URL.
 
         See Also:
-            :func:`.base.account_url`.
+            :func:`~.base.account_url`.
         """
         return account_url()
 
@@ -56,10 +56,7 @@ class ClientFullscreenView(ClientView):
 
 
 class ClientMenuView(ClientView):
-    """Base class for client menu view.
-
-    It sets default valued for url and endpoint.
-    """
+    """Base class for client menu view."""
     url_rule = '/menu'
     endpoint = 'client_menu'
 
@@ -117,7 +114,8 @@ class ClientQuizView(QuizViewBase):
     It adds extra template URL - ``quiz`` and implements common
     quiz building algo in the :meth:`~QuizViewBase.get_quiz`.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_quiz.html'
     url_rule = '/quiz/<int:topic>'
@@ -146,7 +144,8 @@ class ClientReviewView(QuizViewBase):
 
     It adds extra template URL and implements common review algo.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_review.html'
     url_rule = '/review'
@@ -211,7 +210,8 @@ class ClientExamView(ClientView):
 class ClientExamReviewView(ClientView):
     """Common exam review view.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_exam_review.html'
     endpoint = 'client_exam_review'
@@ -237,7 +237,8 @@ class ClientStatisticsBase(ClientView):
     It limits access to the page only by clients excluding guest users and
     handles ``name`` URL query parameter.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     decorators = [access.be_user.require()]
 
@@ -287,9 +288,10 @@ class ClientStatisticsView(ClientStatisticsBase):
       School's statistics passes it query; school menu page doesn't set
       back URL at all. Client's stat page (this page) saves it
       in session. And later can extract it.
-      For more info see :meth:`ClientStatistics.page_urls` sources.
+      For more info see :meth:`ClientStatisticsView.page_urls` sources.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_statistics_client.html'
     endpoint = 'client_statistics'
@@ -333,7 +335,8 @@ class ClientTopicStatisticsView(ClientStatisticsBase):
     It provides back URL depending on request URL and implements
     common topics info algo.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_statistics_client_topic.html'
     endpoint = 'client_statistics_topic'
@@ -363,7 +366,8 @@ class ClientExamStatisticsView(ClientStatisticsBase):
 
     It provides URLs for the template and implements common exam info logic.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_statistics_client_exams.html'
     endpoint = 'client_statistics_exams'

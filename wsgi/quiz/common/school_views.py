@@ -34,7 +34,8 @@ class SchoolMenuView(SchoolView):
 
     It adds extra URLs to the template and renders school's client list.
 
-    May be used without changes for various quiz types.
+    Note:
+        May be used without changes for various quiz types.
     """
     template_name = 'common_menu_school.html'
     url_rule = '/school/menu'
