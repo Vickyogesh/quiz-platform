@@ -238,7 +238,7 @@ class Bundle(object):
         modify_static_endpoint(app, '%s.static' % bp_name)
 
     def init_app(self, app, quiz_id, quiz_year, base_prefix='',
-                 as_default=False):
+                 no_url_year=False, main=False):
         """Register quiz in the flask application.
 
         Args:
@@ -246,8 +246,8 @@ class Bundle(object):
             quiz_id: Quiz ID in the database.
             quiz_year: Quiz year.
             base_prefix: Prefix for quiz URLs.
-            as_default: Create extra endpoint to handle
-                ``/<base_prefix>/<quiz_name>`` URL without specifying year.
+            no_url_year: Don't put ``quiz_year`` to the attr:`Bundle.base_url`.
+            main: Redirect ``/<base_prefix>`` to this quiz.
 
         Result URL prefix is build from :attr:`Bundle.base_url` and
         ``base_prefix``::
@@ -288,7 +288,10 @@ class Bundle(object):
 
         # Create final URL prefix.
         if self.base_url is None:
-            base_url = '/{0}/{1}'.format(meta['name'], meta['year'])
+            if no_url_year:
+                base_url = '/{0}'.format(meta['name'])
+            else:
+                base_url = '/{0}/{1}'.format(meta['name'], meta['year'])
         else:
             base_url = self.base_url
         prefix = base_prefix + base_url
@@ -297,13 +300,9 @@ class Bundle(object):
         app.register_blueprint(bp, url_prefix=prefix)
         self.modify_static_endpoint(app, bp_name)
 
-        # Create extra URL '/<quiz_name>' to access to quiz without
-        # specifying a year.
-        if as_default:
-            url = '{0}/{1}'.format(base_prefix, meta['name'])
-            ep = '%s.default_index' % meta['name']
-            @app.route(url, endpoint=ep)
-            def default_index():
+        if main:
+            @app.route(base_prefix)
+            def main_quiz():
                 return redirect(url_for('%s.index' % bp_name))
 
     def view(self, view_cls):
