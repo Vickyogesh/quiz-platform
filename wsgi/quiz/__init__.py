@@ -116,7 +116,11 @@ def init_app():
     from . import quiz_b, quiz_cqc, quiz_am, quiz_truck
 
     quiz_b.quiz.init_app(app, quiz_id=1, quiz_year=2011, base_prefix='/ui')
-    quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/ui')
-    quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/ui')
-    quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2013, base_prefix='/ui')
-    quiz_truck.quiz.init_app(app, quiz_id=5, quiz_year=2013, base_prefix='/ui')
+    quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/ui',
+                           as_default=True)
+    quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/ui',
+                         as_default=True)
+    quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2013, base_prefix='/ui',
+                          as_default=True)
+    quiz_truck.quiz.init_app(app, quiz_id=5, quiz_year=2013, base_prefix='/ui',
+                             as_default=True)

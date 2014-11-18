@@ -237,7 +237,8 @@ class Bundle(object):
         """
         modify_static_endpoint(app, '%s.static' % bp_name)
 
-    def init_app(self, app, quiz_id, quiz_year, base_prefix=''):
+    def init_app(self, app, quiz_id, quiz_year, base_prefix='',
+                 as_default=False):
         """Register quiz in the flask application.
 
         Args:
@@ -245,6 +246,8 @@ class Bundle(object):
             quiz_id: Quiz ID in the database.
             quiz_year: Quiz year.
             base_prefix: Prefix for quiz URLs.
+            as_default: Create extra endpoint to handle
+                ``/<base_prefix>/<quiz_name>`` URL without specifying year.
 
         Result URL prefix is build from :attr:`Bundle.base_url` and
         ``base_prefix``::
@@ -293,6 +296,15 @@ class Bundle(object):
         # And register quiz blueprint in the application.
         app.register_blueprint(bp, url_prefix=prefix)
         self.modify_static_endpoint(app, bp_name)
+
+        # Create extra URL '/<quiz_name>' to access to quiz without
+        # specifying a year.
+        if as_default:
+            url = '{0}/{1}'.format(base_prefix, meta['name'])
+            ep = '%s.default_index' % meta['name']
+            @app.route(url, endpoint=ep)
+            def default_index():
+                return redirect(url_for('%s.index' % bp_name))
 
     def view(self, view_cls):
         """Decorator to add pluggable views to the quiz bundle.
