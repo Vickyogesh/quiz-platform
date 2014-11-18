@@ -100,6 +100,8 @@ def store_quiz_meta_in_session(meta):
     session['quiz_name'] = meta['name']
     session['quiz_year'] = meta['year']
     session['quiz_fullname'] = '{0}{1}'.format(meta['name'], meta['year'])
+    # Some of views uses 'back_url' in session, like ClientStatisticsView.
+    session.pop('back_url', None)
 
 
 #FIXME: may cause infinite recursion on access denied.
