@@ -119,7 +119,6 @@ def init_app():
 
     base.modify_static_endpoint(app, 'ui.static')
     init_quiz(app)
-    print app.url_map
 
 
 def init_quiz(app):
