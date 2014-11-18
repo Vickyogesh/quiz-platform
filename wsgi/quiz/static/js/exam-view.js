@@ -381,7 +381,7 @@
                         callback: this.backToMenu.bind(this)
                     },
                     {
-                        text: this.labels.btt_try_again, type: "btn-default",
+                        text: this.labels.btt_review, type: "btn-default",
                         icon: "glyphicon-eye-open",
                         callback: to_review.bind(this)
                     }
