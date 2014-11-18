@@ -301,7 +301,7 @@ class Bundle(object):
         self.modify_static_endpoint(app, bp_name)
 
         if main:
-            @app.route(base_prefix)
+            @app.route(base_prefix + '/')
             def main_quiz():
                 return redirect(url_for('%s.index' % bp_name))
 
