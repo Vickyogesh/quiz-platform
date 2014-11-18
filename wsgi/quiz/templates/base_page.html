@@ -84,7 +84,7 @@
     };
     moment.locale("{{ current_lang }}");
     if (Aux.getUrlParameterByName("upd") == "1")
-      window.location.search = null;
+      window.location.search = "";
 
     if (!Aux.canFullscreen() || parent.FullScreen == undefined)
       $("#btt-fullscreen").hide();
