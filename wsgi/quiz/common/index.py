@@ -8,7 +8,7 @@ from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
 from wtforms import StringField, PasswordField, HiddenField
-from ..common.base import BaseView
+from ..common.base import BaseView, store_quiz_meta_in_session
 from ..login import do_login
 
 
@@ -102,6 +102,7 @@ class IndexView(BaseView):
                                                 or current_user.is_school_member):
             # See base.check_access()
             if request.args.get('reauth') != '1':
+                store_quiz_meta_in_session(self.meta)
                 return after_login()
 
         fb_autologin = request.args.get('fblogin')

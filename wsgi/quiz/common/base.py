@@ -83,6 +83,25 @@ def account_url(with_uid=True):
     return hr(args)
 
 
+def store_quiz_meta_in_session(meta):
+    """We save metadata in session because some parts still uses info
+    from session and not from quiz metadata object.
+
+    This function gets called if client is authorized but for different quiz.
+    So to not force him to login again for new quiz we just update quiz part in
+    session
+
+    See Also:
+        :func:`~quiz.login.do_login` sources.
+
+        :func:`check_access`, :class:`~quiz.common.index.IndexView`.
+    """
+    session['quiz_id'] = meta['id']
+    session['quiz_name'] = meta['name']
+    session['quiz_year'] = meta['year']
+    session['quiz_fullname'] = '{0}{1}'.format(meta['name'], meta['year'])
+
+
 #FIXME: may cause infinite recursion on access denied.
 def check_access(f):
     """This decorator extends view with extra access feature.
@@ -98,6 +117,9 @@ def check_access(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if current_user.is_authenticated():
+            if g.quiz_meta['name'] != session.get('quiz_name'):
+                store_quiz_meta_in_session(g.quiz_meta)
+
             # If 'upd' query parameter is set then this means account data
             # was changed and we have to sync it.
             upd = request.args.get('upd')
