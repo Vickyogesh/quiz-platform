@@ -59,8 +59,6 @@ def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
 
     # application modules initialization
     init_app()
-
-    # print app.url_map
     return app
 
 
@@ -109,26 +107,16 @@ def init_app():
     from . import access
     from . import login
     from .api import api
-    from .ui import ui
+    from .assets import assets
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
-    app.register_blueprint(ui, url_prefix='/ui')
-
-    from .common import base
-
-    base.modify_static_endpoint(app, 'ui.static')
-    init_quiz(app)
-
-
-def init_quiz(app):
-    from .assets import assets
-    from . import quiz_b, quiz_cqc, quiz_am, quiz_truck
-
     assets.init_app(app)
 
-    quiz_b.quiz.init_app(app, quiz_id=1, quiz_year=2011, base_prefix='/new')
-    quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/new')
-    quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/new')
-    quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2013, base_prefix='/new')
-    quiz_truck.quiz.init_app(app, quiz_id=5, quiz_year=2013, base_prefix='/new')
+    from . import quiz_b, quiz_cqc, quiz_am, quiz_truck
+
+    quiz_b.quiz.init_app(app, quiz_id=1, quiz_year=2011, base_prefix='/ui')
+    quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/ui')
+    quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/ui')
+    quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2013, base_prefix='/ui')
+    quiz_truck.quiz.init_app(app, quiz_id=5, quiz_year=2013, base_prefix='/ui')

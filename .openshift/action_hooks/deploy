@@ -32,7 +32,6 @@ ln -s $OPENSHIFT_REPO_DIR/web $OPENSHIFT_REPO_DIR/wsgi/static/oldfrontend
 
 # Generate translations & build assets
 cd $OPENSHIFT_REPO_DIR
-pybabel compile -d wsgi/quiz/ui/translations -D ui
 pybabel compile -d wsgi/quiz/translations
 python manage.py assets build
 
