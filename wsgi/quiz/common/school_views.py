@@ -23,10 +23,8 @@ class SchoolView(BaseView):
         :class:`back_url <.client_views.ClientStatisticsView>` and
         :class:`force_name <.client_views.ClientStatisticsBase>`.
         """
-        if 'back_url' in session:
-            del session['back_url']
-        if 'force_name' in session:
-            del session['force_name']
+        session.pop('back_url', None)
+        session.pop('force_name', None)
 
 
 class SchoolMenuView(SchoolView):
@@ -80,9 +78,10 @@ class SchoolStatisticsView(SchoolView):
     @staticmethod
     def _update_names(users, data):
         for x in data:
-            user = users[x['id']]
-            x['name'] = user['name']
-            x['surname'] = user['surname']
+            user = users.get(x['id'])
+            if user is not None:
+                x['name'] = user['name']
+                x['surname'] = user['surname']
 
     def page_urls(self):
         urls = SchoolView.page_urls(self)
