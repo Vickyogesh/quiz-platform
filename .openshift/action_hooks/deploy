@@ -26,6 +26,7 @@ unzip -o $OPENSHIFT_REPO_DIR/misc/img.zip -d $OPENSHIFT_DATA_DIR/quiz/img
 fi
 
 echo "Creating wsgi/static..."
+mkdir $OPENSHIFT_REPO_DIR/wsgi/static
 ln -s $OPENSHIFT_DATA_DIR/quiz/img $OPENSHIFT_REPO_DIR/wsgi/static/qimg
 ln -s $OPENSHIFT_REPO_DIR/web $OPENSHIFT_REPO_DIR/wsgi/static/oldfrontend
 
