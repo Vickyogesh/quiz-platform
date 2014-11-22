@@ -1,0 +1,52 @@
+{% extends "base_statistics.html" %}
+
+{% block top_menu %}
+  {%- if exams %}
+    <li class="active"><a href="#" data-e-range="data-e-all">{{ _('All') }}</a></li>
+    <li><a href="#" data-e-range="data-e-current">{{ _('Recent') }}</a></li>
+    <li><a href="#" data-e-range="data-e-week">{{ _('Last week') }}</a></li>
+    <li><a href="#" data-e-range="data-e-week3">{{ _('Previous') }}</a></li>
+  {% endif -%}
+{% endblock %}
+
+{% block panel_content %}
+  <div id="stat">
+    {% if exams %}
+      <div id="exams">
+        <div class="row separator">
+          <div class="col-md-12">{{ _('Exam statistics') }}</div>
+        </div>
+        <a href="#">
+          <div class="chart" id="exam_chart"></div>
+        </a>
+      </div>
+      <div class="row separator" id="topic-header">
+        <div class="col-md-12">{{ _('Statistics topics in greater blue portion of the graph corresponds to a better preparation.') }}</div>
+      </div>
+      {% for topic in client_stat.topics %}
+      <a class="tablerow" href="{{ url_for('.client_statistics_topic', uid=uid, topic_id=topic.id) }}">
+        <div class="content">
+          <div class="cell">
+            <div class="chart" id="{{ topic.id }}"
+                               data-e-current="{{topic.errors.current}}"
+                               data-e-week="{{topic.errors.week}}"
+                               data-e-week3="{{topic.errors.week3}}"></div>
+          </div>
+          <div class="cell">{{ topic.text }}</div>
+          <div class="cell"><span class="glyphicon glyphicon-chevron-right"></span></div>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <p class="bg-info info">{{ _('The student has not passed any exercises.') }}</p>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block express_bar_anchor %}#topic-header{% endblock %}
+{% block page_script %}
+  {%- if exams %}
+    window.g.exam_url = "{{ url_for('.client_statistics_exams', uid=uid, range='') }}";
+    UserStat({{ exams.exams|tojson }}, {{ quiz_meta.exam_meta.num_questions }}, {{ quiz_meta.exam_meta.max_errors }});
+  {% endif -%}
+{% endblock%}

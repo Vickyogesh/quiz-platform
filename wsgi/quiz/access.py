@@ -24,8 +24,12 @@ from flask_principal import (
 from . import app
 
 login_manager = LoginManager()
-login_manager.init_app(app)
-Principal(app)
+
+# To support sphinx autodoc extension we check for app
+# since it will not be created on autodoc's import action.
+if app:
+    login_manager.init_app(app)
+    Principal(app)
 
 
 ###########################################################

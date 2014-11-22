@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% import "utils.html" as utils %}
+{% block subtitle %}{{ quiz_meta.title }} {{ quiz_meta.year }}{% endblock %}
+
+{% block body %}
+  <script>
+    function dologin(keepForm) {
+      if (!keepForm) {
+        $("#login-form").hide();
+        $("#busy_layer").fadeIn(100);
+      }
+      FB.login(function(response) {
+        $("#busy_layer").hide();
+        if (response.authResponse) {
+          $("form #is_fb").val(1);
+          $("form #fb_auth_id").val(response.authResponse.userID);
+          $("form #fb_auth_token").val(response.authResponse.accessToken);
+          $("form").submit();
+        }
+        else {
+          $("#login-form").show();
+        }
+      }, {scope: 'publish_actions'});
+    }
+  </script>
+  {{ utils.fb_async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
+  {{ super() }}
+{% endblock %}
+
+{% block content_class %}startup{% endblock %}
+{% block container -%}
+<div class="contentpanel" id="login-form">
+  <div class="topspace"></div>
+  <img class="startup-img"
+    src="{{url_for('.static', filename='i/%s/startup.jpg' % quiz_meta.name)}}">
+
+    <div class="row">
+      <div class="col-md-12">
+      <form class="form" role="form" method="POST">
+        {{ form.csrf_token }}
+        {{ form.is_fb() }}
+        {{ form.fb_auth_id() }}
+        {{ form.fb_auth_token() }}
+        <div class="form-group {%- if form.pwd.errors %} has-error {%- endif %}">
+          {{ form.name.label }}
+          {{ form.name(class_="form-control") }}
+        </div>
+        <div class="form-group {%- if form.pwd.errors %} has-error {%- endif %}">
+          {{ form.pwd.label }}
+          {{ form.pwd(class_="form-control") }}
+        </div>
+        <div class="form-group bottom">
+          <div class="row">
+            <div class="col-xs-6">
+              <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
+            </div>
+            <div class="col-xs-6">
+              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> <span>{{ _('Log In') }}</span></a>
+            </div>
+          </div>
+          {%- set messages = get_flashed_messages() %}
+          {%- if messages %}
+          <p class="text-danger"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages[0] }} </p>
+          {%- endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $("form").submit(function(event) {
+        $("button").addClass("disabled");
+        $("input").attr("readonly", "");
+    });
+
+    $("form #btt-plain").click(function() {
+      $("form #is_fb").val(0);
+    });
+
+    $("form #btt-fb").click(function() {
+      dologin(true);
+    });
+  </script>
+{%- endblock %}

@@ -3,8 +3,8 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} ^/img/
 RewriteRule /img/(.+)$ /static/qimg/$1 [L]
 
-RewriteCond %{REQUEST_URI} ^/ui/static/ui/
-RewriteRule /ui/static/ui/(.+)$ /static/ui/$1 [L]
+RewriteCond %{REQUEST_URI} ^/static/
+RewriteRule /static/(.+)$ /static/$1 [L]
 
 # Old frontends
 

@@ -1,0 +1,30 @@
+{% extends "base_menu_client.html" %}
+{% block content_class %}menu cqc{% endblock %}
+
+{% block exam_button %}
+  <div id="cqcexam">
+      <table cellpadding="0" cellspacing="0">
+          <tr>
+              <td rowspan="2" id="generale" class="generale hoverbg">
+                  <div class="rotate_box">Generale</div>
+              </td>
+              <td id="merci" class="merci hoverbg">
+                  <div class="rotate_box">Merci</div>
+              </td>
+          </tr>
+          <tr>
+              <td id="persone" class="persone hoverbg">
+                  <div class="rotate_box">Persone</div>
+              </td>
+          </tr>
+      </table>
+  </div>
+{% endblock %}
+
+{%- block page_script %}
+  {{ super() }}
+  $("#cqcexam td").click(function(){
+    var type = $(this).attr("id");
+    window.location = "{{ url_for('.client_exam') }}?exam_type=" + type;
+  });
+{% endblock %}
