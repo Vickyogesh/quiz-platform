@@ -401,6 +401,7 @@ class ClientExamStatisticsView(ClientStatisticsBase):
         return self.render_template(exams=range_exams)
 
 
+# TODO: seems not works
 class FacebookCanvasView(BaseView):
     """This view redirects to facebook tab page."""
     tmpl = """<!DOCTYPE html>
