@@ -414,6 +414,7 @@ class FacebookCanvasView(BaseView):
     """
 
     def dispatch_request(self, *args, **kwargs):
-        html = self.tmpl.format(current_app.config['FACEBOOK_APP_ID'],
-                                url_for('.index', fblogin=1, _external=True))
+        url = 'https://quiz-editricetoni.rhcloud.com%s'\
+              % url_for('.index', fblogin=1)
+        html = self.tmpl.format(current_app.config['FACEBOOK_APP_ID'], url)
         return Response(html, mimetype='text/html')
