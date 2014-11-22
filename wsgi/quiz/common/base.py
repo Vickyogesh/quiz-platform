@@ -310,6 +310,11 @@ class Bundle(object):
         for route in self._routes:
             bp.route(route[1], **route[2])(route[0])
 
+        # Facebook integration
+        from .client_views import FacebookCanvasView
+        bp.add_url_rule('/aggiungi-piattaforma-a-pagina-facebook',
+                        view_func=FacebookCanvasView.get_view())
+
         # Create final URL prefix.
         if self.base_url is None:
             if no_url_year:

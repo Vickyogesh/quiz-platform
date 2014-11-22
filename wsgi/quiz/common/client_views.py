@@ -2,6 +2,7 @@
 This module provides common client related quiz views.
 """
 from flask import redirect, url_for, request, current_app, abort, session
+from flask import Response
 from flask_login import current_user
 from flask_babelex import gettext
 from .base import BaseView, account_url
@@ -399,3 +400,20 @@ class ClientExamStatisticsView(ClientStatisticsBase):
             range_exams.extend(exams['current'])
         return self.render_template(exams=range_exams)
 
+
+class FacebookCanvasView(BaseView):
+    """This view redirects to facebook tab page."""
+    tmpl = """<!DOCTYPE html>
+    <html>
+    <body>
+    <script>top.location =
+        "http://www.facebook.com/dialog/pagetab?app_id={0}&redirect_uri={1}";
+    </script>
+    </body>
+    </html>
+    """
+
+    def dispatch_request(self, *args, **kwargs):
+        html = self.tmpl.format(current_app.config['FACEBOOK_APP_ID'],
+                                url_for('.index', fblogin=1, _external=True))
+        return Response(html, mimetype='text/html')
