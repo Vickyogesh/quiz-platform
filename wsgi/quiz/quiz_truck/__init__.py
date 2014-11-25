@@ -1,8 +1,9 @@
+# coding=utf-8
 """
 This package implements Quiz CQC.
 """
 from flask import session, request, redirect, url_for, current_app
-from flask_babelex import lazy_gettext
+from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
 from sqlalchemy import select, and_
 from ..common.base import Bundle, BaseView
@@ -29,6 +30,145 @@ sublicense = {
     }
 }
 
+# NOTE: areas list is build with help of misc/csvtosqlite.py
+
+# NOTE: few areas has 'cls' item - custom class for the html tag.
+# QuizMenuView supports it, see QuizAreaPageView.render()
+# in static/js/quiz-menu.js.
+
+areas = {
+    5: [
+        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Disposizioni per il trasporto nazionale e internazionale',
+            'chapters': [[3, 4, 5, 6], [7]]
+        },
+        {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
+        {
+            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'chapters': [[12, 13, 14, 15], [16]]
+        },
+        {
+            'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
+            'chapters': [[17, 18], [19, 20, 21]]
+        }
+    ],
+    6: [
+        {
+            'text': u'Incidenti ed emergenza',
+            'chapters': [[1, 2, 3], [4]],
+            'cls': 'area3'
+        },
+        {
+            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'chapters': [[5, 6, 7, 8], [9]],
+            'cls': 'area4'
+        },
+        {
+            'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
+            'chapters': [[10, 11], [12, 13, 14]],
+            'cls': 'area5'
+        }
+    ],
+    7: [
+        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Disposizioni per il trasporto nazionale e internazionale',
+            'chapters': [[3, 4, 5, 6], [7]]
+        },
+        {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
+        {
+            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'chapters': [[12, 13, 14, 15], [16]]
+        },
+        {
+            'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
+            'chapters': [[17, 18], [19, 20, 21]]
+        },
+        {
+            'text': u'Tecnica e funzionamento del veicolo',
+            'chapters': [[22, 23, 24, 25, 26], [27, 28], [29, 30, 31], [32]]
+        },
+        {
+            'text': u'Manutenzione e guasti',
+            'chapters': [[33, 34, 35, 36], [37, 38, 39, 40]]
+        },
+        {
+            'text': u'Responsabilità e contratto di trasporto',
+            'chapters': [[41]]
+        }
+    ],
+    8: [
+        {
+            'text': u'Tecnica e funzionamento del veicolo',
+            'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
+            'cls': 'area6'
+        },
+        {
+            'text': u'Manutenzione e guasti',
+            'chapters': [[12, 13, 14, 15], [16, 17, 18, 19]],
+            'cls': 'area7'
+        },
+        {
+            'text': u'Responsabilità e contratto di trasporto',
+            'chapters': [[20]],
+            'cls': 'area8'
+        }
+    ],
+    9: [
+        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Disposizioni per il trasporto nazionale e internazionale',
+            'chapters': [[3], [4]]
+        },
+        {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
+        {
+            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'chapters': [[9, 10, 11, 12], [13]]
+        },
+        {
+            'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
+            'chapters': [[14, 15, 16], [17, 18]]
+        }
+    ],
+    10: [
+        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Disposizioni per il trasporto nazionale e internazionale',
+            'chapters': [[3], [4]]
+        },
+        {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
+        {
+            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'chapters': [[9, 10, 11, 12], [13]]
+        },
+        {
+            'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
+            'chapters': [[14, 15, 16], [17, 18]]
+        },
+        {
+            'text': u'Tecnica e funzionamento del veicolo',
+            'chapters': [[19, 20, 21, 22, 23], [24, 25], [26, 27, 28], [29]]
+        },
+        {
+            'text': u'Manutenzione e guasti',
+            'chapters': [[30, 31, 32, 33], [34, 35, 36, 37]]
+        }
+    ],
+    11: [
+        {
+            'text': u'Tecnica e funzionamento del veicolo',
+            'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
+            'cls': 'area6'
+        },
+        {
+            'text': u'Manutenzione e guasti',
+            'chapters': [[12, 13, 14, 15], [16, 17, 18, 19]],
+            'cls': 'area7'
+        }
+    ]
+}
+
 
 class TruckMeta(dict):
     """Extends :class:`dict` with pseudo items.
@@ -53,6 +193,8 @@ class TruckMeta(dict):
         sub = session.get('sub_license')
         if name == 'id':
             return sub
+        elif sub is None and name == 'title':
+            return gettext('Truck')
         return sublicense[name][sub] if sub is not None else d
 
     def __getitem__(self, item):
@@ -62,7 +204,7 @@ class TruckMeta(dict):
 
     def get(self, k, d=None):
         if k in self.sub_items:
-            return self.__subitem(item, d)
+            return self.__subitem(k, d)
         return dict.get(self, k, d)
 
 
@@ -184,6 +326,18 @@ class ClientMenu(client_views.ClientMenuView):
 @quiz.view
 class ClientMenuQuiz(client_views.ClientTopicsView):
     template_name = 'quiz_truck/menu_topics.html'
+
+    # TODO: cache me
+    def get_topics(self):
+        t = current_app.core.topics
+        sql = select([t.c.text]).where(t.c.quiz_type==self.meta['id'])
+        res = current_app.core.engine.execute(sql)
+        return [x[0] for x in res]
+
+    def render_template(self, **kwargs):
+        kwargs['topics'] = self.get_topics()
+        kwargs['areas'] = areas[self.meta['id']]
+        return client_views.ClientTopicsView.render_template(self, **kwargs)
 
 
 @quiz.view
