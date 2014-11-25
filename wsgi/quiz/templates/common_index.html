@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% import "utils.html" as utils %}
-{% block subtitle %}{{ quiz_meta.title }} {{ quiz_meta.year }}{% endblock %}
+
+{% block title %}
+  {%- if quiz_meta.title -%}
+    {{ quiz_meta.title }} {{ quiz_meta.year }} &mdash;
+  {%- endif %}
+  {{ _('Quiz Platform') }}
+{%- endblock %}
 
 {% block body %}
   <script>
