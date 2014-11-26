@@ -6,7 +6,7 @@ $("#page-quiz").bind("pageinit", function() {
 
     mgr.getQuestionsUrl = function(force) {
         var topic = sessionStorage.getItem("topic");
-        var url = "/v1/quiz/" + topic;
+        var url = url("/v1/quiz/" + topic);
 
         if (force == true)
             url += "?force=true";
@@ -14,7 +14,7 @@ $("#page-quiz").bind("pageinit", function() {
     };
     
     mgr.sendAnswersUrl = function() {
-        return "/v1/quiz/" + sessionStorage.getItem("topic");
+        return url("/v1/quiz/" + sessionStorage.getItem("topic"));
     }
 
     var func = mgr.setQuestions;

@@ -20,7 +20,7 @@ $("#page-student").bind("pageinit", function() {
     function saveFbId(userId) {
         var data = {userId: userId};
         $.mobile.loading("show");
-        aux_postJSON("/v1/link_facebook", data, null).always(function (data) {
+        aux_postJSON(url("/v1/link_facebook"), data, null).always(function (data) {
             $.mobile.loading("hide");
             if (data.status != 200) {
                 // Can't link Facebook account
@@ -41,7 +41,7 @@ $("#page-student").bind("pageinit", function() {
   $("#page-student #bttLogout").click(function() {
       window.name = null;
       $.mobile.loading("show");
-      $.ajax("/v1/authorize/logout").always(function() {
+      $.ajax(url("/v1/authorize/logout")).always(function() {
           aux_deleteServicesCookies();
           $.mobile.loading("hide");
           $.mobile.changePage("#page-login");

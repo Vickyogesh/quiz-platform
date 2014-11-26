@@ -58,7 +58,7 @@ $("#page-exam-review").bind("pageinit", function() {
         exam_el.html(exam_id);
 
         aux_busy(true);
-        $.getJSON("/v1/exam/" + exam_id).always(function(data) {
+        $.getJSON(url("/v1/exam/" + exam_id)).always(function(data) {
             aux_busy(false);
             if (data.status != 200)
                 processError(data);

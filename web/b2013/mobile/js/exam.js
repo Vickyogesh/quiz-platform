@@ -8,9 +8,9 @@ $("#page-exam").bind("pageinit", function() {
         headerId: "#page-exam .ui-header h3 > span#count"
     });
 
-    mgr.getQuestionsUrl = function() { return "/v1/exam"; };
+    mgr.getQuestionsUrl = function() { return url("/v1/exam"); };
     mgr.sendAnswersUrl = function() {
-        return "/v1/exam/" + sessionStorage.getItem("examid");
+        return url("/v1/exam/" + sessionStorage.getItem("examid"));
     };
 
     // Exam time counting.

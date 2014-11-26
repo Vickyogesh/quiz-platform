@@ -55,7 +55,7 @@ $("#page-login").bind("pageinit", function() {
     $("#loginForm").submit(function (event) {
         event.preventDefault();
         aux_busy(true, "#login");
-        $.getJSON("/v1/authorize").always(function(data) {
+        $.getJSON(url("/v1/authorize")).always(function(data) {
             data = JSON.parse(data.responseText);
             var login = $("#login #un").val();
             var passwd = $("#login #pw").val();
@@ -70,7 +70,7 @@ $("#page-login").bind("pageinit", function() {
                 digest: hex_md5(nonce + ':' + digest)
             };
 
-            aux_postJSON("/v1/authorize", auth, null).always(do_auth);
+            aux_postJSON(url("/v1/authorize"), auth, null).always(do_auth);
         });
     });
 });

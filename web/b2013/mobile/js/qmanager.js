@@ -61,7 +61,7 @@ function createQuestionManager(config) {
             var self = this;
             window.name = null;
             aux_busy(true);
-            $.ajax("/v1/authorize/logout").always(function() {
+            $.ajax(url("/v1/authorize/logout")).always(function() {
                 self.onLeave();
                 aux_deleteServicesCookies();
                 aux_busy(false);
@@ -142,7 +142,7 @@ function createQuestionManager(config) {
         // See showNextQuestion().
         buildImageUrl: function(img) {
             if (img != "")
-              return "/img/" + img + ".jpg";
+              return url("/img/" + img + ".jpg");
         },
 
         // Load images for next question(s) to show them faster.

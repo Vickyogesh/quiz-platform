@@ -69,7 +69,7 @@ $("#page-quiz-list").bind("pageinit", function() {
     $("#page-quiz-list #bttLogout").click(function() {
         window.name = null;
         aux_busy(true);
-        $.ajax("/v1/authorize/logout").always(function() {
+        $.ajax(url("/v1/authorize/logout")).always(function() {
             aux_deleteServicesCookies();
             aux_busy(false);
             $.mobile.changePage("#page-login");

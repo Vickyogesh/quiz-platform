@@ -10,6 +10,13 @@ if (!String.prototype.format) {
   };
 }
 
+
+function url(url)
+{
+    var server = "";
+    return server + url;
+}
+
 function getUrlParameterByName(name) {
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -98,7 +105,7 @@ function aux_showError(msg, title) {
 function aux_logout() {
     window.name = null;
     aux_busy(true);
-    $.ajax("/v1/authorize/logout").always(function() {
+    $.ajax(url("/v1/authorize/logout")).always(function() {
         aux_deleteServicesCookies();
         aux_busy(false);
         $.mobile.changePage("#page-login");

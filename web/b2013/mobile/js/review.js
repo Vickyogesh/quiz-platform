@@ -4,7 +4,7 @@ $("#page-review").bind("pageinit", function() {
         headerId: "#page-review .ui-header h3"
     });
 
-    mgr.getQuestionsUrl = function() { return "/v1/errorreview"; };
+    mgr.getQuestionsUrl = function() { return url("/v1/errorreview"); };
     mgr.sendAnswersUrl = mgr.getQuestionsUrl;
 
     var func = mgr.setQuestions;

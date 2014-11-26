@@ -56,7 +56,7 @@ alt="hits counter"></a></div></noscript>
           };
 
           aux_busy(true, "#login");
-          aux_postJSON("/v1/authorize", auth, do_auth);
+          aux_postJSON(url("/v1/authorize"), auth, do_auth);
         }
       });
     }
