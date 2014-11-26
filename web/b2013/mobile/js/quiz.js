@@ -6,11 +6,11 @@ $("#page-quiz").bind("pageinit", function() {
 
     mgr.getQuestionsUrl = function(force) {
         var topic = sessionStorage.getItem("topic");
-        var url = url("/v1/quiz/" + topic);
+        var u = url("/v1/quiz/" + topic);
 
         if (force == true)
-            url += "?force=true";
-        return url;
+            u += "?force=true";
+        return u;
     };
     
     mgr.sendAnswersUrl = function() {
