@@ -8,3 +8,4 @@ of the project parts.
    :maxdepth: 2
 
    api_common
+   api_web
