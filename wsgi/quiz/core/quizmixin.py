@@ -118,11 +118,12 @@ class QuizMixin(object):
                        and start quiz from the beginning.
 
         Question is represented as a dictionary with the following items:
-            id        - question ID in the DB
-            text      - question text
-            answer    - question answer (True/False)
-            image     - image ID to illustrate the question (optional)
-            image_bis - image type ID (optional)
+
+            * id        - question ID in the DB
+            * text      - question text
+            * answer    - question answer (True/False)
+            * image     - image ID to illustrate the question (optional)
+            * image_bis - image type ID (optional)
         """
         # TODO: do we need to validate topic ID?
         questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
@@ -156,14 +157,14 @@ class QuizMixin(object):
         Args:
             quiz_type:  Quiz type.
             user_id:    ID of the user for whom need to save the quiz.
-            questions:  List of the quesions IDs.
+            questions:  List of the questions IDs.
             answers:    List of questions' answers.
 
         Raises:
-            QuizCoreError
+            QuizCoreError: Already answered.
 
         .. note::
-           questions and answers must have tha same length.
+           Questions and answers must have tha same length.
         """
         questions, answers = self._aux_prepareLists(questions, answers)
 

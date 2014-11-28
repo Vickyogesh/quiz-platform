@@ -15,6 +15,7 @@ of the |quiz|.
    :maxdepth: 2
 
    overview
+   core
    api
 
 

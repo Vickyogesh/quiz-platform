@@ -13,7 +13,10 @@ import flask_bootstrap
 ###########################################################
 
 class JSONEncoderEx(json.JSONEncoder):
-    """Extends JSONEncoder with date to ISO string encoding."""
+    """Extends :class:`flask.json.JSONEncoder` with date-to-ISO string encoding.
+
+    It used in :func:`jsonify_ex` to convert datetime objects.
+    """
     def default(self, obj):
         if isinstance(obj, date):
             return obj.isoformat()
@@ -22,7 +25,14 @@ class JSONEncoderEx(json.JSONEncoder):
 
 # Based on code from flask.jsonify().
 def jsonify_ex(*args, **kwargs):
-    """Extended version of flask.jsonify() which supports date objects."""
+    """Extended version of :func:`flask.json.jsonify`
+    which supports date objects.
+
+    The arguments to this function are the same as to the dict constructor.
+
+    See Also:
+        :func:`json_response`.
+    """
     indent = None
     if (current_app.config['JSONIFY_PRETTYPRINT_REGULAR']
        and not request.is_xhr):
@@ -33,16 +43,45 @@ def jsonify_ex(*args, **kwargs):
 
 
 def json_response(status=200, **kwargs):
+    """Helper function for building JSON response with the given HTTP status.
+
+    It also puts status to the JSON as `status` field.
+
+    Args:
+        status: HTTP response status code
+        kwargs: keyword arguments to put in result JSON.
+
+    Returns:
+        :class:`flask.Response` with the JSON.
+
+    See Also:
+            :func:`jsonify_ex`
+    """
     response = jsonify_ex(status=status, **kwargs)
     response.status_code = status
     return response
 
 
 def dict_to_json_response(data, status=200):
+    """Creates JSON response for :class:`dict`.
+
+    Args:
+        data: Dictionary to convert.
+        status: Response status.
+
+    See Also:
+        :func:`jsonify_ex`.
+    """
     return jsonify_ex(data, status=status)
 
 
 class JsonRequest(Request):
+    """This class changes :class:`flask.Request` behaviour on JSON parse error.
+
+    If HTTP response doesn't contain JSON data and you call
+    :samp:`request.get_json()` then :class:`~werkzeug.exceptions.BadRequest`
+    will be raised.
+    """
     def __init__(self, environ, populate_request=True, shallow=False):
         super(JsonRequest, self).__init__(environ, populate_request, shallow)
 
@@ -61,6 +100,17 @@ class JsonRequest(Request):
 ###########################################################
 
 class Application(Flask):
+    """This class adds to the :class:`flask.Flask` JSON error handing
+    and also performs core initialization.
+
+    Initialization example::
+
+        app = Application()
+        app.load_config()
+        app.init()
+
+    Other initialization steps are performed in :func:`quiz.init_app`.
+    """
     request_class = JsonRequest
 
     def __init__(self, *args, **kwargs):
@@ -129,7 +179,12 @@ class Application(Flask):
         """Basic initialization.
 
         This method initialize 3rd party extensions, access control routines
-        and accounts API.
+        and accounts API:
+
+        * Beaker session.
+        * Babel (localization).
+        * Bootstrap.
+        * Templates language.
         """
         BeakerSession(self)
         self.babel = Babel(self)
