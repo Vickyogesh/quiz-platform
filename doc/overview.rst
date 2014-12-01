@@ -12,7 +12,7 @@ We assume what OpenShift is used throughout the documentation.
 Project Layout
 --------------
 
-This section describes the project directory structure scripts.
+This section describes the project directory structure and scripts.
 
 =========================== ====================================================
 :file:`.openshift/`         OpenShift deploy scripts.
@@ -48,7 +48,8 @@ and exams. There is also per topics and exams statistics pages. Web API provides
 access to the backend features (see :doc:`api_web`).
 
 Authentication is performed via **Accounts Service** where all account data
-is stored. And |quiz| stores questions, statistics and other quiz related data.
+is stored. |quiz| itself stores only questions, statistics and
+other quiz related data.
 The service also supports **Accounts Service** permissions. Each quiz has it's
 own permission in **Accounts Service** with expiration date.
 
@@ -62,11 +63,16 @@ Authentication dataflow:
 
     Client -> Quiz: login data
     Quiz -> Accounts: login data
-    Accounts -> Quiz: Account data & permissions
     Accounts -> Accounts: Authenticate
+    Accounts -> Quiz: Account data & permissions
     Quiz -> Quiz: Check permissions
     Quiz -> Client: allow login
 
+#. Client sends it’s username and password to the |quiz|.
+#. |quiz| sends that data with additional info to the |accounts|.
+#. |accounts| performs authentication of the client and sends account info with
+   permissions back to the |quiz|.
+#. |quiz| validates permissions and account and allows or discards login.
 
 Application
 ^^^^^^^^^^^
@@ -90,3 +96,16 @@ initializes |quiz| application by the following steps:
 * Final initialization (frontends, web API etc), see :func:`quiz.init_app`.
 
 More details in :doc:`core`.
+
+Quizzes
+^^^^^^^
+
+|quiz| handles multiple quizzes. Each quiz has it's own separate frontend,
+all frontends are based on one code base and templates. But it's possible to
+use separate code base and templates if required.
+
+The only thing is shared between quizzes is :doc:`logic`.
+It implements logic for all quizzes. This may be improved in future versions.
+
+Frontend base is provided by :mod:`quiz.common` and concrete frontends are
+implemented in a ``quiz_<name>`` packages. See :doc:`frontends` for more info.

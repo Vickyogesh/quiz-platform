@@ -16,6 +16,9 @@ of the |quiz|.
 
    overview
    core
+   db
+   logic
+   frontends
    api
 
 
