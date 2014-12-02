@@ -1,3 +1,6 @@
+"""
+This module provides user session and authentication features.
+"""
 from functools import partial
 from werkzeug.utils import cached_property
 from flask import session, current_app
@@ -72,6 +75,9 @@ def on_identity_loaded(sender, identity):
 ###########################################################
 
 class User(UserMixin):
+    """User class represents an account and aims to provide
+    information for the login manager about it.
+    """
     def __init__(self, account):
         self.account = account
 
@@ -137,6 +143,9 @@ def load_user(uid):
 
 
 def login(account):
+    """Create user object for the `account`, save it in the session and
+    call LoginManager's login routine.
+    """
     session['user'] = account
     user = User(account)
     login_user(user)
@@ -145,6 +154,11 @@ def login(account):
 
 
 def logout():
+    """Clean session from the user object and call
+    LoginManager's logout routine.
+
+    It also logout from **Accounts Service**.
+    """
     app.account.logout()
     logout_user()
     session.delete()

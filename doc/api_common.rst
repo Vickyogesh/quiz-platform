@@ -1,6 +1,12 @@
 Quiz common parts
 -----------------
 
+quiz.common
+^^^^^^^^^^^
+
+.. automodule:: quiz.common
+    :members:
+
 quiz.common.base
 ^^^^^^^^^^^^^^^^
 

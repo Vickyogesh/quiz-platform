@@ -37,6 +37,26 @@ class WordConverter(BaseConverter):
 
 
 def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
+    """Application factory function.
+
+    It creates and configures **Quiz Service** WSGI application.
+
+    Configuration is loaded in the following order:
+
+    * :file:`misc/quiz.cfg`
+    * :file:`local/quiz.cfg`
+    * ``extra_config``
+    * :envvar:`QUIZ_SETTINGS` environment variable
+
+    Args:
+        extra_config: extra configuration.
+
+    Returns:
+        **Quiz Service** WSGI application.
+
+    See Also:
+        :func:`init_app`.
+    """
     # Default initialization
     global app
     app = Application(__name__)
@@ -63,6 +83,18 @@ def create_app(main_config='../../misc/quiz.cfg', extra_config=None):
 
 
 def init_app():
+    """Application initialization.
+
+    This function gets called in :func:`create_app` as a last step.
+
+    It performs the following actions:
+
+    * Extra errors handlers setup.
+    * Static files URL riles setup.
+    * :class:`.AccountsApi` setup.
+    * Backend logic setup.
+    * Frontends and web API setup.
+    """
     def core_error_handler(error):
         return json_response(status=400, description=error.message)
 

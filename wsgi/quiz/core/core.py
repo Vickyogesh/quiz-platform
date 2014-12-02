@@ -49,8 +49,72 @@ def append_string(insert, compiler, **kw):
 
 class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
                AdminMixin, SchoolMixin):
-    """ Core quiz logic. """
+    """This class provides core service logic.
 
+    Logic is implemented by mixins:
+
+    * :class:`.AdminMixin`
+    * :class:`.ErrorReviewMixin`
+    * :class:`.ExamMixin`
+    * :class:`.GuestMixin`
+    * :class:`.QuizMixin`
+    * :class:`.SchoolMixin`
+    * :class:`.UserMixin`
+
+    It also provides access to the database. Structure of **Quiz Service** is
+    creates by :file:`misc/dbinit.py` script. See also
+    :file:`misc/dbtools/tables.py` and :file:`misc/dbtools/func.py`.
+
+    .. attribute:: engine
+
+        Core interface to the database.
+
+    .. attribute:: meta
+
+        Database metadata.
+
+    Database tables:
+
+    .. attribute:: apps
+
+        ``applications`` table.
+
+    .. attribute:: users
+
+        ``users`` table.
+
+    .. attribute:: chapters
+
+        ``chapters`` table.
+
+    .. attribute:: topics
+
+        ``topics`` table.
+
+    .. attribute:: questions
+
+        ``questions`` table.
+
+    .. attribute:: answers
+
+        ``answers`` table.
+
+    .. attribute:: quiz_answers
+
+        ``quiz_answers`` table.
+
+    .. attribute:: exam_answers
+
+        ``exam_answers`` table.
+
+    .. attribute:: exams
+
+        ``exams`` table.
+
+    .. attribute:: truck_last_sublicense
+
+        ``truck_last_sublicense`` table (used by truck quiz).
+    """
     def __init__(self, app):
         self._setupDb(app)
         UserMixin.__init__(self)
@@ -91,7 +155,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.truck_last_sublicense = self.meta.tables['truck_last_sublicense']
 
     def sql(self, stmt):
-        """Build SQL expression."""
+        """Compile SQL expression."""
         if isinstance(stmt, str) or isinstance(stmt, unicode):
             stmt = text(' '.join(stmt.split()))
         return stmt.compile(self.engine)

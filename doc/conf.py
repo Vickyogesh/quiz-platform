@@ -31,6 +31,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.napoleon',
+    'sphinxcontrib.plantuml',
     'sphinxcontrib.httpdomain',
     'sphinxcontrib.autohttp.flask'
 ]

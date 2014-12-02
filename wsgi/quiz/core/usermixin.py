@@ -77,6 +77,7 @@ class UserMixin(object):
                             user_id=user_id, type=type, school_id=school_id)
 
     def getAppId(self, appkey):
+        """Find application ID by application key."""
         try:
             row = self.__appid.execute(appkey=appkey).fetchone()
         except SQLAlchemyError:
@@ -146,6 +147,7 @@ class UserMixin(object):
         }
 
     def getUserStat(self, quiz_type, user_id, lang):
+        """User's statistics."""
         user = self._getStudentById(user_id)
         topics = self._getTopicsStat(quiz_type, user_id, lang)
         return {
@@ -200,12 +202,14 @@ class UserMixin(object):
         # return rows
 
     def getExamList(self, quiz_type, user_id):
+        """Student's exam list."""
         return {
             'student': self._getStudentById(user_id),
             'exams': self._getExamList(quiz_type, user_id)
         }
 
     def getTopicErrors(self, quiz_type, user_id, topic_id, lang):
+        """Student's topics statistics."""
         student = self._getStudentById(user_id)
 
         rows = self.__topicerr.execute(user_id=user_id, topic_id=topic_id,

@@ -22,7 +22,7 @@ exam_meta = {
 
 
 class ExamMixin(object):
-    """Mixin for working with exams. Used in QuizCore."""
+    """Mixin for working with exams."""
     def __init__(self):
         # Get chapters info: priority and chapter's questions' id range.
         sql = self.sql("""SELECT priority, min_id, max_id FROM chapters
@@ -216,6 +216,17 @@ class ExamMixin(object):
     # NOTE: exam_id is always unique so we don't need to specify quiz_type
     # for the __getExamInfo()
     def createExam(self, quiz_type, user_id, lang, examType=None):
+        """Create new exam.
+
+        Args:
+            quiz_type: Quiz type ID.
+            user_id: ID if the user for whom create exam.
+            lang: Language of the exam questions.
+            examType: Exam type for the CQC quiz.
+
+        Returns:
+            Dict with exam metadata and questions.
+        """
         norm, high = self.__generate_idList(quiz_type, examType)
         exam_id = self.__initExam(quiz_type, user_id, norm + high)
 
@@ -232,6 +243,23 @@ class ExamMixin(object):
 
     #@profile
     def saveExam(self, exam_id, questions, answers):
+        """Save exam answers.
+
+        Args:
+            exam_id: Exam ID.
+            questions: Exam questions list (IDs of questions).
+            answers:List of answers.
+
+        Returns:
+            Number of wrong answers.
+
+        Raises:
+            QuizCoreError: Exam is already passed.
+            QuizCoreError: Exam is expired.
+            QuizCoreError: Invalid value.
+            QuizCoreError: Wrong number of answers.
+            QuizCoreError: Invalid question ID.
+        """
         expires, end_time, quiz_type = self.__getExamInfo(exam_id)
         now = datetime.utcnow()
 
@@ -281,6 +309,12 @@ class ExamMixin(object):
         return wrong
 
     def getExamInfo(self, exam_id, lang):
+        """Exam details.
+
+        Args:
+            exam_id: Exam ID.
+            lang: questions language.
+        """
         res = self.__getexam.execute(exam_id=exam_id).fetchone()
 
         if res is None:

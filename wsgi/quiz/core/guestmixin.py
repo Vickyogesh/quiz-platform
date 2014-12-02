@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class GuestMixin(object):
-    """Mixin for processing guest access. Used in QuizCore."""
+    """Mixin for processing guest access."""
     def __init__(self):
         self.__getinfo = self.sql("""SELECT * FROM guest_access WHERE
                                   id=:id AND quiz_type=:quiz_type""")
@@ -17,7 +17,8 @@ class GuestMixin(object):
         Request is allowed if total number of requests within one hour
         is less than X (10 by default).
 
-        Return True if service allows guest request.
+        Returns:
+            True if service allows guest request.
         """
         row = self.__getinfo.execute(id=user_id, quiz_type=quiz_type).fetchone()
         num_requests = row[2]

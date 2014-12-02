@@ -33,6 +33,7 @@ class ErrorReviewMixin(object):
         return stmt1
 
     def getErrorReview(self, quiz_type, user, lang, exclude=None):
+        """Get user's error review."""
         query = self.__getQuery(quiz_type, user, exclude)
         try:
             res = self.engine.execute(query)
@@ -62,6 +63,7 @@ class ErrorReviewMixin(object):
         return {'questions': questions}
 
     def saveErrorReview(self, quiz_type, user, questions, answers):
+        """Save user's error review."""
         questions, answers = self._aux_prepareLists(questions, answers)
 
         # select and check answers

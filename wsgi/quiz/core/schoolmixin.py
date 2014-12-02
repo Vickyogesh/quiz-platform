@@ -59,6 +59,7 @@ class SchoolMixin(object):
         return topics
 
     def getSchoolStat(self, quiz_type, school_id, lang):
+        """Aggregated school's statistics."""
         topics = self.__getSchoolTopics(quiz_type, school_id, lang)
         stat = self.__cache.execute(school_id=school_id, quiz_type=quiz_type)
         stat = stat.fetchone()
