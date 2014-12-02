@@ -161,7 +161,7 @@ def modify_static_endpoint(app, endpoint):
     You need to add symlinks to ``wsgi/static`` if you have assets
     in other locations in ``.openshift/action_hooks/deploy``. For example::
 
-        ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static \
+        ln -s $OPENSHIFT_REPO_DIR/wsgi/quiz/ui/static
               $OPENSHIFT_REPO_DIR/wsgi/static/ui
 
     Here we create symlink for frontend's static files, now apache will serve
@@ -208,6 +208,11 @@ class Bundle(object):
                 'num_questions': 40
             }
         }
+
+    .. note::
+        Currently exams metadata must be duplicated in the
+        :file:`wsgi/quiz/core/exammixin.pp` because logic is shared between
+        quizzes. Later this will be fixed.
     """
     def __init__(self, import_name, meta, base_url=None):
         """Creates quiz bundle.
