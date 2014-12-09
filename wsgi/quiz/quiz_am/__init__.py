@@ -33,9 +33,9 @@ class IndexView(index.IndexView):
     def quiz_fullname(self):
         # For backward compatibility.
         # We have to send 'scooter' to the Accounts Service instead of
-        # scooter2013.
+        # scooter2014.
         year = self.meta['year']
-        if year == 2013:
+        if year == 2014:
             return self.meta['name']
         else:
             return ''.join((self.meta['name'], str(year)))
