@@ -86,13 +86,15 @@
     if (Aux.getUrlParameterByName("upd") == "1")
       window.location.search = "";
 
-    if (!Aux.canFullscreen() || parent.FullScreen == undefined)
-      $("#btt-fullscreen").hide();
-    else
-      $("#btt-fullscreen").click(parent.FullScreen.toggle);
+    try {
+      if (!Aux.canFullscreen() || parent.FullScreen == undefined)
+        $("#btt-fullscreen").hide();
+      else
+        $("#btt-fullscreen").click(parent.FullScreen.toggle);
 
-    if (parent.FullScreen !== undefined)
-      parent.FullScreen.applyIFrameClass();
+      if (parent.FullScreen !== undefined)
+        parent.FullScreen.applyIFrameClass();
+    } catch (e) {}
 
     $("body > .container").show();
 
