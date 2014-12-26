@@ -158,9 +158,9 @@ args = parser.parse_args()
 
 data = parse_csv(args.input)
 
-# for num, quiz in data.iteritems():
-#     out = os.path.abspath('{0}/quizdb-{1}.sqlite'.format(args.out_dir, num))
-#     write_data(quiz, out)
+for num, quiz in data.iteritems():
+    out = os.path.abspath('{0}/quizdb-{1}.sqlite'.format(args.out_dir, num))
+    write_data(quiz, out)
 
 logging.info('Truck sub license areas:')
 
