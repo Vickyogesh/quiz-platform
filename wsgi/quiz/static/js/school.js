@@ -3,7 +3,11 @@
         defaults: {id: -1},
 
         fullName: function() {
-            return this.get("name") + " " + this.get("surname");
+            var surname = this.get("surname");
+            if (surname)
+                return  surname + " " + this.get("name");
+            else
+                return this.get("name");
         }
     });
 

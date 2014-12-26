@@ -90,7 +90,7 @@
             var html = [];
             _.each(students, function(student) {
                 html.push(this.client_tmpl({
-                    fullname: student.name + " " + student.surname,
+                    fullname: student.surname + " " + student.name,
                     id: student.id
                 }));
             }.bind(this));
