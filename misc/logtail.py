@@ -29,7 +29,7 @@ Example:
     logtail.py -t mytag /path/to/apache.log http://my.endpoint.com/get-this
 
 This command sends apache log
-    [mytag] <log line>
+    mytag <log line>
     to
     http://my.endpoint.com/get-this?tag=mytag
 
@@ -148,7 +148,7 @@ def follow(filename, read_delay=1.0, buf_size=4, tag=None):
 
                 trailing = False
                 if tag is not None:
-                    line = '[{0}] {1}'.format(tag, line)
+                    line = '{0} {1}'.format(tag, line)
                 buf.append(line)
 
                 if len(buf) >= buf_size:
