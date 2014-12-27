@@ -8,5 +8,5 @@ if [ -f $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid ]; then
 fi
 
 echo "Stopping logtail..."
-$OPENSHIFT_REPO_DIR/misc/logtail.py --pid $OPENSHIFT_DATA_DIR/logtail.pid stop
+python $OPENSHIFT_REPO_DIR/misc/logtail.py --pid $OPENSHIFT_DATA_DIR/logtail.pid stop
 echo "Stopping logtail... done"
