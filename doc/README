@@ -1,9 +1,27 @@
-This dir contains web API documentation for the Quiz Web Service.
-To build documentatio you need Sphinx (http://sphinx-doc.org) and
-sphinxcontrib.httpdomain (easy_install sphinxcontrib-httpdomain).
+This dir contains project documentation.
+To build documentation you need the following tools:
+
+  pip install sphinxcontrib-napoleon sphinx sphinxcontrib-plantuml
+      sphinxcontrib-httpdomain sphinx_rtd_theme
+
+Also install PlantUML (http://plantuml.sourceforge.net/download.html) and
+Graphviz (http://www.graphviz.org).
+
+Make plantuml available for calling
+(see https://pypi.python.org/pypi/sphinxcontrib-plantuml):
+
+* Update config.py with full path to the tool
+* Or create script and place it to one of the PATH location.
+
+Make sure dot tool is available (you may set GRAPHVIZ_DOT env).
+
 
 How to build:
-    sphinx-build -b html . html
+
+    sphinx-build -D plantuml=plantuml.cmd -b html . html
+
+where ``-D plantuml=...`` specifies path to PlantUML run script.
+
 
 Deploy
 ======

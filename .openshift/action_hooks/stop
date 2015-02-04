@@ -1,6 +1,12 @@
 #!/bin/bash
 
+source $OPENSHIFT_PYTHON_DIR/virtenv/bin/activate
+
 if [ -f $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid ]; then
   echo "Stopping collectd..."
   kill `cat $OPENSHIFT_DATA_DIR/collectd/var/run/collectd.pid`
 fi
+
+echo "Stopping logtail..."
+python $OPENSHIFT_REPO_DIR/misc/logtail.py --pid $OPENSHIFT_DATA_DIR/logtail.pid stop
+echo "Stopping logtail... done"
