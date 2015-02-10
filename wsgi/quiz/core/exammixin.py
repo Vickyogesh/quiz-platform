@@ -10,14 +10,14 @@ exam_meta = {
     2: {'max_errors': 6, 'total_time': 7200, 'num_questions': 60},
     3: {'max_errors': 4, 'total_time': 1800, 'num_questions': 40},
     4: {'max_errors': 3, 'total_time': 1500, 'num_questions': 30},
-    # Truck (fake)
-    5: {'max_errors': 1, 'total_time': 2000, 'num_questions': 31},
-    6: {'max_errors': 2, 'total_time': 2100, 'num_questions': 32},
-    7: {'max_errors': 3, 'total_time': 2200, 'num_questions': 33},
-    8: {'max_errors': 4, 'total_time': 2300, 'num_questions': 34},
-    9: {'max_errors': 5, 'total_time': 2400, 'num_questions': 35},
-    10: {'max_errors': 6, 'total_time': 2500, 'num_questions': 36},
-    11: {'max_errors': 7, 'total_time': 2600, 'num_questions': 37}
+
+    5: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
+    6: {'max_errors': 1, 'total_time': 1200, 'num_questions': 10},
+    7: {'max_errors': 4, 'total_time': 2400, 'num_questions': 40},
+    8: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
+    9: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
+    10: {'max_errors': 4, 'total_time': 2400, 'num_questions': 40},
+    11: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20}
 }
 
 
@@ -155,7 +155,12 @@ class ExamMixin(object):
 
     def __generate_idListTruck(self, quiz_type, examType):
         meta = exam_meta[quiz_type]
-        return random.sample(xrange(1, 6000), meta['num_questions']), []
+
+        t = self.chapters
+        sql = select([func.max(t.c.max_id)]).where(t.c.quiz_type==quiz_type)
+        max_id = self.engine.execute(sql).fetchone()[0] + 1
+
+        return random.sample(xrange(1, max_id), meta['num_questions']), []
 
     #@profile
     def __initExam(self, quiz_type, user_id, questions):

@@ -56,7 +56,11 @@ parser.add_argument(
     help="Output dir (default: current working dir).",
     default='.',
     dest='out_dir')
-parser.add_argument('input', metavar='INPUT',help="Input CSV file.")
+parser.add_argument(
+    '--tab',
+    help="Use TAB as delimiter in CSV instead of comma.",
+    action='store_true')
+parser.add_argument('input', metavar='INPUT', help="Input CSV file.")
 
 
 def setup_db(out_file):
@@ -74,10 +78,10 @@ def setup_db(out_file):
     return conn
 
 
-def parse_csv(input_file):
+def parse_csv(input_file, delim):
     data = {}
     f = open(input_file, "rb")
-    reader = csv.reader(f, delimiter=',')
+    reader = csv.reader(f, delimiter=delim)
 
     is_first = True
     for row in reader:
@@ -156,7 +160,7 @@ def write_data(quiz, out):
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 args = parser.parse_args()
 
-data = parse_csv(args.input)
+data = parse_csv(args.input, '\t' if args.tab else ',')
 
 for num, quiz in data.iteritems():
     out = os.path.abspath('{0}/quizdb-{1}.sqlite'.format(args.out_dir, num))

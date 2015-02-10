@@ -160,8 +160,20 @@ Commands:
 
 Update translations:
 
-    pybabel extract -F misc/babel.cfg -k lazy_gettext -o wsgi/quiz/ui/translations/ui.pot wsgi/quiz/ui
-    pybabel update -i wsgi/quiz/ui/translations/ui.pot -d wsgi/quiz/ui/translations -D ui
+    pybabel extract -F misc/babel.cfg -k lazy_gettext -o wsgi/quiz/translations/messages.pot wsgi/quiz
+    pybabel update -i wsgi/quiz/translations/messages.pot -d wsgi/quiz/translations
+
+
+Truck quiz db update
+--------------------
+
+    python misc\dbfill.py -c local\config.ini -r -t 5 -i ..\quizdb-1.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 6 -i ..\quizdb-2.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 7 -i ..\quizdb-3.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 8 -i ..\quizdb-4.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 9 -i ..\quizdb-5.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 10 -i ..\quizdb-6.sqlite
+    python misc\dbfill.py -c local\config.ini -r -t 11 -i ..\quizdb-7.sqlite
 
 
 Adding new quiz
