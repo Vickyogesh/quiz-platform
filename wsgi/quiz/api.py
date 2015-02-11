@@ -13,11 +13,12 @@ api = Blueprint('api', __name__)
 
 @api.before_request
 def get_quiz_meta():
-    uid = session['quiz_id']
-    # truck quiz has special meta object which covers multiple items.
-    if 5 <= uid <= 11:
-        uid = 5
-    g.quiz_meta = registered_quiz_meta[uid]
+    uid = session.get('quiz_id', None)
+    if uid is not None:
+        # truck quiz has special meta object which covers multiple items.
+        if 5 <= uid <= 11:
+            uid = 5
+        g.quiz_meta = registered_quiz_meta[uid]
 
 
 _ifix_html = """<!DOCTYPE html>
