@@ -2,13 +2,22 @@ from functools import wraps
 from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
-from flask import Blueprint, request, session, Response, redirect, abort
+from flask import Blueprint, request, session, Response, redirect, abort, g
 from .appcore import json_response, dict_to_json_response
 from .core.exceptions import QuizCoreError
 from . import access
 from .access import current_user, OwnerPermission
+from .common.base import registered_quiz_meta
 
 api = Blueprint('api', __name__)
+
+@api.before_request
+def get_quiz_meta():
+    uid = session['quiz_id']
+    # truck quiz has special meta object which covers multiple items.
+    if 5 <= uid <= 11:
+        uid = 5
+    g.quiz_meta = registered_quiz_meta[uid]
 
 
 _ifix_html = """<!DOCTYPE html>

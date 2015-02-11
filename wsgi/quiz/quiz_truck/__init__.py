@@ -11,22 +11,65 @@ from ..common import client_views, school_views, index
 
 sublicense = {
     'title': {
-        5: lazy_gettext('Truck C1 and C1E'),
-        6: lazy_gettext('Truck C1 and C1E non-professional'),
-        7: lazy_gettext('Truck C and CE'),
-        8: lazy_gettext('Truck C and CE with C1 and C1E category'),
-        9: lazy_gettext('Truck D1 and D1E'),
-        10: lazy_gettext('Truck D and DE'),
-        11: lazy_gettext('Truck D and DE with D1 and D1E category'),
+        5: lazy_gettext('C1 or C1E'),
+        6: lazy_gettext('C1 or C1E - code Union 97, unprofessional'),
+        7: lazy_gettext('C or CE'),
+        8: lazy_gettext('C or CE formerly C1'),
+        9: lazy_gettext('D1 or D1E'),
+        10: lazy_gettext('D or DE'),
+        11: lazy_gettext('D or DE, formerly D1'),
     },
     'exam_meta': {
-        5: {'max_errors': 1, 'total_time': 2000, 'num_questions': 31},
-        6: {'max_errors': 2, 'total_time': 2100, 'num_questions': 32},
-        7: {'max_errors': 3, 'total_time': 2200, 'num_questions': 33},
-        8: {'max_errors': 4, 'total_time': 2300, 'num_questions': 34},
-        9: {'max_errors': 5, 'total_time': 2400, 'num_questions': 35},
-        10: {'max_errors': 6, 'total_time': 2500, 'num_questions': 36},
-        11: {'max_errors': 7, 'total_time': 2600, 'num_questions': 37}
+        5: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [2, 3, 3, 1, 3, 1, 3, 1, 1, 2]
+        },
+        6: {
+            'max_errors': 1,
+            'total_time': 1200,
+            'num_questions': 10,
+            'questions_per_chapter': [2, 1, 3, 1, 1, 2]
+
+        },
+        7: {
+            'max_errors': 4,
+            'total_time': 2400,
+            'num_questions': 40,
+            'questions_per_chapter': [2, 3, 4, 1, 2, 1, 3, 1, 1, 2, 5, 1, 4, 3,
+                                      3, 3, 1]
+
+        },
+        8: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [5, 1, 4, 3, 3, 3, 1]
+
+        },
+        9: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [2, 3, 2, 1, 2, 2, 3, 1, 2, 2]
+
+        },
+        10: {
+            'max_errors': 4,
+            'total_time': 2400,
+            'num_questions': 40,
+            'questions_per_chapter': [2, 3, 3, 1, 3, 2, 3, 1, 2, 2, 5, 1, 4, 2,
+                                      3, 3]
+
+        },
+        11: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [5, 2, 4, 3, 3, 3]
+
+        }
     }
 }
 

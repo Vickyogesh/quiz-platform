@@ -20,7 +20,7 @@
   </div>
 
   <div class="bottom-nav hidden-xs">
-    {% for i in range(exam_meta.num_questions) -%}
+    {% for i in range(quiz_meta.exam_meta.num_questions) -%}
     <div id="rect{{ loop.index0 }}">{{ loop.index }}</div>
     {%- endfor %}
   </div>
