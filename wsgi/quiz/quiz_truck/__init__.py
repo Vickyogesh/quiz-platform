@@ -20,13 +20,56 @@ sublicense = {
         11: lazy_gettext('D or DE, formerly D1'),
     },
     'exam_meta': {
-        5: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
-        6: {'max_errors': 1, 'total_time': 1200, 'num_questions': 10},
-        7: {'max_errors': 4, 'total_time': 2400, 'num_questions': 40},
-        8: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
-        9: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20},
-        10: {'max_errors': 4, 'total_time': 2400, 'num_questions': 40},
-        11: {'max_errors': 2, 'total_time': 1200, 'num_questions': 20}
+        5: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [2, 3, 3, 1, 3, 1, 3, 1, 1, 2]
+        },
+        6: {
+            'max_errors': 1,
+            'total_time': 1200,
+            'num_questions': 10,
+            'questions_per_chapter': [2, 1, 3, 1, 1, 2]
+
+        },
+        7: {
+            'max_errors': 4,
+            'total_time': 2400,
+            'num_questions': 40,
+            'questions_per_chapter': [2, 3, 4, 1, 2, 1, 3, 1, 1, 2, 5, 1, 4, 3,
+                                      3, 3, 1]
+
+        },
+        8: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [5, 1, 4, 3, 3, 3, 1]
+
+        },
+        9: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [2, 3, 2, 1, 2, 2, 3, 1, 2, 2]
+
+        },
+        10: {
+            'max_errors': 4,
+            'total_time': 2400,
+            'num_questions': 40,
+            'questions_per_chapter': [2, 3, 3, 1, 3, 2, 3, 1, 2, 2, 5, 1, 4, 2,
+                                      3, 3]
+
+        },
+        11: {
+            'max_errors': 2,
+            'total_time': 1200,
+            'num_questions': 20,
+            'questions_per_chapter': [5, 2, 4, 3, 3, 3]
+
+        }
     }
 }
 

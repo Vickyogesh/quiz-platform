@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
+from flask import g
 from .exceptions import QuizCoreError
-from .exammixin import exam_meta
+# from .exammixin import exam_meta
 
 
 class UserMixin(object):
@@ -130,7 +131,7 @@ class UserMixin(object):
         return stat
 
     def __getExamStat(self, quiz_type, user_id):
-        meta = exam_meta[quiz_type]
+        meta = g.quiz_meta['exam_meta']
         numerr = meta['max_errors']
         try:
             row = self.__examstat.execute(user_id=user_id,
@@ -157,13 +158,12 @@ class UserMixin(object):
         }
 
     def _createExamInfo(self, exam_db_row):
-        quiz_type = exam_db_row[1]
         start = exam_db_row[3]
         end = exam_db_row[4]
         errors = exam_db_row[5]
         expired = exam_db_row[6]
 
-        meta = exam_meta[quiz_type]
+        meta = g.quiz_meta['exam_meta']
         numerr = meta['max_errors']
 
         if end:

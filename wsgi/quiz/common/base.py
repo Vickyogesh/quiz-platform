@@ -22,6 +22,13 @@ from .. import access
 _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
 _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 
+# Container for registered quiz bundles.
+# It will be used to get quiz_meta from outside the bundle.
+# Because a bundle puts quiz_meta to g.quiz_meta on each request
+# and in other places (like api blueprint) there no way to get quiz_meta.
+# So this dict will be used as a workaround.
+registered_quiz_meta = {}
+
 
 def _camel_to_underscore(name):
     """Convert name from 'CamelCase' to 'camel_case' format.
@@ -288,6 +295,8 @@ class Bundle(object):
         # parameters.
         meta = self.meta.__class__(id=quiz_id, year=quiz_year, **self.meta)
         # meta = dict(id=quiz_id, year=quiz_year, **self.meta)
+
+        registered_quiz_meta[quiz_id] = meta
 
         # Create blueprint for quiz. It's name is always builds as
         # <quiz_name><quiz_year>.
