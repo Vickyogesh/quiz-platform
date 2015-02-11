@@ -175,6 +175,13 @@ Truck quiz db update
     python misc\dbfill.py -c local\config.ini -r -t 10 -i ..\quizdb-6.sqlite
     python misc\dbfill.py -c local\config.ini -r -t 11 -i ..\quizdb-7.sqlite
 
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 5 -i quizdb-1.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 6 -i quizdb-2.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 7 -i quizdb-3.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 8 -i quizdb-4.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 9 -i quizdb-5.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 10 -i quizdb-6.sqlite
+    python $OPENSHIFT_REPO_DIR/misc/dbfill.py -c $OPENSHIFT_REPO_DIR/misc/config.ini -r -t 11 -i quizdb-7.sqlite
 
 Adding new quiz
 ---------------
