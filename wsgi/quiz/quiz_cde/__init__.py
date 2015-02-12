@@ -251,7 +251,7 @@ class TruckMeta(dict):
         return dict.get(self, k, d)
 
 
-quiz = Bundle(__name__, TruckMeta(name='truck'))
+quiz = Bundle(__name__, TruckMeta(name='cde'))
 
 
 def _handle_sub_license():
@@ -267,7 +267,7 @@ def _handle_sub_license():
 
     Note:
         ``sub`` query parameter is provided by the
-        :file:`templates/quiz_truck/sublicense.html`.
+        :file:`templates/quiz_cde/sublicense.html`.
     """
     user = current_user
     try:
@@ -332,7 +332,7 @@ quiz.view(school_views.SchoolStatisticsView)
 # Well we actually don't need it here.
 @quiz.view
 class SubLicense(BaseView):
-    template_name = 'quiz_truck/sublicense.html'
+    template_name = 'quiz_cde/sublicense.html'
     url_rule = '/sublicense'
     endpoint = 'sub_license'
 
@@ -357,7 +357,7 @@ class IndexView(index.IndexView):
 
 @quiz.view
 class ClientMenu(client_views.ClientMenuView):
-    template_name = 'quiz_truck/menu_client.html'
+    template_name = 'quiz_cde/menu_client.html'
 
     def dispatch_request(self, *args, **kwargs):
         sub_license = _handle_sub_license()
@@ -368,7 +368,7 @@ class ClientMenu(client_views.ClientMenuView):
 
 @quiz.view
 class ClientMenuQuiz(client_views.ClientTopicsView):
-    template_name = 'quiz_truck/menu_topics.html'
+    template_name = 'quiz_cde/menu_topics.html'
 
     # TODO: cache me
     def get_topics(self):
@@ -385,12 +385,12 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
 
 @quiz.view
 class ClientExam(client_views.ClientExamView):
-    template_name = 'quiz_truck/exam.html'
+    template_name = 'quiz_cde/exam.html'
 
 
 @quiz.view
 class SchoolMenu(school_views.SchoolMenuView):
-    template_name = 'quiz_truck/menu_school.html'
+    template_name = 'quiz_cde/menu_school.html'
 
     def dispatch_request(self, *args, **kwargs):
         sub_license = _handle_sub_license()

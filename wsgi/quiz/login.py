@@ -11,8 +11,8 @@ QUIZ_ID_MAP = {
     'cqc': 2,
     'b2013': 3,
     'am': 4,
-    # (it covers 7 sub types 5 - 11), see core/exammixin.py
-    'truck': 5
+    # (it covers 7 sub types 5 - 11), see quiz_cde
+    'cde': 5
 }
 
 login_api = Blueprint('login_api', __name__)
