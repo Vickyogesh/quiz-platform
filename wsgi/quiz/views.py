@@ -8,7 +8,7 @@ quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/ui',
                      no_url_year=True, main=True)
 quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2014, base_prefix='/ui',
                       no_url_year=True)
-quiz_cde.quiz.init_app(app, quiz_id=5, quiz_year=2013, base_prefix='/ui',
+quiz_cde.quiz.init_app(app, quiz_id=5, quiz_year=2015, base_prefix='/ui',
                        no_url_year=True)
 
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-10 16:02+0700\n"
+"POT-Creation-Date: 2015-02-13 12:48+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,40 +44,40 @@ msgstr ""
 msgid "Quiz B"
 msgstr ""
 
-#: wsgi/quiz/quiz_cqc/__init__.py:10
-msgid "CQC"
-msgstr ""
-
-#: wsgi/quiz/quiz_truck/__init__.py:14
+#: wsgi/quiz/quiz_cde/__init__.py:14
 msgid "C1 or C1E"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:15
+#: wsgi/quiz/quiz_cde/__init__.py:15
 msgid "C1 or C1E - code Union 97, unprofessional"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:16
+#: wsgi/quiz/quiz_cde/__init__.py:16
 msgid "C or CE"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:17
+#: wsgi/quiz/quiz_cde/__init__.py:17
 msgid "C or CE formerly C1"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:18
+#: wsgi/quiz/quiz_cde/__init__.py:18
 msgid "D1 or D1E"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:19
+#: wsgi/quiz/quiz_cde/__init__.py:19
 msgid "D or DE"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:20
+#: wsgi/quiz/quiz_cde/__init__.py:20
 msgid "D or DE, formerly D1"
 msgstr ""
 
-#: wsgi/quiz/quiz_truck/__init__.py:197
-msgid "Truck"
+#: wsgi/quiz/quiz_cde/__init__.py:240
+msgid "C D E"
+msgstr ""
+
+#: wsgi/quiz/quiz_cqc/__init__.py:10
+msgid "CQC"
 msgstr ""
 
 #: wsgi/quiz/templates/base.html:15
@@ -189,7 +189,7 @@ msgstr ""
 #: wsgi/quiz/templates/base_menu_client.html:4
 #: wsgi/quiz/templates/base_menu_topics.html:4
 #: wsgi/quiz/templates/common_menu_school.html:2
-#: wsgi/quiz/templates/quiz_truck/sublicense.html:4
+#: wsgi/quiz/templates/quiz_cde/sublicense.html:4
 msgid "Menu"
 msgstr ""
 
@@ -198,19 +198,19 @@ msgstr ""
 #: wsgi/quiz/templates/common_menu_school.html:10
 #: wsgi/quiz/templates/common_statistics_school.html:3
 #: wsgi/quiz/templates/common_statistics_school.html:18
-#: wsgi/quiz/templates/quiz_truck/menu_client.html:7
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:7
 msgid "Statistics"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:44
 #: wsgi/quiz/templates/common_menu_school.html:6
-#: wsgi/quiz/templates/quiz_truck/menu_client.html:8
-#: wsgi/quiz/templates/quiz_truck/sublicense.html:29
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/sublicense.html:29
 msgid "Log out"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:47
-#: wsgi/quiz/templates/quiz_truck/menu_client.html:11
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:11
 msgid "Connect with"
 msgstr ""
 
@@ -488,32 +488,32 @@ msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/exam.html:8
 #: wsgi/quiz/templates/quiz_b/exam.html:8
+#: wsgi/quiz/templates/quiz_cde/exam.html:10
 #: wsgi/quiz/templates/quiz_cqc/exam.html:8
-#: wsgi/quiz/templates/quiz_truck/exam.html:10
 msgid "Questions"
 msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/exam.html:9
 #: wsgi/quiz/templates/quiz_b/exam.html:9
+#: wsgi/quiz/templates/quiz_cde/exam.html:11
 #: wsgi/quiz/templates/quiz_cqc/exam.html:9
-#: wsgi/quiz/templates/quiz_truck/exam.html:11
 #, python-format
 msgid "From %(from)s to %(to)s"
 msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/menu_topics.html:44
 #: wsgi/quiz/templates/quiz_b/menu_topics.html:21
+#: wsgi/quiz/templates/quiz_cde/menu_topics.html:33
 #: wsgi/quiz/templates/quiz_cqc/menu_topics.html:21
-#: wsgi/quiz/templates/quiz_truck/menu_topics.html:33
 msgid "Chapter"
 msgstr ""
 
-#: wsgi/quiz/templates/quiz_truck/menu_client.html:6
-#: wsgi/quiz/templates/quiz_truck/menu_school.html:4
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:6
+#: wsgi/quiz/templates/quiz_cde/menu_school.html:4
 msgid "Change license"
 msgstr ""
 
-#: wsgi/quiz/templates/quiz_truck/sublicense.html:10
+#: wsgi/quiz/templates/quiz_cde/sublicense.html:10
 msgid "Truck sub license"
 msgstr ""
 

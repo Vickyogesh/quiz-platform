@@ -237,7 +237,7 @@ class TruckMeta(dict):
         if name == 'id':
             return sub
         elif sub is None and name == 'title':
-            return gettext('Truck')
+            return gettext('C D E')
         return sublicense[name][sub] if sub is not None else d
 
     def __getitem__(self, item):
@@ -347,9 +347,9 @@ class IndexView(index.IndexView):
     def quiz_fullname(self):
         # For backward compatibility.
         # We have to send 'truck' to the Accounts Service instead of
-        # truck2013.
+        # truck2015.
         year = self.meta['year']
-        if year == 2013:
+        if year == 2015:
             return self.meta['name']
         else:
             return ''.join((self.meta['name'], str(year)))
