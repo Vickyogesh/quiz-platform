@@ -11,13 +11,13 @@ from ..common import client_views, school_views, index
 
 sublicense = {
     'title': {
-        5: lazy_gettext('C1 or C1E'),
-        6: lazy_gettext('C1 or C1E - code Union 97, unprofessional'),
-        7: lazy_gettext('C or CE'),
-        8: lazy_gettext('C or CE formerly C1'),
-        9: lazy_gettext('D1 or D1E'),
-        10: lazy_gettext('D or DE'),
-        11: lazy_gettext('D or DE, formerly D1'),
+        5: lazy_gettext('Licenses categories C1 - C1E'),
+        6: lazy_gettext('Licenses categories C1 - C1E code Union 97'),
+        7: lazy_gettext('Licenses categories C - CE'),
+        8: lazy_gettext('Licenses categories C - CE formerly C1'),
+        9: lazy_gettext('Licenses categories D1 - D1E'),
+        10: lazy_gettext('Licenses categories D - DE'),
+        11: lazy_gettext('Licenses categories D - DE formerly D1'),
     },
     'exam_meta': {
         5: {

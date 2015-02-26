@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-13 12:48+0700\n"
-"PO-Revision-Date: 2015-02-13 11:49+0600\n"
+"POT-Creation-Date: 2015-02-26 11:44+0700\n"
+"PO-Revision-Date: 2015-02-26 10:45+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -46,32 +46,32 @@ msgid "Quiz B"
 msgstr "Quiz Patente"
 
 #: wsgi/quiz/quiz_cde/__init__.py:14
-msgid "C1 or C1E"
-msgstr "C1 o C1E"
+msgid "Licenses categories C1 - C1E"
+msgstr "Patenti categorie C1 – C1E"
 
 #: wsgi/quiz/quiz_cde/__init__.py:15
-msgid "C1 or C1E - code Union 97, unprofessional"
-msgstr "C1 o C1E - codice unionale 97, non professionale"
+msgid "Licenses categories C1 - C1E code Union 97"
+msgstr "Patenti categorie C1 – C1E codice unionale 97 "
 
 #: wsgi/quiz/quiz_cde/__init__.py:16
-msgid "C or CE"
-msgstr "C o CE"
+msgid "Licenses categories C - CE"
+msgstr "Patenti categorie C – CE"
 
 #: wsgi/quiz/quiz_cde/__init__.py:17
-msgid "C or CE formerly C1"
-msgstr "C o CE, già C1"
+msgid "Licenses categories C - CE formerly C1"
+msgstr "Patenti categorie C – CE già C1"
 
 #: wsgi/quiz/quiz_cde/__init__.py:18
-msgid "D1 or D1E"
-msgstr "D1 o D1E"
+msgid "Licenses categories D1 - D1E"
+msgstr "Patenti categorie D1 – D1E"
 
 #: wsgi/quiz/quiz_cde/__init__.py:19
-msgid "D or DE"
-msgstr "D o DE"
+msgid "Licenses categories D - DE"
+msgstr "Patenti categorie D – DE"
 
 #: wsgi/quiz/quiz_cde/__init__.py:20
-msgid "D or DE, formerly D1"
-msgstr "D o DE, già D1"
+msgid "Licenses categories D - DE formerly D1"
+msgstr "Patenti categorie D – DE già D1"
 
 #: wsgi/quiz/quiz_cde/__init__.py:240
 msgid "C D E"
@@ -552,3 +552,24 @@ msgstr "Programma"
 
 #~ msgid "Truck"
 #~ msgstr "Camion"
+
+#~ msgid "C1 or C1E"
+#~ msgstr "C1 o C1E"
+
+#~ msgid "C1 or C1E - code Union 97, unprofessional"
+#~ msgstr "C1 o C1E - codice unionale 97, non professionale"
+
+#~ msgid "C or CE"
+#~ msgstr "C o CE"
+
+#~ msgid "C or CE formerly C1"
+#~ msgstr "C o CE, già C1"
+
+#~ msgid "D1 or D1E"
+#~ msgstr "D1 o D1E"
+
+#~ msgid "D or DE"
+#~ msgstr "D o DE"
+
+#~ msgid "D or DE, formerly D1"
+#~ msgstr "D o DE, già D1"

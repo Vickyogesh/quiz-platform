@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-13 12:48+0700\n"
+"POT-Creation-Date: 2015-02-26 11:44+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,31 +45,31 @@ msgid "Quiz B"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:14
-msgid "C1 or C1E"
+msgid "Licenses categories C1 - C1E"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:15
-msgid "C1 or C1E - code Union 97, unprofessional"
+msgid "Licenses categories C1 - C1E code Union 97"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:16
-msgid "C or CE"
+msgid "Licenses categories C - CE"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:17
-msgid "C or CE formerly C1"
+msgid "Licenses categories C - CE formerly C1"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:18
-msgid "D1 or D1E"
+msgid "Licenses categories D1 - D1E"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:19
-msgid "D or DE"
+msgid "Licenses categories D - DE"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:20
-msgid "D or DE, formerly D1"
+msgid "Licenses categories D - DE formerly D1"
 msgstr ""
 
 #: wsgi/quiz/quiz_cde/__init__.py:240
