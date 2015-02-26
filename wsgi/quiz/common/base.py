@@ -274,7 +274,7 @@ class Bundle(object):
         modify_static_endpoint(app, '%s.static' % bp_name)
 
     def init_app(self, app, quiz_id, quiz_year, base_prefix='',
-                 no_url_year=False, main=False):
+                 no_url_year=False, year_in_title=True, main=False):
         """Register quiz in the flask application.
 
         Args:
@@ -293,7 +293,8 @@ class Bundle(object):
         """
         # Prepare result metadata as a mix of Bundle.meta and init_app()
         # parameters.
-        meta = self.meta.__class__(id=quiz_id, year=quiz_year, **self.meta)
+        meta = self.meta.__class__(id=quiz_id, year=quiz_year,
+                                   year_in_title=year_in_title, **self.meta)
         # meta = dict(id=quiz_id, year=quiz_year, **self.meta)
 
         registered_quiz_meta[quiz_id] = meta
