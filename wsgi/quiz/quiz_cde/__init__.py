@@ -88,7 +88,7 @@ areas = {
         },
         {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
         {
-            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[12, 13, 14, 15], [16]]
         },
         {
@@ -103,7 +103,7 @@ areas = {
             'cls': 'area3'
         },
         {
-            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[5, 6, 7, 8], [9]],
             'cls': 'area4'
         },
@@ -121,7 +121,7 @@ areas = {
         },
         {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
         {
-            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[12, 13, 14, 15], [16]]
         },
         {
@@ -129,7 +129,7 @@ areas = {
             'chapters': [[17, 18], [19, 20, 21]]
         },
         {
-            'text': u'Tecnica e funzionamento del veicolo',
+            'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[22, 23, 24, 25, 26], [27, 28], [29, 30, 31], [32]]
         },
         {
@@ -137,13 +137,13 @@ areas = {
             'chapters': [[33, 34, 35, 36], [37, 38, 39, 40]]
         },
         {
-            'text': u'Responsabilità e contratto di trasporto',
+            'text': u'Responsabilità del conducente nel trasporto di merci',
             'chapters': [[41]]
         }
     ],
     8: [
         {
-            'text': u'Tecnica e funzionamento del veicolo',
+            'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
             'cls': 'area6'
         },
@@ -153,7 +153,7 @@ areas = {
             'cls': 'area7'
         },
         {
-            'text': u'Responsabilità e contratto di trasporto',
+            'text': u'Responsabilità del conducente nel trasporto di merci',
             'chapters': [[20]],
             'cls': 'area8'
         }
@@ -166,7 +166,7 @@ areas = {
         },
         {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
         {
-            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[9, 10, 11, 12], [13]]
         },
         {
@@ -182,7 +182,7 @@ areas = {
         },
         {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
         {
-            'text': u'Masse, dimensioni dei veicoli e campo visivo',
+            'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[9, 10, 11, 12], [13]]
         },
         {
@@ -190,7 +190,7 @@ areas = {
             'chapters': [[14, 15, 16], [17, 18]]
         },
         {
-            'text': u'Tecnica e funzionamento del veicolo',
+            'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[19, 20, 21, 22, 23], [24, 25], [26, 27, 28], [29]]
         },
         {
@@ -200,7 +200,7 @@ areas = {
     ],
     11: [
         {
-            'text': u'Tecnica e funzionamento del veicolo',
+            'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
             'cls': 'area6'
         },

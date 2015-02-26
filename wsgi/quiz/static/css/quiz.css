@@ -14,7 +14,8 @@ li.area2:hover {background: #009d00;}
 .area3 {background: #9966cc;}
 li.area3:hover {background: #9159c8;}
 
-.area4 {background: #ffdd00;}
+.area4 {background: #ffdd00; color: #2F4F4F;}
+.area4 table, .area4 table a {color: #2F4F4F !important;}
 li.area4:hover {background: #eece00;}
 
 .area5 {background: #ff6633;}
