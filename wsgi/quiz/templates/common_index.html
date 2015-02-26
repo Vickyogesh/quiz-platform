@@ -3,7 +3,7 @@
 
 {% block title %}
   {%- if quiz_meta.title -%}
-    {{ quiz_meta.title }} {{ quiz_meta.year }} &mdash;
+    {{ quiz_meta.title }} {% if quiz_meta.year_in_title %}{{ quiz_meta.year }}{% endif %} &mdash;
   {%- endif %}
   {{ _('Quiz Platform') }}
 {%- endblock %}
