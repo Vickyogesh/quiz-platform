@@ -7,16 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-26 11:48+0700\n"
+"POT-Creation-Date: 2015-02-26 12:06+0700\n"
 "PO-Revision-Date: 2015-02-26 10:48+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"X-Generator: Poedit 1.5.7\n"
 
 #: wsgi/quiz/common/client_views.py:199
 #, python-format
@@ -81,17 +80,17 @@ msgstr "C D E"
 msgid "CQC"
 msgstr "CQC"
 
-#: wsgi/quiz/templates/base.html:15
+#: wsgi/quiz/templates/base.html:14
 #: wsgi/quiz/templates/client_fullscreen_wrapper.html:20
 #: wsgi/quiz/templates/common_index.html:8 wsgi/quiz/templates/policy.html:4
 msgid "Quiz Platform"
 msgstr "Quiz Platform"
 
-#: wsgi/quiz/templates/base.html:24
+#: wsgi/quiz/templates/base.html:23
 msgid "Please wait ..."
 msgstr "Attendere prego ..."
 
-#: wsgi/quiz/templates/base.html:34 wsgi/quiz/templates/base.html:40
+#: wsgi/quiz/templates/base.html:33 wsgi/quiz/templates/base.html:39
 #: wsgi/quiz/templates/base_exam.html:187
 #: wsgi/quiz/templates/common_menu_school.html:26
 #: wsgi/quiz/templates/common_menu_school.html:66
@@ -121,13 +120,11 @@ msgstr "Falso"
 msgid "Time available"
 msgstr "TEMPO A DISPOSIZIONE"
 
-#: wsgi/quiz/templates/base_exam.html:81
-#: wsgi/quiz/templates/base_exam.html:125
+#: wsgi/quiz/templates/base_exam.html:81 wsgi/quiz/templates/base_exam.html:125
 msgid "Exam number"
 msgstr "Scheda Esame N."
 
-#: wsgi/quiz/templates/base_exam.html:85
-#: wsgi/quiz/templates/base_exam.html:129
+#: wsgi/quiz/templates/base_exam.html:85 wsgi/quiz/templates/base_exam.html:129
 msgid "Name and surname"
 msgstr "Cognome e Nome del Candidato"
 
@@ -172,8 +169,7 @@ msgstr "Errore nel salvataggio dell'esame."
 msgid "In this exam you made errors: %%(errors)s"
 msgstr "Errori commessi in questa sessione: %%(errors)s"
 
-#: wsgi/quiz/templates/base_exam.html:188
-#: wsgi/quiz/templates/base_page.html:48
+#: wsgi/quiz/templates/base_exam.html:188 wsgi/quiz/templates/base_page.html:48
 #: wsgi/quiz/templates/common_quiz.html:15
 #: wsgi/quiz/templates/common_review.html:21
 msgid "Back to menu"
@@ -202,19 +198,19 @@ msgstr "Menu"
 #: wsgi/quiz/templates/common_menu_school.html:10
 #: wsgi/quiz/templates/common_statistics_school.html:3
 #: wsgi/quiz/templates/common_statistics_school.html:18
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:7
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:9
 msgid "Statistics"
 msgstr "Statistiche"
 
 #: wsgi/quiz/templates/base_menu_client.html:44
 #: wsgi/quiz/templates/common_menu_school.html:6
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:10
 #: wsgi/quiz/templates/quiz_cde/sublicense.html:29
 msgid "Log out"
 msgstr "Esci"
 
 #: wsgi/quiz/templates/base_menu_client.html:47
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:11
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:13
 msgid "Connect with"
 msgstr "Collegati con"
 
@@ -432,8 +428,8 @@ msgid ""
 "Statistics topics in greater blue portion of the graph corresponds to a "
 "better preparation."
 msgstr ""
-"Statistiche argomenti: a una maggior porzione blu del grafico corrisponde "
-"una migliore preparazione."
+"Statistiche argomenti: a una maggior porzione blu del grafico corrisponde"
+" una migliore preparazione."
 
 #: wsgi/quiz/templates/common_statistics_client.html:41
 msgid "The student has not passed any exercises."
@@ -471,8 +467,8 @@ msgid ""
 "Exam statistics: a greater blue sector of the graph, the better the "
 "preparation"
 msgstr ""
-"Statistiche Esami: a una maggiore porzione blu del grafico corrisponde una "
-"migliore preparazione"
+"Statistiche Esami: a una maggiore porzione blu del grafico corrisponde "
+"una migliore preparazione"
 
 #: wsgi/quiz/templates/common_statistics_school.html:32
 msgid "Best students"
@@ -487,8 +483,8 @@ msgid ""
 "Topic statistics: a greater blue sector of the graph, the better the "
 "preparation"
 msgstr ""
-"Statistiche Argomenti: a una maggiore porzione blu del grafico corrisponde "
-"una migliore preparazione"
+"Statistiche Argomenti: a una maggiore porzione blu del grafico "
+"corrisponde una migliore preparazione"
 
 #: wsgi/quiz/templates/common_statistics_school.html:59
 msgid "<Empty>"
@@ -520,14 +516,15 @@ msgstr "Da %(from)s a %(to)s"
 msgid "Chapter"
 msgstr "Capitolo"
 
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:6
-#: wsgi/quiz/templates/quiz_cde/menu_school.html:4
-msgid "Change license"
-msgstr "Cambia Programma"
-
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:4
 #: wsgi/quiz/templates/quiz_cde/sublicense.html:10
 msgid "Examination program"
 msgstr "Programma d'esame"
+
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/menu_school.html:4
+msgid "Change license"
+msgstr "Cambia Programma"
 
 #~ msgid "Truck C1 and C1E"
 #~ msgstr "C1 E C1E"
@@ -576,3 +573,4 @@ msgstr "Programma d'esame"
 
 #~ msgid "Truck sub license"
 #~ msgstr "Programma"
+

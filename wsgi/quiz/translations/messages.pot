@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-26 11:48+0700\n"
+"POT-Creation-Date: 2015-02-26 12:06+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,17 +80,17 @@ msgstr ""
 msgid "CQC"
 msgstr ""
 
-#: wsgi/quiz/templates/base.html:15
+#: wsgi/quiz/templates/base.html:14
 #: wsgi/quiz/templates/client_fullscreen_wrapper.html:20
 #: wsgi/quiz/templates/common_index.html:8 wsgi/quiz/templates/policy.html:4
 msgid "Quiz Platform"
 msgstr ""
 
-#: wsgi/quiz/templates/base.html:24
+#: wsgi/quiz/templates/base.html:23
 msgid "Please wait ..."
 msgstr ""
 
-#: wsgi/quiz/templates/base.html:34 wsgi/quiz/templates/base.html:40
+#: wsgi/quiz/templates/base.html:33 wsgi/quiz/templates/base.html:39
 #: wsgi/quiz/templates/base_exam.html:187
 #: wsgi/quiz/templates/common_menu_school.html:26
 #: wsgi/quiz/templates/common_menu_school.html:66
@@ -198,19 +198,19 @@ msgstr ""
 #: wsgi/quiz/templates/common_menu_school.html:10
 #: wsgi/quiz/templates/common_statistics_school.html:3
 #: wsgi/quiz/templates/common_statistics_school.html:18
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:7
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:9
 msgid "Statistics"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:44
 #: wsgi/quiz/templates/common_menu_school.html:6
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:10
 #: wsgi/quiz/templates/quiz_cde/sublicense.html:29
 msgid "Log out"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:47
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:11
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:13
 msgid "Connect with"
 msgstr ""
 
@@ -508,12 +508,13 @@ msgstr ""
 msgid "Chapter"
 msgstr ""
 
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:6
-#: wsgi/quiz/templates/quiz_cde/menu_school.html:4
-msgid "Change license"
-msgstr ""
-
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:4
 #: wsgi/quiz/templates/quiz_cde/sublicense.html:10
 msgid "Examination program"
+msgstr ""
+
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/menu_school.html:4
+msgid "Change license"
 msgstr ""
 

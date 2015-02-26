@@ -1,6 +1,8 @@
 {% extends "quiz_b/menu_client.html" %}
 {% block content_class %}menu truck{% endblock %}
 
+{%- block title_prefix %}{{ _('Examination program') }}{% endblock %}
+
 {% block footer %}
 <div class="footer row">
   <div class="col-sm-3"><a href="{{ url_for('.sub_license') }}" class="button"><span class="glyphicon glyphicon-book"></span> {{ _('Change license') }}</a></div>
