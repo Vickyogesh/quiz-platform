@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-26 11:44+0700\n"
-"PO-Revision-Date: 2015-02-26 10:45+0600\n"
+"POT-Creation-Date: 2015-02-26 11:48+0700\n"
+"PO-Revision-Date: 2015-02-26 10:48+0600\n"
 "Last-Translator: Sergey Kozlov <skozlovf@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -526,8 +526,8 @@ msgid "Change license"
 msgstr "Cambia Programma"
 
 #: wsgi/quiz/templates/quiz_cde/sublicense.html:10
-msgid "Truck sub license"
-msgstr "Programma"
+msgid "Examination program"
+msgstr "Programma d'esame"
 
 #~ msgid "Truck C1 and C1E"
 #~ msgstr "C1 E C1E"
@@ -573,3 +573,6 @@ msgstr "Programma"
 
 #~ msgid "D or DE, formerly D1"
 #~ msgstr "D o DE, già D1"
+
+#~ msgid "Truck sub license"
+#~ msgstr "Programma"
