@@ -146,6 +146,10 @@ class Application(Flask):
         cdn = self.extensions['bootstrap']['cdns']['bootstrap']
         cdn.fallback.baseurl = '//maxcdn.bootstrapcdn.com/bootstrap/%s/' % ver
 
+        # http://blog.jquery.com/2014/12/18/jquery-1-11-2-and-2-1-3-released-safari-fail-safe-edition/
+        cdn = self.extensions['bootstrap']['cdns']['jquery']
+        cdn.fallback.baseurl = '//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/'
+
     def load_config(self, config_path, extra_configs=None, env_var=None):
         """Load application configurations.
 
