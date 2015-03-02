@@ -35,6 +35,13 @@
   </style>
 {% endblock %}
 
+{% block header_row %}
+<div class="col-md-12">
+  <h4><span>{{ quiz_meta.title }}</span></h4>
+  {{ utils.fullscreen_button() }}
+</div>
+{% endblock %}
+
 {% block panel_content %}
   <div class="topics row" id="topics">
     <div class="col-xs-4 areas"><ul></ul></div>

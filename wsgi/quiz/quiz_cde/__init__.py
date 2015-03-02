@@ -318,7 +318,6 @@ def _handle_sub_license():
 # -- Common views --------------------------------------------------------------
 
 quiz.view(client_views.ClientQuizView)
-quiz.view(client_views.ClientReviewView)
 quiz.view(client_views.ClientExamReviewView)
 quiz.view(client_views.ClientStatisticsView)
 quiz.view(client_views.ClientTopicStatisticsView)
@@ -381,6 +380,11 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
         kwargs['topics'] = self.get_topics()
         kwargs['areas'] = areas[self.meta['id']]
         return client_views.ClientTopicsView.render_template(self, **kwargs)
+
+
+@quiz.view
+class ReviewView(client_views.ClientReviewView):
+    template_name = 'quiz_cde/review.html'
 
 
 @quiz.view

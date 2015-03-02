@@ -3,6 +3,13 @@
 
 {% set top = (quiz_meta.exam_meta.num_questions / 10) | int %}
 
+{% block header_row %}
+<div class="col-md-12">
+  <h4><span>{{ quiz_meta.title }}</span></h4>
+  {{ utils.fullscreen_button() }}
+</div>
+{% endblock %}
+
 {%- block exam_nav %}
   <div class="exam-row top-nav hidden-xs">
     {% for i in range(top) -%}
