@@ -28,20 +28,29 @@
 
         addArea: function(area, topics) {
             var item = new Area({text: area.text, cls: area.cls});
+            if (area.chapter_numbers !== undefined)
+                this.num = 0;
             if (typeof area.chapters == "number") {
                 for (var i = 0; i < area.chapters; ++i)
-                    item.chapters.push(this.createChapter(topics, []));
+                    item.chapters.push(this.createChapter(topics, [],
+                        area.chapter_numbers));
             }
             else {
                 _.each(area.chapters, function (val) {
-                    item.chapters.push(this.createChapter(topics, val));
+                    item.chapters.push(this.createChapter(topics, val,
+                    area.chapter_numbers));
                 }.bind(this));
             }
             this.areas.push(item);
         },
 
-        createChapter: function(topics, id_list) {
-            var chapter = new Chapter({"number": ++this.num});
+        createChapter: function(topics, id_list, chapter_numbers) {
+            var chapter_num;
+            if (chapter_numbers !== undefined)
+                chapter_num = chapter_numbers[this.num++];
+            else
+                chapter_num = ++this.num;
+            var chapter = new Chapter({"number": chapter_num});
             _.each(id_list, function(val) {
                 chapter.topics.push({text: topics[val - 1], number: val});
             }.bind(this));
