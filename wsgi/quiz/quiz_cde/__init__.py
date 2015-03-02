@@ -81,132 +81,189 @@ sublicense = {
 
 areas = {
     5: [
-        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Normativa sociale',
+            'chapters': [[1], [2]],
+            'chapter_numbers': [1, 2]
+        },
         {
             'text': u'Disposizioni per il trasporto nazionale e internazionale',
-            'chapters': [[3, 4, 5, 6], [7]]
+            'chapters': [[3, 4, 5, 6], [7]],
+            'chapter_numbers': [3, 4]
         },
-        {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
+        {
+            'text': u'Incidenti ed emergenza',
+            'chapters': [[8, 9, 10], [11]],
+            'chapter_numbers': [5, 6]
+        },
         {
             'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
-            'chapters': [[12, 13, 14, 15], [16]]
+            'chapters': [[12, 13, 14, 15], [16]],
+            'chapter_numbers': [7, 8]
         },
         {
             'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
-            'chapters': [[17, 18], [19, 20, 21]]
+            'chapters': [[17, 18], [19, 20, 21]],
+            'chapter_numbers': [9, 10]
         }
     ],
     6: [
         {
             'text': u'Incidenti ed emergenza',
             'chapters': [[1, 2, 3], [4]],
+            'chapter_numbers': [5, 6],
             'cls': 'area3'
         },
         {
             'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
             'chapters': [[5, 6, 7, 8], [9]],
+            'chapter_numbers': [7, 8],
             'cls': 'area4'
         },
         {
             'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
             'chapters': [[10, 11], [12, 13, 14]],
+            'chapter_numbers': [9, 10],
             'cls': 'area5'
         }
     ],
     7: [
-        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Normativa sociale',
+            'chapters': [[1], [2]],
+            'chapter_numbers': [1, 2]
+        },
         {
             'text': u'Disposizioni per il trasporto nazionale e internazionale',
-            'chapters': [[3, 4, 5, 6], [7]]
+            'chapters': [[3, 4, 5, 6], [7]],
+            'chapter_numbers': [3, 4]
         },
-        {'text': u'Incidenti ed emergenza', 'chapters': [[8, 9, 10], [11]]},
+        {
+            'text': u'Incidenti ed emergenza',
+            'chapters': [[8, 9, 10], [11]],
+            'chapter_numbers': [5, 6]
+        },
         {
             'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
-            'chapters': [[12, 13, 14, 15], [16]]
+            'chapters': [[12, 13, 14, 15], [16]],
+            'chapter_numbers': [7, 8]
         },
         {
             'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
-            'chapters': [[17, 18], [19, 20, 21]]
+            'chapters': [[17, 18], [19, 20, 21]],
+            'chapter_numbers': [9, 10]
         },
         {
             'text': u'Tecnica e funzionamento dei veicoli',
-            'chapters': [[22, 23, 24, 25, 26], [27, 28], [29, 30, 31], [32]]
+            'chapters': [[22, 23, 24, 25, 26], [27, 28], [29, 30, 31], [32]],
+            'chapter_numbers': [11, 12, 13, 14]
         },
         {
             'text': u'Manutenzione e guasti',
-            'chapters': [[33, 34, 35, 36], [37, 38, 39, 40]]
+            'chapters': [[33, 34, 35, 36], [37, 38, 39, 40]],
+            'chapter_numbers': [15, 16]
         },
         {
             'text': u'Responsabilità del conducente nel trasporto di merci',
-            'chapters': [[41]]
+            'chapters': [[41]],
+            'chapter_numbers': [17]
         }
     ],
     8: [
         {
             'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
+            'chapter_numbers': [11, 12, 13, 14],
             'cls': 'area6'
         },
         {
             'text': u'Manutenzione e guasti',
             'chapters': [[12, 13, 14, 15], [16, 17, 18, 19]],
+            'chapter_numbers': [15, 16],
             'cls': 'area7'
         },
         {
             'text': u'Responsabilità del conducente nel trasporto di merci',
             'chapters': [[20]],
+            'chapter_numbers': [17],
             'cls': 'area8'
         }
     ],
     9: [
-        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Normativa sociale',
+            'chapters': [[1], [2]],
+            'chapter_numbers': [1, 2]
+        },
         {
             'text': u'Disposizioni per il trasporto nazionale e internazionale',
-            'chapters': [[3], [4]]
+            'chapters': [[3], [4]],
+            'chapter_numbers': [3, 4]
         },
-        {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
+        {
+            'text': u'Incidenti ed emergenza',
+            'chapters': [[5, 6, 7], [8]],
+            'chapter_numbers': [5, 6]
+        },
         {
             'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
-            'chapters': [[9, 10, 11, 12], [13]]
+            'chapters': [[9, 10, 11, 12], [13]],
+            'chapter_numbers': [7, 8]
         },
         {
             'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
-            'chapters': [[14, 15, 16], [17, 18]]
+            'chapters': [[14, 15, 16], [17, 18]],
+            'chapter_numbers': [9, 10]
         }
     ],
     10: [
-        {'text': u'Normativa sociale', 'chapters': [[1], [2]]},
+        {
+            'text': u'Normativa sociale',
+            'chapters': [[1], [2]],
+            'chapter_numbers': [1, 2]
+        },
         {
             'text': u'Disposizioni per il trasporto nazionale e internazionale',
-            'chapters': [[3], [4]]
+            'chapters': [[3], [4]],
+            'chapter_numbers': [3, 4]
         },
-        {'text': u'Incidenti ed emergenza', 'chapters': [[5, 6, 7], [8]]},
+        {
+            'text': u'Incidenti ed emergenza',
+            'chapters': [[5, 6, 7], [8]],
+            'chapter_numbers': [5, 6]
+        },
         {
             'text': u'Massa, dimensione dei veicoli e limitazione del campo visivo',
-            'chapters': [[9, 10, 11, 12], [13]]
+            'chapters': [[9, 10, 11, 12], [13]],
+            'chapter_numbers': [7, 8]
         },
         {
             'text': u'Carico, aggancio e vari tipi di veicoli pesanti',
-            'chapters': [[14, 15, 16], [17, 18]]
+            'chapters': [[14, 15, 16], [17, 18]],
+            'chapter_numbers': [9, 10]
         },
         {
             'text': u'Tecnica e funzionamento dei veicoli',
-            'chapters': [[19, 20, 21, 22, 23], [24, 25], [26, 27, 28], [29]]
+            'chapters': [[19, 20, 21, 22, 23], [24, 25], [26, 27, 28], [29]],
+            'chapter_numbers': [11, 12, 13, 14]
         },
         {
             'text': u'Manutenzione e guasti',
-            'chapters': [[30, 31, 32, 33], [34, 35, 36, 37]]
+            'chapters': [[30, 31, 32, 33], [34, 35, 36, 37]],
+            'chapter_numbers': [15, 16]
         }
     ],
     11: [
         {
             'text': u'Tecnica e funzionamento dei veicoli',
             'chapters': [[1, 2, 3, 4, 5], [6, 7], [8, 9, 10], [11]],
+            'chapter_numbers': [11, 12, 13, 14],
             'cls': 'area6'
         },
         {
             'text': u'Manutenzione e guasti',
             'chapters': [[12, 13, 14, 15], [16, 17, 18, 19]],
+            'chapter_numbers': [15, 16],
             'cls': 'area7'
         }
     ]
