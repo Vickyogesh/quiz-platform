@@ -2,7 +2,7 @@ from functools import wraps
 from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
-from flask import Blueprint, request, session, Response, redirect, abort, g
+from flask import Blueprint, request, session, Response, redirect, abort, g, json
 from .appcore import json_response, dict_to_json_response
 from .core.exceptions import QuizCoreError
 from . import access
@@ -1279,3 +1279,14 @@ def school_stat(id):
         _update_names(lst, students['week3']['worst'])
 
     return dict_to_json_response(res)
+
+
+# NOTE: this call is for internal use by accounts service.
+@api.route('/stat/school_exams')
+def stat_school_exams():
+    # It returns raw string with json content;
+    # and we simply resend it to the caller as JSON response.
+    stat = app.core.getStatByExams()
+    result = stat or '{}'
+    r = app.response_class(result, mimetype='application/json')
+    return r

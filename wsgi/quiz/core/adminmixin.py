@@ -16,3 +16,10 @@ class AdminMixin(object):
         dl = t.delete().where(t.c.school_id == id)
         self.engine.execute(dl)
         return {}
+
+    def getStatByExams(self):
+        # See update() in stat.py
+        sql = self.stat_json.select().where(self.stat_json.c.name == 'exams')
+        res = self.engine.execute(sql).fetchone()
+        if res:
+            return res[1]
