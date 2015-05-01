@@ -59,6 +59,11 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (school_id, quiz_type)
         );
 
+        CREATE TABLE stat_json(
+            name VARCHAR(80) NOT NULL,
+            value TEXT NOT NULL,
+            CONSTRAINT PRIMARY KEY (name)
+        );
 
         CREATE TABLE guest_access(
             id INTEGER UNSIGNED NOT NULL,
