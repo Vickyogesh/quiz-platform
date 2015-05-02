@@ -50,6 +50,7 @@ def update():
     #     start_time >= DATE_SUB(DATE(UTC_TIMESTAMP()), INTERVAL 28 DAY) AND
     #     start_time < DATE_ADD(DATE(UTC_TIMESTAMP), INTERVAL 1 DAY)
     # AND users.id=user_id GROUP BY quiz_type, school_id
+    # order is not needed here:
     # ORDER BY quiz_type, finished DESC, not_finished DESC;
     finished = func.sum(func.if_(e.c.end_time, 1, 0)).label('finished')
     not_finished = func.sum(func.if_(e.c.end_time, 0, 1)).label('not_finished')
@@ -62,7 +63,7 @@ def update():
     ])
     sql = sql.where(e.c.user_id == u.c.id)
     sql = sql.group_by(e.c.quiz_type, u.c.school_id)
-    sql = sql.order_by(e.c.quiz_type, desc(finished), desc(not_finished))
+    # sql = sql.order_by(e.c.quiz_type, desc(finished), desc(not_finished))
     sql = sql.where(e.c.start_time < datetime.utcnow() + timedelta(days=1))
 
     sql_month = sql.where(e.c.start_time >= datetime.utcnow() - timedelta(days=28))
