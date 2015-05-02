@@ -19,7 +19,9 @@ def fill_exam_stat(stat, result, range_key, quiz_type_names):
         # detect quiz name, with one exception. IDs 5 - 11 belongs to cde
         # See quiz.login.QUIZ_ID_MAP.
         if 5 <= row.quiz_type <= 11:
-            quiz_name = 'cde'
+            names = ['C1-C1E', 'C1-C1E_97', 'C-CE', 'C-CE_C1', 'D1-D1E', 'D-DE',
+                     'D-DE_D1']
+            quiz_name = 'cde %s' % names[row.quiz_type - 5]
         else:
             quiz_name = quiz_type_names[row.quiz_type]
 
