@@ -105,11 +105,11 @@ class ExamMixin(object):
             start = 1
             end = 10
         elif examType == 'persone':
-            start = 11
-            end = 13
-        elif examType == 'merci':
             start = 14
             end = 16
+        elif examType == 'merci':
+            start = 11
+            end = 13
         else:
             raise QuizCoreError('Unknown exam type.')
 
