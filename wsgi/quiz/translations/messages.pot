@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-26 12:06+0700\n"
+"POT-Creation-Date: 2015-05-20 12:21+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Licenses categories D - DE formerly D1"
 msgstr ""
 
-#: wsgi/quiz/quiz_cde/__init__.py:240
+#: wsgi/quiz/quiz_cde/__init__.py:297
 msgid "C D E"
 msgstr ""
 
@@ -198,19 +198,18 @@ msgstr ""
 #: wsgi/quiz/templates/common_menu_school.html:10
 #: wsgi/quiz/templates/common_statistics_school.html:3
 #: wsgi/quiz/templates/common_statistics_school.html:18
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:9
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:15
 msgid "Statistics"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:44
 #: wsgi/quiz/templates/common_menu_school.html:6
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:10
-#: wsgi/quiz/templates/quiz_cde/sublicense.html:29
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:16
 msgid "Log out"
 msgstr ""
 
 #: wsgi/quiz/templates/base_menu_client.html:47
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:13
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:19
 msgid "Connect with"
 msgstr ""
 
@@ -227,6 +226,7 @@ msgstr ""
 #: wsgi/quiz/templates/base_statistics.html:23
 #: wsgi/quiz/templates/common_exam_review.html:16
 #: wsgi/quiz/templates/common_statistics_school.html:13
+#: wsgi/quiz/templates/quiz_cde/sublicense.html:32
 msgid "Back"
 msgstr ""
 
@@ -488,14 +488,14 @@ msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/exam.html:8
 #: wsgi/quiz/templates/quiz_b/exam.html:8
-#: wsgi/quiz/templates/quiz_cde/exam.html:10
+#: wsgi/quiz/templates/quiz_cde/exam.html:17
 #: wsgi/quiz/templates/quiz_cqc/exam.html:8
 msgid "Questions"
 msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/exam.html:9
 #: wsgi/quiz/templates/quiz_b/exam.html:9
-#: wsgi/quiz/templates/quiz_cde/exam.html:11
+#: wsgi/quiz/templates/quiz_cde/exam.html:18
 #: wsgi/quiz/templates/quiz_cqc/exam.html:9
 #, python-format
 msgid "From %(from)s to %(to)s"
@@ -503,7 +503,7 @@ msgstr ""
 
 #: wsgi/quiz/templates/quiz_am/menu_topics.html:44
 #: wsgi/quiz/templates/quiz_b/menu_topics.html:21
-#: wsgi/quiz/templates/quiz_cde/menu_topics.html:33
+#: wsgi/quiz/templates/quiz_cde/menu_topics.html:62
 #: wsgi/quiz/templates/quiz_cqc/menu_topics.html:21
 msgid "Chapter"
 msgstr ""
@@ -513,7 +513,7 @@ msgstr ""
 msgid "Examination program"
 msgstr ""
 
-#: wsgi/quiz/templates/quiz_cde/menu_client.html:8
+#: wsgi/quiz/templates/quiz_cde/menu_client.html:14
 #: wsgi/quiz/templates/quiz_cde/menu_school.html:4
 msgid "Change license"
 msgstr ""
