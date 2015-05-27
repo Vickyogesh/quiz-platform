@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-20 12:21+0700\n"
+"POT-Creation-Date: 2015-05-27 11:20+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -277,8 +277,7 @@ msgid "Exam review"
 msgstr ""
 
 #: wsgi/quiz/templates/common_exam_review.html:22
-#, python-format
-msgid "List of exam %(id)s answers."
+msgid "List of answers."
 msgstr ""
 
 #: wsgi/quiz/templates/common_index.html:61
