@@ -1,28 +1,14 @@
 """
 This module implements common login feature.
 """
-import hashlib
 from werkzeug.exceptions import HTTPException
 from flask import request, current_app, flash, session, redirect, url_for
 from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
-from wtforms import StringField, PasswordField, HiddenField
+from wtforms import StringField, PasswordField, HiddenField, BooleanField
 from ..common.base import BaseView, store_quiz_meta_in_session
-from ..login import do_login
-
-
-def get_plain_login(login, passwd, quiz_fullname):
-    nonce = current_app.account.get_auth().get('nonce', '')
-    digest = hashlib.md5('{0}:{1}'.format(login, passwd)).hexdigest()
-    digest = hashlib.md5('{0}:{1}'.format(nonce, digest)).hexdigest()
-    return {
-        'nonce': nonce,
-        'login': login,
-        'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
-        'quiz_type': quiz_fullname,
-        'digest': digest
-    }
+from ..login import do_login, get_plain_login
 
 
 def get_fb_login(fb_id, fb_auth_token, quiz_fullname):
@@ -82,6 +68,9 @@ class LoginFrom(Form):
     #: Hidden field to determine if normal or facebook login is used.
     is_fb = HiddenField()
 
+    #: Remember me feature flag.
+    remember_me = BooleanField()
+
 
 class IndexView(BaseView):
     """Common quiz index view with login form.
@@ -109,6 +98,7 @@ class IndexView(BaseView):
         form = LoginFrom()
 
         if form.validate_on_submit():
+            remember = False
             if form.is_fb.data == "1":
                 fb_id = form.fb_auth_id.data
                 fb_auth_token = form.fb_auth_token.data
@@ -117,9 +107,11 @@ class IndexView(BaseView):
                 login = form.name.data
                 passwd = form.pwd.data
                 data = get_plain_login(login, passwd, self.quiz_fullname)
+                # We use 'remember me' feature only for plain login.
+                remember = form.remember_me.data
 
             try:
-                do_login(data)
+                do_login(data, remember)
             except HTTPException as e:
                 fb_autologin = None
                 if e.code == 403:
