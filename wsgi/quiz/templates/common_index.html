@@ -55,6 +55,11 @@
           {{ form.pwd.label }}
           {{ form.pwd(class_="form-control") }}
         </div>
+        <div class="checkbox">
+          <label>
+            {{ form.remember_me() }} {{ _('Remember Me') }}
+          </label>
+        </div>
         <div class="form-group bottom">
           <div class="row">
             <div class="col-xs-6">

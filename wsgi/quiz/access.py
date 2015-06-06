@@ -3,6 +3,7 @@ This module provides user session and authentication features.
 """
 from functools import partial
 from werkzeug.utils import cached_property
+from itsdangerous import URLSafeTimedSerializer
 from flask import session, current_app
 from flask_login import (
     LoginManager,
@@ -25,6 +26,11 @@ from flask_principal import (
 )
 
 from . import app
+
+# http://thecircuitnerd.com/flask-login-tokens/
+# Login_serializer used to encrypt and decrypt the cookie token for the remember
+# me option of flask-login
+login_serializer = URLSafeTimedSerializer(app.secret_key)
 
 login_manager = LoginManager()
 
@@ -93,6 +99,10 @@ class User(UserMixin):
     def get_id(self):
         return self.account['login']
 
+    def get_auth_token(self):
+        data = [self.account['login'], self.account.get('passwd')]
+        return login_serializer.dumps(data)
+
     def set_account(self, account):
         self.__dict__.clear()
         self.account = account
@@ -141,14 +151,13 @@ def load_user(uid):
         return None
     return User(account)
 
-
-def login(account):
+def login(account, remember=False):
     """Create user object for the `account`, save it in the session and
     call LoginManager's login routine.
     """
     session['user'] = account
     user = User(account)
-    login_user(user)
+    login_user(user, remember=remember)
     identity_changed.send(current_app._get_current_object(),
                           identity=Identity(user.get_id()))
 
@@ -160,8 +169,8 @@ def logout():
     It also logout from **Accounts Service**.
     """
     app.account.logout()
-    logout_user()
     session.delete()
+    logout_user()
     # Tell Flask-Principal the user is anonymous
     identity_changed.send(current_app._get_current_object(),
                           identity=AnonymousIdentity())
