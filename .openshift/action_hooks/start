@@ -6,5 +6,5 @@ echo "Starting collectd..."
 $OPENSHIFT_DATA_DIR/collectd/sbin/collectd
 
 #echo "Starting logtail.py..."
-#python $OPENSHIFT_REPO_DIR/misc/logtail.py --pid $OPENSHIFT_DATA_DIR/logtail.pid --log $OPENSHIFT_LOG_DIR/logtail.log -t quiz -d $OPENSHIFT_LOG_DIR/python.log http://dashboard-editricetoni.rhcloud.com/toni/apachelog-post
+#python $OPENSHIFT_REPO_DIR/misc/logtail.py --pid $OPENSHIFT_DATA_DIR/logtail.pid --log $OPENSHIFT_LOG_DIR/logtail.log -t quiz -d $OPENSHIFT_LOG_DIR/python.log http://dashboard-cetoni.rhcloud.com/toni/apachelog-post
 #echo "Starting logtail.py... done"
