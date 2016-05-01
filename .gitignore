@@ -3,6 +3,7 @@
 *.mo
 *.sublime-*
 .virtualenv/
+.venv/
 test-data/
 local/
 doc/html/
