@@ -3,7 +3,7 @@ from . import app, quiz_b, quiz_cqc, quiz_am, quiz_cde
 
 quiz_b.quiz.init_app(app, quiz_id=1, quiz_year=2011, base_prefix='/ui')
 quiz_b.quiz.init_app(app, quiz_id=3, quiz_year=2013, base_prefix='/ui')
-quiz_b.quiz.init_app(app, quiz_id=10, quiz_year=2016, base_prefix='/ui',
+quiz_b.quiz.init_app(app, quiz_id=50, quiz_year=2016, base_prefix='/ui',
                      no_url_year=True, main=True)
 
 quiz_cqc.quiz.init_app(app, quiz_id=2, quiz_year=2011, base_prefix='/ui',
