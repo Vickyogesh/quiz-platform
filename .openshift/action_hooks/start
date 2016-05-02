@@ -2,6 +2,7 @@
 
 source $OPENSHIFT_PYTHON_DIR/virtenv/bin/activate
 
+# Not used for a moment
 #echo "Starting collectd..."
 #$OPENSHIFT_DATA_DIR/collectd/sbin/collectd
 
