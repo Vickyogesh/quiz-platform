@@ -60,7 +60,7 @@ class ExamMixin(object):
             return self.__generate_idListCQC(quiz_type, examType)
         elif quiz_type == 4:
             return self.__generate_idListScooter(quiz_type, examType)
-        elif quiz_type == 1 or quiz_type == 3:
+        elif quiz_type in (1, 3, 50):
             return self.__generate_idListB(quiz_type, examType)
         elif 5 <= quiz_type <= 11:
             return self.__generate_idListTruck(quiz_type, examType)
