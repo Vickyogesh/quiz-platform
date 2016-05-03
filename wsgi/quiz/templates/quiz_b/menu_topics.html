@@ -82,6 +82,9 @@
       "Primo soccorso",
       "Responsabilità civile, penale, amministrativa",
       "Assicurazione R.C.A. - Altre forme assicurative legate al veicolo",
+      {% if quiz_fullname == 'b2016' %}
+      "Elementi di psicologia per la sicurezza",
+      {% endif %}
       "Limitazione dei consumi - Rispetto dell'ambiente - Inquinamento",
       "Elementi costitutivi del veicolo importanti per la sicurezza - Manutenzione ed uso",
       "Stabilità e tenuta di strada del veicolo",
@@ -93,8 +96,13 @@
         {text: "Norme di comportamento", chapters: [[16, 17], [18], [19, 20, 21, 22, 23, 24, 25], [26], [27], [28], [29, 30, 31, 32, 33, 34, 35]]},
         {text: "Equipaggiamento dei veicoli", chapters: [[36, 37], [38, 39]]},
         {text: "Documenti", chapters: [[40, 41, 42, 43]]},
+        {% if quiz_fullname == 'b2016' %}
+        {text: "La sicurezza sulla strada e la prevenzione degli incidenti", chapters: [[44, 45, 46], [47, 48], [49, 50, 51]]},
+        {text: "L'ambiente, la tecnica del veicolo, la correttezza di guida", chapters: [[52], [53, 54, 55]]}
+        {% else %}
         {text: "La sicurezza sulla strada e la prevenzione degli incidenti", chapters: [[44, 45, 46], [47, 48], [49, 50]]},
         {text: "L'ambiente, la tecnica del veicolo, la correttezza di guida", chapters: [[51], [52, 53, 54]]}
+        {% endif %}
     ]
   });
 {% endblock%}
