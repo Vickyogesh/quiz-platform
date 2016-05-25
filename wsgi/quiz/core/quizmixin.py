@@ -47,6 +47,7 @@ class QuizMixin(object):
     # may be appear in future quizzes.
     def __getQuery(self, quiz_type, user_id, topic_id, exclude):
         q = self.questions
+        b = self.blacklist
         qa = self.quiz_answers
 
         # SELECT question_id FROM quiz_answers WHERE
@@ -61,6 +62,10 @@ class QuizMixin(object):
             not_in = [q.c.id.notin_(exclude), q.c.id.notin_(stmt)]
         else:
             not_in = [q.c.id.notin_(stmt)]
+
+        # .. AND id NOT IN (SELECT id FROM blacklist WHERE id == q.quiz_type)
+        blacklist = select([b.c.id]).where(b.c.quiz_type == q.c.quiz_type)
+        not_in += [q.c.id.notin_(blacklist)]
 
         stmt2 = select([q]).where(and_(
             q.c.quiz_type == quiz_type,
