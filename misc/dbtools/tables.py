@@ -133,6 +133,12 @@ def create(mgr):
             CONSTRAINT PRIMARY KEY (id, quiz_type)
         );
 
+        CREATE TABLE blacklist(
+            id INTEGER UNSIGNED NOT NULL,
+            quiz_type SMALLINT UNSIGNED NOT NULL,
+            CONSTRAINT PRIMARY KEY (id, quiz_type)
+        );
+
 
         CREATE TABLE topic_err_current(
             user_id INTEGER UNSIGNED NOT NULL,
@@ -232,6 +238,7 @@ def create_indices(mgr):
 
 
 def do_optimize(mgr):
-    for tbl in mgr.meta.tables:
-        print("Table optimizations... %s" % tbl)
-        mgr.conn.execute('OPTIMIZE TABLE %s;' % tbl)
+    pass
+    # for tbl in mgr.meta.tables:
+    #     print("Table optimizations... %s" % tbl)
+    #     mgr.conn.execute('OPTIMIZE TABLE %s;' % tbl)
