@@ -67,6 +67,15 @@ class ExamMixin(object):
         else:
             raise QuizCoreError('Unknown exam generator')
 
+    def __get_blacklisted_ids(self, quiz_type):
+        b = self.blacklist
+        query = select([b.c.id]).where(b.c.quiz_type == quiz_type)
+        res = self.engine.execute(query)
+        return [x[0] for x in res]
+
+    def __filter_questions(self, min, max, blacklist):
+        return [x for x in xrange(min, max + 1) if x not in blacklist]
+
     # Create list of exam questions for B quiz.
     # At first, we get info about chapters: chapter priority,
     # min question ID for the chapter and max question ID for the chapter.
@@ -81,13 +90,20 @@ class ExamMixin(object):
     # [1 - 100] and for row 2 we need select two (random) questions
     # in the range [101 - 200].
     def __generate_idListB(self, quiz_type, examType):
+        # Get blacklisted IDs.
+        blacklist = self.__get_blacklisted_ids(quiz_type)
+
         id_norm = []
         id_high = []
         ids = None
         res = self.__stmt_ch_info.execute(quiz_type=quiz_type)
         for row in res:
+            # Build ID list with excluding blacklisted ones.
+            allowed_ids = self.__filter_questions(row[1], row[2], blacklist)
+
             # priority = row[0], min_id = row[1], max_id = row[2]
-            ids = random.sample(xrange(row[1], row[2] + 1), row[0])
+            # ids = random.sample(xrange(row[1], row[2] + 1), row[0])
+            ids = random.sample(allowed_ids, row[0])
             if len(ids) > 1:
                 id_norm.append(ids[0])
                 id_high.extend(ids[1:])
@@ -121,21 +137,25 @@ class ExamMixin(object):
         sql = select([sql_min, sql_max])
 
         res = self.engine.execute(sql).fetchone()
-        start = res[0]
-        end = res[1] + 1
         num_questions = g.quiz_meta['exam_meta']['num_questions']
-        return random.sample(xrange(start, end), num_questions), []
+
+        blacklist = self.__get_blacklisted_ids(quiz_type)
+        allowed_ids = self.__filter_questions(res[0], res[1], blacklist)
+
+        return random.sample(allowed_ids, num_questions), []
 
     # Create list of exam questions for CQC quiz
     # 3 questions per topic. Total 30 questions.
     def __generate_idListScooter(self, quiz_type, examType):
+        blacklist = self.__get_blacklisted_ids(quiz_type)
         id_list = []
 
         t = self.chapters
         res = self.__stmt_ch_info.execute(quiz_type=quiz_type)
         for row in res:
+            allowed_ids = self.__filter_questions(row[1], row[2], blacklist)
             # 3 random questions for each chapter
-            vals = random.sample(xrange(row[1], row[2] + 1), 3)
+            vals = random.sample(allowed_ids, 3)
             id_list.extend(vals)
         return id_list, []
 
@@ -147,10 +167,12 @@ class ExamMixin(object):
         sql = select([t.c.min_id, t.c.max_id]).where(t.c.quiz_type==quiz_type)
         sql = sql.order_by(t.c.id)
 
+        blacklist = self.__get_blacklisted_ids(quiz_type)
         id_list = []
         for i, row in enumerate(self.engine.execute(sql)):
-            lst = random.sample(xrange(row[t.c.min_id], row[t.c.max_id] + 1),
-                                questions_per_chapter[i])
+            allowed_ids = self.__filter_questions(row[t.c.min_id],
+                                                  row[t.c.max_id], blacklist)
+            lst = random.sample(allowed_ids, questions_per_chapter[i])
             id_list.extend(lst)
         return id_list, []
 
