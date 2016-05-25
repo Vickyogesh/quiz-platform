@@ -148,6 +148,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.chapters = self.meta.tables['chapters']
         self.topics = self.meta.tables['topics']
         self.questions = self.meta.tables['questions']
+        self.blacklist = self.meta.tables['blacklist']
         self.answers = self.meta.tables['answers']
         self.quiz_answers = self.meta.tables['quiz_answers']
         self.exam_answers = self.meta.tables['exam_answers']
