@@ -8,18 +8,12 @@ RewriteRule /static/(.+)$ /static/$1 [L]
 
 # Backward compatibility.
 RewriteCond %{REQUEST_URI} ^/ui/b2013(/)?$
-RewriteRule /ui/b2013(/)?$ /ui/b/ [R,L]
+RewriteRule /ui/b2013(/)?$ /ui/b/2013/ [R,L]
 
 # Old frontends
 
 RewriteCond %{REQUEST_URI} ^/b2013/$
-RewriteRule /b2013/$ /static/oldfrontend/b2013/index.html [L]
-
-RewriteCond %{REQUEST_URI} ^/b2013/
-RewriteRule /b2013/(.+)$ /static/oldfrontend/b2013/$1 [L]
+RewriteRule /b2013/$ /ui/b/2013/ [L]
 
 RewriteCond %{REQUEST_URI} ^/cqc/$
-RewriteRule /cqc/$ /static/oldfrontend/cqc/index.html [L]
-
-RewriteCond %{REQUEST_URI} ^/cqc/
-RewriteRule /cqc/(.+)$ /static/oldfrontend/cqc/$1 [L]
+RewriteRule /cqc/$ /ui/cqc/ [L]
