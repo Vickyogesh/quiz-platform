@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, redirect, url_for
 from . import app, quiz_b, quiz_cqc, quiz_am, quiz_cde
 
 quiz_b.quiz.init_app(app, quiz_id=1, quiz_year=2011, base_prefix='/ui')
@@ -13,6 +13,11 @@ quiz_am.quiz.init_app(app, quiz_id=4, quiz_year=2014, base_prefix='/ui',
                       no_url_year=True)
 quiz_cde.quiz.init_app(app, quiz_id=5, quiz_year=2015, base_prefix='/ui',
                        no_url_year=True, year_in_title=False)
+
+
+@app.route('/')
+def index():
+    return redirect(url_for('b2016.index'))
 
 
 @app.route('/ui/policy')

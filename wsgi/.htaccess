@@ -12,9 +12,6 @@ RewriteRule /ui/b2013(/)?$ /ui/b/ [R,L]
 
 # Old frontends
 
-RewriteCond %{REQUEST_URI} ^/$
-RewriteRule /$ /b2013/ [R,L]
-
 RewriteCond %{REQUEST_URI} ^/b2013/$
 RewriteRule /b2013/$ /static/oldfrontend/b2013/index.html [L]
 
