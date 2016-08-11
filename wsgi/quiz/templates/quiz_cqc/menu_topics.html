@@ -1,6 +1,13 @@
 {% extends "base_menu_topics.html" %}
 {% block content_class %}quiz-menu cqc{% endblock %}
 
+{% block head -%}
+{{ super() }}
+<style>
+    .topics .slides .page table a {color: #fff;}
+</style>
+{% endblock %}
+
 {% block panel_content %}
   <div class="topics row" id="topics">
     <div class="col-xs-4 areas"><ul></ul></div>

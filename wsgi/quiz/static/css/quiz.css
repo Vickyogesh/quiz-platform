@@ -6,25 +6,31 @@
 }
 
 .area1 {background: #c0c0c0;}
+.area1 table, .area1 table a {color: #fff;}
 li.area1:hover {background: #b8b8b8;}
 
 .area2 {background: #00ae00;}
+.area2 table, .area2 table a {color: #fff;}
 li.area2:hover {background: #009d00;}
 
 .area3 {background: #9966cc;}
+.area3 table, .area3 table a {color: #fff;}
 li.area3:hover {background: #9159c8;}
 
 .area4 {background: #ffdd00; color: #2F4F4F;}
-.area4 table, .area4 table a {color: #2F4F4F !important;}
+.area4 table, .area4 table a {color: #2F4F4F;}
 li.area4:hover {background: #eece00;}
 
 .area5 {background: #ff6633;}
+.area5 table, .area5 table a {color: #fff;}
 li.area5:hover {background: #ff5922;}
 
 .area6 {background: #004586;}
+.area6 table, .area6 table a {color: #fff;}
 li.area6:hover {background: #003c75;}
 
 .area7 {background: #b84747;}
+.area7 table, .area7 table a {color: #fff;}
 li.area7:hover {background: #ac4242;}
 
 .topics {
@@ -87,7 +93,6 @@ li.area7:hover {background: #ac4242;}
 .topics .slides .page table {
   border-collapse: inherit;
   border-spacing: 6px;
-  color: #fff;
   width: 98%;
 }
 
@@ -96,7 +101,6 @@ li.area7:hover {background: #ac4242;}
 }
 
 .topics .slides .page table a {
-    color: #fff;
     text-decoration: none;
 }
 
