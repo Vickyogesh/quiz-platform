@@ -1,0 +1,191 @@
+{% extends "base_menu_topics.html" %}
+{% block content_class %}quiz-menu rev rev{{ quiz_meta.id }}{% endblock %}
+
+{% block head -%}
+  {{ super() }}
+  <style>
+    .rev5 .topics > div ul li {height: 6em;}
+    .rev6 .topics > div ul li {height: 6em;}
+
+    .rev0 .area1 {background: #94bd5e;}
+    .rev0 li.area1:hover {background: #8cb852;}
+
+    .rev0 .area2 {background: #9999ff;}
+    .rev0 li.area2:hover {background: #88f;}
+
+    .rev0 .area3 {background: #0047ff;}
+    .rev0 li.area3:hover {background: #0042ee;}
+
+    .rev0 .area4 {background: #ff0000;}
+    .rev0 .area4, .rev0 .area4 table, .rev0 .area4 table a {color: #fff; !important;}
+    .rev0 li.area4:hover {background: #e00;}
+
+    .rev0 .area5 {background: #83caff;}
+    .rev0 li.area5:hover {background: #72c3ff;}
+
+
+    .rev1 .area1 {background: #94bd5e;}
+    .rev1 li.area1:hover {background: #8cb852;}
+
+    .rev1 .area2 {background: #9999ff;}
+    .rev1 li.area2:hover {background: #88f;}
+
+    .rev1 .area3 {background: #ffff00;}
+    .rev1 .area3, .rev1 .area3 table, .rev1 .area3 table a {color: #2F4F4F !important;}
+    .rev1 li.area3:hover {background: #ee0;}
+
+
+    .rev1 .area4 {background: #cccccc;}
+    .rev1 .area4, .rev1 .area4 table, .rev1 .area4 table a {color: #2F4F4F !important;}
+    .rev1 li.area4:hover {background: #c4c4c4;}
+
+    .rev1 .area5 {background: #0047ff;}
+    .rev1 li.area5:hover {background: #0042ee;}
+
+    .rev1 .area6 {background: #ff0000;}
+    .rev1 li.area6:hover {background: #e00;}
+
+
+    .rev2 .area1 {background: #94bd5e;}
+    .rev2 li.area1:hover {background: #8cb852;}
+
+    .rev2 .area2 {background: #9999ff;}
+    .rev2 li.area2:hover {background: #88f;}
+
+    .rev2 .area3 {background: #cccccc;}
+    .rev2 .area3, .rev2 .area3 table, .rev2 .area3 table a {color: #2F4F4F !important;}
+    .rev2 li.area3:hover {background: #c4c4c4;}
+
+    .rev2 .area4 {background: #0047ff;}
+    .rev2 .area4, .rev2 .area4 table, .rev2 .area4 table a {color: #fff !important;}
+    .rev2 li.area4:hover {background: #0042ee;}
+
+    .rev2 .area5 {background: #ff0000;}
+    .rev2 .area5, .rev2 .area5 table, .rev2 .area5 table a {color: #fff !important;}
+    .rev2 li.area5:hover {background: #e00;}
+
+
+    .rev3 .area1 {background: #94bd5e;}
+    .rev3 li.area1:hover {background: #8cb852;}
+
+    .rev3 .area2 {background: #9999ff;}
+    .rev3 li.area2:hover {background: #88f;}
+
+    .rev3 .area3 {background: #0047ff;}
+    .rev3 .area3, .rev3 .area3 table, .rev3 .area3 table a {color: #fff !important;}
+    .rev3 li.area3:hover {background: #0042ee;}
+
+    .rev3 .area4 {background: #cccccc;}
+    .rev3 .area4, .rev3 .area4 table, .rev3 .area4 table a {color: #2F4F4F !important;}
+    .rev3 li.area4:hover {background: #c4c4c4;}
+
+    .rev3 .area5 {background: #ff0000;}
+    .rev3 .area5, .rev3 .area5 table, .rev3 .area5 table a {color: #fff !important;}
+    .rev3 li.area5:hover {background: #e00;}
+
+
+    .rev4 .area1 {background: #94bd5e;}
+    .rev4 li.area1:hover {background: #8cb852;}
+
+    .rev4 .area2 {background: #9999ff;}
+    .rev4 li.area2:hover {background: #88f;}
+
+    .rev4 .area3 {background: #0047ff;}
+    .rev4 .area3, .rev4 .area3 table, .rev4 .area3 table a {color: #fff !important;}
+    .rev4 li.area3:hover {background: #0042ee;}
+
+    .rev4 .area4 {background: #cccccc;}
+    .rev4 .area4, .rev4 .area4 table, .rev4 .area4 table a {color: #2F4F4F !important;}
+    .rev4 li.area4:hover {background: #c4c4c4;}
+
+    .rev4 .area5 {background: #ff0000;}
+    .rev4 .area5, .rev4 .area5 table, .rev4 .area5 table a {color: #fff !important;}
+    .rev4 li.area5:hover {background: #e00;}
+
+
+    .rev5 .area1 {background: #94bd5e;}
+    .rev5 li.area1:hover {background: #8cb852;}
+
+    .rev5 .area2 {background: #9999ff;}
+    .rev5 li.area2:hover {background: #88f;}
+
+    .rev5 .area3 {background: #0047ff;}
+    .rev5 .area3, .rev5 .area3 table, .rev5 .area3 table a {color: #fff !important;}
+    .rev5 li.area3:hover {background: #0042ee;}
+
+    .rev5 .area4 {background: #cccccc;}
+    .rev5 .area4, .rev5 .area4 table, .rev5 .area4 table a {color: #2F4F4F !important;}
+    .rev5 li.area4:hover {background: #c4c4c4;}
+
+    .rev5 .area5 {background: #ff0000;}
+    .rev5 .area5, .rev5 .area5 table, .rev5 .area5 table a {color: #fff !important;}
+    .rev5 li.area5:hover {background: #e00;}
+
+    .rev5 .area6 {background: #83caff;}
+    .rev5 li.area6:hover {background: #72c3ff;}
+
+
+    .rev6 .area1 {background: #94bd5e;}
+    .rev6 li.area1:hover {background: #8cb852;}
+
+    .rev6 .area2 {background: #9999ff;}
+    .rev6 li.area2:hover {background: #88f;}
+
+    .rev6 .area3 {background: #0047ff;}
+    .rev6 .area3, .rev6 .area3 table, .rev6 .area3 table a {color: #fff !important;}
+    .rev6 li.area3:hover {background: #0042ee;}
+
+    .rev6 .area4 {background: #cccccc;}
+    .rev6 .area4, .rev6 .area4 table, .rev6 .area4 table a {color: #2F4F4F !important;}
+    .rev6 li.area4:hover {background: #c4c4c4;}
+
+    .rev6 .area5 {background: #ff0000;}
+    .rev6 .area5, .rev6 .area5 table, .rev6 .area5 table a {color: #fff !important;}
+    .rev6 li.area5:hover {background: #e00;}
+
+    .rev6 .area6 {background: #83caff;}
+    .rev6 li.area6:hover {background: #72c3ff;}
+  </style>
+{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4><span>{{ quiz_meta.title }}</span></h4>
+  {{ utils.fullscreen_button() }}
+</div>
+{% endblock %}
+
+{% block panel_content %}
+  <div class="topics row" id="topics">
+    <div class="col-xs-4 areas"><ul></ul></div>
+    <div class="col-xs-8 slides"></div>
+  </div>
+
+  <script type="text/template" id="area-tmpl"><span><%= text %></span></script>
+
+  <script type="text/template" id="page-tmpl">
+    <div class="page-wrapper">
+      <div class="page-content">
+        <table><%= rows %></table>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="chapter-tmpl">
+    <tr><td width="30%" style="text-align:right">{{ _('Chapter') }} <%= chapter_id %></td><td><a href="<%= topic_url %>"><%= topic_text %></a></td></tr>
+  </script>
+
+  <script type="text/template" id="topic-tmpl">
+    <tr><td></td><td><a href="<%= topic_url %>"><%= topic_text %></a></td></tr>
+  </script>
+
+{% endblock %}
+
+{% block page_script %}
+  var menu = new QuizMenuView({
+    el: $("#topics"),
+    urls: {{ urls|tojson }},
+    topics: {{ topics|tojson }},
+    areas: {{ areas|tojson }}
+  });
+{% endblock%}
