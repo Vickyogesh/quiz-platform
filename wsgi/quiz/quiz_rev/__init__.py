@@ -169,7 +169,7 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
     # TODO: cache me
     def get_topics(self):
         t = current_app.core.topics
-        sql = select([t.c.text]).where(t.c.quiz_type == self.meta['id'])
+        sql = select([t.c.text]).where(t.c.quiz_type == self.meta['id'] + 60)
         sql = sql.order_by(t.c.id)
         res = current_app.core.engine.execute(sql)
         return [x[0] for x in res]
