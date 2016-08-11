@@ -15,7 +15,10 @@ QUIZ_ID_MAP = {
     'cqc': 2,
     'am': 4,
     # (it covers 7 sub types 5 - 11), see quiz_cde
-    'cde': 5
+    'cde': 5,
+
+    #  covers 60-66, see quiz_rev/data.py
+    'revisioni': 60
 }
 
 login_api = Blueprint('login_api', __name__)
