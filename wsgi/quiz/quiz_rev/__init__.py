@@ -131,7 +131,7 @@ class SubQuiz(BaseView):
     endpoint = 'sub_quiz'
 
     def render_template(self, **kwargs):
-        kwargs['subquiz'] = self.meta['title']
+        kwargs['subquiz'] = subquiz
         return BaseView.render_template(self, **kwargs)
 
 
