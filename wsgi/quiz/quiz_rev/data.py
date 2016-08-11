@@ -2,7 +2,7 @@
 from flask_babelex import lazy_gettext
 
 subquiz = {
-    0: {
+    60: {
         'title': lazy_gettext('Revisioni AM'),
         'exam_meta': {
             'max_errors': 2,
@@ -39,7 +39,7 @@ subquiz = {
         ]
     },
 
-    1: {
+    61: {
         'title': lazy_gettext('Revisioni A1 A2 A B1 B BE'),
         'exam_meta': {
             'max_errors': 3,
@@ -81,7 +81,7 @@ subquiz = {
         ]
     },
 
-    2: {
+    62: {
         'title': lazy_gettext('Revisioni C1 (97), C1E (97)'),
         'exam_meta': {
             'max_errors': 3,
@@ -118,7 +118,7 @@ subquiz = {
         ]
     },
 
-    3: {
+    63: {
         'title': lazy_gettext('Revisioni C1 C1E C CE'),
         'exam_meta': {
             'max_errors': 3,
@@ -155,7 +155,7 @@ subquiz = {
         ]
     },
 
-    4: {
+    64: {
         'title': lazy_gettext('Revisioni D1 D1E D DE'),
         'exam_meta': {
             'max_errors': 3,
@@ -192,7 +192,7 @@ subquiz = {
         ]
     },
 
-    5: {
+    65: {
         'title': lazy_gettext('Revisioni CQC merci'),
         'exam_meta': {
             'max_errors': 4,
@@ -235,7 +235,7 @@ subquiz = {
         ]
     },
 
-    6: {
+    66: {
         'title': lazy_gettext('Revisioni CQC persone'),
         'exam_meta': {
             'max_errors': 4,

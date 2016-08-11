@@ -27,10 +27,10 @@ class RevMeta(dict):
 
     def __subitem(self, name, d=None):
         subquiz_id = session.get('subquiz')
-        if name == 'id':
-            return subquiz_id
         if subquiz_id is None:
             return d
+        if name == 'id':
+            return subquiz_id
         return subquiz[subquiz_id][name]
 
     def __getitem__(self, item):
@@ -131,7 +131,9 @@ class SubQuiz(BaseView):
     endpoint = 'sub_quiz'
 
     def render_template(self, **kwargs):
-        kwargs['subquiz'] = subquiz
+        title = [(k, v['title']) for k, v in subquiz.iteritems()]
+        title = sorted(title, cmp=lambda x, y: cmp(x[0], y[0]))
+        kwargs['subquiz'] = title
         return BaseView.render_template(self, **kwargs)
 
 
@@ -169,7 +171,7 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
     # TODO: cache me
     def get_topics(self):
         t = current_app.core.topics
-        sql = select([t.c.text]).where(t.c.quiz_type == self.meta['id'] + 60)
+        sql = select([t.c.text]).where(t.c.quiz_type == self.meta['id'])
         sql = sql.order_by(t.c.id)
         res = current_app.core.engine.execute(sql)
         return [x[0] for x in res]

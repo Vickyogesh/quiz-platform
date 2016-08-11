@@ -1,5 +1,5 @@
 {% extends "base_menu_topics.html" %}
-{% block content_class %}quiz-menu rev rev{{ quiz_meta.id }}{% endblock %}
+{% block content_class %}quiz-menu rev rev{{ quiz_meta.id - 60 }}{% endblock %}
 
 {% block head -%}
   {{ super() }}
