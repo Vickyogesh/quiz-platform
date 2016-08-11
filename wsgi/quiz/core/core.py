@@ -154,6 +154,7 @@ class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
         self.exam_answers = self.meta.tables['exam_answers']
         self.exams = self.meta.tables['exams']
         self.truck_last_sublicense = self.meta.tables['truck_last_sublicense']
+        self.last_subquiz = self.meta.tables['last_subquiz']
         self.stat_json = self.meta.tables['stat_json']
 
     def sql(self, stmt):
