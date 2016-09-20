@@ -55,6 +55,7 @@ class ExamMixin(object):
     # 2 - cqc
     # 4 - scooter
     # 5 - 11 - truck
+    # 60 - 66 - revisioni
     def __generate_idList(self, quiz_type, examType):
         if quiz_type == 2:
             return self.__generate_idListCQC(quiz_type, examType)
@@ -64,6 +65,8 @@ class ExamMixin(object):
             return self.__generate_idListB(quiz_type, examType)
         elif 5 <= quiz_type <= 11:
             return self.__generate_idListTruck(quiz_type, examType)
+        elif 60 <= quiz_type <= 66:
+            return self.__generate_idListRev(quiz_type, examType)
         else:
             raise QuizCoreError('Unknown exam generator')
 
@@ -165,6 +168,23 @@ class ExamMixin(object):
 
         t = self.chapters
         sql = select([t.c.min_id, t.c.max_id]).where(t.c.quiz_type==quiz_type)
+        sql = sql.order_by(t.c.id)
+
+        blacklist = self.__get_blacklisted_ids(quiz_type)
+        id_list = []
+        for i, row in enumerate(self.engine.execute(sql)):
+            allowed_ids = self.__filter_questions(row[t.c.min_id],
+                                                  row[t.c.max_id], blacklist)
+            lst = random.sample(allowed_ids, questions_per_chapter[i])
+            id_list.extend(lst)
+        return id_list, []
+
+    def __generate_idListRev(self, quiz_type, examType):
+        exam_meta = g.quiz_meta['exam_meta']
+        questions_per_chapter = exam_meta['questions_per_chapter']
+
+        t = self.chapters
+        sql = select([t.c.min_id, t.c.max_id]).where(t.c.quiz_type == quiz_type)
         sql = sql.order_by(t.c.id)
 
         blacklist = self.__get_blacklisted_ids(quiz_type)

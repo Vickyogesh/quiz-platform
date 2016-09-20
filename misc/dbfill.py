@@ -120,9 +120,9 @@ def post_process(db, quiz_type):
     db.conn.execute('CALL set_topics_info(%d);' % quiz_type)
     db.conn.execute('DROP PROCEDURE IF EXISTS set_chapters_info;')
     db.conn.execute('DROP PROCEDURE IF EXISTS set_topics_info;')
-    for tbl in db.meta.tables:
-        print("Table optimizations... %s" % tbl)
-        db.conn.execute('OPTIMIZE TABLE %s;' % tbl)
+    # for tbl in db.meta.tables:
+    #     print("Table optimizations... %s" % tbl)
+    #     db.conn.execute('OPTIMIZE TABLE %s;' % tbl)
 
 
 def fill(db, quiz_type, infile):

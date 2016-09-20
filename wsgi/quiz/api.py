@@ -18,6 +18,8 @@ def get_quiz_meta():
         # truck quiz has special meta object which covers multiple items.
         if 5 <= uid <= 11:
             uid = 5
+        elif 60 <= uid <= 66:
+            uid = 60
         g.quiz_meta = registered_quiz_meta[uid]
 
 

@@ -198,6 +198,14 @@ def create(mgr):
           sublicense SMALLINT UNSIGNED NOT NULL,
           CONSTRAINT PRIMARY KEY (user_id, user_type)
         );
+
+        CREATE TABLE last_subquiz(
+          quiz_type SMALLINT UNSIGNED NOT NULL,
+          user_id INTEGER UNSIGNED NOT NULL,
+          user_type SMALLINT UNSIGNED NOT NULL,
+          subquiz SMALLINT UNSIGNED NOT NULL,
+          CONSTRAINT PRIMARY KEY (quiz_type, user_id, user_type)
+        );
         """)
     reflect(mgr)
 

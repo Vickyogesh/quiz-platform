@@ -92,7 +92,10 @@ def parse_csv(input_file, delim):
         item = [row[i].decode('utf8').strip() for i in (0, 1, 6, 9, 11)]
         item[CHAPTER] = int(item[CHAPTER].replace('.', ''))
         item[ANSWER] = 1 if item[ANSWER] == 'V' else 0
-        item[IMAGE] = '' if not item[IMAGE] else int(item[IMAGE])
+        img = item[IMAGE]
+        if '.' in img:
+            img = img.rsplit('.')[0]
+        item[IMAGE] = img
         item = Item._make(item)
 
         # sub license format: (X X X X)

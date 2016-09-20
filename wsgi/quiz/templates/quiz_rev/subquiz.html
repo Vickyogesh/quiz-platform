@@ -1,0 +1,36 @@
+{% extends "base_page.html" %}
+{% import "utils.html" as utils %}
+
+{% block subtitle %}{{ _('Menu') }}{% endblock %}
+{% block navbar_class %}hidden{% endblock %}
+{% block content_class %}menu rev{% endblock %}
+
+{% block header_row %}
+  <div class="col-md-12">
+    <h4>{{ _('Auditing program') }}</h4>
+    {{ utils.fullscreen_button() }}
+  </div>
+{% endblock %}
+
+{% block panel_content %}
+  {% for id, title in subquiz %}
+    <div class="tablerow">
+      <div class="content">
+        <div class="cell">
+          <a href="{% if user.is_school %}{{ url_for('.school_menu') }}{% else %}{{ url_for('.client_menu') }}{% endif %}?sub={{ id }}">{{ title }}</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block footer %}
+<div class="footer row">
+  <div class="center-block">
+      <a href="{% if user.is_school %}{{ url_for('.school_menu') }}{% else %}{{ url_for('.client_menu') }}{% endif %}" class="button">
+          <span class="glyphicon glyphicon-arrow-left"></span>
+          <span>{{ _('Back') }}</span>
+      </a>
+  </div>
+</div>
+{% endblock %}
