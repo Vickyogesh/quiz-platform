@@ -20,6 +20,8 @@ services:
      image: quiz
      ports:
        - "80:80"
+     volumes:
+      - data_vol:/var/www/quiz2/data/sessions
 #     restart: always
 # Temporary
      environment:
@@ -28,5 +30,6 @@ services:
        DB_PASS: quiz
        DB_HOST: 51.15.47.144
        DB_NAME: quiz
-#volumes:
+volumes:
+    data_vol:
 #    db_data:
