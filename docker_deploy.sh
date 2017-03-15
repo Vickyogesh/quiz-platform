@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clean untagged docker images (trash)
-# docker rmi $(docker images -a | grep "^<none>" | awk '{print $3}')
+docker rmi $(docker images -a | grep "^<none>" | awk '{print $3}')
 
 docker build . -t quiz;
 
