@@ -28,6 +28,8 @@ COPY manage.py /var/www/quiz2/manage.py
 COPY uwsgi.ini /var/www/quiz2/uwsgi.ini
 RUN unzip /var/www/quiz2/misc/img.zip -d /var/www/quiz2/data/quiz/img
 
+RUN pybabel compile -d /var/www/quiz2/wsgi/quiz/translations
+
 RUN mkdir -p /var/log/nginx/app /var/log/uwsgi/app /var/log/supervisor \
     && rm /etc/nginx/sites-enabled/default \
     && ln -s /etc/nginx/sites-available/flask.conf /etc/nginx/sites-enabled/flask.conf \
