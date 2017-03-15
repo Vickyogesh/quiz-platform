@@ -19,6 +19,7 @@ COPY requirements.txt /var/www/quiz2/requirements.txt
 RUN pip install -r /var/www/quiz2/requirements.txt
 COPY nginx/flask.conf /etc/nginx/sites-available/
 COPY nginx/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY nginx/logrotate /etc/logrotate.d/nginx
 
 COPY wsgi /var/www/quiz2/wsgi
 COPY web /var/www/quiz2/web
