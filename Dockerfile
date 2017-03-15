@@ -9,7 +9,12 @@ RUN apt-get update && apt-get install -y \
     nginx supervisor uwsgi python-mysqldb libmysqlclient-dev \
     openjdk-8-jre unzip
 RUN pip install --upgrade pip && pip install --upgrade setuptools
+# Making dirs
 RUN mkdir -p /var/www/quiz2/data/quiz/img
+RUN mkdir -p /var/www/quiz2/data/sessions/data
+RUN mkdir -p /var/www/quiz2/data/sessions/lock
+RUN mkdir -p /var/www/quiz2/data/files
+
 COPY requirements.txt /var/www/quiz2/requirements.txt
 RUN pip install -r /var/www/quiz2/requirements.txt
 COPY nginx/flask.conf /etc/nginx/sites-available/
