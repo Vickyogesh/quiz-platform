@@ -26,7 +26,7 @@ COPY web /var/www/quiz2/web
 COPY misc /var/www/quiz2/misc
 COPY manage.py /var/www/quiz2/manage.py
 COPY uwsgi.ini /var/www/quiz2/uwsgi.ini
-RUN unzip /var/www/quiz2/misc/img.zip -d /var/www/quiz2/data/quiz/img
+RUN unzip /var/www/quiz2/misc/img.zip -d /var/www/quiz2/data/quiz
 
 RUN pybabel compile -d /var/www/quiz2/wsgi/quiz/translations
 
