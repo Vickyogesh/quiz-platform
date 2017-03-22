@@ -9,6 +9,7 @@ def db_update():
 
 def db_clean():
     os.system('python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini --clean --force')
+    os.system('python /var/www/quiz2/manage.py stat update')
 
 
 def del_old_session():
