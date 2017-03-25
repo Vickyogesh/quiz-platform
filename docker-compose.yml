@@ -25,10 +25,10 @@ services:
 #     restart: always
 # Temporary
      environment:
-       DB_URI: mysql://root:quiz@51.15.47.144:3306/
-       DB_USER: root
-       DB_PASS: quiz
-       DB_HOST: 51.15.47.144
+       DB_URI: mysql://quiz:u16F6gip@db:3306/
+       DB_USER: quiz
+       DB_PASS: u16F6gip
+       DB_HOST: db
        DB_NAME: quiz
 volumes:
     data_vol:
