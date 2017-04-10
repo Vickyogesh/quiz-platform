@@ -7,7 +7,7 @@ ENV DOCKER_STATE prod
 RUN apt-get update && apt-get install -y \
     python-pip python-dev uwsgi-plugin-python \
     nginx supervisor uwsgi python-mysqldb libmysqlclient-dev \
-    openjdk-8-jre unzip
+    openjdk-8-jre unzip logrotate
 RUN pip install --upgrade pip && pip install --upgrade setuptools
 # Making dirs
 RUN mkdir -p /var/www/quiz2/data/quiz/img
