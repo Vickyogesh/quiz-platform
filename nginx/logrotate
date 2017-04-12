@@ -1,6 +1,15 @@
 /var/log/nginx/*.log {
     copytruncate
-    size 50M
+    size 25M
+    rotate 2
+    compress
+    delaycompress
+    missingok
+    notifempty
+}
+/var/log/uwsgi/app/*.log {
+    copytruncate
+    size 12M
     rotate 2
     compress
     delaycompress
