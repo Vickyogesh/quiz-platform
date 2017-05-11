@@ -2,6 +2,8 @@
 This module implements common login feature.
 """
 from werkzeug.exceptions import HTTPException
+from urlparse import urlparse
+from urllib import quote
 from flask import request, current_app, flash, session, redirect, url_for
 from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
@@ -49,6 +51,13 @@ def after_login():
         else:
             return redirect(url_for('.client_fullscreen'))
             # return redirect(url_for('.client_menu'))
+
+
+def pass_reset(url, next_url):
+    url = urlparse(url)
+    base = '%s://%s' % (url.scheme, url.netloc) if url.scheme else url.netloc
+    return base + '/user/pass_reset?next=' + quote(next_url)
+
 
 
 class LoginFrom(Form):
@@ -122,5 +131,6 @@ class IndexView(BaseView):
                 return after_login()
 
         fb_appid = current_app.config['FACEBOOK_APP_ID']
+        r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
         return self.render_template(form=form, fb_autologin=fb_autologin,
-                                    fb_appid=fb_appid)
+                                    fb_appid=fb_appid, pass_reset=r)
