@@ -5,6 +5,7 @@ except ImportError:
 
 import requests
 import hashlib
+from flask import current_app
 from urlparse import urlparse
 from werkzeug.http import dump_cookie, parse_dict_header
 from werkzeug.exceptions import default_exceptions, abort
@@ -223,11 +224,16 @@ def _check_json_response_status(response):
             raise default_exceptions[code](description=data['description'])
 
 
-def _create_digest(login, passwd):
+def _create_digest(salt_or_nonce, passwd):
     m = hashlib.md5()
-    m.update('%s:%s' % (login, passwd))
+    m.update('{}:{}'.format(salt_or_nonce, passwd))
     return m.hexdigest()
 
+def salt():
+    s = current_app.config['SALT']
+    if not s:
+        raise Exception('Failed to get salt')
+    return s
 
 class AccountsApi(HttpServiceProxy):
     """This class provides Accounts service API."""
@@ -247,7 +253,7 @@ class AccountsApi(HttpServiceProxy):
         hdr = parse_dict_header(hdr[6:])
         return hdr
 
-    def send_auth(self, login, passwd_digest, nonce, caller_service):
+    def send_auth(self, login, passwd_digest, passwd_digest_old, nonce, caller_service):
         """Send auth info to the Accounts Service.
 
         Args: accounts service auth args.
@@ -256,8 +262,8 @@ class AccountsApi(HttpServiceProxy):
 
         Raises: werkzeug's exception respective to status code.
         """
-        hdr = 'QAuth nonce="{0}", username="{1}", response="{2}"'
-        hdr = hdr.format(nonce, login, passwd_digest)
+        hdr = 'QAuth nonce="{0}", username="{1}", response="{2}", response_old="{3}"'
+        hdr = hdr.format(nonce, login, passwd_digest, passwd_digest_old)
         hdr = {'Authenticate': hdr}
 
         if caller_service is not None:
@@ -298,7 +304,7 @@ class AccountsApi(HttpServiceProxy):
     def login(self, login, passwd, caller_service):
         """Login to the Accounts Service."""
         info = self.get_auth()
-        passwd_digest = _create_digest(login, passwd)
+        passwd_digest = _create_digest(salt(), passwd)
         passwd_digest = _create_digest(info['nonce'], passwd_digest)
 
         account = self.send_auth(login, passwd_digest, info['nonce'],
@@ -405,9 +411,10 @@ class AccountsApi(HttpServiceProxy):
         It must be well formed JSON string with above fields.
         """
         if 'raw' in kwargs:
-            kwargs = kwargs['raw']
+            kwargs = json.loads(kwargs['raw'])
+            kwargs['passwd'] = _create_digest(salt(), kwargs['passwd'])
         response = self.post('/schools/{0}/students'.format(school_id),
-                             data=kwargs)
+                             data=json.dumps(kwargs))
         _check_json_response_status(response)
         return response.json()
 

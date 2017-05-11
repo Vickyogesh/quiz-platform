@@ -90,6 +90,7 @@ def _plain_login(data):
         login = data["login"]
         appkey = data["appid"]
         digest = data["digest"]
+        digest_old = data["digest_old"]
     except KeyError:
         raise BadRequest('Invalid parameters.')
 
@@ -98,7 +99,7 @@ def _plain_login(data):
     except QuizCoreError:
         raise BadRequest('Authorization is invalid.')
 
-    return appid, app.account.send_auth(login, digest, nonce, 'quiz')
+    return appid, app.account.send_auth(login, digest, digest_old, nonce, 'quiz')
 
 
 def _facebook_login(data):
@@ -164,7 +165,11 @@ def do_login(data, remember=False):
 
 def get_plain_login(login, passwd, quiz_fullname):
     nonce = app.account.get_auth().get('nonce', '')
-    digest = hashlib.md5('{0}:{1}'.format(login, passwd)).hexdigest()
+    # for old users
+    digest_old = hashlib.md5('{0}:{1}'.format(login, passwd)).hexdigest()
+    digest_old = hashlib.md5('{0}:{1}'.format(nonce, digest_old)).hexdigest()
+    # for new
+    digest = hashlib.md5('{0}:{1}'.format(app.config['SALT'], passwd)).hexdigest()
     digest = hashlib.md5('{0}:{1}'.format(nonce, digest)).hexdigest()
     return {
         'nonce': nonce,
@@ -172,6 +177,7 @@ def get_plain_login(login, passwd, quiz_fullname):
         'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
         'quiz_type': quiz_fullname,
         'digest': digest,
+        'digest_old': digest_old,
         'passwd': passwd
     }
 

@@ -38,7 +38,6 @@
         },
 
         addClient: function(data) {
-            data.passwd = md5(data.login + ':' + data.passwd);
             var url = this.urls.add;
 
             Aux.postJson(url, data, function(info) {
