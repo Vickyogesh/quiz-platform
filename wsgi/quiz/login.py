@@ -90,7 +90,7 @@ def _plain_login(data):
         login = data["login"]
         appkey = data["appid"]
         digest = data["digest"]
-        digest_old = data["digest_old"]
+        digest_old = data.get("digest_old")
     except KeyError:
         raise BadRequest('Invalid parameters.')
 

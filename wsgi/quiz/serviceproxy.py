@@ -263,7 +263,7 @@ class AccountsApi(HttpServiceProxy):
         Raises: werkzeug's exception respective to status code.
         """
         hdr = 'QAuth nonce="{0}", username="{1}", response="{2}", response_old="{3}"'
-        hdr = hdr.format(nonce, login, passwd_digest, passwd_digest_old)
+        hdr = hdr.format(nonce, login, passwd_digest, passwd_digest_old or '')
         hdr = {'Authenticate': hdr}
 
         if caller_service is not None:
