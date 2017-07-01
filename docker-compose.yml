@@ -30,6 +30,7 @@ services:
        DB_PASS: u16F6gip
        DB_HOST: db
        DB_NAME: quiz
+       ACCOUNTS_URL: ${ACCOUNTS_URL}
 volumes:
     data_vol:
     db_data:
