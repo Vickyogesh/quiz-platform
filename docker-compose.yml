@@ -19,7 +19,7 @@ services:
        - db
      image: quiz
      ports:
-       - "80:80"
+       - "${PORT}:80"
      volumes:
       - data_vol:/var/www/quiz2/data/sessions
 #     restart: always
