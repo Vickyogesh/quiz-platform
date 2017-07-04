@@ -129,6 +129,7 @@
             this.name_el = this.$("#name");
             this.surname_el = this.$("#surname");
             this.login_el = this.$("#login");
+            this.email_el = this.$("#email");
             this.passwd_el = this.$("#passwd");
             this.can_set_login = true;
 
@@ -147,11 +148,13 @@
                 name: this.name_el.val(),
                 surname: this.surname_el.val(),
                 login: this.login_el.val(),
+                email: this.email_el.val(),
                 passwd: this.passwd_el.val()
             };
 
             if (data.name.length == 0 || data.surname.length == 0
-                || data.login.length == 0 || data.passwd.length == 0)
+                || data.login.length == 0 || data.passwd.length == 0
+                || data.email.length == 0)
                 return;
 
             this.trigger("done", data);
@@ -175,6 +178,7 @@
             this.name_el.val("");
             this.surname_el.val("");
             this.login_el.val("");
+            this.email_el.val("");
             this.passwd_el.val("");
             this.can_set_login = true;
         },

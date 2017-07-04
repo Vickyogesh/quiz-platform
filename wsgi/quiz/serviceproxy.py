@@ -403,6 +403,7 @@ class AccountsApi(HttpServiceProxy):
                     ======= ================
                     name    Student name.
                     surname Student surname.
+                    email   Student email.
                     login   Student login.
                     passwd  Student passwd.
                     ======= ================
