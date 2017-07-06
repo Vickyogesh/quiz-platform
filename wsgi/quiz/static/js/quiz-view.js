@@ -15,6 +15,7 @@
             this.text_el = this.$("#text");
             this.cells = this.$(".qcell");
             this.ansbox_el = this.$(".ansbox");
+            this.expl_butt = this.$(".expl_butt");
             this.btt_true = this.$(".true");
             this.btt_false = this.$(".false");
             this.listenTo(this.quiz_model, "change:show_answers", this.renderAnswerBox);
@@ -47,11 +48,17 @@
         renderAnswerBox: function() {
             this.ansbox_el.removeClass("correct");
             this.ansbox_el.removeClass("incorrect");
+
+            this.expl_butt.addClass("hidden");
+
             if (this.model !== undefined) {
                 if (this.model.isAnswered()) {
                     if (this.quiz_model.get("show_answers")) {
                         this.ansbox_el.addClass(this.model.isCorrectAnswer()
                             ? "correct" : "incorrect");
+                        if (!this.model.isCorrectAnswer()){
+                            this.expl_butt.removeClass("hidden")
+                        }
                     }
                 }
             }
@@ -318,6 +325,7 @@
         },
 
         onSwitch: function(show_answers) {
+            //
             this.model.set("show_answers", show_answers);
         },
 

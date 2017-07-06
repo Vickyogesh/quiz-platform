@@ -125,6 +125,7 @@ def create(mgr):
             text VARCHAR(500) NOT NULL,
             text_fr VARCHAR(500),
             text_de VARCHAR(500),
+            explanation VARCHAR(500),
             answer BOOLEAN NOT NULL,
             image VARCHAR(10),
             image_part VARCHAR(10),
