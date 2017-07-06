@@ -5,6 +5,11 @@
   max-width: 800px;
 }
 
+.required:after {
+  content:" *";
+  color: #ff6d67;
+}
+
 .area1 {background: #c0c0c0;}
 .area1 table, .area1 table a {color: #fff;}
 li.area1:hover {background: #b8b8b8;}

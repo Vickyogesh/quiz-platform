@@ -153,8 +153,7 @@
             };
 
             if (data.name.length == 0 || data.surname.length == 0
-                || data.login.length == 0 || data.passwd.length == 0
-                || data.email.length == 0)
+                || data.login.length == 0 || data.passwd.length == 0)
                 return;
 
             this.trigger("done", data);
