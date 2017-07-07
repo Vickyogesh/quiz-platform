@@ -55,6 +55,7 @@ class ErrorReviewMixin(object):
                 'id': row[self.questions.c.id],
                 'text': row[lang],
                 'answer': row[self.questions.c.answer],
+                'explanation': row[self.questions.c.explanation],
                 'image': row[self.questions.c.image],
                 'image_bis': row[self.questions.c.image_part]
             }

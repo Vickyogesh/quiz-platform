@@ -161,15 +161,25 @@ li.area7:hover {background: #ac4242;}
 }
 
 .quiz .expl_butt {
-    position: relative;
-    top: 20px;
-    right: 16px;
-    font-size: 20px;
+  display: inline-block;
+  position: relative;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-size: contain;
+  width: 30px;
+  height: 30px;
+  top: 28px;
+  background-image: url(../i/explanation.png);
 }
 
-.quiz .expl_butt:hover {
-  color: #6d6c72;
+.expl_wrap {
+  background-color: #c9463e;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 7px;
 }
+
 .quiz .qrect {
   border-radius: 8px;
   padding: 4px;

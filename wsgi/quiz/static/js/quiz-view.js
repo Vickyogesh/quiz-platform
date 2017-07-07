@@ -111,7 +111,8 @@
             "click #btt-done": "onBttFinish",
             "click .qnav#btt-prev": "onBttPrev",
             "click .qnav#btt-next": "onBttNext",
-            "mousewheel": "onWheel"
+            "mousewheel": "onWheel",
+            "click #expl_butt": "onExplClick"
         },
 
         createModel: function(params) {
@@ -231,6 +232,18 @@
             });
         },
 
+        showExplanation: function () {
+            this.removeExplanation();
+            var explanation = this.model.getCurrentQuestion().attributes.explanation;
+            var row = this.active_row.$el;
+
+            $('<div class="expl_wrap">'+ explanation +'</div>').insertAfter(row);
+        },
+
+        removeExplanation: function () {
+            $(".expl_wrap").remove()
+        },
+
         showDone: function(show_errors) {
             function back() {
                 window.location = this.urls.back;
@@ -343,6 +356,7 @@
             this.active_row.setModel(question);
             this._setImage(this.model.getCurrentQuestionImage(),
                 this.model.getCurrentQuestion());
+            this.removeExplanation()
         },
 
         onModelSaveError: function(response, ok_callback) {
@@ -359,6 +373,10 @@
         
         onDone: function () {
             this.showDone(true);
+        },
+
+        onExplClick: function () {
+            this.showExplanation()
         }
     });
 })();
