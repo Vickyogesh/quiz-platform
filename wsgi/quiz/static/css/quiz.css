@@ -355,6 +355,10 @@ li.area7:hover {background: #ac4242;}
     display: none;
   }
 
+  .quiz .expl_butt{
+    top: 3px;
+  }
+
   .quiz .qrow.pos1, .quiz .qrow.pos2 {
     display: none;
   }
