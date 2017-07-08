@@ -137,6 +137,8 @@
             this.question_image_src_el = this.$("#question_image_src");
             this.question_image_num_el = this.$("#question_image_num");
             this.question_image_num_span_el = this.question_image_num_el.find("span");
+            this.expl_wrap = this.$(".expl_wrap");
+            this.explanation_enabled = false;
 
             this.switch_view = new AnswersSwitchView({
                 el: this.$("form.navbar-form")
@@ -232,16 +234,22 @@
             });
         },
 
-        showExplanation: function () {
-            this.removeExplanation();
+        showExplanation: function (opt) {
             var explanation = this.model.getCurrentQuestion().attributes.explanation;
-            var row = this.active_row.$el;
-
-            $('<div class="expl_wrap">'+ explanation +'</div>').insertAfter(row);
+            this.expl_wrap.html(explanation);
+            if (opt) {
+                this.expl_wrap.slideDown(opt)
+            }else {
+                this.expl_wrap.show()
+            }
         },
 
-        removeExplanation: function () {
-            $(".expl_wrap").remove()
+        hideExplanation: function (opt) {
+            if (opt){
+                this.expl_wrap.slideUp(opt)
+            }else {
+                this.expl_wrap.hide()
+            }
         },
 
         showDone: function(show_errors) {
@@ -356,7 +364,12 @@
             this.active_row.setModel(question);
             this._setImage(this.model.getCurrentQuestionImage(),
                 this.model.getCurrentQuestion());
-            this.removeExplanation()
+            if (this.explanation_enabled && this.model.get("show_answers") &&
+                !question.isCorrectAnswer() && question.isAnswered()){
+                this.showExplanation();
+            }else {
+                this.hideExplanation();
+            }
         },
 
         onModelSaveError: function(response, ok_callback) {
@@ -376,7 +389,15 @@
         },
 
         onExplClick: function () {
-            this.showExplanation()
+            if(this.explanation_enabled) {
+                this.explanation_enabled = false;
+                this.hideExplanation('fast');
+                $(".expl_butt").toggleClass("active")
+            }else {
+                this.explanation_enabled = true;
+                this.showExplanation('fast');
+                $(".expl_butt").toggleClass("active")
+            }
         }
     });
 })();

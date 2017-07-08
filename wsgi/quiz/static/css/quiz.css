@@ -172,9 +172,14 @@ li.area7:hover {background: #ac4242;}
   background-image: url(../i/explanation.png);
 }
 
+.quiz .expl_butt.active{
+  background-image: url(../i/explanation_active.png);
+}
+
 .expl_wrap {
-  background-color: #c9463e;
   text-align: center;
+  border: solid #c9463e;
+  border-width: 2px;
   border-radius: 8px;
   padding: 10px;
   margin: 7px;
