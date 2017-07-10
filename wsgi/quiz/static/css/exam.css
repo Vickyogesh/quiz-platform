@@ -415,7 +415,7 @@
   min-width: 50px;
 }
 
-.expl_butt {
+.exam_expl_butt {
   right: 30px;
   top: 20px;
   display: block;
@@ -429,11 +429,11 @@
 
 }
 
-.expl_butt.active{
+.exam_expl_butt.active{
   background-image: url(../i/explanation_active.png);
 }
 
-.expl_wrap {
+.exam_expl_wrap {
   display: none;
   text-align: center;
   border: solid #c9463e;
