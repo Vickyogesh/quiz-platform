@@ -380,7 +380,8 @@ class ExamMixin(object):
                 'answer': row[q.c.answer],
                 'image': row[q.c.image],
                 'image_bis': row[q.c.image_part],
-                'is_correct': row[10]
+                'explanation': row[q.c.explanation],
+                'is_correct': row[11]
             }
             self._aux_question_delOptionalField(d)
             questions.append(d)

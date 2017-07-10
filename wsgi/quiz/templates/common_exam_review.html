@@ -34,10 +34,15 @@
           <span class="question-id">{{ question.id }}</span>
           {{ question.text }}
         </div>
-        <div class="cell"><span class="question-answer {%- if question.is_correct %} correct {%- else %} wrong {%- endif %}">
+        <div class="cell">
+            {% if not question.is_correct %}
+                <a href="javascript:void(0);"><span class="expl_butt" data-id="{{ question.id }}"></span></a>
+            {% endif %}
+            <span class="question-answer {%- if question.is_correct %} correct {%- else %} wrong {%- endif %}">
           {%- if question.answer == 1 %} V {% else %} F {% endif -%}
         </span></div>
       </div>
+      <div class="expl_wrap {{ question.id }}_expl">{{ question.explanation }}</div>
     </div>
     {%- endfor -%}
   </div>
@@ -46,4 +51,17 @@
 {% block express_bar_anchor %}#header{% endblock %}
 {%- block page_script %}
   $("a.cbox").colorbox();
+
+    $(".expl_butt").on('click', function () {
+        el = $(this);
+        //question id
+        q_id = el.attr('data-id');
+
+        el.toggleClass('active');
+        if (el.hasClass('active')){
+            $('.'+q_id+'_expl').slideDown('fast')
+        }else {
+            $('.'+q_id+'_expl').slideUp('fast')
+        }
+    })
 {% endblock %}

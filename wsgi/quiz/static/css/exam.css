@@ -415,6 +415,34 @@
   min-width: 50px;
 }
 
+.expl_butt {
+  right: 30px;
+  top: 20px;
+  display: block;
+  position: relative;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-size: contain;
+  width: 25px;
+  height: 25px;
+  background-image: url(../i/explanation.png);
+
+}
+
+.expl_butt.active{
+  background-image: url(../i/explanation_active.png);
+}
+
+.expl_wrap {
+  display: none;
+  text-align: center;
+  border: solid #c9463e;
+  border-width: 2px;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 7px;
+}
+
 @media (max-width: 768px) {
   .exam .exam-data .image {
     height: inherit;
