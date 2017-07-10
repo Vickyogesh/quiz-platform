@@ -42,7 +42,9 @@
           {%- if question.answer == 1 %} V {% else %} F {% endif -%}
         </span></div>
       </div>
+      {% if not question.is_correct and question.explanation %}
       <div class="exam_expl_wrap {{ question.id }}_expl">{{ question.explanation }}</div>
+      {% endif %}
     </div>
     {%- endfor -%}
   </div>
@@ -53,15 +55,12 @@
   $("a.cbox").colorbox();
 
     $(".exam_expl_butt").on('click', function () {
-        el = $(this);
-        //question id
-        q_id = el.attr('data-id');
-
-        el.toggleClass('active');
-        if (el.hasClass('active')){
-            $('.'+q_id+'_expl').slideDown('fast')
+        var lamp = $(".exam_expl_butt")
+        lamp.toggleClass('active');
+        if (lamp.hasClass('active')){
+            $('.exam_expl_wrap').slideDown('fast')
         }else {
-            $('.'+q_id+'_expl').slideUp('fast')
+            $('.exam_expl_wrap').slideUp('fast')
         }
     })
 {% endblock %}
