@@ -56,7 +56,7 @@
                     if (this.quiz_model.get("show_answers")) {
                         this.ansbox_el.addClass(this.model.isCorrectAnswer()
                             ? "correct" : "incorrect");
-                        if (!this.model.isCorrectAnswer()){
+                        if (!this.model.isCorrectAnswer() && this.model.attributes.explanation){
                             this.expl_butt.removeClass("hidden")
                         }
                     }
@@ -365,7 +365,7 @@
             this._setImage(this.model.getCurrentQuestionImage(),
                 this.model.getCurrentQuestion());
             if (this.explanation_enabled && this.model.get("show_answers") &&
-                !question.isCorrectAnswer() && question.isAnswered()){
+                !question.isCorrectAnswer() && question.isAnswered() && question.attributes.explanation){
                 this.showExplanation();
             }else {
                 this.hideExplanation();
