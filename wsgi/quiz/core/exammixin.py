@@ -228,6 +228,7 @@ class ExamMixin(object):
                     'id': row[q.c.id],
                     'text': row[q.c.text],
                     'answer': row[q.c.answer],
+                    'explanation': row[q.c.explanation],
                     'image': row[q.c.image],
                     'image_bis': row[q.c.image_part]
                 }
@@ -246,6 +247,7 @@ class ExamMixin(object):
                     'text': row[q.c.text],
                     'text_extra': row[txt_lang],
                     'answer': row[q.c.answer],
+                    'explanation': row[q.c.explanation],
                     'image': row[q.c.image],
                     'image_bis': row[q.c.image_part]
                 }
