@@ -47,6 +47,7 @@ if app:
 
 ParentSchoolNeed = partial(Need, 'school_id')
 be_admin = Permission(RoleNeed('admin'))
+be_content_manager = Permission(RoleNeed('content_manager'))
 be_school = Permission(RoleNeed('school'))
 be_client = Permission(RoleNeed('student'))
 be_admin_or_school = Permission(RoleNeed('admin'), RoleNeed('school'))
@@ -118,6 +119,10 @@ class User(UserMixin):
     @cached_property
     def is_admin(self):
         return self.user_type == 'admin'
+
+    @cached_property
+    def is_content_manager(self):
+        return self.user_type == 'content_manager'
 
     @cached_property
     def is_readonly(self):
