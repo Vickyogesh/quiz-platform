@@ -130,6 +130,12 @@ def do_login(data, remember=False):
         # used for remember me tocken, see access.User.get_auth_token()
         user['passwd'] = data.get('passwd')
 
+    if user['type'] == 'content_manager':
+        user['access'] = {}
+        user['quiz'] = None
+        access.login(user, remember)
+        return user
+
     can_check_date = user['type'] != 'admin'
 
     try:

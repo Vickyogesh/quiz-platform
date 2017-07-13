@@ -43,13 +43,16 @@ school_js = Bundle('js/libs/md5.js', 'js/school.js',
 fullscreen_js = Bundle('js/fullscreen.js', filters=js_filter,
                        output='gen/fullscreen.js')
 
+cm_js = Bundle('js/cm.js', filters=js_filter,
+               output='gen/cm.js')
+
 css_ui = Bundle('css/colorbox.css', 'css/style.css',
                 'css/startup.css', 'css/menu.css',
                 'css/statistics.css', 'css/quiz.css',
                 'css/msgbox.css', 'css/exam.css',
                 'css/school_menu.css', 'css/school_stat.css',
                 'css/b_menu.css', 'css/cqc_menu.css',
-                'css/fullscreen.css',
+                'css/fullscreen.css', 'css/cm.css',
                 filters=css_filter, output='gen/ui.css')
 
 assets.register('base.js', base_js)
@@ -60,4 +63,5 @@ assets.register('quiz.js', quiz_js)
 assets.register('exam.js', exam_js)
 assets.register('school.js', school_js)
 assets.register('fullscreen.js', fullscreen_js)
+assets.register('cm.js', cm_js)
 assets.register('ui.css', css_ui)

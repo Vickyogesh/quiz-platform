@@ -48,6 +48,8 @@ def after_login():
         # So comments are just a reminders how to implement.
         if current_user.is_school:
             return redirect(url_for('.school_menu'))
+        elif current_user.is_content_manager:
+            return redirect(url_for('cm.index'))
         else:
             return redirect(url_for('.client_fullscreen'))
             # return redirect(url_for('.client_menu'))

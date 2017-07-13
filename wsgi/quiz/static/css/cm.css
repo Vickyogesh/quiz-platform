@@ -1,0 +1,15 @@
+.cm_get_butt {
+    margin-top: 23px;
+    background-color: #9bc9da;
+}
+
+.cm_set_butt {
+    margin-top: 23px;
+    background-color: #a5e0a2;
+}
+
+.cm_success {
+    text-align: center;
+    color: #68bd68;
+    display: none;
+}

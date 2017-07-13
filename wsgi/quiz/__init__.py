@@ -139,10 +139,12 @@ def init_app():
     from . import access
     from . import login
     from .api import api
+    from .content_manager import cm
     from .assets import assets
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
+    app.register_blueprint(cm, url_prefix='/cm')
     assets.init_app(app)
 
     from . import views

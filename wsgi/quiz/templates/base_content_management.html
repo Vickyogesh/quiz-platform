@@ -1,0 +1,25 @@
+{% extends "base_page.html" %}
+{% import "utils.html" as utils %}
+
+{% block subtitle %}{{ _('Content management') }}{% endblock %}
+{% block content_class %}statistics client{% endblock %}
+
+{% block header_row %}
+<div class="col-md-12">
+  <h4>
+    Content manager
+  </h4>
+  {{ utils.fullscreen_button() }}
+</div>
+{% endblock %}
+
+{% block nav_brand %}
+  <a href="{{ url_for('.logout') }}" class="navbar-brand"><span class="glyphicon glyphicon-arrow-left"></span> <span>{{ _('Log out') }}</span></a>
+{% endblock %}
+
+{% block script_include %}
+  {{ super() }}
+  {% assets "cm.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}
