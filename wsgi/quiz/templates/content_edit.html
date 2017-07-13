@@ -3,5 +3,44 @@
 
 
 {% block panel_content %}
-Hello
+    <div class="cm_quiz_map">
+        <div class="row">
+            <div class="col-md-5">
+                <label for="cm_quiz_id">Quiz type</label>
+                <select class="form-control cm_map_select" id="cm_quiz_id" onchange="getQuestion()">
+                    {% for q in quiz_map %}
+                        <option value="{{ q.id }}">{{ q.name }} (Quiz id: {{ q.id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="cm_question_id">Question id</label>
+                <input type="number" class="form-control" id="cm_question_id" onchange="getQuestion()">
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="button btn cm_get_butt" onclick="getQuestion()">Get question</button>
+            </div>
+        </div>
+        <br>
+        <div class="hline"></div>
+        <br>
+        <div class="row">
+            <div class="col-md-5">
+                <label for="cm_question_text">Question text</label><br>
+                <span id="cm_question_text"></span>
+            </div>
+            <div class="col-md-4">
+                <label for="cm_question_expl">Question explanation</label><br>
+                <textarea class="form-control" id="cm_question_expl"></textarea>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="button btn cm_set_butt" onclick="setExplanation()">Set explanation</button>
+            </div>
+        </div>
+        <div class="cm_success">
+            <h2>Success</h2>
+        </div>
+
+
+    </div>
 {% endblock %}
