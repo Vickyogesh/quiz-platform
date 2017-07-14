@@ -13,7 +13,8 @@ class ContentManagerMixin(object):
         if res is None:
             return 'null'
 
-        info = {'id': res[q.c.id], 'text': res[q.c.text], 'explanation': res[q.c.explanation]}
+        info = {'id': res[q.c.id], 'text': res[q.c.text],
+                'explanation': res[q.c.explanation], 'image': res[q.c.image]}
         return jsonify(info)
 
     def setExplanation(self, quiz_id, question_id, explanation):

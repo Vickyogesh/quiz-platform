@@ -4,6 +4,9 @@ function getQuestion() {
 
     var question_text = $('#cm_question_text');
     var question_expl = $('#cm_question_expl');
+    var img_wrap = $("#cm_image_wrap");
+
+    img_wrap.html('');
 
     if (question_id === ''){
         return
@@ -14,7 +17,11 @@ function getQuestion() {
             question_text.html("Wrong question id")
         }else {
             question_text.html(question_id + ' | '+data['text']);
-            question_expl.val(data['explanation'])
+            question_expl.val(data['explanation']);
+            if (data['image']){
+                img_wrap.html('<img class="cm_image">');
+                $(".cm_image").attr('src', '/img/'+data['image']+'.jpg')
+            }
         }
 
     })

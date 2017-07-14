@@ -13,3 +13,13 @@
     color: #68bd68;
     display: none;
 }
+
+#cm_image_wrap {
+    text-align: center;
+    height: 100px;
+}
+
+.cm_image {
+    width: 100px;
+    height: 100px;
+}
