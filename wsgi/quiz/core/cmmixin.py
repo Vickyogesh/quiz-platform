@@ -13,7 +13,7 @@ class ContentManagerMixin(object):
         if res is None:
             return 'null'
 
-        info = {'id': res[q.c.id], 'text': res[q.c.text],
+        info = {'id': res[q.c.id], 'text': res[q.c.text], 'answer': res[q.c.answer],
                 'explanation': res[q.c.explanation], 'image': res[q.c.image]}
         return jsonify(info)
 

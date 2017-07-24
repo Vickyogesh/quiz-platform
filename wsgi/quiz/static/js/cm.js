@@ -16,7 +16,7 @@ function getQuestion() {
         if (data === 'null'){
             question_text.html("Wrong question id")
         }else {
-            question_text.html(question_id + ' | '+data['text']);
+            question_text.html(question_id + ' | '+data['text'] + (data['answer'] ? ' (V)' : ' (F)'));
             question_expl.val(data['explanation']);
             if (data['image']){
                 img_wrap.html('<img class="cm_image">');
