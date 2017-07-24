@@ -7,7 +7,7 @@
     missingok
     notifempty
 }
-/var/log/uwsgi/app/*.log {
+/var/log/uwsgi/app/app.log {
     copytruncate
     size 12M
     rotate 2

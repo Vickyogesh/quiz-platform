@@ -1,0 +1,16 @@
+import requests
+
+
+def send_truncate_file(path, tag='quiz_errors'):
+    f = open(path, mode='rw+')
+    data = {'data': f.read()}
+    if len(data['data']) == 0:
+        return
+    res = requests.post(url='https://logs-01.loggly.com/inputs/8933229a-dbf7-4766-8234-8dbf752ebdda/tag/'+tag,
+                  data=data, timeout=5)
+    f.truncate(0)
+    f.close()
+    return res
+
+if __name__ == '__main__':
+    print send_truncate_file('../test.log')
