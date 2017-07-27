@@ -1,7 +1,10 @@
 import requests
+import os
 
 
 def send_truncate_file(path, tag='quiz_errors'):
+    if not os.path.exists(path):
+        return
     f = open(path, mode='rw+')
     data = {'data': f.read()}
     if len(data['data']) == 0:
