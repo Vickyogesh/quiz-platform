@@ -23,5 +23,4 @@ class ContentManagerMixin(object):
         sql = q.update().where(and_(q.c.quiz_type == quiz_id, q.c.id == question_id))\
             .values(explanation=explanation)
         res = self.engine.execute(sql)
-        print res
         return jsonify({'status': 200})
