@@ -10,3 +10,4 @@ doc/html/
 .idea/
 .webassets-cache/
 wsgi/quiz/ui/static/gen/
+.env

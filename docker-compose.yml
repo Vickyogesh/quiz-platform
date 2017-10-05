@@ -18,8 +18,6 @@ services:
      depends_on:
        - db
      image: quiz
-     ports:
-       - "${PORT}:80"
      volumes:
       - data_vol:/var/www/quiz2/data/sessions
 #     restart: always
@@ -31,6 +29,16 @@ services:
        DB_HOST: db
        DB_NAME: quiz
        ACCOUNTS_URL: ${ACCOUNTS_URL}
+   proxy:
+     privileged: true
+     depends_on:
+      - web
+     image: front_proxy
+     volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+     ports:
+       - "80:80"
+       - "443:443"
 volumes:
     data_vol:
     db_data:

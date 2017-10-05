@@ -1,0 +1,28 @@
+FROM ubuntu:16.04
+MAINTAINER vertuzz <alexavd@gmail.com>
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && apt-get install -y  python-pip \
+    nginx fail2ban software-properties-common supervisor \
+    && add-apt-repository ppa:certbot/certbot \
+    && apt-get update && apt-get install python-certbot-nginx -y
+
+RUN pip install apscheduler
+
+COPY front_nginx/dev_front_hosts.conf /etc/nginx/sites-available/front_hosts.conf
+COPY front_nginx/front_nginx.conf /etc/nginx/front_nginx.conf
+COPY front_nginx/front_supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY front_nginx/scheduler.py /root/scheduler.py
+COPY front_nginx/jail.local /etc/fail2ban/jail.local
+COPY front_nginx/nginx-req-limit.conf /etc/fail2ban/filter.d/nginx-req-limit.conf
+
+RUN mkdir -p /var/log/nginx/app /var/log/supervisor \
+    && rm /etc/nginx/sites-enabled/default \
+    && ln -s /etc/nginx/sites-available/front_hosts.conf /etc/nginx/sites-enabled/front_hosts.conf \
+    && rm /etc/nginx/nginx.conf && mv /etc/nginx/front_nginx.conf /etc/nginx/nginx.conf  \
+    && echo "daemon off;" >> /etc/nginx/nginx.conf \
+    && chown -R www-data:www-data /var/log \
+    && touch /var/log/auth.log
+
+CMD ["/usr/bin/supervisord"]
