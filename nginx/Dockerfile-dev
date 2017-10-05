@@ -4,7 +4,7 @@ MAINTAINER vertuzz <alexavd@gmail.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y  python-pip \
-    nginx fail2ban software-properties-common supervisor \
+    nginx fail2ban software-properties-common supervisor logrotate \
     && add-apt-repository ppa:certbot/certbot \
     && apt-get update && apt-get install python-certbot-nginx -y
 
@@ -16,6 +16,7 @@ COPY front_nginx/front_supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY front_nginx/scheduler.py /root/scheduler.py
 COPY front_nginx/jail.local /etc/fail2ban/jail.local
 COPY front_nginx/nginx-req-limit.conf /etc/fail2ban/filter.d/nginx-req-limit.conf
+COPY front_nginx/logrotate /etc/logrotate.d/nginx
 
 RUN mkdir -p /var/log/nginx/app /var/log/supervisor \
     && rm /etc/nginx/sites-enabled/default \
