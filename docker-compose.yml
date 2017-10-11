@@ -21,14 +21,8 @@ services:
      volumes:
       - data_vol:/var/www/quiz2/data/sessions
 #     restart: always
-# Temporary
-     environment:
-       DB_URI: mysql://quiz:u16F6gip@db:3306/
-       DB_USER: quiz
-       DB_PASS: u16F6gip
-       DB_HOST: db
-       DB_NAME: quiz
-       ACCOUNTS_URL: ${ACCOUNTS_URL}
+     env_file:
+      - web.env
    proxy:
      privileged: true
      depends_on:

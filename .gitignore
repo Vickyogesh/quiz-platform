@@ -11,3 +11,4 @@ doc/html/
 .webassets-cache/
 wsgi/quiz/ui/static/gen/
 .env
+*.env

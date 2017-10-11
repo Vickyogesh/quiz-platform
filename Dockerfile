@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV DOCKER_STATE prod
 
 RUN apt-get update && apt-get install -y \
-    python-pip python-dev uwsgi-plugin-python \
+    python-pip python-dev uwsgi-plugin-python mysql-client \
     nginx supervisor uwsgi python-mysqldb libmysqlclient-dev \
     openjdk-8-jre unzip logrotate
 RUN pip install --upgrade pip && pip install --upgrade setuptools
