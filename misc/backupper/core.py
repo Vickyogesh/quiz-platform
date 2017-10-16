@@ -5,8 +5,7 @@ from boto3.s3.transfer import S3Transfer
 
 
 def rm_file(path):
-    try:os.remove(path)
-    except:pass
+    os.system('rm {}*'.format(path.split('.')[0]))
 
 
 class Backup:
@@ -73,7 +72,6 @@ class Backup:
             remote_path = "{}/{}".format(self.remote_dir, file_path.split("/")[-1])
         self.transfer.upload_file(file_path, self.bucket, remote_path)
         rm_file(file_path)
-        rm_file(file_path+".enc")
 
     # replacing existing file with encrypted one
     def _encrypt_file(self, file_path):
