@@ -46,7 +46,7 @@ class Backup:
                 dumps.append({'full_path': d['Key'],
                               'name': d['Key'].split('/')[-1],
                               'last_modified': d['LastModified']})
-        dumps = sorted(dumps, key=lambda k: k['last_modified'])
+        dumps = sorted(dumps, key=lambda k: k['last_modified'], reverse=True)
         if len(dumps) > 7:
             for_del = dumps[7:]
             for i in for_del:
@@ -60,7 +60,7 @@ class Backup:
             dirs.append({'full_path': d['Key'],
                          'name': d['Key'].split('/')[-1],
                          'last_modified': d['LastModified']})
-        dirs = sorted(dirs, key=lambda k: k['last_modified'])
+        dirs = sorted(dirs, key=lambda k: k['last_modified'], reverse=True)
         if len(dirs) > 7:
             for_del = dirs[7:]
             for i in for_del:
