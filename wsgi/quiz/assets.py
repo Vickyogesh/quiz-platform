@@ -12,7 +12,7 @@ base_js = Bundle('js/libs/sprintf.min.js',
                  'js/libs/moment.min.js',
                  'js/libs/moment.langs.js',
                  'js/common.js', 'js/expressbar.js',
-                 'js/fbsupport.js',
+                 'js/fbsupport.js', 'js/libs/loggly.tracker-2.2.2.min.js',
                  filters=js_filter, output='gen/base.js')
 
 bb_js = Bundle('js/libs/json2.js', 'js/libs/underscore-min.js',

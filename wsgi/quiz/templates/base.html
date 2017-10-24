@@ -66,4 +66,13 @@
       <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
   {% endblock %}
+<script>
+    var _LTracker = _LTracker || [];
+    _LTracker.push({
+        'logglyKey': '{{ config['LOGGLY_KEY'] }}',
+        'sendConsoleErrors': true,
+        'tag': '{{ "quiz_frontend_prod" if config["PROD"] else "quiz_frontend_test" }}'
+    });
+
+</script>
 {% endblock %}
