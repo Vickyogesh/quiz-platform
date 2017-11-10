@@ -94,6 +94,8 @@
 
         quizUrl: function(topic) {
             var id = topic.get("number");
+            if (location.search.indexOf("ai=1") !== -1)
+                return this.urls.quiz + id + "?ai=1";
             return this.urls.quiz + id;
         },
 

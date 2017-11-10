@@ -1,6 +1,7 @@
 """
 This module provides common client related quiz views.
 """
+import uuid
 from flask import redirect, url_for, request, current_app, abort, session
 from flask import Response
 from flask_login import current_user
@@ -99,11 +100,19 @@ class QuizViewBase(ClientView):
 
     def dispatch_request(self, *args, **kwargs):
         """Render template on request."""
+        if request.args.get('ai'):
+            return self.render_template(quiz=self.get_ai_quiz(*args, **kwargs))
         return self.render_template(quiz=self.get_quiz(*args, **kwargs))
 
     def get_quiz(self, *args, **kwargs):
         """Return questions for quiz/review.
 
+        Must be overridden in subclass.
+        """
+        raise NotImplemented
+
+    def get_ai_quiz(self, *args, **kwargs):
+        """
         Must be overridden in subclass.
         """
         raise NotImplemented
@@ -138,6 +147,19 @@ class ClientQuizView(QuizViewBase):
 
         return current_app.core.getQuiz(self.meta['id'], uid, topic,
                                         self.request_lang, force, exclude)
+
+    def get_ai_quiz(self, topic):
+        title, chapter = current_app.core.getAiTitle(self.meta['id'], topic, self.request_lang)
+        session_id = uuid.uuid4().hex
+        first_question = current_app.core.getAiQuestion({
+            "quiz_type": self.meta['id'],
+            "chapter_id": chapter,
+            "topic_id": topic,
+            "num_ex": 40,
+            "quiz_session": session_id,
+            "u_id": current_user.account_id
+        })
+        return {'topic_id': topic, 'questions': [first_question], 'title': title}
 
 
 class ClientReviewView(QuizViewBase):

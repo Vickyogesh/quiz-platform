@@ -158,7 +158,13 @@
   {% assets "bb.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
-  {% assets "quiz.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
+  {% if request.args.get('ai') %}
+      {% assets "quiz-ai.js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      {% endassets %}
+  {% else %}
+      {% assets "quiz.js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      {% endassets %}
+  {% endif %}
 {% endblock %}

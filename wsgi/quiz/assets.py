@@ -33,6 +33,8 @@ user_stat_js = Bundle('js/stat-user.js', 'js/stat-exam.js',
 quiz_js = Bundle('js/quiz-view.js', 'js/quiz-review.js',
                  filters=js_filter, output='gen/quiz.js')
 
+quiz_ai_js = Bundle('js/quiz-ai-view.js', filters=js_filter, output='gen/quiz-ai.js')
+
 exam_js = Bundle('js/exam-model.js', 'js/exam-view.js',
                  filters=js_filter, output='gen/exam.js')
 
@@ -60,6 +62,7 @@ assets.register('bb.js', bb_js)
 assets.register('graph.js', graph_js)
 assets.register('user-stat.js', user_stat_js)
 assets.register('quiz.js', quiz_js)
+assets.register('quiz-ai.js', quiz_ai_js)
 assets.register('exam.js', exam_js)
 assets.register('school.js', school_js)
 assets.register('fullscreen.js', fullscreen_js)

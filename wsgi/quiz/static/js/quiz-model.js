@@ -197,6 +197,10 @@
             });
         },
 
+        loadAiQuestion: function () {
+
+        },
+
         addQuestions: function(questions) {
             if (questions.length < 40)
                 this.is_can_load_more = false;
