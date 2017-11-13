@@ -263,7 +263,7 @@ def get_ai_question():
     user_id = get_user_id()
     data = request.get_json(force=True)
     data['u_id'] = user_id
-    return app.core.getAiQuestion(data)
+    return dict_to_json_response(app.core.getAiQuestion(data))
 
 
 @api.route('/post_ai_answer', methods=['POST'])
@@ -271,7 +271,7 @@ def get_ai_question():
 @count_user_access()
 def post_ai_answer():
     data = request.get_json(force=True)
-    return app.core.postAiAnswer(data)
+    return dict_to_json_response(app.core.postAiAnswer(data))
 
 
 @api.route('/quiz/<int:topic>', methods=['POST'])

@@ -94,12 +94,22 @@
                 if (!question.isCorrectAnswer())
                     this.set("total_errors", this.get("total_errors") + 1);
                 this.set("last_answered_index", this.get("index"));
-                this.moveToNext();
+                console.log(this.get("ai"));
+
+                if (this.get("ai")) {
+                    this.postAiAnswer(question.get("id"), question.isCorrectAnswer())
+                }else {
+                    this.moveToNext();
+                }
             }
         },
 
         moveToNext: function() {
             var index = this.get("index");
+            if (this.get("ai")){
+                this.set("index", index + 1);
+                return
+            }
             if (index + 3 >= this.questions.length
                 && this.is_can_load_more) {
                 this.loadMoreQuestions();
@@ -198,6 +208,56 @@
         },
 
         loadAiQuestion: function () {
+            var self = this;
+
+            var url = this.get_url("ai_question");
+
+            var exclude = [];
+
+            this.questions.each(function(question, index) {
+                exclude.push(question.get("id"))
+            });
+
+            var data = {"quiz_type": this.get("data")["quiz_type"],
+                "quiz_session": this.get("data")["session_id"],
+                "num_ex": this.get("data")["num_ex"],
+                "chapter_id": this.get("data")["chapter"],
+                "topic_id": this.get("data")["topic"],
+                "exclude": exclude
+            };
+
+
+            Aux.postJson(url, data, function (res) {
+                console.log(res);
+                if (res['status'] !== 200){
+                    alert(res['description']);
+                    return
+                }
+                self.addQuestions([res]);
+                self.moveToNext();
+            })
+
+        },
+
+        postAiAnswer : function (quest_id, answer) {
+            var self = this;
+
+            var url = this.get_url("ai_answer");
+
+            var data = {"quiz_session": this.get("data")["session_id"],
+                "num_quest": this.get("data")["num_ex"],
+                "correct": answer,
+                "quest_id": quest_id
+            };
+
+            Aux.postJson(url, data, function (res) {
+                console.log(res);
+                if (res['status'] !== 200){
+                    alert(res['description']);
+                    return
+                }
+                self.loadAiQuestion()
+            })
 
         },
 

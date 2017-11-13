@@ -28,6 +28,9 @@ class AiMixin(object):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         ai_res = requests.post(current_app.config["AI_REST_URL"] + "get_question",
                              data=json.dumps(data), headers=headers).json()
+        print ai_res
+        if ai_res['status'] != 200:
+            return ai_res
         q = self.questions
 
         sql = q.select().where(and_(q.c.quiz_type == data['quiz_type'], q.c.id == ai_res['quest_id']))

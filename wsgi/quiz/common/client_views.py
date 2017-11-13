@@ -134,6 +134,8 @@ class ClientQuizView(QuizViewBase):
     def page_urls(self):
         urls = QuizViewBase.page_urls(self)
         urls['quiz'] = url_for('api.create_quiz', topic=0)[:-1]
+        urls['ai_question'] = url_for('api.get_ai_question')
+        urls['ai_answer'] = url_for('api.post_ai_answer')
         return urls
 
     def get_quiz(self, topic):
@@ -151,15 +153,18 @@ class ClientQuizView(QuizViewBase):
     def get_ai_quiz(self, topic):
         title, chapter = current_app.core.getAiTitle(self.meta['id'], topic, self.request_lang)
         session_id = uuid.uuid4().hex
+        num_ex = 40
         first_question = current_app.core.getAiQuestion({
             "quiz_type": self.meta['id'],
             "chapter_id": chapter,
             "topic_id": topic,
-            "num_ex": 40,
+            "num_ex": num_ex,
             "quiz_session": session_id,
             "u_id": current_user.account_id
         })
-        return {'topic_id': topic, 'questions': [first_question], 'title': title}
+        return {'topic': topic, 'questions': [first_question], 'title': title,
+                'session_id': session_id, 'num_ex': num_ex, 'chapter': chapter,
+                "quiz_type": self.meta['id']}
 
 
 class ClientReviewView(QuizViewBase):

@@ -118,7 +118,9 @@
         createModel: function(params) {
             return new QuizModel({
                 urls: params.urls,
-                topic_id: params.data.topic
+                topic_id: params.data.topic,
+                data: params.data,
+                ai: true
             });
         },
 
