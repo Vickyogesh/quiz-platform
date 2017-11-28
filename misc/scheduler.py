@@ -35,7 +35,7 @@ scheduler = BlockingScheduler()
 scheduler.add_job(del_old_session, 'cron', hour=2)
 scheduler.add_job(create_backup, 'cron', hour=3)
 scheduler.add_job(log_rotate, 'cron', hour=10)
-scheduler.add_job(loggly_logs, 'interval', minutes=5)
+# scheduler.add_job(loggly_logs, 'interval', minutes=5)
 
 try:
     scheduler.start()
