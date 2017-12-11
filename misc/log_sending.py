@@ -15,5 +15,6 @@ def send_truncate_file(path, tag='quiz_errors'):
     f.close()
     return res
 
+
 if __name__ == '__main__':
-    print send_truncate_file('../test.log')
+    send_truncate_file('/var/log/uwsgi/app/err.log')
