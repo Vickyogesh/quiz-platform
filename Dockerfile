@@ -5,8 +5,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV DOCKER_STATE prod
 
 RUN apt-get update && apt-get install -y \
-    python-pip python-dev uwsgi-plugin-python mysql-client \
-    nginx supervisor uwsgi python-mysqldb libmysqlclient-dev \
+    python-pip python-dev gunicorn mysql-client \
+    nginx supervisor python-mysqldb libmysqlclient-dev \
     openjdk-8-jre unzip logrotate cron
 RUN pip install --upgrade pip && pip install --upgrade setuptools
 # Making dirs
@@ -20,13 +20,13 @@ RUN pip install -r /var/www/quiz2/requirements.txt
 COPY nginx/app_nginx/flask.conf /etc/nginx/sites-available/
 COPY nginx/app_nginx/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY nginx/app_nginx/logrotate /etc/logrotate.d/nginx
+COPY nginx/app_nginx/g_conf.py /var/www/quiz2/g_conf.py
 
 COPY wsgi /var/www/quiz2/wsgi
 COPY web /var/www/quiz2/web
 COPY misc /var/www/quiz2/misc
 COPY misc/crontab /etc/cron.d/app-cron
 COPY manage.py /var/www/quiz2/manage.py
-COPY uwsgi.ini /var/www/quiz2/uwsgi.ini
 RUN unzip /var/www/quiz2/misc/img.zip -d /var/www/quiz2/data/quiz
 
 RUN pybabel compile -d /var/www/quiz2/wsgi/quiz/translations
