@@ -1,0 +1,7 @@
+0 2 * * * root logrotate -f /etc/logrotate.d/nginx >> /var/log/cron.log 2>&1
+0 2 * * * root find /var/www/quiz2/data/sessions -mtime +1 -type f -exec rm {} \ >> /var/log/cron.log 2>&1
+*/5 * * * * root python /var/www/quiz2/misc/log_sending.py >> /var/log/cron.log 2>&1
+0 3 * * * root . /root/project_env.sh; python /var/www/quiz2/misc/backupper/core.py >> /var/log/cron.log 2>&1
+#0 2 * * 6 root . /root/project_env.sh; python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini --clean --force >> /var/log/cron.log 2>&1
+#0 3 * * 6 root . /root/project_env.sh; python /var/www/quiz2/manage.py stat update >> /var/log/cron.log 2>&1
+#*/5 * * * * root . /root/project_env.sh; python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini >> /var/log/cron.log 2>&1
