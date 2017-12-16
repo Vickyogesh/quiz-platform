@@ -37,7 +37,7 @@ RUN mkdir -p /var/log/nginx/app /var/log/uwsgi/app /var/log/supervisor \
     && echo "daemon off;" >> /etc/nginx/nginx.conf \
     && chown -R www-data:www-data /var/www/quiz2 \
     && chown -R www-data:www-data /var/log \
-    && chmod 0644 /etc/cron.d/app-cron \
+    && chmod 0644 /etc/cron.d/app-cron && chmod +x /var/www/quiz2/misc/dbupdate \
     && touch /var/log/cron.log && chmod +x /var/www/quiz2/misc/env.sh
 
 CMD ["/usr/bin/supervisord"]
