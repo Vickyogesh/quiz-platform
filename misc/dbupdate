@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ ! -f /root/last_run_dbupdate ];
+then
+    touch /root/last_run_dbupdate
+    python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini
+else
+ if [[ $(find /root/last_run_dbupdate -mmin +4) ]]; then #run every 5 mins
+   rm -f /root/last_run_dbupdate
+   python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini
+   touch /root/last_run_dbupdate
+  fi  
+fi
