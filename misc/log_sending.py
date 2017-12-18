@@ -17,4 +17,7 @@ def send_truncate_file(path, tag='quiz_errors'):
 
 
 if __name__ == '__main__':
-    send_truncate_file('/var/log/g_errors.log')
+    if os.environ.get("PROD"):
+        send_truncate_file('/var/log/g_errors.log')
+    else:
+        send_truncate_file('/var/log/g_errors.log', tag='quiz_test_errors')
