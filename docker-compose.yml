@@ -7,7 +7,7 @@ services:
        - db_data:/var/lib/mysql
      restart: always
      ports:
-       - "127.0.0.1:3306:3306" # for debug (have to be removed in future)
+       - "3306:3306"  # will be under firewall
      environment:
        MYSQL_ROOT_PASSWORD: LqWA9M42
        MYSQL_DATABASE: quiz
