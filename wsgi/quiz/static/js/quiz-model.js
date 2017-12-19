@@ -228,7 +228,6 @@
 
 
             Aux.postJson(url, data, function (res) {
-                console.log(res);
                 if (res['status'] !== 200){
                     alert(res['description']);
                     return
@@ -256,9 +255,15 @@
                     alert(res['description']);
                     return
                 }
+                self.showMetric(res['data']);
                 self.loadAiQuestion()
             })
 
+        },
+
+        showMetric: function (data) {
+            $("#ai_progress").html((data['progress'] * 100).toFixed(2));
+            $("#ai_score").html((data['score'] * 100).toFixed(2));
         },
 
         addQuestions: function(questions) {
