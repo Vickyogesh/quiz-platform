@@ -35,7 +35,7 @@
     </a>
   </div>
 </div>
-{% if config['AI_ENABLED'] %}
+{% if config['AI_ENABLED'] and current_user['account']['ai'] %}
 <div class="content row">
   <div class="col-sm-12">
     <div class="ai-menu">
