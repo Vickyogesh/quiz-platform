@@ -16,6 +16,14 @@
     margin-bottom: 40px;
 }
 
+
+.ai-menu {
+    text-align: center;
+    border: 5px black;
+    background-color: #0078d4;
+    border-radius: 11px;
+}
+
 .btn-menu {
   width: 200px;
   margin: 4px;

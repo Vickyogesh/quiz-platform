@@ -37,29 +37,13 @@
 </div>
 {% if config['AI_ENABLED'] %}
 <div class="content row">
-  <div class="col-sm-4">
-    <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
-       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
-    </a>
+  <div class="col-sm-12">
+    <div class="ai-menu">
+      <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
+         <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+      </a>
+    </div>
   </div>
-{#  <div class="col-sm-4">#}
-{#      <div>#}
-{#  <div class="btn-exam">#}
-{#    <table cellpadding="0" cellspacing="0">#}
-{#      <tr><td colspan="2" id="it"></td></tr>#}
-{#      <tr style="height:30px">#}
-{#        <td id="fr"></td>#}
-{#        <td id="de"></td>#}
-{#      </tr>#}
-{#    </table>#}
-{#  </div>#}
-{#  </div>#}
-{#  </div>#}
-{#  <div class="col-sm-4">#}
-{#    <a href="{{ url_for('.client_review') }}">#}
-{#      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">#}
-{#    </a>#}
-{#  </div>#}
 </div>
 {% endif %}
 {% endblock %}
