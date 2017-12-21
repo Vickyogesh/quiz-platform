@@ -6,6 +6,7 @@ from flask_principal import PermissionDenied
 from .appcore import Application, json_response
 from .core.exceptions import QuizCoreError
 from .serviceproxy import AccountsApi
+from raven.contrib.flask import Sentry
 
 app = None
 
@@ -146,5 +147,6 @@ def init_app():
     app.register_blueprint(api, url_prefix='/v1')
     app.register_blueprint(cm, url_prefix='/cm')
     assets.init_app(app)
+    sentry = Sentry(app)
 
     from . import views
