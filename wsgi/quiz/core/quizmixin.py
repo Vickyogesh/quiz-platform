@@ -45,7 +45,7 @@ class QuizMixin(object):
     #
     # NOTE: if quiz answers will not be returned then current questions
     # may be appear in future quizzes.
-    def __getQuery(self, quiz_type, user_id, topic_id, exclude):
+    def __getQuery(self, quiz_type, user_id, topic_id, exclude, topic_lst=None):
         q = self.questions
         b = self.blacklist
         qa = self.quiz_answers
@@ -67,11 +67,18 @@ class QuizMixin(object):
         blacklist = select([b.c.id]).where(b.c.quiz_type == q.c.quiz_type)
         not_in += [q.c.id.notin_(blacklist)]
 
-        stmt2 = select([q]).where(and_(
-            q.c.quiz_type == quiz_type,
-            q.c.topic_id == topic_id,
-            *not_in
-        )).limit(100).alias('t')
+        if topic_lst is None:
+            stmt2 = select([q]).where(and_(
+                q.c.quiz_type == quiz_type,
+                q.c.topic_id == topic_id,
+                *not_in
+            )).limit(100).alias('t')
+        else:
+            stmt2 = select([q]).where(and_(
+                q.c.quiz_type == quiz_type,
+                q.c.topic_id.in_(set(topic_lst)),
+                *not_in
+            )).limit(100).alias('t')
 
         # Final query
         stmt3 = select([stmt2]).order_by(func.rand()).limit(40)
@@ -80,8 +87,8 @@ class QuizMixin(object):
     # Get 40 random questions from for the specified topic which are
     # not answered by the specified user.
     # Answered quiz questions are placed in the quiz_answers.
-    def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang, exclude):
-        query = self.__getQuery(quiz_type, user_id, topic_id, exclude)
+    def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang, exclude, topic_lst=None):
+        query = self.__getQuery(quiz_type, user_id, topic_id, exclude, topic_lst=topic_lst)
         try:
             res = self.engine.execute(query)
         except SQLAlchemyError as e:
@@ -112,7 +119,7 @@ class QuizMixin(object):
         res.close()
         return quiz
 
-    def getQuiz(self, quiz_type, user_id, topic_id, lang, force, exclude=None):
+    def getQuiz(self, quiz_type, user_id, topic_id, lang, force, exclude=None, topic_lst=None):
         """Return list of Quiz questions.
 
         Args:
@@ -133,7 +140,7 @@ class QuizMixin(object):
         """
         # TODO: do we need to validate topic ID?
         questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
-                                           lang, exclude)
+                                           lang, exclude, topic_lst=topic_lst)
 
         # FIXME: bug! it resets quizzes for all topics!
         # Seems all questions are answered so we make all questions

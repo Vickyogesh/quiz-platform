@@ -233,4 +233,21 @@
             this.current_index = id;
         }
     });
+
+    $(".run-quiz").click(function () {
+        var checked = $(".m_topic:checked");
+        var topics = [];
+        var url = ''; // url to run quiz. doesn't matter which topic if t_lst arg present
+
+        checked.each(function (i, v) {
+            url = $(v).attr('data-url');
+            var t_id = $(v).attr('data-url').split('/').reverse()[0];
+            topics.push(t_id);
+        });
+        if (topics.length > 0){
+            location.href = url + "?t_lst=" + topics.join(",")
+        }else {
+
+        }
+    })
 })();

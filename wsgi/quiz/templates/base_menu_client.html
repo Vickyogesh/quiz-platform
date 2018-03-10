@@ -35,6 +35,17 @@
     </a>
   </div>
 </div>
+{% if True %}
+<div class="content row">
+  <div class="col-sm-12">
+    <div class="ai-menu">
+      <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
+         <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block footer %}

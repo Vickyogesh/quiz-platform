@@ -245,14 +245,22 @@ def create_quiz(topic):
     lang = request.args.get('lang', 'it')
     force = request.args.get('force', False)
     exclude = request.args.get('exclude', None)
+    topic_lst = request.args.get('t_lst')
+
     if exclude is not None:
         try:
             exclude = exclude.split(',')
             exclude = [int(x) for x in exclude]
         except ValueError:
             raise QuizCoreError('Invalid parameters.')
+    if topic_lst is not None:
+        try:
+            topic_lst = topic_lst.split(',')
+            topic_lst = [int(t) for t in topic_lst]
+        except ValueError:
+            raise QuizCoreError('Invalid parameters.')
     quiz = app.core.getQuiz(session['quiz_id'], user_id, topic, lang, force,
-                            exclude)
+                            exclude, topic_lst=topic_lst)
     return dict_to_json_response(quiz)
 
 

@@ -131,13 +131,17 @@ class ClientQuizView(QuizViewBase):
         force = request.args.get('force', False)
         uid = current_user.account_id
 
+        topic_lst = request.args.get('t_lst')
+
         # TODO: what if x is not int?
         exclude = request.args.get('exclude', None)
         if exclude is not None:
             exclude = [int(x) for x in exclude.split(',')]
+        if topic_lst is not None:
+            topic_lst = [int(t) for t in topic_lst.split(',')]
 
         return current_app.core.getQuiz(self.meta['id'], uid, topic,
-                                        self.request_lang, force, exclude)
+                                        self.request_lang, force, exclude, topic_lst=topic_lst)
 
 
 class ClientReviewView(QuizViewBase):
