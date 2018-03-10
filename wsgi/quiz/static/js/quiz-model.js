@@ -172,13 +172,9 @@
 
             var t_lst = Aux.getUrlParameterByName('t_lst');
 
-            console.log(t_lst);
-
             if (t_lst){
                 params.t_lst = t_lst;
             }
-
-            console.log(params);
 
             if (force == true) {
                 params.force = true;
