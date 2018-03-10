@@ -245,7 +245,7 @@
             topics.push(t_id);
         });
         if (topics.length > 0){
-            location.href = url + "?t_lst=" + topics.join(",")
+            window.location.href = url + "?t_lst=" + topics.join(",")
         }else {
 
         }
