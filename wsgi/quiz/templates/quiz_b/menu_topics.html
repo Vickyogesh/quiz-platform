@@ -22,11 +22,11 @@
 
   {% if request.args.get("multi") %}
   <script type="text/template" id="chapter-tmpl">
-    <tr><td width="30%" style="text-align:right">{{ _('Chapter') }} <%= chapter_id %></td><td><input type="checkbox" class="checkbox m_topic" data-url="<%= topic_url %>" style="display: inline"><%= topic_text %></td></tr>
+    <tr><td width="30%" style="text-align:right">{{ _('Chapter') }} <%= chapter_id %></td><td><input type="checkbox" class="m_topic" data-url="<%= topic_url %>"><%= topic_text %></td></tr>
   </script>
 
   <script type="text/template" id="topic-tmpl">
-    <tr><td></td><td><input type="checkbox" class="checkbox m_topic" data-url="<%= topic_url %>" style="display: inline"><%= topic_text %></td></tr>
+    <tr><td></td><td><input type="checkbox" class="m_topic" data-url="<%= topic_url %>"><%= topic_text %></td></tr>
   </script>
   {% else %}
   <script type="text/template" id="chapter-tmpl">

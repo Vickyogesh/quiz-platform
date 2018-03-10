@@ -344,6 +344,10 @@ li.area7:hover {background: #ac4242;}
   filter: FlipW;                 /* IE 6/7/8 */
 }
 
+.m_topic {
+  display: inline;
+}
+
 /* super-small */
 @media (max-width: 480px) {
   .quiz .qrow.pos0 .qrect.ansbox .imgbox {
