@@ -322,6 +322,14 @@ class AccountsApi(HttpServiceProxy):
         _check_json_response_status(response)
         return response.json()
 
+    def getSchoolConfig(self, s_id):
+        response = self.get('/school_config/{}'.format(s_id))
+        try:
+            response = response.json()
+            return json.loads(response['data'])
+        except:
+            return None
+
     # name, login, passwd, access=None
     def addSchool(self, **kwargs):
         """Register new school.

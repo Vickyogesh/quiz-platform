@@ -97,6 +97,9 @@ class User(UserMixin):
     def is_anonymous(self):
         return False
 
+    def school_config(self, s_id):
+        return app.account.getSchoolConfig(s_id)
+
     def get_id(self):
         return self.account['login']
 
