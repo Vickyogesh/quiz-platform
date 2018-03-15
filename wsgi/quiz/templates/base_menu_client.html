@@ -37,26 +37,22 @@
 </div>
     {% set conf = user.school_config(user['account']['school_id']) %}
 {% if conf != None %}
-    {% if conf['mult'] %}
     <div class="content row">
+      {% if conf['mult'] %}
       <div class="col-sm-4">
           <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
              <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
           </a>
       </div>
-    </div>
-    {% endif %}
-{% endif %}
-{% if config['AI_ENABLED'] and current_user['account']['ai'] %}
-<div class="content row">
-  <div class="col-sm-12">
-    <div class="ai-menu">
-      <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
+      {% endif %}
+      {% if conf['ai'] %}
+      <div class="col-sm-4">
+        <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
          <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
-      </a>
+        </a>
+      </div>
+      {% endif %}
     </div>
-  </div>
-</div>
 {% endif %}
 {% endblock %}
 
