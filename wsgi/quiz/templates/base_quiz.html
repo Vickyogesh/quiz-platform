@@ -30,6 +30,10 @@
               <input type="radio" name="options" id="opt_no" checked>{{ _('No') }}</label>
           </div>
         </div>
+        <div>
+        Progress: <span id="ai_progress"></span>% <br>
+        Score: <span id="ai_score"></span>%
+        </div>
       </form>
     </div>
   </div>
@@ -158,7 +162,13 @@
   {% assets "bb.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
-  {% assets "quiz.js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {% endassets %}
+  {% if request.args.get('ai') %}
+      {% assets "quiz-ai.js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      {% endassets %}
+  {% else %}
+      {% assets "quiz.js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      {% endassets %}
+  {% endif %}
 {% endblock %}

@@ -13,6 +13,7 @@ from .guestmixin import GuestMixin
 from .adminmixin import AdminMixin
 from .schoolmixin import SchoolMixin
 from .cmmixin import ContentManagerMixin
+from .aimixin import AiMixin
 
 
 # http://stackoverflow.com/questions/15753102/python-sqlalchemy-how-do-i-ensure-connection-not-stale-using-new-event-system
@@ -49,7 +50,7 @@ def append_string(insert, compiler, **kw):
 
 
 class QuizCore(UserMixin, QuizMixin, ErrorReviewMixin, ExamMixin, GuestMixin,
-               AdminMixin, SchoolMixin, ContentManagerMixin):
+               AdminMixin, SchoolMixin, ContentManagerMixin, AiMixin):
     """This class provides core service logic.
 
     Logic is implemented by mixins:
