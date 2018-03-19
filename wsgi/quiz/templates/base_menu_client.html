@@ -22,12 +22,18 @@
 {% endblock %}
 
 {% block panel_content %}
+{% set conf = user.school_config(user['account']['school_id']) %}
+
 <div class="content row">
+  {% if conf != None %}
+      {% if conf['single'] %}
   <div class="col-sm-4">
     <a href="{{ url_for('.client_menu_quiz') }}">
        <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
     </a>
   </div>
+  {% endif %}
+  {% endif %}
   <div class="col-sm-4">{% block exam_button %}{% endblock %}</div>
   <div class="col-sm-4">
     <a href="{{ url_for('.client_review') }}">
@@ -35,7 +41,6 @@
     </a>
   </div>
 </div>
-    {% set conf = user.school_config(user['account']['school_id']) %}
 {% if conf != None %}
     <div class="content row">
       {% if conf['mult'] %}
