@@ -32,7 +32,7 @@
        <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
     </a>
   </div>
-  {% endif %}
+      {% endif %}
   {% endif %}
   <div class="col-sm-4">{% block exam_button %}{% endblock %}</div>
   <div class="col-sm-4">
@@ -46,14 +46,14 @@
       {% if conf['mult'] %}
       <div class="col-sm-4">
           <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
-             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-mult.png') }}">
           </a>
       </div>
       {% endif %}
       {% if conf['ai'] %}
       <div class="col-sm-4">
         <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
-         <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
+         <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-ai.png') }}">
         </a>
       </div>
       {% endif %}
