@@ -234,6 +234,10 @@
 
 
             Aux.postJson(url, data, function (res) {
+                if (res['status'] === 416) {
+                    self.trigger("done")
+                    return
+                }
                 if (res['status'] !== 200){
                     alert(res['description']);
                     return

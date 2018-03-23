@@ -271,7 +271,8 @@ def get_ai_question():
     user_id = get_user_id()
     data = request.get_json(force=True)
     data['u_id'] = user_id
-    return dict_to_json_response(app.core.getAiQuestion(data))
+    res = app.core.getAiQuestion(data)
+    return dict_to_json_response(res, status=res['status'])
 
 
 @api.route('/post_ai_answer', methods=['POST'])

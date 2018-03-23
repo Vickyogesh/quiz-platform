@@ -40,7 +40,7 @@ class AiMixin(object):
             return 'null'
 
         info = {'id': res[q.c.id], 'text': res[q.c.text], 'answer': res[q.c.answer],
-                'explanation': res[q.c.explanation], 'image': res[q.c.image]}
+                'explanation': res[q.c.explanation], 'image': res[q.c.image], 'status': 200}
         return info
 
     def postAiAnswer(self, data):
