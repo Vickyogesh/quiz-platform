@@ -166,7 +166,9 @@ class ClientQuizView(QuizViewBase):
             "quiz_session": session_id,
             "u_id": current_user.account_id
         })
-        return {'topic': topic, 'questions': [first_question], 'title': title,
+        return {'topic': topic,
+                'questions': [first_question] if first_question.get('id') else [],
+                'title': title,
                 'session_id': session_id, 'num_ex': num_ex, 'chapter': chapter,
                 "quiz_type": self.meta['id']}
 
