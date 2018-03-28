@@ -45,7 +45,7 @@ class QuizMixin(object):
     #
     # NOTE: if quiz answers will not be returned then current questions
     # may be appear in future quizzes.
-    def __getQuery(self, quiz_type, user_id, topic_id, exclude, topic_lst=None):
+    def __getQuery(self, quiz_type, user_id, topic_id, exclude):
         q = self.questions
         b = self.blacklist
         qa = self.quiz_answers
@@ -67,55 +67,100 @@ class QuizMixin(object):
         blacklist = select([b.c.id]).where(b.c.quiz_type == q.c.quiz_type)
         not_in += [q.c.id.notin_(blacklist)]
 
-        if topic_lst is None:
-            stmt2 = select([q]).where(and_(
-                q.c.quiz_type == quiz_type,
-                q.c.topic_id == topic_id,
-                *not_in
-            )).limit(100).alias('t')
-        else:
-            stmt2 = select([q]).where(and_(
-                q.c.quiz_type == quiz_type,
-                q.c.topic_id.in_(set(topic_lst)),
-                *not_in
-            )).limit(100).alias('t')
+        stmt2 = select([q]).where(and_(
+            q.c.quiz_type == quiz_type,
+            q.c.topic_id == topic_id,
+            *not_in
+        )).limit(100).alias('t')
 
         # Final query
         stmt3 = select([stmt2]).order_by(func.rand()).limit(40)
         return stmt3
 
+    # quiz questions lang
+    def __lang(self, lang):
+        if lang == 'de':
+            return self.questions.c.text_de
+        elif lang == 'fr':
+            return self.questions.c.text_fr
+        else:
+            return self.questions.c.text
+
+    # Question data structure
+    def __question_data(self, row, txt_lang):
+        d = {
+            'id': row[self.questions.c.id],
+            'text': row[txt_lang],
+            'answer': row[self.questions.c.answer],
+            'explanation': row[self.questions.c.explanation],
+            'image': row[self.questions.c.image],
+            'image_bis': row[self.questions.c.image_part]
+        }
+
+        self._aux_question_delOptionalField(d)
+
+        return d
+
+    def _multi_topic_quiz(self, quiz_type, user_id, topic_id, lang, exclude, topic_lst):
+        QUIZ_LEN = 40
+
+        # querying questions for each topic and saving to dict:
+        # topic_id : [question list], another_topic: [question list], ...
+        topic_questions = {}
+        for topic in topic_lst:
+            query = self.__getQuery(quiz_type, user_id, topic, exclude)
+            try:
+                res = self.engine.execute(query)
+            except SQLAlchemyError as e:
+                print e
+                raise QuizCoreError('Invalid parameters.')
+
+            txt_lang = self.__lang(lang)
+
+            topic_questions[topic] = []
+            for row in res:
+                topic_questions[topic].append(self.__question_data(row, txt_lang))
+            res.close()
+
+        # Manual sorting for quiz questions
+        # 40 question one by one from all the topics
+        sorted_quiz = []
+
+        questions_added = 0
+        for question_index in range(QUIZ_LEN):
+            for topic in topic_questions:
+                try:
+                    sorted_quiz.append(topic_questions[topic][question_index])
+                    questions_added += 1
+                    if questions_added == QUIZ_LEN:
+                        return sorted_quiz
+                except:
+                    pass
+
+        return sorted_quiz
+
     # Get 40 random questions from for the specified topic which are
     # not answered by the specified user.
     # Answered quiz questions are placed in the quiz_answers.
     def _getQuizQuestions(self, quiz_type, user_id, topic_id, lang, exclude, topic_lst=None):
-        query = self.__getQuery(quiz_type, user_id, topic_id, exclude, topic_lst=topic_lst)
+
+        # Multi topic quiz
+        if topic_lst is not None:
+            return self._multi_topic_quiz(quiz_type, user_id, topic_id, lang, exclude, topic_lst)
+
+        query = self.__getQuery(quiz_type, user_id, topic_id, exclude)
         try:
             res = self.engine.execute(query)
         except SQLAlchemyError as e:
             print e
             raise QuizCoreError('Invalid parameters.')
 
-        if lang == 'de':
-            txt_lang = self.questions.c.text_de
-        elif lang == 'fr':
-            txt_lang = self.questions.c.text_fr
-        else:
-            txt_lang = self.questions.c.text
+        txt_lang = self.__lang(lang)
 
         # TODO: maybe preallocate with quiz = [None] * 40?
         quiz = []
         for row in res:
-            d = {
-                'id': row[self.questions.c.id],
-                'text': row[txt_lang],
-                'answer': row[self.questions.c.answer],
-                'explanation': row[self.questions.c.explanation],
-                'image': row[self.questions.c.image],
-                'image_bis': row[self.questions.c.image_part]
-            }
-
-            self._aux_question_delOptionalField(d)
-            quiz.append(d)
+            quiz.append(self.__question_data(row, txt_lang))
         res.close()
         return quiz
 
