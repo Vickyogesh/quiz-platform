@@ -25,38 +25,81 @@
 {% set conf = user.school_config(user['account']['school_id']) %}
 
 <div class="content row">
-  {% if conf == None or conf['single'] %}
-  <div class="col-sm-4">
-    <a href="{{ url_for('.client_menu_quiz') }}">
-       <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
-    </a>
-  </div>
-  {% endif %}
-  <div class="col-sm-4">{% block exam_button %}{% endblock %}</div>
-  <div class="col-sm-4">
-    <a href="{{ url_for('.client_review') }}">
-      <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
-    </a>
-  </div>
+  <div class="col-sm-4" id="slot_1"></div>
+  <div class="col-sm-4" id="slot_2"></div>
+  <div class="col-sm-4" id="slot_3"></div>
 </div>
-{% if conf != None %}
-    <div class="content row">
-      {% if conf['mult'] %}
-      <div class="col-sm-4">
-          <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
-             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-mult.png') }}">
-          </a>
-      </div>
-      {% endif %}
-      {% if conf['ai'] %}
-      <div class="col-sm-4">
-        <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
-         <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-ai.png') }}">
+
+<div class="content row" id="second_row">
+  <div class="col-sm-4" id="slot_4"></div>
+  <div class="col-sm-4" id="slot_5"></div>
+  <div class="col-sm-4" id="slot_6"></div>
+</div>
+
+<script>
+    'use strict';
+
+    // Dynamic buttons ordering based on config stored in redis
+
+    // button templates
+    let single_quiz = `
+        <a href="{{ url_for('.client_menu_quiz') }}">
+           <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
         </a>
-      </div>
-      {% endif %}
-    </div>
-{% endif %}
+    `;
+
+    let ai_quiz = `
+        <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
+            <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-ai.png') }}">
+        </a>
+    `;
+
+    let multi_quiz = `
+        <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
+            <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-mult.png') }}">
+        </a>
+    `;
+
+    let exam_button = `
+    {% block exam_button %}{% endblock %}
+    `;
+
+    let client_review = `
+        <a href="{{ url_for('.client_review') }}">
+          <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
+        </a>
+    `;
+
+    // redis config
+    let conf = {{ conf|tojson }};
+
+    // array of buttons in specific order
+    let content = [];
+
+
+    // we are checking if redis config is not empty. if empty => we use default (single_quiz+exam+error_review)
+    if (conf == null || conf['single'])
+        content.push(single_quiz);
+    if (conf != null && conf['mult'])
+        content.push(multi_quiz);
+    if (conf != null && conf['ai'])
+        content.push(ai_quiz);
+
+    // always showed
+    content.push(exam_button);
+    content.push(client_review);
+
+    // filling html with buttons
+    for (let i = 0; i < content.length; i++){
+        window.document.getElementById("slot_"+ (i+1)).innerHTML = content[i];
+    }
+
+    // if number of buttons less then 3 we hiding second row
+    if (content.length <= 3)
+        window.document.getElementById("second_row").style.display = 'none';
+
+
+</script>
 {% endblock %}
 
 {% block footer %}
