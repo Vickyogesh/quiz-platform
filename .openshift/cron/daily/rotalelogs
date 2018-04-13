@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# $OPENSHIFT_REPO_DIR/misc/lrotate.sh
-rm $OPENSHIFT_LOG_DIR/*.log-*
-rm $OPENSHIFT_LOG_DIR/*.log.*
