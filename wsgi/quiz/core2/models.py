@@ -12,7 +12,7 @@ class Answer(db.Model):
     user_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     question_id = Column(Integer, primary_key=True, nullable=False)
-    is_correct = Column(Integer, nullable=False, server_default=text("'0'"))
+    is_correct = Column(Integer, nullable=False, default=0)
 
 
 class Application(db.Model):
@@ -37,8 +37,8 @@ class Chapter(db.Model):
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     priority = Column(Integer, nullable=False)
     text = Column(String(100), nullable=False)
-    min_id = Column(Integer, nullable=False, server_default=text("'0'"))
-    max_id = Column(Integer, nullable=False, server_default=text("'0'"))
+    min_id = Column(Integer, nullable=False, default=0)
+    max_id = Column(Integer, nullable=False, default=0)
 
 
 class ExamAnswer(db.Model):
@@ -51,7 +51,7 @@ class ExamAnswer(db.Model):
     exam_id = Column(Integer, nullable=False)
     question_id = Column(Integer, nullable=False)
     quiz_type = Column(SmallInteger, nullable=False)
-    is_correct = Column(Integer, nullable=False, server_default=text("'0'"))
+    is_correct = Column(Integer, nullable=False, default=0)
 
 
 class Exam(db.Model):
@@ -62,7 +62,7 @@ class Exam(db.Model):
     user_id = Column(Integer, nullable=False, index=True)
     start_time = Column(DateTime, nullable=False, index=True)
     end_time = Column(DateTime, index=True)
-    err_count = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    err_count = Column(SmallInteger, nullable=False, default=0)
 
 
 class GuestAcces(db.Model):
@@ -70,7 +70,7 @@ class GuestAcces(db.Model):
 
     id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
-    num_requests = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    num_requests = Column(SmallInteger, nullable=False, default=0)
     period_end = Column(DateTime, nullable=False)
 
 
@@ -80,7 +80,7 @@ class GuestAccessSnapshot(db.Model):
     guest_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     now_date = Column(Date, primary_key=True, nullable=False)
-    num_requests = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    num_requests = Column(SmallInteger, nullable=False, default=0)
 
 
 class LastSubquiz(db.Model):
@@ -114,7 +114,7 @@ class QuizAnswer(db.Model):
     user_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     question_id = Column(Integer, primary_key=True, nullable=False)
-    is_correct = Column(Integer, nullable=False, server_default=text("'0'"))
+    is_correct = Column(Integer, nullable=False, default=0)
 
 
 class SchoolStatCache(db.Model):
@@ -122,8 +122,8 @@ class SchoolStatCache(db.Model):
 
     school_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
-    last_activity = Column(DateTime, nullable=False, server_default=text("'0000-00-00 00:00:00'"))
-    last_update = Column(DateTime, nullable=False, server_default=text("'0000-00-00 00:00:00'"))
+    last_activity = Column(DateTime, nullable=False, default='0000-00-00 00:00:00')
+    last_update = Column(DateTime, nullable=False, default='0000-00-00 00:00:00')
     stat_cache = Column(Text, nullable=False)
 
 
@@ -133,10 +133,10 @@ class SchoolTopicErr(db.Model):
     school_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     topic_id = Column(Integer, primary_key=True, nullable=False)
-    err_count = Column(SmallInteger, nullable=False, server_default=text("'0'"))
-    count = Column(SmallInteger, nullable=False, server_default=text("'0'"))
-    err_week = Column(Float, nullable=False, server_default=text("'-1'"))
-    err_week3 = Column(Float, nullable=False, server_default=text("'-1'"))
+    err_count = Column(SmallInteger, nullable=False, default=0)
+    count = Column(SmallInteger, nullable=False, default=0)
+    err_week = Column(Float, nullable=False, default=-1)
+    err_week3 = Column(Float, nullable=False, default=-1)
 
 
 class SchoolTopicErrSnapshot(db.Model):
@@ -146,7 +146,7 @@ class SchoolTopicErrSnapshot(db.Model):
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     topic_id = Column(Integer, primary_key=True, nullable=False)
     now_date = Column(Date, primary_key=True, nullable=False)
-    err_percent = Column(Float, nullable=False, server_default=text("'-1'"))
+    err_percent = Column(Float, nullable=False, default=-1)
 
 
 class StatJson(db.Model):
@@ -162,8 +162,8 @@ class TopicErrCurrent(db.Model):
     user_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     topic_id = Column(Integer, primary_key=True, nullable=False)
-    err_count = Column(SmallInteger, nullable=False, server_default=text("'0'"))
-    count = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    err_count = Column(SmallInteger, nullable=False, default=0)
+    count = Column(SmallInteger, nullable=False, default=0)
 
 
 class TopicErrSnapshot(db.Model):
@@ -173,7 +173,7 @@ class TopicErrSnapshot(db.Model):
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     topic_id = Column(Integer, primary_key=True, nullable=False)
     now_date = Column(Date, primary_key=True, nullable=False)
-    err_percent = Column(Float, nullable=False, server_default=text("'-1'"))
+    err_percent = Column(Float, nullable=False, default=-1)
 
 
 class Topic(db.Model):
@@ -185,8 +185,8 @@ class Topic(db.Model):
     text_fr = Column(String(200))
     text_de = Column(String(200))
     chapter_id = Column(SmallInteger, index=True)
-    min_id = Column(Integer, nullable=False, server_default=text("'0'"))
-    max_id = Column(Integer, nullable=False, server_default=text("'0'"))
+    min_id = Column(Integer, nullable=False, default=0)
+    max_id = Column(Integer, nullable=False, default=0)
 
 
 class TruckLastSublicense(db.Model):
@@ -203,7 +203,7 @@ class UserProgressSnapshot(db.Model):
     user_id = Column(Integer, primary_key=True, nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     now_date = Column(Date, primary_key=True, nullable=False)
-    progress_coef = Column(Float, nullable=False, server_default=text("'-1'"))
+    progress_coef = Column(Float, nullable=False, default=-1)
 
 
 class User(db.Model):
@@ -213,5 +213,5 @@ class User(db.Model):
     type = Column(ENUM(u'student', u'guest'), nullable=False)
     quiz_type = Column(SmallInteger, primary_key=True, nullable=False)
     school_id = Column(Integer, primary_key=True, nullable=False)
-    last_visit = Column(DateTime, nullable=False, index=True, server_default=text("'0000-00-00 00:00:00'"))
-    progress_coef = Column(Float, nullable=False, server_default=text("'-1'"))
+    last_visit = Column(DateTime, nullable=False, index=True, default='0000-00-00 00:00:00')
+    progress_coef = Column(Float, nullable=False, default=-1)

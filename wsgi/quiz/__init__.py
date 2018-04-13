@@ -141,6 +141,7 @@ def init_app():
     from . import login
     from .api import api
     from .core2.bp import core2
+    from .core2.models import db
     from .content_manager import cm
     from .assets import assets
 
@@ -149,6 +150,7 @@ def init_app():
     app.register_blueprint(cm, url_prefix='/cm')
     app.register_blueprint(core2, url_prefix='/new')
     assets.init_app(app)
+    db.init_app(app)
     sentry = Sentry(app)
 
     from . import views
