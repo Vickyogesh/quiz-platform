@@ -45,6 +45,11 @@
                 data.id = info.id;
                 this.add(data);
             }.bind(this)).error(function(response) {
+                if (response['responseJSON']['description'] == "Already exists." ||
+                    response['responseJSON']['description'] =="Già esistente."){
+                    alert(response['responseJSON']['description']);
+                    return false
+                }
                 this.trigger("error:add", response);
             }.bind(this));
         },
