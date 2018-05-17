@@ -30,8 +30,8 @@ def _aux_prepareLists(questions, answers):
 
 
 class ExamCore(object):
-    def __init__(self):
-        pass
+    def __init__(self, meta):
+        self.meta = meta
 
 
     # Create list of exam questions.
@@ -146,18 +146,17 @@ class ExamCore(object):
         return id_list, []
 
     def __generate_idListTruck(self, quiz_type, examType):
-        exam_meta = g.quiz_meta['exam_meta']
-        questions_per_chapter = exam_meta['questions_per_chapter']
+        exam_meta = self.meta['cde']['exam_meta']
+        # FIXME: bug. probably cache issue. sometimes when change cde license - it still use old quiz meta
+        questions_per_chapter = exam_meta.get(quiz_type, exam_meta)['questions_per_chapter']
 
-        t = self.chapters
-        sql = select([t.c.min_id, t.c.max_id]).where(t.c.quiz_type==quiz_type)
-        sql = sql.order_by(t.c.id)
+        res = Chapter.query.filter_by(quiz_type=quiz_type).order_by(Chapter.id)
 
         blacklist = self.__get_blacklisted_ids(quiz_type)
         id_list = []
-        for i, row in enumerate(self.engine.execute(sql)):
-            allowed_ids = self.__filter_questions(row[t.c.min_id],
-                                                  row[t.c.max_id], blacklist)
+        for i, row in enumerate(res):
+            allowed_ids = self.__filter_questions(row.min_id,
+                                                  row.max_id, blacklist)
             lst = random.sample(allowed_ids, questions_per_chapter[i])
             id_list.extend(lst)
         return id_list, []

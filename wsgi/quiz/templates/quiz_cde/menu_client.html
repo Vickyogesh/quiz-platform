@@ -4,7 +4,7 @@
 {%- block title_prefix %}{{ _('Examination program') }}{% endblock %}
 
 {% block exam_button %}
-<a href="{{ url_for('.client_exam') }}">
+<a href="{{ url_for('core2.get_exam') }}">
    <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/b/menu-exam.png') }}">
 </a>
 {% endblock %}
