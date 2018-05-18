@@ -358,5 +358,6 @@ class ExamCore(object):
 def get_urls(session):
     urls = {'exam': url_for('core2.save_exam', id=0)[:-1],
             'back': '/ui/' + session['quiz_name'],
-            'image': '/img/'}
+            'image': '/img/',
+            'exam_review': '/ui/{}/exam_review/'.format(session['quiz_name'])}
     return urls
