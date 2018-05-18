@@ -78,3 +78,15 @@ meta = {
             }
         }
 }
+
+
+def get_quiz_meta(session):
+    quiz_meta = meta.get(session['quiz_name'])
+
+    # if exam has sublicenses
+    if quiz_meta['exam_meta'].get(session['quiz_id']):
+        # we replace title with sublicense title
+        quiz_meta['title'] = quiz_meta['title'][session['quiz_id']]
+        # and exam meta with sublicense meta
+        quiz_meta['exam_meta'] = quiz_meta['exam_meta'].get(session['quiz_id'])
+    return quiz_meta

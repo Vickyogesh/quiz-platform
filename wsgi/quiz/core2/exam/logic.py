@@ -2,7 +2,7 @@ import random
 import datetime as dt
 from sqlalchemy import select, func, and_
 from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist
-from flask import g
+from flask import g, url_for
 from ...core.exceptions import QuizCoreError
 
 
@@ -353,3 +353,10 @@ class ExamCore(object):
             questions.append(d)
 
         return {'exam': exam, 'student': student, 'questions': questions}
+
+
+def get_urls(session):
+    urls = {'exam': url_for('core2.save_exam', id=0)[:-1],
+            'back': '/ui/' + session['quiz_name'],
+            'image': '/img/'}
+    return urls
