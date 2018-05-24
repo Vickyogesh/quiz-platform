@@ -45,6 +45,11 @@
                 data.id = info.id;
                 this.add(data);
             }.bind(this)).error(function(response) {
+                if (response['responseJSON']['description'] == "Already exists." ||
+                    response['responseJSON']['description'] =="Già esistente."){
+                    alert("Nome già esistente - si prega di aggiungere qualche lettera o di utilizzare la mail");
+                    return false
+                }
                 this.trigger("error:add", response);
             }.bind(this));
         },
