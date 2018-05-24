@@ -330,6 +330,10 @@ class AccountsApi(HttpServiceProxy):
         except:
             return None
 
+    def acceptStudentCookie(self, id):
+        response = self.post('/cookie_accept/{}'.format(id))
+        return response
+
     # name, login, passwd, access=None
     def addSchool(self, **kwargs):
         """Register new school.
