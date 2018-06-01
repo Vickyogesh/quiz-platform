@@ -1,4 +1,5 @@
 from flask_babelex import lazy_gettext
+from ..quiz_rev import RevMeta
 
 meta = {
     'am':
@@ -82,7 +83,8 @@ meta = {
             'name': 'cqc',
             'title': lazy_gettext('CQC'),
             'exam_meta': {'max_errors': 6, 'total_time': 7200, 'num_questions': 60}
-        }
+        },
+    'revisioni': RevMeta()
 
 }
 

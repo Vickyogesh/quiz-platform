@@ -174,7 +174,7 @@ class ExamCore(object):
         return id_list, []
 
     def __generate_idListRev(self, quiz_type, examType):
-        exam_meta = g.quiz_meta['exam_meta']
+        exam_meta = self.meta['revisioni']['exam_meta']
         questions_per_chapter = exam_meta['questions_per_chapter']
 
         res = Chapter.query.filter_by(quiz_type=quiz_type)

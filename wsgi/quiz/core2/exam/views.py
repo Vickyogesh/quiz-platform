@@ -13,7 +13,9 @@ def get_exam():
 
     data = e.createExam(session['quiz_id'], session['user']['id'], 'it', exam_type)
 
-    return render_template("quiz_{}/exam.html".format(session['quiz_name']),
+    tpl_folder_name = session['quiz_name'] if session['quiz_name'] != 'revisioni' else 'rev'
+
+    return render_template("quiz_{}/exam.html".format(tpl_folder_name),
                            exam=data, quiz_meta=get_quiz_meta(session),
                            user={'account': session['user']},
                            urls=get_urls(session))
