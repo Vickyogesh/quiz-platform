@@ -1,6 +1,8 @@
 import random
 import datetime as dt
 from sqlalchemy import select, func, and_
+from sqlalchemy.orm import aliased
+
 from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist
 from flask import g, url_for
 from ...core.exceptions import QuizCoreError
@@ -115,15 +117,26 @@ class ExamCore(object):
         else:
             raise QuizCoreError('Unknown exam type.')
 
-        t = self.chapters
-        sql_min = select([t.c.min_id]).where(and_(
-            t.c.quiz_type == quiz_type, t.c.id == start)).as_scalar()
-        sql_max = select([t.c.max_id]).where(and_(
-            t.c.quiz_type == quiz_type, t.c.id == end)).as_scalar()
-        sql = select([sql_min, sql_max])
+        # t = self.chapters
+        # sql_min = select([t.c.min_id]).where(and_(
+        #     t.c.quiz_type == quiz_type, t.c.id == start)).as_scalar()
+        # sql_max = select([t.c.max_id]).where(and_(
+        #     t.c.quiz_type == quiz_type, t.c.id == end)).as_scalar()
+        # sql = select([sql_min, sql_max])
+        #
+        # res = self.engine.execute(sql).fetchone()
 
-        res = self.engine.execute(sql).fetchone()
-        num_questions = g.quiz_meta['exam_meta']['num_questions']
+        ch1 = aliased(Chapter)
+        ch2 = aliased(Chapter)
+
+        res = db.session.query(ch1.min_id, ch2.max_id).filter(and_(
+            ch1.quiz_type == quiz_type,
+            ch2.quiz_type == quiz_type,
+            ch1.id == start,
+            ch2.id == end
+        )).first()
+
+        num_questions = self.meta['cqc']['exam_meta']['num_questions']
 
         blacklist = self.__get_blacklisted_ids(quiz_type)
         allowed_ids = self.__filter_questions(res[0], res[1], blacklist)

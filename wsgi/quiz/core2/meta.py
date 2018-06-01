@@ -76,7 +76,14 @@ meta = {
 
                 }
             }
+        },
+    'cqc':
+        {
+            'name': 'cqc',
+            'title': lazy_gettext('CQC'),
+            'exam_meta': {'max_errors': 6, 'total_time': 7200, 'num_questions': 60}
         }
+
 }
 
 

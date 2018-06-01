@@ -9,8 +9,9 @@ e = ExamCore(meta)
 
 @core2.route("/exam", methods=['GET'])
 def get_exam():
+    exam_type = request.args.get('exam_type', None)
 
-    data = e.createExam(session['quiz_id'], session['user']['id'], 'it')
+    data = e.createExam(session['quiz_id'], session['user']['id'], 'it', exam_type)
 
     return render_template("quiz_{}/exam.html".format(session['quiz_name']),
                            exam=data, quiz_meta=get_quiz_meta(session),
