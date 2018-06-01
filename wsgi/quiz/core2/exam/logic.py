@@ -149,10 +149,9 @@ class ExamCore(object):
         blacklist = self.__get_blacklisted_ids(quiz_type)
         id_list = []
 
-        t = self.chapters
-        res = self.__stmt_ch_info.execute(quiz_type=quiz_type)
+        res = Chapter.query.filter_by(quiz_type=quiz_type)
         for row in res:
-            allowed_ids = self.__filter_questions(row[1], row[2], blacklist)
+            allowed_ids = self.__filter_questions(row.min_id, row.max_id, blacklist)
             # 3 random questions for each chapter
             vals = random.sample(allowed_ids, 3)
             id_list.extend(vals)
@@ -178,15 +177,13 @@ class ExamCore(object):
         exam_meta = g.quiz_meta['exam_meta']
         questions_per_chapter = exam_meta['questions_per_chapter']
 
-        t = self.chapters
-        sql = select([t.c.min_id, t.c.max_id]).where(t.c.quiz_type == quiz_type)
-        sql = sql.order_by(t.c.id)
+        res = Chapter.query.filter_by(quiz_type=quiz_type)
 
         blacklist = self.__get_blacklisted_ids(quiz_type)
         id_list = []
-        for i, row in enumerate(self.engine.execute(sql)):
-            allowed_ids = self.__filter_questions(row[t.c.min_id],
-                                                  row[t.c.max_id], blacklist)
+        for i, row in enumerate(res):
+            allowed_ids = self.__filter_questions(row.min_id,
+                                                  row.max_id, blacklist)
             lst = random.sample(allowed_ids, questions_per_chapter[i])
             id_list.extend(lst)
         return id_list, []
