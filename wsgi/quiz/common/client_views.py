@@ -80,7 +80,7 @@ class ClientTopicsView(ClientView):
     def page_urls(self):
         return {
             'back': url_for('.client_menu'),
-            'quiz': url_for('.client_quiz', topic=0)[:-1],
+            'quiz': url_for('core2.get_quiz', topic=0)[:-1],
             'account': ClientView.account_url()
         }
 

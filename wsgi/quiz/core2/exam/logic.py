@@ -323,6 +323,7 @@ class ExamCore(object):
 
         return wrong
 
+    # TODO rewrite
     def getExamInfo(self, exam_id, lang):
         """Exam details.
 
