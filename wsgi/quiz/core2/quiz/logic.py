@@ -52,18 +52,10 @@ class QuizCore(object):
         topic_questions = {}
         for topic in topic_lst:
             query = self.__getQuery(quiz_type, user_id, topic, exclude)
-            try:
-                res = self.engine.execute(query)
-            except SQLAlchemyError as e:
-                print e
-                raise QuizCoreError('Invalid parameters.')
-
-            txt_lang = self.__lang(lang)
 
             topic_questions[topic] = []
-            for row in res:
-                topic_questions[topic].append(self.__question_data(row, txt_lang))
-            res.close()
+            for row in query:
+                topic_questions[topic].append(self.__question_data(row))
 
         # Manual sorting for quiz questions
         # 40 question one by one from all the topics
