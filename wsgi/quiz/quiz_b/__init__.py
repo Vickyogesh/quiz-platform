@@ -14,6 +14,7 @@ quiz = Bundle(__name__, {
 # -- Common views --------------------------------------------------------------
 
 quiz.view(index.IndexView)
+quiz.view(index.VideoView)
 quiz.view(client_views.ClientQuizView)
 quiz.view(client_views.ClientReviewView)
 quiz.view(client_views.ClientExamReviewView)

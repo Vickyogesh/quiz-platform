@@ -1,10 +1,11 @@
 """
 This module implements common login feature.
 """
+import requests
 from werkzeug.exceptions import HTTPException
 from urlparse import urlparse
 from urllib import quote
-from flask import request, current_app, flash, session, redirect, url_for
+from flask import request, current_app, flash, session, redirect, url_for, abort
 from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
@@ -136,3 +137,27 @@ class IndexView(BaseView):
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
         return self.render_template(form=form, fb_autologin=fb_autologin,
                                     fb_appid=fb_appid, pass_reset=r)
+
+
+class VideoView(BaseView):
+    check_access = False
+    template_name = 'videos.html'
+    url_rule = '/videos'
+
+    def dispatch_request(self, *args, **kwargs):
+        if not session.get('user'):
+            return 'please login to get private video access'
+
+        # api call to get school private videos
+        school = request.args.get('school_id')
+        hostname = request.args.get('hostname')
+        if not school or not hostname:
+            abort(404)
+
+        print 'school and hostname %s %s' % (school, hostname)
+        r = requests.get('http://' + hostname + '/api/v1/video',
+                         params={'school_id': school})
+
+        data = r.json() if r.status_code == 200 else abort(404)
+        print(data)
+        return self.render_template(data=data)
