@@ -76,11 +76,12 @@
     // array of buttons in specific order
     let content = [];
 
+    let quiz_id = '{{ session.quiz_id|tojson }}';
 
     // we are checking if redis config is not empty. if empty => we use default (single_quiz+exam+error_review)
-    {#if (conf == null || conf['single'])#}
+    if (conf == null || conf['single'])
         content.push(single_quiz);
-    {#if (conf != null && conf['mult'])#}
+    if (conf != null && conf['mult'] && quiz_id == '50')
         content.push(multi_quiz);
     if (conf != null && conf['ai'])
         content.push(ai_quiz);
