@@ -78,9 +78,9 @@
 
 
     // we are checking if redis config is not empty. if empty => we use default (single_quiz+exam+error_review)
-    if (conf == null || conf['single'])
+    {#if (conf == null || conf['single'])#}
         content.push(single_quiz);
-    if (conf != null && conf['mult'])
+    {#if (conf != null && conf['mult'])#}
         content.push(multi_quiz);
     if (conf != null && conf['ai'])
         content.push(ai_quiz);

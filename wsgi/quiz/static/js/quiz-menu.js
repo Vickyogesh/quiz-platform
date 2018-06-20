@@ -243,11 +243,11 @@
 
         checked.each(function (i, v) {
             url = $(v).attr('data-url');
-            var t_id = $(v).attr('data-url').split('/').reverse()[0];
+            var t_id = $(v).attr('data-url').split('').reverse()[0];
             topics.push(t_id);
         });
         if (topics.length > 0){
-            window.location.href = url + "?t_lst=" + topics.join(",")
+            window.location.href = url + "&t_lst=" + topics.join(",")
         }else {
 
         }
