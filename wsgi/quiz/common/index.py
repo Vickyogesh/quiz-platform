@@ -62,7 +62,6 @@ def pass_reset(url, next_url):
     return base + '/user/pass_reset?next=' + quote(next_url)
 
 
-
 class LoginFrom(Form):
     """Login form"""
     #: Account name
@@ -135,8 +134,9 @@ class IndexView(BaseView):
 
         fb_appid = current_app.config['FACEBOOK_APP_ID']
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
+        lgimage = request.args.get('lgimage')
         return self.render_template(form=form, fb_autologin=fb_autologin,
-                                    fb_appid=fb_appid, pass_reset=r)
+                                    fb_appid=fb_appid, pass_reset=r, lgimage=lgimage)
 
 
 class VideoView(BaseView):
@@ -146,7 +146,8 @@ class VideoView(BaseView):
 
     def dispatch_request(self, *args, **kwargs):
         if not session.get('user'):
-            return 'please login to get private video access'
+            return redirect(url_for('.index', next=request.url, lgimage='image'))
+            # return '<h3>Please login to get private video access<h3>'
 
         # api call to get school private videos
         school = request.args.get('school_id')
