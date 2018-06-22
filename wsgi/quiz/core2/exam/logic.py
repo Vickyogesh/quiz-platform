@@ -4,6 +4,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.orm import aliased
 
 from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist
+from  ..meta import meta
 from flask import g, url_for
 from ...core.exceptions import QuizCoreError
 
@@ -32,7 +33,7 @@ def _aux_prepareLists(questions, answers):
 
 
 class ExamCore(object):
-    def __init__(self, meta):
+    def __init__(self):
         self.meta = meta
 
 
@@ -295,7 +296,7 @@ class ExamCore(object):
         if len(answers) != exam_answers:
             raise QuizCoreError('Wrong number of answers.')
 
-        res = ExamAnswer.query.filter_by(exam_id=exam_id)
+        res = ExamAnswer.query.filter_by(exam_id=exam_id).order_by(ExamAnswer.question_id)
         exam_questions = [row.question_id for row in res]
         questions, answers = _aux_prepareLists(questions, answers)
 

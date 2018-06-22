@@ -5,11 +5,12 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from ...core.exceptions import QuizCoreError
 
 from ..models import db, Question, QuizAnswer, Blacklist, Topic
+from  ..meta import meta
 
 
 class QuizCore(object):
 
-    def __init__(self, meta):
+    def __init__(self):
         self.meta = meta
         self.__rx = re.compile(".*Duplicate entry '\d+-\d+-(\d+)'")
 
@@ -38,6 +39,7 @@ class QuizCore(object):
             'text': row.text,
             'answer': row.answer,
             'explanation': row.explanation,
+            'topic_id': row.topic_id,
             'image': row.image,
             'image_bis': row.image_part
         }
@@ -119,15 +121,14 @@ class QuizCore(object):
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions and force:
-            ans = QuizAnswer.query.filter_by(quiz_type=quiz_type, user_id=user_id)
-            db.session.delete(ans)
+            ans = QuizAnswer.query.filter_by(quiz_type=quiz_type, user_id=user_id).delete()
             db.session.commit()
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
                                                lang, exclude, topic_lst=topic_lst)
 
         t = Topic.query.filter_by(id=topic_id, quiz_type=quiz_type).first()
 
-        return {'topic': topic_id, 'questions': questions, 'title': t.text}
+        return {'topic': topic_id, 'questions': questions, 'title': t.text if t else ''}
 
     def saveQuiz(self, quiz_type, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.

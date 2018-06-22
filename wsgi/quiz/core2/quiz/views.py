@@ -1,9 +1,9 @@
 from flask import render_template, session, request, url_for
 from ..bp import core2
 from .logic import QuizCore
-from ..meta import meta, get_quiz_meta
+from ..meta import get_quiz_meta
 
-q = QuizCore(meta)
+q = QuizCore()
 
 
 @core2.route("/quiz", methods=['GET'])

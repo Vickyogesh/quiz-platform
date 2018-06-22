@@ -1,10 +1,10 @@
 from ..bp import core2
-from flask import render_template, session, request, url_for, jsonify
+from flask import render_template, session, request, jsonify
 from .logic import ExamCore, get_urls
-from ..meta import meta, get_quiz_meta
+from ..meta import get_quiz_meta
 from flask_babelex import lazy_gettext
 
-e = ExamCore(meta)
+e = ExamCore()
 
 
 @core2.route("/exam", methods=['GET'])
