@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block styles -%} {{super()}}
+<style>
+    .grid-container {
+        display: grid;
+    }
+
+    .grid-container--fill {
+        grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
+        grid-gap: 10px;
+    }
+
+    .grid-element {
+        background-color: rgb(255, 255, 255);
+        padding: 5px;
+        color: #fff;
+        border: 1px solid #fff;
+    }
+
+    .page-content-wrapper {
+        padding: 1em;
+    }
+
+    hr {
+        margin: 10px;
+    }
+
+</style>
+
+{%- endblock %}
+
+{% block body %}
+
+{% for key, value in data.iteritems() if key != 'status' %}
+    <h3>{{ key }}</h3>
+    <hr>
+    <div class="grid-container grid-container--fill">
+        {% for each in value %}
+        <div class="grid-element">{{ each | safe }}</div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+
+
+{% endblock %}

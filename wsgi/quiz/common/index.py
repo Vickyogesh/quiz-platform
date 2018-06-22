@@ -1,10 +1,11 @@
 """
 This module implements common login feature.
 """
+import requests
 from werkzeug.exceptions import HTTPException
 from urlparse import urlparse
 from urllib import quote
-from flask import request, current_app, flash, session, redirect, url_for
+from flask import request, current_app, flash, session, redirect, url_for, abort
 from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
@@ -59,7 +60,6 @@ def pass_reset(url, next_url):
     url = urlparse(url)
     base = '%s://%s' % (url.scheme, url.netloc) if url.scheme else url.netloc
     return base + '/user/pass_reset?next=' + quote(next_url)
-
 
 
 class LoginFrom(Form):
@@ -134,5 +134,31 @@ class IndexView(BaseView):
 
         fb_appid = current_app.config['FACEBOOK_APP_ID']
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
+        lgimage = request.args.get('lgimage')
         return self.render_template(form=form, fb_autologin=fb_autologin,
-                                    fb_appid=fb_appid, pass_reset=r)
+                                    fb_appid=fb_appid, pass_reset=r, lgimage=lgimage)
+
+
+class VideoView(BaseView):
+    check_access = False
+    template_name = 'videos.html'
+    url_rule = '/videos'
+
+    def dispatch_request(self, *args, **kwargs):
+        if not session.get('user'):
+            return redirect(url_for('.index', next=request.url, lgimage='image'))
+            # return '<h3>Please login to get private video access<h3>'
+
+        # api call to get school private videos
+        school = request.args.get('school_id')
+        hostname = request.args.get('hostname')
+        if not school or not hostname:
+            abort(404)
+
+        print 'school and hostname %s %s' % (school, hostname)
+        r = requests.get('http://' + hostname + '/api/v1/video',
+                         params={'school_id': school})
+
+        data = r.json() if r.status_code == 200 else abort(404)
+        print(data)
+        return self.render_template(data=data)

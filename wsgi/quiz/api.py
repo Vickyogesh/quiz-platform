@@ -1319,3 +1319,11 @@ def stat_school_exams():
     result = stat or '{}'
     r = app.response_class(result, mimetype='application/json')
     return r
+
+
+@api.route('/accept_cookie')
+def accept_cookie():
+    student_id = current_user.account['id']
+    res = app.account.acceptStudentCookie(student_id)
+    current_user.account['cookie'] = 1
+    return dict_to_json_response({"status": res.status_code})

@@ -1,0 +1,71 @@
+
+<div class="modal fade" tabindex="-1" role="dialog" id="cookie_policy_modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Consenso trattamento dati personali (GDPR)</h4>
+      </div>
+      <div class="modal-body">
+        <p>In ottemperanza alla normativa europea sulla privacy GDPR, si rende necessario il consenso informato
+          per l'utilizzo del presente software per i seguenti punti:</p>
+            <ul>
+                <li>il sistema memorizza il vostro nome, cognome ed (opzionalmente email)
+
+                <li>il sistema registra i vostri esercizi e le statistiche, in modo da fornire a voi ed alla vostra
+                autoscuola la possibilità di valutare la preparazione negli argomenti di studio
+
+                <li>il sistema cancella automaticamente i vostri dati dopo 6 mesi di inattività
+            </ul>
+        <p>E' possibile revocare il consenso in qualsiasi momento e chiedere la cancellazione dal sistema direttamente
+            alla propria autoscuola, o scrivendo all'indirizzo
+            <a href="mailto:software@editricetoni.it">software@editricetoni.it</a></p>
+
+          <p>Per maggiori dettagli, la nostra privacy policy si trova all'indirizzo
+              <a href="http://www.editricetoni.it/cgi-bin/edtoni/varie/privacy.htm">
+                  http://www.editricetoni.it/cgi-bin/edtoni/varie/privacy.htm</a></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="decline_policy">Rifiuta</button>
+        <button type="button" class="btn btn-primary" id="accept_policy">Accetta</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+
+    let policy_accepted = {{ current_user.account.cookie|tojson }};
+
+    let gdpr_modal = $('#cookie_policy_modal');
+
+    let accepted = false;
+
+    if (!policy_accepted){
+        gdpr_modal.modal('show');
+
+        gdpr_modal.on('hidden.bs.modal', function (e) {
+            if (!accepted){
+              $("#btt-logout").trigger('click');
+            }
+        })
+
+    }
+    $("#accept_policy").click(function () {
+        $.get("{{ url_for('api.accept_cookie') }}", function(res){
+            if (res['status'] == 200){
+                accepted = true;
+                gdpr_modal.modal('hide')
+            }
+        });
+    });
+
+
+</script>
+
+
