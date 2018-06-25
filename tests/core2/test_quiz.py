@@ -51,24 +51,24 @@ class QuizTest(unittest.TestCase):
 
             self.assertEqual(0, len(answers))
 
-
-
     def test_get_multi_quiz(self):
+        quiz_list = [1, 2, 3, 5, 6, 7, 11, 50, 60, 61, 62]
         topic_list = [3, 12, 15, 22]
-        with self.app.app_context():
-            quiz = self.core.getQuiz(50, 1, 1, 'it', False, topic_lst=topic_list)
-            questions = quiz['questions']
+        for q in quiz_list:
+            with self.app.app_context():
+                quiz = self.core.getQuiz(q, 1, 1, 'it', False, topic_lst=topic_list)
+                questions = quiz['questions']
 
-            self.assertEqual(40, len(questions))
+                self.assertEqual(40, len(questions))
 
-            # checking if there different topics in questions list
-            res_topics = []
+                # checking if there different topics in questions list
+                res_topics = []
 
-            for q in questions:
-                res_topics.append(q['topic_id'])
-            res_topics = list(set(res_topics))
+                for q in questions:
+                    res_topics.append(q['topic_id'])
+                res_topics = list(set(res_topics))
 
-            self.assertEqual(len(topic_list), len(res_topics))
+                self.assertTrue(len(res_topics) >= 2)
 
 
 if __name__ == '__main__':
