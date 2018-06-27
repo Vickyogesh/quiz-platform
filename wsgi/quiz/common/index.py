@@ -155,10 +155,9 @@ class VideoView(BaseView):
         if not school or not hostname:
             abort(404)
 
-        print 'school and hostname %s %s' % (school, hostname)
         r = requests.get('http://' + hostname + '/api/v1/video',
                          params={'school_id': school})
 
         data = r.json() if r.status_code == 200 else abort(404)
         print(data)
-        return self.render_template(data=data)
+        return self.render_template(data=data, hostname=hostname)

@@ -35,7 +35,8 @@
     <hr>
     <div class="grid-container grid-container--fill">
         {% for each in value %}
-        <div class="grid-element">{{ each | safe }}</div>
+{#        <div class="grid-element">{{ each | safe }}</div>#}
+        <div class="grid-element"><video controls="" name="media" width="300"><source src="http://{{ hostname }}/content/{{ each }}.mp4" type="video/mp4"></video></div>
         {% endfor %}
     </div>
 {% endfor %}
