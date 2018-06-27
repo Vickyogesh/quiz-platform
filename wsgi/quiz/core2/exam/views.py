@@ -26,3 +26,10 @@ def save_exam(id):
     data = request.get_json(force=True)
     num_errors = e.saveExam(id, data['questions'], data['answers'], get_quiz_meta(session))
     return jsonify(num_errors=num_errors)
+
+
+@core2.route("/exam_review/<id>", methods=['GET'])
+def exam_review(id):
+    info = e.getExamInfo(id, session)
+    return render_template('common_exam_review.html', exam=info, quiz_meta=get_quiz_meta(session),
+                           urls=get_urls(session), user={'account': session['user']})

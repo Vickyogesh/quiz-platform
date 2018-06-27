@@ -3,8 +3,8 @@ import datetime as dt
 from sqlalchemy import select, func, and_
 from sqlalchemy.orm import aliased
 
-from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist
-from  ..meta import meta
+from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist, User
+from  ..meta import meta, get_quiz_meta
 from flask import g, url_for
 from ...core.exceptions import QuizCoreError
 
@@ -30,6 +30,33 @@ def _aux_prepareLists(questions, answers):
     except ValueError:
         raise QuizCoreError('Invalid value.')
     return questions, answers
+
+
+def createExamInfo(row, session):
+    start = row.start_time
+    end = row.end_time
+    errors = row.err_count
+    expired = row.start_time + dt.timedelta(hours=3) < dt.datetime.utcnow()
+
+    numerr = get_quiz_meta(session)['exam_meta']['max_errors']
+
+    if end:
+        if errors > numerr:
+            status = 'failed'
+        else:
+            status = 'passed'
+    elif expired == 1:
+        status = 'expired'
+    else:
+        status = 'in-progress'
+
+    return {
+        'id': row.id,
+        'start': str(start),
+        'end': str(end),
+        'errors': errors,
+        'status': status
+    }
 
 
 class ExamCore(object):
@@ -311,9 +338,8 @@ class ExamCore(object):
             if not is_correct:
                 wrong += 1
 
-            ans = ExamAnswer.query.filter_by(exam_id=exam_id, question_id=row.id, quiz_type=quiz_type)
+            ans = ExamAnswer.query.filter_by(exam_id=exam_id, question_id=row.id, quiz_type=quiz_type).first()
             ans.is_correct = is_correct
-
 
         exam = Exam.query.filter_by(id=exam_id)
 
@@ -325,43 +351,40 @@ class ExamCore(object):
         return wrong
 
     # TODO rewrite
-    def getExamInfo(self, exam_id, lang):
+    def getExamInfo(self, exam_id, session):
         """Exam details.
 
         Args:
             exam_id: Exam ID.
             lang: questions language.
         """
-        res = self.__getexam.execute(exam_id=exam_id).fetchone()
+
+        res = Exam.query.filter_by(id=exam_id).first()
 
         if res is None:
             raise QuizCoreError('Invalid exam ID.')
 
-        user_id = res[self.exams.c.user_id]
-        exam = self._createExamInfo(res)
-        student = self._getStudentById(user_id)
-        res = self.__examquest.execute(exam_id=exam_id)
-        q = self.questions
+        user_id = res.user_id
+        exam = createExamInfo(res, session)
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            raise QuizCoreError('Unknown student.')
+        student = {'id': user.id, 'type': user.type, 'school_id': user.school_id}
 
-        if lang == 'de':
-            txt_lang = q.c.text_de
-        elif lang == 'fr':
-            txt_lang = q.c.text_fr
-        else:
-            txt_lang = q.c.text
+        res = db.session.query(Question, ExamAnswer).join(ExamAnswer, Question.id == ExamAnswer.question_id)\
+                .filter(ExamAnswer.exam_id == exam_id).filter(Question.quiz_type == ExamAnswer.quiz_type)
 
         questions = []
         for row in res:
             d = {
-                'id': row[q.c.id],
-                'text': row[txt_lang],
-                'answer': row[q.c.answer],
-                'image': row[q.c.image],
-                'image_bis': row[q.c.image_part],
-                'explanation': row[q.c.explanation],
-                'is_correct': row[11]
+                'id': row[0].id,
+                'text': row[0].text,
+                'answer': row[0].answer,
+                'image': row[0].image,
+                'image_bis': row[0].image_part,
+                'explanation': row[0].explanation,
+                'is_correct': row[1].is_correct
             }
-            self._aux_question_delOptionalField(d)
             questions.append(d)
 
         return {'exam': exam, 'student': student, 'questions': questions}
@@ -371,5 +394,5 @@ def get_urls(session):
     urls = {'exam': url_for('core2.save_exam', id=0)[:-1],
             'back': '/ui/' + session['quiz_name'],
             'image': '/img/',
-            'exam_review': '/ui/{}/exam_review/'.format(session['quiz_name'])}
+            'exam_review': url_for('core2.exam_review', id=0)[:-1]}
     return urls
