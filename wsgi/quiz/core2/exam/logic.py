@@ -341,7 +341,7 @@ class ExamCore(object):
             ans = ExamAnswer.query.filter_by(exam_id=exam_id, question_id=row.id, quiz_type=quiz_type).first()
             ans.is_correct = is_correct
 
-        exam = Exam.query.filter_by(id=exam_id)
+        exam = Exam.query.filter_by(id=exam_id).first()
 
         exam.end_time = dt.datetime.utcnow()
         exam.err_count = wrong
