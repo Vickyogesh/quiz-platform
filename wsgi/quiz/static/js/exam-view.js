@@ -311,7 +311,7 @@
         },
 
         backToMenu: function() {
-            window.location = this.urls.back;
+            window.location = window.history.back();
         },
 
         onModelSaveError: function(response, ok_callback) {
