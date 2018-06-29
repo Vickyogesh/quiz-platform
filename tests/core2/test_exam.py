@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'wsgi'))
 
 import unittest
-from quiz.core2.models import db
+from quiz.core2.models import db, Exam
 from test_common import app, truncate_answers
 
 
@@ -59,7 +59,6 @@ class QuizTest(unittest.TestCase):
     #             exam = self.core.createExam(quiz_type, 1, 'it')
     #             self.assertTrue(len(exam['questions']) > 0)
 
-
     def test_save_exam(self):
         with self.app.app_context():
             exam = self.core.createExam(50, 1, 'it')
@@ -71,6 +70,8 @@ class QuizTest(unittest.TestCase):
             errors = self.core.saveExam(exam_id, question_ids, answers, self.meta['b'])
 
             self.assertIsNot(None, errors)
+            saved_exam = Exam.query.filter_by(id=exam_id, quiz_type=50).first()
+            self.assertIsNot(None, saved_exam.end_time)
 
 
 
