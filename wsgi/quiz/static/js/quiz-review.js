@@ -17,7 +17,7 @@
             }
 
             function back() {
-                window.location = window.history.back();
+                window.history.back();
             }
             this.msgbox.show({
                 "text": this.labels.done,
