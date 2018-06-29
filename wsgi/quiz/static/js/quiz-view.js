@@ -207,7 +207,7 @@
 
         showLoadError: function(msg, tryagain_callback) {
             function back() {
-                window.history.go(-2);
+                window.history.go(-3);
             }
             function close() {
                 this.msgbox.hide();
@@ -254,7 +254,7 @@
 
         showDone: function(show_errors) {
             function back() {
-                window.history.go(-2);
+                window.history.go(-3);
             }
             function restart() {
                 this.model.loadMoreQuestions(true);
@@ -298,7 +298,7 @@
 
         showFinish: function() {
             function back() {
-                window.history.go(-2);
+                window.history.go(-3);
             }
             function review() {
                 this.msgbox.hide();
