@@ -8,6 +8,7 @@ q = QuizCore()
 
 @core2.route("/quiz", methods=['GET'])
 def get_quiz():
+    quiz_type = request.args.get('quiz_type')
     force = request.args.get('force', False)
     topic_id = request.args.get('topic')
     topic_lst = request.args.get('t_lst')
@@ -18,8 +19,8 @@ def get_quiz():
     if topic_lst is not None:
         topic_lst = [int(t) for t in topic_lst.split(',')]
 
-    quiz = q.getQuiz(session['quiz_id'], session['user']['id'], topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
-    return render_template('common_quiz.html', quiz_meta=get_quiz_meta(session), quiz=quiz,
+    quiz = q.getQuiz(quiz_type, session['user']['id'], topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
+    return render_template('common_quiz.html', quiz_meta=get_quiz_meta(quiz_type), quiz=quiz,
                            user={'account': session['user']},
                            urls={'back': '/ui/' + session['quiz_name'], 'image': '/img/',
                                  'quiz': url_for('api.create_quiz', topic=0)[:-1]})

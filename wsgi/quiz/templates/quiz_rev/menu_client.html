@@ -2,7 +2,7 @@
 {% block content_class %}menu rev{% endblock %}
 
 {% block exam_button %}
-<a href="{{ url_for('core2.get_exam') }}">
+<a href="{{ url_for('core2.get_exam', quiz_type=g.quiz_meta.id) }}">
    <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/b/menu-exam.png') }}">
 </a>
 {% endblock %}

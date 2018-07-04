@@ -89,13 +89,18 @@ meta = {
 }
 
 
-def get_quiz_meta(session):
-    quiz_meta = meta.get(session['quiz_name'])
+def get_quiz_meta(quiz_type):
+    quiz_type = int(quiz_type)
 
-    # if exam has sublicenses
-    if quiz_meta['exam_meta'].get(session['quiz_id']):
-        # we replace title with sublicense title
-        quiz_meta['title'] = quiz_meta['title'][session['quiz_id']]
-        # and exam meta with sublicense meta
-        quiz_meta['exam_meta'] = quiz_meta['exam_meta'].get(session['quiz_id'])
-    return quiz_meta
+    if quiz_type == 2:
+        return meta['cqc']
+    elif quiz_type == 4:
+        return meta['am']
+    elif quiz_type in (1, 3, 50):
+        return meta['b']
+    elif 5 <= quiz_type <= 11:
+        return {'title': meta['cde']['title'][quiz_type], 'exam_meta': meta['cde']['exam_meta'][quiz_type]}
+    elif 60 <= quiz_type <= 66:
+        return meta['revisioni']
+    else:
+        raise Exception("Unknown quiz type")

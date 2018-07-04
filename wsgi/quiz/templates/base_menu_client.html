@@ -43,13 +43,13 @@
 
     // button templates
     let single_quiz = `
-        <a href="{{ url_for('.client_menu_quiz') }}">
+        <a href="{{ url_for('.client_menu_quiz', quiz_type=g.quiz_meta.id) }}">
            <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz.png') }}">
         </a>
     `;
 
     let ai_quiz = `
-        <a href="{{ url_for('.client_menu_quiz') }}?ai=1">
+        <a href="{{ url_for('.client_menu_quiz', ai=1) }}">
             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-ai.png') }}">
         </a>
     `;

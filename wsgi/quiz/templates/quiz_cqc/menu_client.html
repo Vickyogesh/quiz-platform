@@ -25,6 +25,6 @@
   {{ super() }}
   $("#cqcexam td").click(function(){
     var type = $(this).attr("id");
-    window.location = "{{ url_for('core2.get_exam') }}?exam_type=" + type;
+    window.location = "{{ url_for('core2.get_exam') }}?exam_type=" + type + "&quiz_type={{ g.quiz_meta.id }}";;
   });
 {% endblock %}

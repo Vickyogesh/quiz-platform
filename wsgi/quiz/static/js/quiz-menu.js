@@ -94,9 +94,14 @@
 
         quizUrl: function(topic) {
             var id = topic.get("number");
+
+            var url = this.urls.quiz;
+            url = url.replace('topic=0', 'topic='+id);
+            url = url.replace('quiz_type=0', 'quiz_type='+quiz_type);
             if (location.search.indexOf("ai=1") !== -1)
-                return this.urls.quiz + id + "?ai=1";
-            return this.urls.quiz + id;
+                url += "&ai=1";
+            console.log(url);
+            return url;
         },
 
         render: function() {
@@ -124,10 +129,12 @@
                 chapter.topics.each(function(topic, index) {
                     if (index == 0)
                         return;
-                    var params = {topic_url: this.quizUrl(topic), topic_text: topic.get("text")}
+                    var params = {topic_url: this.quizUrl(topic), topic_text: topic.get("text")};
                     rows.push(this.topic_template(params));
                 }.bind(this));
             }.bind(this));
+
+            // console.log(rows);
 
             this.$el.html(this.template({rows: rows.join("\n")}));
             return this;

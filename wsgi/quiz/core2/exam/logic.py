@@ -32,13 +32,13 @@ def _aux_prepareLists(questions, answers):
     return questions, answers
 
 
-def createExamInfo(row, session):
+def createExamInfo(row):
     start = row.start_time
     end = row.end_time
     errors = row.err_count
     expired = row.start_time + dt.timedelta(hours=3) < dt.datetime.utcnow()
 
-    numerr = get_quiz_meta(session)['exam_meta']['max_errors']
+    numerr = get_quiz_meta(row.quiz_type)['exam_meta']['max_errors']
 
     if end:
         if errors > numerr:
@@ -289,7 +289,7 @@ class ExamCore(object):
         exam = {'id': exam_id, 'expires': expires}
         return {'exam': exam, 'questions': questions}
 
-    def saveExam(self, exam_id, questions, answers, meta):
+    def saveExam(self, exam_id, questions, answers):
         """Save exam answers.
 
         Args:
@@ -317,7 +317,7 @@ class ExamCore(object):
         elif not isinstance(answers, list):
             raise QuizCoreError('Invalid value.')
 
-        meta = meta['exam_meta']
+        meta = get_quiz_meta(quiz_type)['exam_meta']
         exam_answers = meta['num_questions']
 
         if len(answers) != exam_answers:
@@ -351,7 +351,7 @@ class ExamCore(object):
         return wrong
 
     # TODO rewrite
-    def getExamInfo(self, exam_id, session):
+    def getExamInfo(self, exam_id):
         """Exam details.
 
         Args:
@@ -365,7 +365,7 @@ class ExamCore(object):
             raise QuizCoreError('Invalid exam ID.')
 
         user_id = res.user_id
-        exam = createExamInfo(res, session)
+        exam = createExamInfo(res)
         user = User.query.filter_by(id=user_id).first()
         if not user:
             raise QuizCoreError('Unknown student.')

@@ -19,6 +19,6 @@
   {{ super() }}
   $(".btn-exam td").click(function(){
     var lang = $(this).attr("id");
-    window.location = "{{ url_for('core2.get_exam') }}?lang=" + lang;
+    window.location = "{{ url_for('core2.get_exam') }}?lang=" + lang + "&quiz_type={{ g.quiz_meta.id }}";
   });
 {% endblock %}
