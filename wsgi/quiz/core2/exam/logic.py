@@ -55,7 +55,8 @@ def createExamInfo(row):
         'start': str(start),
         'end': str(end),
         'errors': errors,
-        'status': status
+        'status': status,
+        'quiz_type': row.quiz_type
     }
 
 

@@ -32,5 +32,5 @@ def save_exam(id):
 @core2.route("/exam_review/<id>", methods=['GET'])
 def exam_review(id):
     info = e.getExamInfo(id)
-    return render_template('common_exam_review.html', exam=info, quiz_meta=get_quiz_meta(session),
+    return render_template('common_exam_review.html', exam=info, quiz_meta=get_quiz_meta(info['exam']['quiz_type']),
                            urls=get_urls(session), user={'account': session['user']})
