@@ -10,10 +10,12 @@
     }
 
     .grid-element {
-        background-color: rgb(255, 255, 255);
+        {#background-color: rgb(255, 255, 255);#}
         padding: 5px;
-        color: #fff;
+        {#color: #fff;#}
         border: 1px solid #fff;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .page-content-wrapper {
@@ -36,7 +38,9 @@
     <div class="grid-container grid-container--fill">
         {% for each in value %}
 {#        <div class="grid-element">{{ each | safe }}</div>#}
-        <div class="grid-element"><video controls="" name="media" width="300"><source src="http://{{ hostname }}/content/{{ each }}.mp4" type="video/mp4"></video></div>
+{#        <div class="grid-element"><video controls="" name="media" width="300"><source src="http://{{ hostname }}/content/{{ each }}.mp4" type="video/mp4"></video></div>#}
+            <div class="grid-element"><a href="http://{{ hostname }}/videos/player/{{ each }}"><img border="0" alt="Videothumb" src="http://{{ hostname }}/static/i/videoImage.png" width="315" height="256"></a><br><div style="text-align: center; font-size: large">{{ each }}</div>
+            </div>
         {% endfor %}
     </div>
 {% endfor %}
