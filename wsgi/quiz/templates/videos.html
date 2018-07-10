@@ -39,7 +39,7 @@
         {% for each in value %}
 {#        <div class="grid-element">{{ each | safe }}</div>#}
 {#        <div class="grid-element"><video controls="" name="media" width="300"><source src="http://{{ hostname }}/content/{{ each }}.mp4" type="video/mp4"></video></div>#}
-            <div class="grid-element"><a target="_parent" href="http://{{ hostname }}/video-lezioni/player/{{ each }}"><img border="0" alt="Videothumb" src="http://{{ hostname }}/video-lezioni/images/db_by_title/{{ each }}" width="315" height="256"></a><br><div style="text-align: center; font-size: large">{{ each }}</div>
+            <div class="grid-element"><a target="_parent" href="http://{{ hostname }}/video-lezioni/player/{{ each[0] }}"><img border="0" alt="Videothumb" src="http://{{ hostname }}/video-lezioni/images/db/{{ each[0] }}" width="315" height="256"></a><br><div style="text-align: center; font-size: large">{{ each[1] }}</div>
             </div>
         {% endfor %}
     </div>
