@@ -149,6 +149,8 @@ class VideoView(BaseView):
             return redirect(url_for('.index', next=request.url, lgimage='image'))
             # return '<h3>Please login to get private video access<h3>'
 
+        print 'session', session['user']
+        print 'user_id', session['user']['id']
         # api call to get school private videos
         school = request.args.get('school_id')
         hostname = request.args.get('hostname')
@@ -160,4 +162,7 @@ class VideoView(BaseView):
 
         data = r.json() if r.status_code == 200 else abort(404)
         print(data)
-        return self.render_template(data=data, hostname=hostname)
+        student_id=session['user']['id']
+        return self.render_template(data=data,
+                                    hostname=hostname,
+                                    student_id=student_id)
