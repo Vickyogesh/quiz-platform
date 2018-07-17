@@ -100,7 +100,6 @@
             url = url.replace('quiz_type=0', 'quiz_type='+quiz_type);
             if (location.search.indexOf("ai=1") !== -1)
                 url += "&ai=1";
-            console.log(url);
             return url;
         },
 
@@ -133,8 +132,6 @@
                     rows.push(this.topic_template(params));
                 }.bind(this));
             }.bind(this));
-
-            // console.log(rows);
 
             this.$el.html(this.template({rows: rows.join("\n")}));
             return this;
@@ -250,7 +247,7 @@
 
         checked.each(function (i, v) {
             url = $(v).attr('data-url');
-            var t_id = $(v).attr('data-url').split('').reverse()[0];
+            var t_id = Aux.getUrlParameterFromUrl(url, 'topic');
             topics.push(t_id);
         });
         if (topics.length > 0){
