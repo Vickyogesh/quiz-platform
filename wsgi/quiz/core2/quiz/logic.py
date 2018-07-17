@@ -121,7 +121,7 @@ class QuizCore(object):
         # Seems all questions are answered so we make all questions
         # unanswered and generate quiz again.
         if not questions and force:
-            ans = QuizAnswer.query.filter_by(quiz_type=quiz_type, user_id=user_id).delete()
+            QuizAnswer.query.filter_by(quiz_type=quiz_type, user_id=user_id).delete()
             db.session.commit()
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
                                                lang, exclude, topic_lst=topic_lst)

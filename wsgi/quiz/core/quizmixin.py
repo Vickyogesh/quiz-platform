@@ -196,7 +196,7 @@ class QuizMixin(object):
                 t.c.quiz_type == quiz_type,
                 t.c.user_id == user_id)))
             questions = self._getQuizQuestions(quiz_type, user_id, topic_id,
-                                               lang, exclude)
+                                               lang, exclude, topic_lst=topic_lst)
 
         t = self.topics
         if lang == 'de':
