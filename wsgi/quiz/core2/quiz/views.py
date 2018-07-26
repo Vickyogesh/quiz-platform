@@ -19,6 +19,8 @@ def get_quiz():
     if topic_lst is not None:
         topic_lst = [int(t) for t in topic_lst.split(',')]
 
+    ses = session
+
     quiz = q.getQuiz(quiz_type, session['user']['id'], topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
     return render_template('common_quiz.html', quiz_meta=get_quiz_meta(quiz_type), quiz=quiz,
                            user={'account': session['user']},

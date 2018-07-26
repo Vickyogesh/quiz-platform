@@ -12,6 +12,8 @@ def get_exam():
     quiz_type = int(request.args.get('quiz_type'))
     exam_type = request.args.get('exam_type')
 
+    ses = session
+
     data = e.createExam(quiz_type, session['user']['id'], 'it', exam_type)
 
     tpl_folder_name = session['quiz_name'] if session['quiz_name'] != 'revisioni' else 'rev'
