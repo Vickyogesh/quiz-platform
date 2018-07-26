@@ -89,6 +89,22 @@ meta = {
 }
 
 
+def get_quiz_name(quiz_type):
+    quiz_type = int(quiz_type)
+
+    if quiz_type == 2:
+        return 'cqc'
+    elif quiz_type == 4:
+        return 'am'
+    elif quiz_type in (1, 3, 50):
+        return 'b'
+    elif 5 <= quiz_type <= 11:
+        return 'cde'
+    elif 60 <= quiz_type <= 66:
+        return 'revisioni'
+    else:
+        raise Exception("Unknown quiz type")
+
 def get_quiz_meta(quiz_type):
     quiz_type = int(quiz_type)
 

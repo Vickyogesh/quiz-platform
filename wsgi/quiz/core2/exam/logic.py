@@ -4,7 +4,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.orm import aliased
 
 from ..models import db, Chapter, Exam, ExamAnswer, Question, Blacklist, User
-from  ..meta import meta, get_quiz_meta
+from  ..meta import meta, get_quiz_meta, get_quiz_name
 from flask import g, url_for
 from ...core.exceptions import QuizCoreError
 
@@ -391,9 +391,9 @@ class ExamCore(object):
         return {'exam': exam, 'student': student, 'questions': questions}
 
 
-def get_urls(session):
+def get_urls(quiz_type):
     urls = {'exam': url_for('core2.save_exam', id=0)[:-1],
-            'back': '/ui/' + session['quiz_name'],
+            'back': '/ui/' + get_quiz_name(quiz_type),
             'image': '/img/',
             'exam_review': url_for('core2.exam_review', id=0)[:-1]}
     return urls
