@@ -170,6 +170,9 @@ def do_login(data, remember=False):
 
 
 def get_plain_login(login, passwd, quiz_fullname):
+    login = login.encode('utf-8')
+    passwd = passwd.encode('utf-8')
+
     nonce = app.account.get_auth().get('nonce', '')
     # for old users
     digest_old = hashlib.md5('{0}:{1}'.format(login, passwd)).hexdigest()
