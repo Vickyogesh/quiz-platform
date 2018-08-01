@@ -92,11 +92,10 @@
             Backbone.View.prototype.constructor.apply(this, arguments);
         },
 
-        quizUrl: function(topic) {
-            var id = topic.get("number");
+        quizUrl: function(topic_id) {
 
             var url = this.urls.quiz;
-            url = url.replace('topic=0', 'topic='+id);
+            url = url.replace('topic=0', 'topic='+topic_id);
             url = url.replace('quiz_type=0', 'quiz_type='+quiz_type);
             if (location.search.indexOf("ai=1") !== -1)
                 url += "&ai=1";
@@ -119,16 +118,16 @@
                 var params = {chapter_id: chapter.get("number")};
                 if (topic !== undefined) {
                     params.topic_text = topic.get("text");
-                    params.topic_url = this.quizUrl(topic)
+                    params.topic_url = this.quizUrl(topic.get("number"));
                 }
                 else
-                    params.topic_url = this.urls.quiz + params.chapter_id;
+                    params.topic_url = this.quizUrl(chapter.get("number"));
 
                 rows.push(this.ch_template(params));
                 chapter.topics.each(function(topic, index) {
                     if (index == 0)
                         return;
-                    var params = {topic_url: this.quizUrl(topic), topic_text: topic.get("text")};
+                    var params = {topic_url: this.quizUrl(topic.get("number")), topic_text: topic.get("text")};
                     rows.push(this.topic_template(params));
                 }.bind(this));
             }.bind(this));

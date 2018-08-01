@@ -1322,6 +1322,7 @@ def stat_school_exams():
 
 
 @api.route('/accept_cookie')
+@access.be_user.require()
 def accept_cookie():
     student_id = current_user.account['id']
     res = app.account.acceptStudentCookie(student_id)
