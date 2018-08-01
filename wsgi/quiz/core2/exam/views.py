@@ -1,6 +1,6 @@
 from ..bp import core2
 from flask import render_template, session, request, jsonify
-from flask_login import current_user
+from flask_login import current_user, login_required
 from .logic import ExamCore, get_urls
 from ..meta import get_quiz_meta
 from flask_babelex import lazy_gettext
@@ -9,6 +9,7 @@ e = ExamCore()
 
 
 @core2.route("/exam", methods=['GET'])
+@login_required
 def get_exam():
     quiz_type = int(request.args.get('quiz_type'))
     exam_type = request.args.get('exam_type')
@@ -24,6 +25,7 @@ def get_exam():
 
 
 @core2.route("/exam/<id>", methods=['POST'])
+@login_required
 def save_exam(id):
     data = request.get_json(force=True)
     num_errors = e.saveExam(id, data['questions'], data['answers'])
@@ -31,6 +33,7 @@ def save_exam(id):
 
 
 @core2.route("/exam_review/<id>", methods=['GET'])
+@login_required
 def exam_review(id):
     info = e.getExamInfo(id)
     return render_template('common_exam_review.html', exam=info, quiz_meta=get_quiz_meta(info['exam']['quiz_type']),

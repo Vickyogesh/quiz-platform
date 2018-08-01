@@ -2,12 +2,13 @@ from flask import render_template, session, request, url_for
 from ..bp import core2
 from .logic import QuizCore
 from ..meta import get_quiz_meta, get_quiz_name
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 q = QuizCore()
 
 
 @core2.route("/quiz", methods=['GET'])
+@login_required
 def get_quiz():
     quiz_type = request.args.get('quiz_type')
     force = request.args.get('force', False)
