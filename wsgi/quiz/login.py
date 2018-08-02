@@ -122,6 +122,7 @@ def _facebook_login(data):
 
 
 def do_login(data, remember=False):
+    data['login'] = data['login'].encode('utf-8')
     # handle facebook login
     if 'fb' in data:
         appid, (user, cookie) = _facebook_login(data)
