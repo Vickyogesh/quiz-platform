@@ -436,7 +436,7 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
 
     def render_template(self, **kwargs):
         kwargs['topics'] = self.get_topics()
-        kwargs['areas'] = areas[self.meta['id']]
+        kwargs['areas'] = areas[int(request.args.get('quiz_type'))]
         return client_views.ClientTopicsView.render_template(self, **kwargs)
 
 
