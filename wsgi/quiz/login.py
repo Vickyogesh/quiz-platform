@@ -87,7 +87,7 @@ def _validate_quiz_access(quiz_name, quiz_id, user):
 def _plain_login(data):
     try:
         nonce = data["nonce"]
-        login = data["login"]
+        login = data["login"].encode('utf-8')
         appkey = data["appid"]
         digest = data["digest"]
         digest_old = data.get("digest_old")
@@ -122,7 +122,7 @@ def _facebook_login(data):
 
 
 def do_login(data, remember=False):
-    data['login'] = data['login'].encode('utf-8')
+    data['login'] = data['login'].decode('utf-8')
     # handle facebook login
     if 'fb' in data:
         appid, (user, cookie) = _facebook_login(data)
