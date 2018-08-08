@@ -353,8 +353,9 @@ class ClientStatisticsView(ClientStatisticsBase):
         user_id = get_user_id(uid)
         quiz_type = self.meta.get('id', session['quiz_id'])
         user = session.get('user', current_user.account)
+        school_id = user.get('school_id', user['id'])
         try:
-            current_app.core.updateUserLastVisit(quiz_type, user_id, 'student', user['school_id'])
+            current_app.core.updateUserLastVisit(quiz_type, user_id, 'student', school_id)
             stat = current_app.core.getUserStat(quiz_type, user_id,
                                                 self.request_lang)
         except QuizCoreError:
