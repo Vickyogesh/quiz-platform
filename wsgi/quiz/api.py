@@ -264,6 +264,16 @@ def create_quiz(topic):
     return dict_to_json_response(quiz)
 
 
+@api.route('/quiz_by_image/<int:image>')
+@access.be_client_or_guest.require()
+@count_user_access()
+def quiz_by_image(image):
+    from .core2 import QuizCore
+    q = QuizCore()
+    quiz = q.getQuizByImage(image)
+    return dict_to_json_response(quiz)
+
+
 @api.route('/get_ai_question', methods=['POST'])
 @access.be_client_or_guest.require()
 @count_user_access()
