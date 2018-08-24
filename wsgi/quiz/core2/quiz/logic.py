@@ -130,6 +130,13 @@ class QuizCore(object):
 
         return {'topic': topic_id, 'questions': questions, 'title': t.text if t else ''}
 
+    def getQuizByImage(self, image):
+        query = Question.query.filter_by(image=image)
+        questions = []
+        for row in query:
+            questions.append(self.__question_data(row))
+        return {'image': image, 'questions': questions}
+
     def saveQuiz(self, quiz_type, user_id, topic_id, questions, answers):
         """Save quiz answers for the user.
 
