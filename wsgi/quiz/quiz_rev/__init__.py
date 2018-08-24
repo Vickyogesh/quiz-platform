@@ -66,7 +66,7 @@ def _handle_sub_quiz():
     try:
         sub_quiz = int(request.args.get('sub'))
     except (ValueError, TypeError):
-        sub_quiz = None
+        sub_quiz = 60
 
     user_type = 0
     if user.is_student or user.is_guest:
