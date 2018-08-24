@@ -330,7 +330,7 @@ def _handle_sub_license():
     try:
         sub_license = int(request.args.get('sub'))
     except (ValueError, TypeError):
-        sub_license = None
+        sub_license = 5
 
     user_type = 0
     if user.is_student or user.is_guest:
