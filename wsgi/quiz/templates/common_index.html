@@ -63,14 +63,19 @@
             <a style="margin-left: 10px" href="{{ pass_reset }}">{{ _('Password dimenticata?') }}</a>
         </div>
         <div class="form-group bottom">
-          <div class="row">
-            <div class="col-xs-6">
-              <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
+            <div class="row">
+                <div class="col-xs-6">
+                    <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
+                </div>
+                <div class="col-xs-6">
+                    <a href="{{ url_for('instagram_login') }}" class="btn btn-default" id="btt-ig"><img
+                            src="{{ url_for('.static', filename='i/instagram.png') }}">
+                        <span>{{ _('Log In') }}</span></a>
+                    <a href="#" class="btn btn-default" id="btt-fb"><img
+                            src="{{ url_for('.static', filename='i/fb-small.png') }}">
+                        <span>{{ _('Log In') }}</span></a>
+                </div>
             </div>
-            <div class="col-xs-6">
-              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> <span>{{ _('Log In') }}</span></a>
-            </div>
-          </div>
           {%- set messages = get_flashed_messages() %}
           {%- if messages %}
           <p class="text-danger"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages[0] }} </p>

@@ -25,6 +25,17 @@ def get_fb_login(fb_id, fb_auth_token, quiz_fullname):
     }
 
 
+def get_ig_login(ig_id, quiz_fullname):
+    return {
+        'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
+        'quiz_type': quiz_fullname,
+        'ig': {
+            'id': ig_id
+            # 'token': ig_auth_token
+        }
+    }
+
+
 def after_login():
     """Redirect to menu page or to the page specified in the URL query
     parameter 'next'.
@@ -108,6 +119,23 @@ class IndexView(BaseView):
         fb_autologin = request.args.get('fblogin')
         form = LoginFrom()
 
+        if request.args.get('ig_user'):
+            remember = False
+            ig_id = request.args.get('ig_user')
+            # ig_auth_token = request.args.get('ig_token')
+            data = get_ig_login(ig_id, self.quiz_fullname)
+            print(data)
+            try:
+                do_login(data, remember)
+            except HTTPException as e:
+                fb_autologin = None
+                if e.code == 403:
+                    flash(gettext('Forbidden.'))
+                else:
+                    flash(e.description)
+            else:
+                return after_login()
+
         if form.validate_on_submit():
             remember = False
             if form.is_fb.data == "1":
@@ -131,7 +159,10 @@ class IndexView(BaseView):
                     flash(e.description)
             else:
                 return after_login()
-
+        # construct redirect url for instagram to redirect after login
+        import urlparse
+        request_url = urlparse.urljoin(request.host_url, request.full_path)
+        session['request_url'] = request_url
         fb_appid = current_app.config['FACEBOOK_APP_ID']
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
         lgimage = request.args.get('lgimage')
@@ -149,8 +180,6 @@ class VideoView(BaseView):
             return redirect(url_for('.index', next=request.url, lgimage='image'))
             # return '<h3>Please login to get private video access<h3>'
 
-        print 'session', session['user']
-        print 'user_id', session['user']['id']
         # api call to get school private videos
         school = request.args.get('school_id')
         hostname = request.args.get('hostname')

@@ -1,8 +1,9 @@
 from functools import wraps
+import requests
 from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
-from flask import Blueprint, request, session, Response, redirect, abort, g, json
+from flask import Blueprint, request, session, Response, redirect, abort, g, json, url_for
 from .appcore import json_response, dict_to_json_response
 from .core.exceptions import QuizCoreError
 from . import access
@@ -165,6 +166,35 @@ def link_facebook():
     res = app.account.linkFacebookAccount(user_id)
     current_user.account['fb_id'] = user_id
     return dict_to_json_response(res)
+
+
+@api.route('/link_instagram', methods=['GET'])
+@access.be_client.require()
+@count_user_access()
+def link_instagram():
+
+    from .views import ig_api
+    r_url = request.host_url + 'instagram_callback'
+
+    url = requests.Request('GET',
+                           r_url,
+                           params=dict(id=current_user.account_id)).\
+        prepare().url
+    ig_api.redirect_uri = url
+    url = ig_api.get_authorize_url()
+    return redirect(url)
+
+
+# @api.route('/signup_instagram', methods=['POST'])
+# @access.be_client.require()
+# @count_user_access()
+# def signup_instagram():
+#     ig_code = request.json['code']
+#     print(ig_code)
+#     if not user_id:
+#         raise BadRequest('Missing Parameter')
+#
+#     return 'ig sign up'
 
 
 @api.route('/quiz/<int:topic>')
