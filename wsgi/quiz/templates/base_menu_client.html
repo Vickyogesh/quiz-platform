@@ -23,6 +23,7 @@
 
 {% block panel_content %}
 {% set conf = user.school_config(user['account']['school_id']) %}
+    {{ user.update_access(g.quiz_meta.id) }}
 
 <div class="content row">
   <div class="col-sm-4" id="slot_1"></div>

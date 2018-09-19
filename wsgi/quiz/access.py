@@ -100,6 +100,13 @@ class User(UserMixin):
     def school_config(self, s_id):
         return app.account.getSchoolConfig(s_id)
 
+    def update_access(self, quiz_type):
+        try:
+            app.core.updateUserLastVisit(quiz_type, self.account['id'], 'student', self.account['school_id'])
+        except:
+            pass
+        return ''
+
     def get_id(self):
         return self.account['login']
 
