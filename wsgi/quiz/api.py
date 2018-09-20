@@ -175,12 +175,13 @@ def link_instagram():
 
     from .views import ig_api
     r_url = request.host_url + 'instagram_callback'
-
+    print(r_url)
     url = requests.Request('GET',
                            r_url,
                            params=dict(id=current_user.account_id)).\
         prepare().url
     ig_api.redirect_uri = url
+    print(url)
     url = ig_api.get_authorize_url()
     return redirect(url)
 
