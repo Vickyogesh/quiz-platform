@@ -1,4 +1,4 @@
-import os, time, requests
+import os, time, requests, sys
 from flask import render_template, redirect, url_for, jsonify, session, request, abort, flash
 from . import app, quiz_b, quiz_cqc, quiz_am, quiz_cde, quiz_rev
 from instagram.client import InstagramAPI
@@ -60,8 +60,10 @@ def instagram_login():
 def instagram_callback():
     code = request.args.get('code')
     account_id = request.args.get('id')
-
-    print('the parameter', account_id)
+    flash(code)
+    flash(account_id)
+    flash('the parameter %s' % account_id)
+    print >> sys.stderr, code, account_id
     if code:
         access_token, user = ig_api.exchange_code_for_access_token(code)
         if not access_token:
@@ -79,6 +81,7 @@ def instagram_callback():
             redirect_url = requests.Request('GET',
                                             session['request_url'],
                                             params=dict(ig_user=user['id'])).prepare().url
+            flash(redirect_url)
             return redirect(redirect_url)
     else:
         return 'No code provided'
