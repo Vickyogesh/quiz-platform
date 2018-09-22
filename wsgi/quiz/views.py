@@ -6,7 +6,7 @@ from instagram.client import InstagramAPI
 instaConfig = {
     'client_id': os.environ.get('CLIENT_ID'),
     'client_secret': os.environ.get('CLIENT_SECRET'),
-    'redirect_uri': None
+    'redirect_uri': 'https://quiztest.editricetoni.it/instagram_callback'
 }
 ig_api = InstagramAPI(**instaConfig)
 
