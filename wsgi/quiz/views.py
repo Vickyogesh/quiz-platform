@@ -50,7 +50,7 @@ def policy():
 def instagram_login():
     r_url = request.host_url + 'instagram_callback'
     print(r_url)
-    ig_api.redirect_uri = r_url
+    ig_api.redirect_uri = 'https://quiztest.editricetoni.it/instagram_callback'
     url = ig_api.get_authorize_url()
     print(url)
     return redirect(url)

@@ -174,7 +174,7 @@ def link_facebook():
 def link_instagram():
 
     from .views import ig_api
-    r_url = request.host_url + 'instagram_callback'
+    r_url = 'https://quiztest.editricetoni.it/instagram_callback'
     print(r_url)
     url = requests.Request('GET',
                            r_url,
