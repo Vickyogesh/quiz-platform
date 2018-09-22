@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 import hashlib
 from werkzeug.exceptions import BadRequest
 from itsdangerous import BadSignature
@@ -134,8 +135,8 @@ def _instagram_login(data):
     except QuizCoreError:
         raise BadRequest('Authorization is invalid.')
 
-    app_id = app.config['INSTAGRAM_APP_ID']
-    secret = app.config['INSTAGRAM_APP_SECRET']
+    app_id = os.environ.get('CLIENT_ID')
+    secret = os.environ.get('CLIENT_SECRET')
     return appid, app.account.send_ig_auth(ig_id, 'quiz',
                                            app_id=app_id, secret=secret)
 
