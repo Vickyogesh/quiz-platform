@@ -41,7 +41,7 @@ def after_login():
     parameter 'next'.
     """
     next_url = request.args.get('next')
-
+    session.pop('_flashes', None)
     # This part if needed for integration with CMS service.
     # Later these dta will be used in exam to post to Facebook feed.
     # See ExamView.postOnFacebook() in js/exam-view.js and Exam in client.py.
@@ -122,7 +122,6 @@ class IndexView(BaseView):
         if request.args.get('ig_user'):
             remember = False
             ig_id = request.args.get('ig_user')
-            # ig_auth_token = request.args.get('ig_token')
             data = get_ig_login(ig_id, self.quiz_fullname)
             print(data)
             try:
@@ -132,7 +131,8 @@ class IndexView(BaseView):
                 if e.code == 403:
                     flash(gettext('Forbidden.'))
                 else:
-                    flash(e.description)
+                    flash(gettext('Please link your account to social network first'))
+                    return redirect(request.path, code=302)
             else:
                 return after_login()
 

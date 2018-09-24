@@ -6,10 +6,6 @@
 {% block head -%}
   {{super()}}
   {{fixes.ie8()}}
-    {%- set messages = get_flashed_messages() %}
-          {%- if messages %}
-          <p class="text-danger"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages }} </p>
-          {%- endif %}
 {% endblock %}
 
 {% block title %}{% block subtitle %}{% endblock %} &mdash;

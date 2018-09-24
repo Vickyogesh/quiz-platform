@@ -36,7 +36,10 @@
   <div class="col-sm-4" id="slot_5"></div>
   <div class="col-sm-4" id="slot_6"></div>
 </div>
-
+{%- set messages = get_flashed_messages() %}
+    {%- if messages %}
+        <p style="padding-left: 10px" class="text-success"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages[0] }} </p>
+    {%- endif %}
 <script>
     'use strict';
 

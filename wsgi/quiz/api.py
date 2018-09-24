@@ -174,28 +174,17 @@ def link_facebook():
 def link_instagram():
 
     from .views import ig_api
-    r_url = 'https://quiztest.editricetoni.it/instagram_callback'
-    print(r_url)
-    url = requests.Request('GET',
-                           r_url,
-                           params=dict(id=current_user.account_id)).\
-        prepare().url
-    ig_api.redirect_uri = url
-    print(url)
+    # r_url = request.host_url + 'instagram_callback'
+    # # r_url = 'https://quiztest.editricetoni.it/instagram_callback'
+    # print(r_url)
+    # url = requests.Request('GET',
+    #                        r_url,
+    #                        params=dict(id=current_user.account_id)).\
+    #     prepare().url
+    # ig_api.redirect_uri = url
+    # print(url)
     url = ig_api.get_authorize_url()
     return redirect(url)
-
-
-# @api.route('/signup_instagram', methods=['POST'])
-# @access.be_client.require()
-# @count_user_access()
-# def signup_instagram():
-#     ig_code = request.json['code']
-#     print(ig_code)
-#     if not user_id:
-#         raise BadRequest('Missing Parameter')
-#
-#     return 'ig sign up'
 
 
 @api.route('/quiz/<int:topic>')
