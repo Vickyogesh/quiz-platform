@@ -3,7 +3,7 @@ from flask import render_template, session, request, jsonify
 from flask_login import current_user, login_required
 from .logic import ExamCore, get_urls
 from ..meta import get_quiz_meta
-from flask_babelex import lazy_gettext
+from flask_babelex import gettext
 
 e = ExamCore()
 
@@ -18,10 +18,23 @@ def get_exam():
 
     tpl_folder_name = session['quiz_name'] if session['quiz_name'] != 'revisioni' else 'rev'
 
+    if 'fb_id' in current_user.account:
+        fb_data = {
+            'id': current_user.account['fb_id'],
+            'text': gettext('Number of errors in exam: %%(num)s'),
+            'description': 'Quiz Patente',
+            'school_title': session.get('extra_school_name'),
+            'school_link': session.get('extra_school_url'),
+            'school_logo_url': session.get('extra_school_logo_url')
+        }
+        fb_data = dict((k, v) for k, v in fb_data.iteritems() if v)
+    else:
+        fb_data = None
+
     return render_template("quiz_{}/exam.html".format(tpl_folder_name),
                            exam=data, quiz_meta=get_quiz_meta(quiz_type),
                            user={'account': current_user.account},
-                           urls=get_urls(quiz_type))
+                           urls=get_urls(quiz_type), fb_data=fb_data)
 
 
 @core2.route("/exam/<id>", methods=['POST'])
