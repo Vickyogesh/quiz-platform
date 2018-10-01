@@ -111,7 +111,7 @@
         <div class="col-sm-2"></div>
         <div class="col-sm-2">
             {% if not user.account.ig_id %}
-                <a href="{{url_for('api.link_instagram')}}" class="button"
+                <a href="{{url_for('instagram_login')}}" target="_parent" class="button"
                    id="ig-link"><span>{{ _('Connect with') }}</span> <img
                         src="{{ url_for('.static', filename='i/instagram.png') }}"></a>
             {% endif %}
