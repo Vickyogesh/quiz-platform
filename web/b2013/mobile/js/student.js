@@ -61,7 +61,7 @@ $("#page-student").bind("pageinit", function() {
               // The person is not logged into Facebook, do nothing.
               console.log("not login");
           }
-      }, {scope: 'default'});
+      }, {scope: 'publish_to_groups'});
   });
 
   $("#page-student").bind('pageshow', function() {

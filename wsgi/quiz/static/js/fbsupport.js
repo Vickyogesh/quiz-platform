@@ -15,7 +15,7 @@
             FB.login(function(response) {
                 if (response.status === 'connected')
                     saveFbId(response.authResponse.userID, callback);
-            }, {scope: 'default'});
+            }, {scope: 'publish_to_groups'});
         },
 
         post: function(data) {
