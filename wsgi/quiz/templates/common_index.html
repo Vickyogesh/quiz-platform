@@ -26,7 +26,7 @@
         else {
           $("#login-form").show();
         }
-      }, {scope: 'publish_actions'});
+      }, {scope: 'default'});
     }
   </script>
   {{ utils.fb_async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
