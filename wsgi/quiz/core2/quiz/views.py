@@ -15,15 +15,23 @@ def get_quiz():
     topic_id = request.args.get('topic')
     topic_lst = request.args.get('t_lst')
     exclude = request.args.get('exclude', None)
+    ai = request.args.get('ai', None)
 
     if exclude is not None:
         exclude = [int(x) for x in exclude.split(',')]
     if topic_lst is not None:
         topic_lst = [int(t) for t in topic_lst.split(',')]
 
-    quiz = q.getQuiz(quiz_type, current_user.account_id, topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
+    if not ai:
+        quiz = q.getQuiz(quiz_type, current_user.account_id, topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
+    else:
+        quiz = q.get_ai_quiz(quiz_type, current_user.account_id, topic_id, 'it', force, exclude=exclude, topic_lst=topic_lst)
+
     return render_template('common_quiz.html', quiz_meta=get_quiz_meta(quiz_type), quiz=quiz,
                            user={'account': current_user.account},
                            urls={'back': '/ui/' + get_quiz_name(quiz_type), 'image': '/img/',
-                                 'quiz': url_for('api.create_quiz', topic=0)[:-1]})
+                                 'quiz': url_for('api.create_quiz', topic=0)[:-1],
+                                 'ai_answer': url_for('api.post_ai_answer'),
+                                 'ai_question': url_for('api.get_ai_question'),
+                                 })
 

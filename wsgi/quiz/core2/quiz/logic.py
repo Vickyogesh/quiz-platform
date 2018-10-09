@@ -1,11 +1,13 @@
 import re
+import uuid
 from sqlalchemy import select, and_
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from ...core.exceptions import QuizCoreError
 
-from ..models import db, Question, QuizAnswer, Blacklist, Topic
+from ..models import db, Question, QuizAnswer, Blacklist, Topic, Chapter
 from  ..meta import meta
+from .ai import getAiQuestion
 
 
 class QuizCore(object):
@@ -129,6 +131,25 @@ class QuizCore(object):
         t = Topic.query.filter_by(id=topic_id, quiz_type=quiz_type).first()
 
         return {'topic': topic_id, 'questions': questions, 'title': t.text if t else ''}
+
+    def get_ai_quiz(self, quiz_type, user_id, topic_id, lang, force, exclude=None, topic_lst=None):
+        res = Topic.query.filter_by(quiz_type=quiz_type, id=topic_id).first()
+        title, chapter = res.text, res.chapter_id
+        session_id = uuid.uuid4().hex
+        num_ex = 40
+        first_question = getAiQuestion({
+            "quiz_type": quiz_type,
+            "chapter_id": chapter,
+            "topic_id": topic_id,
+            "num_ex": num_ex,
+            "quiz_session": session_id,
+            "u_id": user_id
+        })
+        return {'topic': topic_id,
+                'questions': [first_question] if first_question.get('id') else [],
+                'title': title,
+                'session_id': session_id, 'num_ex': num_ex, 'chapter': chapter,
+                "quiz_type": quiz_type}
 
     def getQuizByImage(self, image):
         query = Question.query.filter_by(image=image)
