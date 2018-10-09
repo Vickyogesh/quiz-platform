@@ -8,7 +8,6 @@ import flask_login
 instaConfig = {
     'client_id': os.environ.get('CLIENT_ID'),
     'client_secret': os.environ.get('CLIENT_SECRET'),
-    # 'redirect_uri': 'https://quiztest.editricetoni.it/instagram_callback'
     'redirect_uri': os.environ.get('REDIRECT_URI')
 }
 ig_api = InstagramAPI(**instaConfig)
@@ -40,30 +39,15 @@ def policy():
     return render_template('policy.html')
 
 
-# @app.route('/instagram_connect')
-# def instagram_connect():
-#     r_url = request.host_url + 'instagram_callback'
-#     url = requests.Request('GET', r_url, params=dict(param='arg1')).prepare().url
-#     ig_api.redirect_uri = url
-#     url = ig_api.get_authorize_url()
-#     return redirect(url)
-
-
 @app.route('/instagram_login')
 def instagram_login():
-    # r_url = request.host_url + 'instagram_callback'
-    # print(r_url)
-    # ig_api.redirect_uri = r_url
-    # ig_api.redirect_uri = 'https://quiztest.editricetoni.it/instagram_callback'
     url = ig_api.get_authorize_url()
-    print(url)
     return redirect(url)
 
 
 @app.route('/instagram_callback')
 def instagram_callback():
     code = request.args.get('code')
-    # account_id = request.args.get('id')
     if code:
         access_token, user = ig_api.exchange_code_for_access_token(code)
         if not access_token:
@@ -73,7 +57,6 @@ def instagram_callback():
         if current_user.get_id():
             res = app.account.linkInstgramAccount(user['id'])
             # TODO: what if res is not successful
-            print(res)
             current_user.account['ig_id'] = user['id']
             redirect_url = session['request_url'] + 'fmenu'
             flash(_('Your account successfully linked with Instagram'), category='success')

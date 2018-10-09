@@ -123,7 +123,6 @@ class IndexView(BaseView):
             remember = False
             ig_id = request.args.get('ig_user')
             data = get_ig_login(ig_id, self.quiz_fullname)
-            print(data)
             try:
                 do_login(data, remember)
             except HTTPException as e:
@@ -190,7 +189,6 @@ class VideoView(BaseView):
                          params={'school_id': school})
 
         data = r.json() if r.status_code == 200 else abort(404)
-        print(data)
         student_id=session['user']['id']
         return self.render_template(data=data,
                                     hostname=hostname,
