@@ -4,4 +4,5 @@
 0 3 * * * root . /root/project_env.sh; python /var/www/quiz2/misc/backupper/core.py >> /var/log/cron.log 2>&1
 0 2 * * 6 root . /root/project_env.sh; python /var/www/quiz2/misc/dbupdate.py -v -l /var/log/dbupdate.log -c /var/www/quiz2/misc/config.ini --clean --force >> /var/log/cron.log 2>&1
 0 3 * * 6 root . /root/project_env.sh; python /var/www/quiz2/manage.py stat update >> /var/log/cron.log 2>&1
+0 0 * * * root . /root/project_env.sh; python /var/www/quiz2/misc/task.py >> /var/log/cron.log 2>&1
 */5 * * * * root . /root/project_env.sh; /var/www/quiz2/misc/dbupdate >> /var/log/cron.log 2>&1
