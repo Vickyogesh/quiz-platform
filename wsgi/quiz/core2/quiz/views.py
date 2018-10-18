@@ -1,4 +1,4 @@
-from flask import render_template, session, request, url_for
+from flask import render_template, session, request, url_for, redirect
 from ..bp import core2
 from .logic import QuizCore
 from ..meta import get_quiz_meta, get_quiz_name
@@ -34,4 +34,10 @@ def get_quiz():
                                  'ai_answer': url_for('api.post_ai_answer'),
                                  'ai_question': url_for('api.get_ai_question'),
                                  })
+
+
+@core2.route("/session_clean", methods=['GET'])
+def session_clean():
+    session.clear()
+    return redirect(request.url_root)
 

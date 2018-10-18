@@ -100,7 +100,8 @@ def init_app():
         return json_response(status=400, description=error.message)
 
     def permission_denied_handler(error):
-        return json_response(status=403, description='Forbidden.')
+        return "Forbidden. <a href='https://quiz.editricetoni.it/new/session_clean'>Logout</a>"
+        # return json_response(status=403, description='Forbidden.')
 
     def sess():
         return session

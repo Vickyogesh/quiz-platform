@@ -2,7 +2,7 @@ import traceback
 import re
 from datetime import date
 from werkzeug.exceptions import HTTPException, BadRequest, default_exceptions
-from flask import Flask, json, current_app, request, Request
+from flask import Flask, json, current_app, request, Request, url_for
 from flask.ext.babelex import Babel, get_locale
 from flask_beaker import BeakerSession
 import flask_bootstrap
@@ -125,6 +125,7 @@ class Application(Flask):
                 desc = 'Unauthorized.'
             elif status == 403:
                 desc = 'Forbidden.'
+                return "Forbidden. <a href='https://quiz.editricetoni.it/new/session_clean'>Logout</a>"
             elif status == 405:
                 desc = 'Not Allowed.'
             else:
