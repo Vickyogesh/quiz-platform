@@ -36,7 +36,10 @@
   <div class="col-sm-4" id="slot_5"></div>
   <div class="col-sm-4" id="slot_6"></div>
 </div>
-
+{%- set messages = get_flashed_messages() %}
+    {%- if messages %}
+        <p style="padding-left: 10px" class="text-success"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages[0] }} </p>
+    {%- endif %}
 <script>
     'use strict';
 
@@ -104,16 +107,26 @@
 {% endblock %}
 
 {% block footer %}
-<div class="footer row">
-  <div class="col-sm-3"></div>
-  <div class="col-sm-3"><a href="{{ url_for('.client_statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
-  <div class="col-sm-3"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
-  <div class="col-sm-3">
-    {% if not user.account.fb_id %}
-    <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
-    {% endif %}
-  </div>
-</div>
+    <div class="footer row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-2">
+            {% if not user.account.ig_id %}
+                <a href="{{url_for('instagram_login')}}" target="_parent" class="button"
+                   id="ig-link"><span>{{ _('Connect with') }}</span> <img
+                        src="{{ url_for('.static', filename='i/instagram.png') }}"></a>
+            {% endif %}
+        </div>
+        <div class="col-sm-2">
+            {% if not user.account.fb_id %}
+                <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img
+                        src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+            {% endif %}
+        </div>
+        <div class="col-sm-2"><a href="{{ url_for('.client_statistics') }}" class="button"><span
+                class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
+        <div class="col-sm-2"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span
+                class="glyphicon glyphicon-log-out"></span></a></div>
+    </div>
 {% endblock %}
 
 {%- block page_script %}
@@ -124,14 +137,14 @@
       window.location = "{{ url_for('.logout') }}";
   });
 
-  {% if not user.account.fb_id %}
-    window.g.labels.fb_connect_ok = "{{ _('Your facebook account has been successfully linked!') }}";
-    window.g.labels.fb_connect_fail = "{{ _('Unable to link account with Facebook.') }}";
-    window.g.link_fb_url = "{{ url_for('api.link_facebook') }}";
-    $("#fb-link").click(function() {
-      FbAux.linkFbAccount(function() {
+    {% if not user.account.fb_id %}
+        window.g.labels.fb_connect_ok = "{{ _('Your facebook account has been successfully linked!') }}";
+        window.g.labels.fb_connect_fail = "{{ _('Unable to link account with Facebook.') }}";
+        window.g.link_fb_url = "{{ url_for('api.link_facebook') }}";
+        $("#fb-link").click(function() {
+        FbAux.linkFbAccount(function() {
         location.reload();
-      });
-    });
-  {% endif %}
+        });
+        });
+    {% endif %}
 {% endblock %}

@@ -25,12 +25,23 @@ def get_fb_login(fb_id, fb_auth_token, quiz_fullname):
     }
 
 
+def get_ig_login(ig_id, quiz_fullname):
+    return {
+        'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
+        'quiz_type': quiz_fullname,
+        'ig': {
+            'id': ig_id
+            # 'token': ig_auth_token
+        }
+    }
+
+
 def after_login():
     """Redirect to menu page or to the page specified in the URL query
     parameter 'next'.
     """
     next_url = request.args.get('next')
-
+    session.pop('_flashes', None)
     # This part if needed for integration with CMS service.
     # Later these dta will be used in exam to post to Facebook feed.
     # See ExamView.postOnFacebook() in js/exam-view.js and Exam in client.py.
@@ -108,6 +119,22 @@ class IndexView(BaseView):
         fb_autologin = request.args.get('fblogin')
         form = LoginFrom()
 
+        if request.args.get('ig_user'):
+            remember = False
+            ig_id = request.args.get('ig_user')
+            data = get_ig_login(ig_id, self.quiz_fullname)
+            try:
+                do_login(data, remember)
+            except HTTPException as e:
+                fb_autologin = None
+                if e.code == 403:
+                    flash(gettext('Forbidden.'))
+                else:
+                    flash(gettext('Please link your account to social network first'))
+                    return redirect(request.path, code=302)
+            else:
+                return after_login()
+
         if form.validate_on_submit():
             remember = False
             if form.is_fb.data == "1":
@@ -131,7 +158,10 @@ class IndexView(BaseView):
                     flash(e.description)
             else:
                 return after_login()
-
+        # construct redirect url for instagram to redirect after login
+        import urlparse
+        request_url = urlparse.urljoin(request.host_url, request.full_path)
+        session['request_url'] = request_url
         fb_appid = current_app.config['FACEBOOK_APP_ID']
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
         lgimage = request.args.get('lgimage')
@@ -149,8 +179,6 @@ class VideoView(BaseView):
             return redirect(url_for('.index', next=request.url, lgimage='image'))
             # return '<h3>Please login to get private video access<h3>'
 
-        print 'session', session['user']
-        print 'user_id', session['user']['id']
         # api call to get school private videos
         school = request.args.get('school_id')
         hostname = request.args.get('hostname')
@@ -161,7 +189,6 @@ class VideoView(BaseView):
                          params={'school_id': school})
 
         data = r.json() if r.status_code == 200 else abort(404)
-        print(data)
         student_id=session['user']['id']
         return self.render_template(data=data,
                                     hostname=hostname,

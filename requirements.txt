@@ -24,8 +24,8 @@ jmespath==0.9.3
 jsmin==2.0.11
 lockfile==0.12.2
 MarkupSafe==0.23
-MySQL-python==1.2.5
-python-daemon==1.6.1
+MySQL-python
+python-daemon==2.1.2
 python-dateutil==2.7.2
 pytz==2014.4
 raven==6.4.0
@@ -40,3 +40,4 @@ webassets==0.10.1
 Werkzeug==0.9.6
 WTForms==2.0.1
 yuicompressor==2.4.8
+urllib3==1.23

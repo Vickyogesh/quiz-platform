@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 import hashlib
 from werkzeug.exceptions import BadRequest
 from itsdangerous import BadSignature
@@ -121,12 +122,33 @@ def _facebook_login(data):
                                            app_id=app_id, secret=secret)
 
 
+def _instagram_login(data):
+    try:
+        ig_id = data['ig']['id']
+        # ig_token = data['ig']['token']
+        appkey = data['appid']
+    except KeyError:
+        raise BadRequest('Invalid parameters.')
+
+    try:
+        appid = app.core.getAppId(appkey)
+    except QuizCoreError:
+        raise BadRequest('Authorization is invalid.')
+
+    app_id = os.environ.get('CLIENT_ID')
+    secret = os.environ.get('CLIENT_SECRET')
+    return appid, app.account.send_ig_auth(ig_id, 'quiz',
+                                           app_id=app_id, secret=secret)
+
+
 def do_login(data, remember=False):
-    data['login'] = data['login'].decode('utf-8')
-    # handle facebook login
-    if 'fb' in data:
+
+    if 'fb' in data:  # handle facebook login
         appid, (user, cookie) = _facebook_login(data)
+    elif 'ig' in data:  # handle instagram login
+        appid, (user, cookie) = _instagram_login(data)
     else:
+        data['login'] = data['login'].decode('utf-8')
         appid, (user, cookie) = _plain_login(data)
         # used for remember me tocken, see access.User.get_auth_token()
         user['passwd'] = data.get('passwd')

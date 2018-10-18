@@ -1,8 +1,10 @@
 from functools import wraps
+import requests
+import os
 from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, Href
 from flask import current_app as app
-from flask import Blueprint, request, session, Response, redirect, abort, g, json
+from flask import Blueprint, request, session, Response, redirect, abort, g, json, url_for
 from .appcore import json_response, dict_to_json_response
 from .core.exceptions import QuizCoreError
 from . import access
@@ -165,6 +167,16 @@ def link_facebook():
     res = app.account.linkFacebookAccount(user_id)
     current_user.account['fb_id'] = user_id
     return dict_to_json_response(res)
+
+
+@api.route('/link_instagram', methods=['GET'])
+@access.be_client.require()
+@count_user_access()
+def link_instagram():
+    # TODO: this is not used now....rework for mobile app login if will be required
+    from .views import ig_api
+    url = ig_api.get_authorize_url()
+    return redirect(url)
 
 
 @api.route('/quiz/<int:topic>')

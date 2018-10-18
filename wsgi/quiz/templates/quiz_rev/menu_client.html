@@ -8,14 +8,25 @@
 {% endblock %}
 
 {% block footer %}
-<div class="footer row">
-  <div class="col-sm-3"><a href="{{ url_for('.sub_quiz') }}" class="button"><span class="glyphicon glyphicon-book"></span> {{ _('Change license') }}</a></div>
-  <div class="col-sm-3"><a href="{{ url_for('.client_statistics') }}" class="button"><span class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
-  <div class="col-sm-3"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span class="glyphicon glyphicon-log-out"></span></a></div>
-  <div class="col-sm-3">
-    {% if not user.account.fb_id %}
-    <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
-    {% endif %}
-  </div>
-</div>
+    <div class="footer row">
+        <div class="col-sm-2">
+            {% if not user.account.ig_id %}
+                <a href="{{ url_for('api.link_instagram') }}" class="button"
+                   id="ig-link"><span>{{ _('Connect with') }}</span> <img
+                        src="{{ url_for('.static', filename='i/instagram.png') }}"></a>
+            {% endif %}
+        </div>
+        <div class="col-sm-2">
+            {% if not user.account.fb_id %}
+                <a href="#" class="button" id="fb-link"><span>{{ _('Connect with') }}</span> <img
+                        src="{{ url_for('.static', filename='i/fb-small.png') }}"></a>
+            {% endif %}
+        </div>
+        <div class="col-sm-3"><a href="{{ url_for('.sub_quiz') }}" class="button"><span
+                class="glyphicon glyphicon-book"></span> {{ _('Change license') }}</a></div>
+        <div class="col-sm-2"><a href="{{ url_for('.client_statistics') }}" class="button"><span
+                class="glyphicon glyphicon-stats"></span> {{ _('Statistics') }}</a></div>
+        <div class="col-sm-3"><a href="#" class="button" id="btt-logout">{{ _('Log out') }} <span
+                class="glyphicon glyphicon-log-out"></span></a></div>
+    </div>
 {% endblock %}
