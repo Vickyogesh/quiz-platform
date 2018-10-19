@@ -235,6 +235,8 @@
             this.msgbox = new MessageBox({el: params.msgbox_el});
 
             Backbone.View.prototype.constructor.apply(this, arguments);
+
+            console.log(this.urls)
         },
 
         initialize: function() {
@@ -309,7 +311,7 @@
         },
 
         backToMenu: function() {
-            window.location = this.urls.back;
+            window.history.back();
         },
 
         onModelSaveError: function(response, ok_callback) {

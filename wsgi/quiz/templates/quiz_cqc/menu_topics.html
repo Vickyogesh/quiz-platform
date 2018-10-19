@@ -12,6 +12,9 @@
   <div class="topics row" id="topics">
     <div class="col-xs-4 areas"><ul></ul></div>
     <div class="col-xs-8 slides"></div>
+      {% if request.args.get("multi") %}
+          <button class="btn btn-success run-quiz" style="float: right; margin-top: 10px">Comincia esercizio</button>
+      {% endif %}
   </div>
 
   <script type="text/template" id="area-tmpl"><span><%= text %></span></script>
@@ -23,10 +26,15 @@
       </div>
     </div>
   </script>
-
-  <script type="text/template" id="chapter-tmpl">
-    <tr><td style="text-align:center"><a href="<%= topic_url %>">{{ _('Chapter') }} <%= chapter_id %></a></td></tr>
-  </script>
+  {% if request.args.get("multi") %}
+        <script type="text/template" id="chapter-tmpl">
+            <tr><td width="30%" style="text-align:right">{{ _('Chapter') }} <%= chapter_id %></td><td><input type="checkbox" class="m_topic" data-url="<%= topic_url %>"></td></tr>
+        </script>
+    {% else %}
+        <script type="text/template" id="chapter-tmpl">
+            <tr><td style="text-align:center"><a href="<%= topic_url %>">{{ _('Chapter') }} <%= chapter_id %></a></td></tr>
+        </script>
+    {% endif %}
 
 {% endblock %}
 

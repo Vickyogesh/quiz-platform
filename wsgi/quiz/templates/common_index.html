@@ -26,7 +26,7 @@
         else {
           $("#login-form").show();
         }
-      }, {scope: 'publish_actions'});
+      }, {scope: 'public_profile'});
     }
   </script>
   {{ utils.fb_async_init(fb_appid, callback='dologin' if fb_autologin else None) }}
@@ -37,9 +37,10 @@
 {% block container -%}
 <div class="contentpanel" id="login-form">
   <div class="topspace"></div>
+  {% if not lgimage %}
   <img class="startup-img"
     src="{{url_for('.static', filename='i/%s/startup.jpg' % quiz_meta.name)}}">
-
+  {% endif %}
     <div class="row">
       <div class="col-md-12">
       <form class="form" role="form" method="POST">
@@ -62,14 +63,19 @@
             <a style="margin-left: 10px" href="{{ pass_reset }}">{{ _('Password dimenticata?') }}</a>
         </div>
         <div class="form-group bottom">
-          <div class="row">
-            <div class="col-xs-6">
-              <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
+            <div class="row">
+                <div class="col-xs-3">
+                    <button type="submit" class="btn btn-primary" id="btt-plain">{{ _('Sign In') }}</button>
+                </div>
+                <div class="col-xs-9">
+{#                    <a href="{{ url_for('instagram_login') }}" class="btn btn-default" id="btt-ig"><img#}
+{#                            src="{{ url_for('.static', filename='i/instagram.png') }}">#}
+{#                        <span>{{ _('Log In') }}</span></a>#}
+                    <a href="#" class="btn btn-default" id="btt-fb"><img
+                            src="{{ url_for('.static', filename='i/fb-small.png') }}">
+                        <span>{{ _('Log In') }}</span></a>
+                </div>
             </div>
-            <div class="col-xs-6">
-              <a href="#" class="btn btn-default" id="btt-fb"><img src="{{ url_for('.static', filename='i/fb-small.png') }}"> <span>{{ _('Log In') }}</span></a>
-            </div>
-          </div>
           {%- set messages = get_flashed_messages() %}
           {%- if messages %}
           <p class="text-danger"><span class="glyphicon glyphicon-warning-sign"></span>{{ messages[0] }} </p>
@@ -97,4 +103,7 @@
       dologin(true);
     });
   </script>
+
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/iframeResizer.contentWindow.min.js') }}"></script>
 {%- endblock %}

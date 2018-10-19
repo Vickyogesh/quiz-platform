@@ -1,10 +1,11 @@
 """
 This module implements common login feature.
 """
+import requests
 from werkzeug.exceptions import HTTPException
 from urlparse import urlparse
 from urllib import quote
-from flask import request, current_app, flash, session, redirect, url_for
+from flask import request, current_app, flash, session, redirect, url_for, abort
 from flask_wtf import Form
 from flask_babelex import lazy_gettext, gettext
 from flask_login import current_user
@@ -24,12 +25,23 @@ def get_fb_login(fb_id, fb_auth_token, quiz_fullname):
     }
 
 
+def get_ig_login(ig_id, quiz_fullname):
+    return {
+        'appid': '32bfe1c505d4a2a042bafd53993f10ece3ccddca',
+        'quiz_type': quiz_fullname,
+        'ig': {
+            'id': ig_id
+            # 'token': ig_auth_token
+        }
+    }
+
+
 def after_login():
     """Redirect to menu page or to the page specified in the URL query
     parameter 'next'.
     """
     next_url = request.args.get('next')
-
+    session.pop('_flashes', None)
     # This part if needed for integration with CMS service.
     # Later these dta will be used in exam to post to Facebook feed.
     # See ExamView.postOnFacebook() in js/exam-view.js and Exam in client.py.
@@ -59,7 +71,6 @@ def pass_reset(url, next_url):
     url = urlparse(url)
     base = '%s://%s' % (url.scheme, url.netloc) if url.scheme else url.netloc
     return base + '/user/pass_reset?next=' + quote(next_url)
-
 
 
 class LoginFrom(Form):
@@ -108,6 +119,22 @@ class IndexView(BaseView):
         fb_autologin = request.args.get('fblogin')
         form = LoginFrom()
 
+        if request.args.get('ig_user'):
+            remember = False
+            ig_id = request.args.get('ig_user')
+            data = get_ig_login(ig_id, self.quiz_fullname)
+            try:
+                do_login(data, remember)
+            except HTTPException as e:
+                fb_autologin = None
+                if e.code == 403:
+                    flash(gettext('Forbidden.'))
+                else:
+                    flash(gettext('Please link your account to social network first'))
+                    return redirect(request.path, code=302)
+            else:
+                return after_login()
+
         if form.validate_on_submit():
             remember = False
             if form.is_fb.data == "1":
@@ -131,8 +158,38 @@ class IndexView(BaseView):
                     flash(e.description)
             else:
                 return after_login()
-
+        # construct redirect url for instagram to redirect after login
+        import urlparse
+        request_url = urlparse.urljoin(request.host_url, request.full_path)
+        session['request_url'] = request_url
         fb_appid = current_app.config['FACEBOOK_APP_ID']
         r = pass_reset(current_app.config['ACCOUNTS_URL'], request.url)
+        lgimage = request.args.get('lgimage')
         return self.render_template(form=form, fb_autologin=fb_autologin,
-                                    fb_appid=fb_appid, pass_reset=r)
+                                    fb_appid=fb_appid, pass_reset=r, lgimage=lgimage)
+
+
+class VideoView(BaseView):
+    check_access = False
+    template_name = 'videos.html'
+    url_rule = '/videos'
+
+    def dispatch_request(self, *args, **kwargs):
+        if not session.get('user'):
+            return redirect(url_for('.index', next=request.url, lgimage='image'))
+            # return '<h3>Please login to get private video access<h3>'
+
+        # api call to get school private videos
+        school = request.args.get('school_id')
+        hostname = request.args.get('hostname')
+        if not school or not hostname:
+            abort(404)
+
+        r = requests.get('http://' + hostname + '/api/v1/video',
+                         params={'school_id': school})
+
+        data = r.json() if r.status_code == 200 else abort(404)
+        student_id=session['user']['id']
+        return self.render_template(data=data,
+                                    hostname=hostname,
+                                    student_id=student_id)

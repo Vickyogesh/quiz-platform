@@ -301,6 +301,32 @@ class AccountsApi(HttpServiceProxy):
         del data['status']
         return data, self._session_cookie
 
+    def send_ig_auth(self, id, caller_service, app_id=None, secret=None):
+        """Send auth info to the Accounts Service.
+
+        Args: accounts service auth args.
+
+        Returns: tuple with account info and session cookie.
+
+        Raises: werkzeug's exception respective to status code.
+        """
+        hdr = 'QAuth igid="{0}"'
+        hdr = hdr.format(id)
+
+        if app_id is not None and secret is not None:
+            hdr += ', appid="%s", secret="%s"' % (app_id, secret)
+
+        hdr = {'Authenticate': hdr}
+
+        if caller_service is not None:
+            hdr['X-Account-Service'] = caller_service
+
+        response = self.post('/login', headers=hdr)
+        _check_json_response_status(response)
+        data = response.json()
+        del data['status']
+        return data, self._session_cookie
+
     def login(self, login, passwd, caller_service):
         """Login to the Accounts Service."""
         info = self.get_auth()
@@ -480,5 +506,10 @@ class AccountsApi(HttpServiceProxy):
 
     def linkFacebookAccount(self, user_id):
         response = self.post('/link_facebook', data={'userId': user_id})
+        _check_json_response_status(response)
+        return response.json()
+
+    def linkInstgramAccount(self, user_id):
+        response = self.post('/link_instagram', data={'userId': user_id})
         _check_json_response_status(response)
         return response.json()

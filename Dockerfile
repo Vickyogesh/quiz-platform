@@ -7,8 +7,8 @@ ENV DOCKER_STATE prod
 RUN apt-get update && apt-get install -y \
     python-pip python-dev gunicorn mysql-client \
     nginx supervisor python-mysqldb libmysqlclient-dev \
-    openjdk-8-jre unzip logrotate cron
-RUN pip install --upgrade pip && pip install --upgrade setuptools
+    openjdk-8-jre unzip logrotate cron git
+RUN pip install --upgrade setuptools
 # Making dirs
 RUN mkdir -p /var/www/quiz2/data/quiz/img
 RUN mkdir -p /var/www/quiz2/data/sessions/data
@@ -17,6 +17,7 @@ RUN mkdir -p /var/www/quiz2/data/files
 
 COPY requirements.txt /var/www/quiz2/requirements.txt
 RUN pip install -r /var/www/quiz2/requirements.txt
+RUN pip install -e git+git://github.com/vgavro/python-instagram.git@master#egg=python_instagram
 COPY nginx/app_nginx/flask.conf /etc/nginx/sites-available/
 COPY nginx/app_nginx/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY nginx/app_nginx/logrotate /etc/logrotate.d/nginx

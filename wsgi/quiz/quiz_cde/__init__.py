@@ -330,7 +330,7 @@ def _handle_sub_license():
     try:
         sub_license = int(request.args.get('sub'))
     except (ValueError, TypeError):
-        sub_license = None
+        sub_license = 5
 
     user_type = 0
     if user.is_student or user.is_guest:
@@ -436,7 +436,7 @@ class ClientMenuQuiz(client_views.ClientTopicsView):
 
     def render_template(self, **kwargs):
         kwargs['topics'] = self.get_topics()
-        kwargs['areas'] = areas[self.meta['id']]
+        kwargs['areas'] = areas[int(request.args.get('quiz_type'))]
         return client_views.ClientTopicsView.render_template(self, **kwargs)
 
 

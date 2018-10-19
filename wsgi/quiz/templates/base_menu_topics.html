@@ -17,6 +17,7 @@
 {% endblock %}
 
 {% block script_include %}
+    <script>var quiz_type = '{{ g.quiz_meta.id }}';</script>
   {{ super() }}
   {% assets "bb.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>

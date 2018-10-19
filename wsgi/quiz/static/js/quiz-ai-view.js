@@ -209,7 +209,7 @@
 
         showLoadError: function(msg, tryagain_callback) {
             function back() {
-                window.location = this.urls.back;
+                window.history.go(-2);
             }
             function close() {
                 this.msgbox.hide();
@@ -256,7 +256,7 @@
 
         showDone: function(show_errors) {
             function back() {
-                window.location = this.urls.back;
+                window.history.go(-2);
             }
             function restart() {
                 this.model.loadAiQuestion();
@@ -300,7 +300,7 @@
 
         showFinish: function() {
             function back() {
-                window.location = this.urls.back;
+                window.history.go(-2);
             }
             function review() {
                 this.msgbox.hide();

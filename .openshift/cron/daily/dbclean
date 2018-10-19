@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source $OPENSHIFT_PYTHON_DIR/virtenv/bin/activate
-python $OPENSHIFT_REPO_DIR/misc/dbupdate.py -v -l $OPENSHIFT_LOG_DIR/dbupdate.log -c $OPENSHIFT_REPO_DIR/misc/config.ini --clean --force
-python $OPENSHIFT_REPO_DIR/manage.py stat update

@@ -100,7 +100,8 @@ def init_app():
         return json_response(status=400, description=error.message)
 
     def permission_denied_handler(error):
-        return json_response(status=403, description='Forbidden.')
+        return "Forbidden. <a href='https://quiz.editricetoni.it/new/session_clean'>Logout</a>"
+        # return json_response(status=403, description='Forbidden.')
 
     def sess():
         return session
@@ -140,13 +141,17 @@ def init_app():
     from . import access
     from . import login
     from .api import api
+    from .core2.bp import core2
+    from .core2.models import db
     from .content_manager import cm
     from .assets import assets
 
     app.register_blueprint(login.login_api, url_prefix='/v1')
     app.register_blueprint(api, url_prefix='/v1')
     app.register_blueprint(cm, url_prefix='/cm')
+    app.register_blueprint(core2, url_prefix='/new')
     assets.init_app(app)
+    db.init_app(app)
     sentry = Sentry(app)
 
     from . import views

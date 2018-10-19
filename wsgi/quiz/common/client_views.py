@@ -80,7 +80,7 @@ class ClientTopicsView(ClientView):
     def page_urls(self):
         return {
             'back': url_for('.client_menu'),
-            'quiz': url_for('.client_quiz', topic=0)[:-1],
+            'quiz': url_for('core2.get_quiz', quiz_type=0, topic=0),
             'account': ClientView.account_url()
         }
 
@@ -351,8 +351,12 @@ class ClientStatisticsView(ClientStatisticsBase):
 
     def dispatch_request(self, uid):
         user_id = get_user_id(uid)
+        quiz_type = self.meta.get('id', session['quiz_id'])
+        user = session.get('user', current_user.account)
+        school_id = user.get('school_id', user['id'])
         try:
-            stat = current_app.core.getUserStat(self.meta['id'], user_id,
+            current_app.core.updateUserLastVisit(quiz_type, user_id, 'student', school_id)
+            stat = current_app.core.getUserStat(quiz_type, user_id,
                                                 self.request_lang)
         except QuizCoreError:
             stat = None
