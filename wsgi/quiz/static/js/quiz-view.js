@@ -254,7 +254,8 @@
 
         showDone: function(show_errors) {
             function back() {
-                window.history.go(-3);
+                window.console.log('back2');
+                // window.history.go(-3);
             }
             function restart() {
                 this.model.loadMoreQuestions(true);
@@ -298,7 +299,11 @@
 
         showFinish: function() {
             function back() {
-                window.history.go(-3);
+                if (window.location.href.indexOf("/review") !== -1){
+                    window.history.go(-2);
+                }else {
+                    window.history.go(-3);
+                }
             }
             function review() {
                 this.msgbox.hide();
