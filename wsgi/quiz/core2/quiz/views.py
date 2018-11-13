@@ -29,7 +29,7 @@ def get_quiz():
 
     return render_template('common_quiz.html', quiz_meta=get_quiz_meta(quiz_type), quiz=quiz,
                            user={'account': current_user.account},
-                           urls={'back': '/ui/' + get_quiz_name(quiz_type), 'image': '/img/',
+                           urls={'back': '/ui/' + get_quiz_name(quiz_type) + '/fmenu', 'image': '/img/',
                                  'quiz': url_for('api.create_quiz', topic=0)[:-1],
                                  'ai_answer': url_for('api.post_ai_answer'),
                                  'ai_question': url_for('api.get_ai_question'),

@@ -393,7 +393,7 @@ class ExamCore(object):
 
 def get_urls(quiz_type):
     urls = {'exam': url_for('core2.save_exam', id=0)[:-1],
-            'back': '/ui/' + get_quiz_name(quiz_type),
+            'back': '/ui/' + get_quiz_name(quiz_type) + '/fmenu',
             'image': '/img/',
             'exam_review': url_for('core2.exam_review', id=0)[:-1]}
     return urls
