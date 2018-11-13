@@ -339,8 +339,8 @@ class ExamCore(object):
             if not is_correct:
                 wrong += 1
 
-            ans = ExamAnswer.query.filter_by(exam_id=exam_id, question_id=row.id, quiz_type=quiz_type).first()
-            ans.is_correct = is_correct
+            ans = ExamAnswer.query.filter_by(exam_id=exam_id, question_id=row.id, quiz_type=quiz_type)\
+                .update({"is_correct": is_correct})
 
         exam = Exam.query.filter_by(id=exam_id).first()
 
