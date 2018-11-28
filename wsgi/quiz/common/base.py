@@ -258,7 +258,9 @@ class Bundle(object):
         @self.route('/logout', methods=['GET', 'POST'])
         def logout():
             access.logout()
-            return redirect(url_for('.index'))
+            return redirect(url_for('.index',
+                                    _scheme='https',
+                                    _external=True))
 
         from .client_views import ClientFullscreenView
         self.view(ClientFullscreenView)
