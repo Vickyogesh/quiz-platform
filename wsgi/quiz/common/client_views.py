@@ -52,7 +52,7 @@ class ClientFullscreenView(ClientView):
 
     def dispatch_request(self, *args, **kwargs):
         if ClientFullscreenView.is_mobile():
-            return redirect(url_for('.client_menu'))
+            return redirect(url_for('.client_menu', _scheme='https', _external=True))
         else:
             return self.render_template()
 
