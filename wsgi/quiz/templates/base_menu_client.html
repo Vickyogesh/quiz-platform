@@ -131,9 +131,9 @@
 
 {%- block page_script %}
   $("#btt-logout").click(function() {
-    if (parent.logout !== undefined)
-      parent.logout();
-    else
+{#    if (parent.logout !== undefined)#}
+{#      parent.logout();#}
+{#    else#}
       window.location = "{{ url_for('.logout') }}";
   });
 
