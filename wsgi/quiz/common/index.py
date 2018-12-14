@@ -54,7 +54,9 @@ def after_login():
         session['extra_school_logo_url'] = extra_school_logo_url
 
     if next_url is not None:
-        return redirect(next_url)
+        from urlparse import urljoin
+        u = urljoin(request.host_url, next_url)
+        return redirect(u)
     else:
         # Maybe there will be fullscreen version for schools.
         # So comments are just a reminders how to implement.
