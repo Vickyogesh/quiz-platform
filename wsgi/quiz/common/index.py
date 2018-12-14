@@ -4,6 +4,7 @@ This module implements common login feature.
 import requests
 from werkzeug.exceptions import HTTPException
 from urlparse import urlparse
+from urlparse import urljoin
 from urllib import quote
 from flask import request, current_app, flash, session, redirect, url_for, abort
 from flask_wtf import Form
@@ -54,7 +55,6 @@ def after_login():
         session['extra_school_logo_url'] = extra_school_logo_url
 
     if next_url is not None:
-        from urlparse import urljoin
         u = urljoin(request.host_url, next_url)
         return redirect(u)
     else:
