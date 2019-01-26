@@ -53,13 +53,13 @@
     `;
 
     let ai_quiz = `
-        <a href="{{ url_for('.client_menu_quiz', ai=1) }}">
+        <a href="{{ url_for('.client_menu_quiz', quiz_type=g.quiz_meta.id, ai=1) }}">
             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-ai.png') }}">
         </a>
     `;
 
     let multi_quiz = `
-        <a href="{{ url_for('.client_menu_quiz') }}?multi=1">
+        <a href="{{ url_for('.client_menu_quiz', quiz_type=g.quiz_meta.id, multi=1) }}">
             <img style="border: 0;" id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-quiz-mult.png') }}">
         </a>
     `;
@@ -69,7 +69,7 @@
     `;
 
     let client_review = `
-        <a href="{{ url_for('.client_review') }}">
+        <a href="{{ url_for('.client_review', quiz_type=g.quiz_meta.id) }}">
           <img id="quiz" class="btn-menu" src="{{ url_for('.static', filename='i/menu-review.png') }}">
         </a>
     `;
@@ -83,7 +83,7 @@
     // we are checking if redis config is not empty. if empty => we use default (single_quiz+exam+error_review)
     if (conf == null || conf['single'])
         content.push(single_quiz);
-    if (conf != null && conf['mult'])
+    {#if (conf != null && conf['mult'])#}
         content.push(multi_quiz);
     if (conf != null && conf['ai'])
         content.push(ai_quiz);
